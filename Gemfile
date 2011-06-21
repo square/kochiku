@@ -22,6 +22,7 @@ group :development do
 end
 
 group :test, :development do
+  gem 'autotest'
   gem 'rspec-rails'
 end
 

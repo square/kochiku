@@ -1,7 +1,7 @@
 class Build < ActiveRecord::Base
   has_many :build_parts
   has_many :build_part_results, :through => :build_parts
-  symbolize :state, :in => [:preparing]#, runnable, enqueued, failed, succeeded
+  symbolize :state, :in => [:partitioning]#, runnable, enqueued, failed, succeeded
   symbolize :queue
 
 

@@ -9,6 +9,7 @@ GEM
   remote: http://mirrors.squareup.com/rubygems/
   specs:
     SystemTimer (1.2.3)
+    ZenTest (4.5.0)
     abstract (1.0.0)
     actionmailer (3.0.9)
       actionpack (= 3.0.9)
@@ -37,6 +38,8 @@ GEM
       activesupport (= 3.0.9)
     activesupport (3.0.9)
     arel (2.0.10)
+    autotest (4.4.6)
+      ZenTest (>= 4.4.1)
     builder (2.1.2)
     columnize (0.3.2)
     diff-lcs (1.1.2)
@@ -129,6 +132,7 @@ PLATFORMS
 
 DEPENDENCIES
   SystemTimer
+  autotest
   haml
   haml-rails
   mysql2 (>= 0.2, < 0.3)
