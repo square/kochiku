@@ -7,7 +7,17 @@ class JobBase
   end
 
   def self.perform(*args)
-    new(*args).perform
+    job = new(*args)
+    job.perform
+  rescue => e
+    if job
+      job.on_exception(e)
+    else
+      raise e
+    end
   end
 
+  def on_exception(e)
+    raise e
+  end
 end

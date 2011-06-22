@@ -24,4 +24,9 @@ class BuildPartitioningJob < JobBase
       @build.enqueue
     end
   end
+
+  def on_exception(e)
+    @build.error!
+    raise e
+  end
 end
