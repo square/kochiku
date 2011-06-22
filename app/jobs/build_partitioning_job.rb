@@ -21,7 +21,6 @@ class BuildPartitioningJob < JobBase
       build_info = YAML.load_file("#{dir}/config/ci/build.yml")
 
       @build.partition(build_info.values)
-      @build.enqueue
     end
   end
 

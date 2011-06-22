@@ -1,5 +1,5 @@
 class JobBase
-  def self.enqueue_in(build_queue, *args)
+  def self.enqueue_on(build_queue, *args)
     Resque::Job.create(build_queue, self, *args)
     Resque::Plugin.after_enqueue_hooks(self).each do |hook|
       klass.send(hook, *args)

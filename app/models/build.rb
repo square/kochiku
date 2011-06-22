@@ -5,23 +5,19 @@ class Build < ActiveRecord::Base
   symbolize :queue
   validates_presence_of :queue
 
-  after_create :enqueue_partitioning
+  after_create :enqueue_partitioning_job
 
-  def partition(parts)
-    parts.each do |part|
-      build_parts.create!(:kind => part['type'], :paths => part['files'])
-    end
+  def self.build_sha!(attributes)
+    Build.create!(attributes.merge(:state => :partitioning))
   end
 
-  def enqueue_partitioning
+  def enqueue_partitioning_job
     Resque.enqueue(BuildPartitioningJob, self.id)
   end
 
-  def enqueue
-    update_attribute(:state, :runnable)
-    build_parts.each do |build_part|
-      BuildPartJob.enqueue_in(queue, build_part.id)
-    end
+  def partition(parts)
+      update_attributes(:state => :runnable)
+      parts.each { |part| build_parts.create!(:kind => part['type'], :paths => part['files']) }
   end
 
   def started_at
@@ -31,5 +27,4 @@ class Build < ActiveRecord::Base
   def finished_at
 #    build_part_results.all.sort_by(&:finished_at).last
   end
-
 end

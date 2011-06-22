@@ -5,7 +5,7 @@ class BuildsController < ApplicationController
   end
 
   def create
-    Build.create!({:state => :partitioning}.merge(params[:build]))
+    Build.build_sha!(params[:build])
     head :ok
   end
 end

@@ -23,6 +23,7 @@ end
 
 group :test, :development do
   gem 'autotest'
+  gem 'autotest-fsevent'
   gem 'rspec-rails'
 end
 
