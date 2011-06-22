@@ -1,4 +1,7 @@
 Kochiku::Application.routes.draw do
+  root :to => "builds#index"
+
+  mount Resque::Server.new, :at => '/resque'
 
   resources :builds
   # The priority is based upon order of creation:
