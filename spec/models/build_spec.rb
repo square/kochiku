@@ -20,5 +20,11 @@ describe Build do
       BuildPartJob.should_receive(:enqueue_on).twice
       build.partition(parts)
     end
+
+    it "rolls back any changes to the database if an error occurs" do
+      build.stub(:build_parts).and_raise(ActiveRecord::Rollback)
+
+      expect { build.partition(parts) }.to_not change { build.reload.state }
+    end
   end
 end

@@ -16,8 +16,10 @@ class Build < ActiveRecord::Base
   end
 
   def partition(parts)
+    transaction do
       update_attributes(:state => :runnable)
       parts.each { |part| build_parts.create!(:kind => part['type'], :paths => part['files']) }
+    end
   end
 
   def started_at
