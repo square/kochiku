@@ -1,7 +1,6 @@
 class BuildsController < ApplicationController
   def create
-    build = Build.create!({:state => :partitioning}.merge(params[:build]))
-    Resque.enqueue(BuildPartitioningJob, build.id)
+    Build.create!({:state => :partitioning}.merge(params[:build]))
     head :ok
   end
 end

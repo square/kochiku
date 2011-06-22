@@ -3,11 +3,18 @@ class Build < ActiveRecord::Base
   has_many :build_part_results, :through => :build_parts
   symbolize :state, :in => [:partitioning, :runnable, :running, :failed, :succeeded]
   symbolize :queue
+  validates_presence_of :queue
+
+  after_create :enqueue_partitioning
 
   def partition(parts)
     parts.each do |part|
       build_parts.create!(:kind => part['type'], :paths => part['files'])
     end
+  end
+
+  def enqueue_partitioning
+    Resque.enqueue(BuildPartitioningJob, self.id)
   end
 
   def enqueue
