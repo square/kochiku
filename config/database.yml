@@ -15,3 +15,12 @@ development: &defaults
 test: &TEST
   <<: *defaults
   database: kochiku_test
+
+production:
+  adapter: mysql2
+  encoding: utf8
+  reconnect: true
+  username: root
+  password:
+  database: kochiku_production
+  host: macbuild-master.sfo.squareup.com
