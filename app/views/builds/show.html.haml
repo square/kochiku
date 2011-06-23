@@ -1,0 +1,20 @@
+%h1= @build.sha
+%h2= @build.state
+
+%table
+  %tr
+    %th Result
+    %th Id
+    %th Kind
+    %th Elapsed Time
+  - @build.build_parts.each do |part|
+    %tr
+      %td= part.status
+      %td= part.id
+      %td= part.kind
+      %td= "x"
+
+
+%hr
+=  @build.inspect
+

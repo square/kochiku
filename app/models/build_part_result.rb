@@ -3,4 +3,8 @@ class BuildPartResult < ActiveRecord::Base
   belongs_to :build_part
 
   symbolize :result, :in => [:passed, :failed, :error]
+
+  scope :failed, where(:result => 'failed')
+  scope :passed, where(:result => 'passed')
+
 end
