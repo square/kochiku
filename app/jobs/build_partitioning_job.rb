@@ -14,9 +14,4 @@ class BuildPartitioningJob < JobBase
     end
 
   end
-
-  def on_exception(e)
-    @build.error!
-    raise e
-  end
 end
