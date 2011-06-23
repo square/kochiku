@@ -1,6 +1,4 @@
 class BuildPartJob < JobBase
-  WORKING_DIR="#{Rails.root}/tmp/build-partition"
-
   attr_reader :build_part, :build
 
   def initialize(build_part_id)
@@ -9,38 +7,18 @@ class BuildPartJob < JobBase
   end
 
   def perform
-    tmp_dir_for(build.sha) do |working_directory|
+    GitRepo.inside_copy('web-cache', build.sha) do
       # TODO:
       # collect stdout, stderr, and any logs
-      if tests_green?(working_directory)
-        build_part.build_part_results.create(:result => :passed)
-      else
-        build_part.build_part_results.create(:result => :failed)
-      end
+      result = tests_green? ? :passed : :failed
+      build_part.build_part_results.create(:result => result)
     end
   end
 
-  # TODO: refactor me. DRY.
-  def tmp_dir_for(sha)
-    # update local repo
-    `cd #{WORKING_DIR}/web-cache && git fetch`
-
-    Dir.mktmpdir(nil, WORKING_DIR) do |dir|
-      # clone local repo (fast!)
-      `cd #{dir} && git clone #{WORKING_DIR}/web-cache .`
-
-      # checkout
-      `cd #{dir} && git co #{sha}`
-
-      yield(dir)
-    end
-  end
-
-  def tests_green?(working_directory)
-    ENV["TEST_RUNNER"] = build.kind
+  def tests_green?
+    ENV["TEST_RUNNER"] = build_part.kind
     ENV["RUN_LIST"] = build_part.paths.join(",")
-    `cd #{working_directory} && script/ci worker`
-    $? == 0
+    system('script/ci worker') == 0
   end
 
 end

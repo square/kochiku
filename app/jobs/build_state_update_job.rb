@@ -1,4 +1,6 @@
 class BuildStateUpdateJob < JobBase
+  @queue = :high
+
   def initialize(build_id)
     @build_id = build_id
   end

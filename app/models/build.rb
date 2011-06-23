@@ -23,12 +23,11 @@ class Build < ActiveRecord::Base
   end
 
   def update_state_from_parts!
+    return if build_parts.empty?
     passed = build_parts.passed
     failed = build_parts.failed
     state =
-      if build_parts.empty?
-        :partitioning
-      elsif (build_parts - passed).empty?
+      if (build_parts - passed).empty?
         :succeeded
       elsif (passed | failed) == build_parts
         :failed

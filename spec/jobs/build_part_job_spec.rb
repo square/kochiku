@@ -14,9 +14,9 @@ describe BuildPartJob do
   subject { BuildPartJob.new(build_part.id) }
 
   describe "#perform" do
-    it "resets the working directory to the current sha" do
-      subject.should_receive(:setup).with(sha)
-      subject.perform
+    before do
+      subject.stub(:tests_green? => true)
+      GitRepo.stub(:run)
     end
 
     context "build is successful" do

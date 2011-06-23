@@ -59,5 +59,16 @@ describe BuildStateUpdateJob do
         }.to change { @build.reload.state }.from(:runnable).to(:succeeded)
       end
     end
+
+    context "when no parts" do
+      before do
+        @build.build_parts.delete_all
+      end
+      it "should not update the state" do
+        expect {
+          BuildStateUpdateJob.perform(@build.id)
+        }.to_not change { @build.reload.state }
+      end
+    end
   end
 end

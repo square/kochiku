@@ -6,7 +6,7 @@ GIT
     symbolize (3.1.3)
 
 GEM
-  remote: http://mirrors.squareup.com/rubygems/
+  remote: https://rubygems.org/
   specs:
     SystemTimer (1.2.3)
     ZenTest (4.5.0)
