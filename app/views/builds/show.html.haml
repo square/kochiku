@@ -7,12 +7,18 @@
     %th Id
     %th Kind
     %th Elapsed Time
+    %th Rerun
   - @build.build_parts.each do |part|
     %tr
       %td= part.status
       %td= part.id
       %td= part.kind
       %td= "x"
+      - if part.status == :failed
+        %td= link_to("Rebuild", rebuild_build_build_part_path(@build, part), :method => :post)
+      - else
+        %td
+
 
 
 %hr
