@@ -7,7 +7,7 @@ class BuildPartJob < JobBase
   end
 
   def perform
-    GitRepo.inside_copy('web-cache', build.sha) do
+    GitRepo.inside_copy('web-cache', build.sha, true) do
       # TODO:
       # collect stdout, stderr, and any logs
       result = tests_green? ? :passed : :failed

@@ -2,7 +2,7 @@ class GitRepo
   WORKING_DIR="#{Rails.root}/tmp/build-partition"
 
   class << self
-    def inside_copy(cached_repo_name, ref = "master")
+    def inside_copy(cached_repo_name, ref = "master", submodules = false)
       # update local repo
       run! "cd #{WORKING_DIR}/#{cached_repo_name} && git fetch"
 
@@ -13,6 +13,7 @@ class GitRepo
 
           # checkout
           run! "git checkout #{ref}"
+          run! "git submodule update --init" if submodules
 
           yield
         end
