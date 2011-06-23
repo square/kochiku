@@ -1,7 +1,8 @@
 class BuildPart < ActiveRecord::Base
   has_many :build_part_results
   belongs_to :build
-  after_create :enqueue_build_part_job
+  after_commit :enqueue_build_part_job
+  validates_presence_of :kind, :paths
 
   serialize :paths, Array
 
