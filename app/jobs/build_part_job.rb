@@ -18,7 +18,7 @@ class BuildPartJob < JobBase
   def tests_green?
     ENV["TEST_RUNNER"] = build_part.kind
     ENV["RUN_LIST"] = build_part.paths.join(",")
-    system('script/ci worker') == 0
+    system("env -i HOME=$HOME bash --noprofile --norc -c 'ruby -v ; source ~/.rvm/scripts/rvm ; rvm use ree ; script/ci worker'")
   end
 
 end
