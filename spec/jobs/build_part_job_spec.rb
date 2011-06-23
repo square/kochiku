@@ -16,7 +16,7 @@ describe BuildPartJob do
   describe "#perform" do
     before do
       subject.stub(:tests_green? => true)
-      GitRepo.stub(:run)
+      GitRepo.stub(:run!)
     end
 
     context "build is successful" do
