@@ -36,5 +36,5 @@ Kochiku::Application.configure do
   config.after_initialize do
     Resque.redis.namespace = "resque:kochiku:test"
   end
-  BUILD_COMMAND = "true"
+  BUILD_COMMAND = lambda {"true"}
 end

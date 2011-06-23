@@ -4,7 +4,8 @@ describe BuildPartJob do
   let(:valid_attributes) do
     {
         :build => Build.build_sha!(:sha => sha, :queue => queue),
-        :paths => ["a", "b"]
+        :paths => ["a", "b"],
+        :kind => "test",
     }
   end
 

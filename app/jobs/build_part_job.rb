@@ -18,7 +18,7 @@ class BuildPartJob < JobBase
   def tests_green?
     ENV["TEST_RUNNER"] = build_part.kind
     ENV["RUN_LIST"] = build_part.paths.join(",")
-    system(BUILD_COMMAND)
+    system(BUILD_COMMAND.call build_part)
   end
 
 end

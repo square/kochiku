@@ -22,6 +22,6 @@ Kochiku::Application.configure do
 
   # Only use best-standards-support built into browsers
   config.action_dispatch.best_standards_support = :builtin
-  BUILD_COMMAND = "ruby -e 'exit(Time.now.usec.even? ? 1 : 0)'"
+  BUILD_COMMAND = lambda {"ruby -e 'exit(Time.now.usec.even? ? 1 : 0)'"}
 end
 

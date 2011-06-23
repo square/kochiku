@@ -49,5 +49,11 @@ Kochiku::Application.configure do
 
 
   Resque.redis = Redis.new(:host => "macbuild-master.sfo.squareup.com")
-  BUILD_COMMAND = "env -i HOME=$HOME bash --noprofile --norc -c 'ruby -v ; source ~/.rvm/scripts/rvm ; rvm use ree ; script/ci worker'"
+  BUILD_COMMAND = lambda do |build_part|
+    "env -i HOME=$HOME"+
+                " PATH=/usr/bin:/bin:/usr/sbin:/sbin:/usr/local/bin:/usr/X11/bin"+
+                " TEST_RUNNER=#{build_part.kind}"+
+                " RUN_LIST=#{build_part.paths.join(',')}"+
+         " bash --noprofile --norc -c 'ruby -v ; source ~/.rvm/scripts/rvm ; rvm use ree ; script/ci worker'"
+  end
 end

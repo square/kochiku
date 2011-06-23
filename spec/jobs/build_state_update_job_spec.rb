@@ -62,7 +62,7 @@ describe BuildStateUpdateJob do
 
     context "when no parts" do
       before do
-        @build.build_parts.delete_all
+        @build.build_parts.destroy_all
       end
       it "should not update the state" do
         expect {
