@@ -18,7 +18,12 @@ class BuildPartJob < JobBase
   def tests_green?
     ENV["TEST_RUNNER"] = build_part.kind
     ENV["RUN_LIST"] = build_part.paths.join(",")
-    system("env -i HOME=$HOME PATH=/usr/bin:/bin:/usr/sbin:/sbin:/usr/local/bin:/usr/X11/bin bash --noprofile --norc -c 'ruby -v ; source ~/.rvm/scripts/rvm ; rvm use ree ; script/ci worker'")
+    cmd = "env -i HOME=$HOME"+
+                " PATH=/usr/bin:/bin:/usr/sbin:/sbin:/usr/local/bin:/usr/X11/bin"+
+                " TEST_RUNNER=#{build_part.kind}"+
+                " RUN_LIST=#{build_part.paths.join(',')}"+
+         " bash --noprofile --norc -c 'ruby -v ; source ~/.rvm/scripts/rvm ; rvm use ree ; script/ci worker'"
+    system(cmd)
   end
 
 end
