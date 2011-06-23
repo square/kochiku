@@ -39,10 +39,22 @@ class Build < ActiveRecord::Base
   end
 
   def started_at
-    build_part_results.all.sort_by(&:started_at).first.started_at
+    build_part_results.order('started_at asc').first.started_at
   end
 
   def finished_at
 #    build_part_results.all.sort_by(&:finished_at).last
+  end
+
+  def finished?
+    state == :succeeded || state == :failed
+  end
+
+  def promotable?
+    queue == :master
+  end
+
+  def promotion_ref
+    "ci-master-distributed-latest" if promotable?
   end
 end
