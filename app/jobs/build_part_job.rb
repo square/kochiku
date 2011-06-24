@@ -35,6 +35,11 @@ class BuildPartJob < JobBase
     end
   end
 
+  def on_exception(e)
+    build_part_result.error!
+    raise e
+  end
+
   private
   def hostname
     `hostname`
@@ -60,10 +65,4 @@ class BuildPartJob < JobBase
   def kill_live_artifact_server
     Process.kill("KILL", @artifact_server_pid)
   end
-
-  def on_exception(e)
-    build_part_result.error!
-    raise e
-  end
-
 end
