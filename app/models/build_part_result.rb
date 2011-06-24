@@ -1,3 +1,6 @@
+# TODO: rename me build part run
+#       and add a method to launch a build part job
+
 class BuildPartResult < ActiveRecord::Base
   has_many :build_artifacts
   belongs_to :build_part
