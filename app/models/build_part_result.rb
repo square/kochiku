@@ -7,4 +7,7 @@ class BuildPartResult < ActiveRecord::Base
   scope :failed, where(:result => 'failed')
   scope :passed, where(:result => 'passed')
 
+  def elapsed_time
+    finished_at - started_at if finished_at && started_at
+  end
 end

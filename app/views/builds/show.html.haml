@@ -11,7 +11,7 @@
   - @build.build_parts.each do |part|
     %tr
       %td= part.status
-      %td= part.id
+      %td= link_to part.id, build_build_part_path(@build, part)
       %td= part.kind
       %td= "x"
       - if part.status == :failed
