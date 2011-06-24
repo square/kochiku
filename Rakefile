@@ -5,3 +5,5 @@ require File.expand_path('../config/application', __FILE__)
 require 'rake'
 
 Kochiku::Application.load_tasks
+
+task :setup => [:'kochiku:slave:setup']
