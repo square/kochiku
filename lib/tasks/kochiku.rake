@@ -35,8 +35,10 @@ namespace :kochiku do
     task :setup do
       puts "checking out the web repo..."
       tmp_dir = Rails.root.join('tmp', 'build-partition', 'web-cache')
-      FileUtils.mkdir_p tmp_dir
-      `cd #{tmp_dir} && git clone git@github.com:square/web .`
+      unless File.exists?(tmp_dir)
+        FileUtils.mkdir_p tmp_dir
+        `cd #{tmp_dir} && git clone git@github.com:square/web .`
+      end
 
       puts "adding plist..."
 
