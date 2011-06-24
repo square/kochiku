@@ -63,6 +63,6 @@ class BuildPartJob < JobBase
   end
 
   def kill_live_artifact_server
-    Process.kill("KILL", @artifact_server_pid)
+    Process.kill("KILL", @artifact_server_pid) if @artifact_server_pid
   end
 end
