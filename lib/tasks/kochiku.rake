@@ -50,9 +50,8 @@ namespace :kochiku do
 
       puts "Creating wrapper for fidelius using #{wanted_rvm}"
       `rvm wrapper #{wanted_rvm} kochiku`
-      `rvm wrapper #{wanted_rvm} kochiku bundle`
 
-      kochiku_bundle_wrapper = `which kochiku_bundle`.chomp
+      kochiku_rake_wrapper = `which kochiku_rake`.chomp
 
       # Install launchctl config
       label                 = "com.squareup.kochiku-slave"
@@ -63,11 +62,11 @@ namespace :kochiku do
       <plist version="1.0">
         <dict>
           <key>Label</key>                <string>#{label}</string>
-          <key>Program</key>              <string>#{kochiku_bundle_wrapper}</string>
+          <key>Program</key>              <string>#{kochiku_rake_wrapper}</string>
           <key>ProgramArguments</key>     <array>
-                                          <string>exec</string>
-                                          <string>rake</string>
+                                          <string> </string>
                                           <string>kochiku:slave:start</string>
+                                          <string>--trace</string>
                                           </array>
           <key>RunAtLoad</key>            <true/>
           <key>WorkingDirectory</key>     <string>#{kochiku_dir}</string>
@@ -80,9 +79,7 @@ namespace :kochiku do
                                           </dict>
         </dict>
       </plist>
-        XML
-      end
-
+XML
     end
   end
 end
