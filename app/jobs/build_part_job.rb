@@ -10,8 +10,7 @@ class BuildPartJob < JobBase
   end
 
   def perform
-    build_part_result.start!
-    build_part_result.update_attributes(:builder => hostname)
+    build_part_result.start!(hostname)
     GitRepo.inside_copy('web-cache', build.sha, true) do
       start_live_artifact_server
       result = tests_green? ? :passed : :failed
@@ -61,4 +60,10 @@ class BuildPartJob < JobBase
   def kill_live_artifact_server
     Process.kill("KILL", @artifact_server_pid)
   end
+
+  def on_exception(e)
+    build_part_result.error!
+    raise e
+  end
+
 end

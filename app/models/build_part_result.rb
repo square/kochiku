@@ -15,11 +15,15 @@ class BuildPartResult < ActiveRecord::Base
     finished_at - started_at if finished_at && started_at
   end
 
-  def start!
-    update_attributes(:state => :running, :started_at => Time.now)
+  def start!(builder)
+    update_attributes(:state => :running, :started_at => Time.now, :builder => builder)
   end
 
   def finish!(state)
     update_attributes(:state => state, :finished_at => Time.now)
+  end
+
+  def error!
+    update_attributes(:state => :error, :finished_at => Time.now)
   end
 end
