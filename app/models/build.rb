@@ -50,11 +50,10 @@ class Build < ActiveRecord::Base
   end
 
   def promotable?
-    queue == :master
-    false #TODO remove this line when we're confident in build
+    succeeded? && queue == :master
   end
 
   def promotion_ref
-    "ci-master-distributed-latest" if promotable?
+    "ci-kochiku-latest" if promotable?
   end
 end
