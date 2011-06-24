@@ -53,7 +53,7 @@ GEM
     erubis (2.6.6)
       abstract (>= 1.0.0)
     fssm (0.2.7)
-    haml (3.1.1)
+    haml (3.1.2)
     haml-rails (0.3.4)
       actionpack (~> 3.0)
       activesupport (~> 3.0)
