@@ -12,6 +12,7 @@ class BuildPartJob < JobBase
       # collect stdout, stderr, and any logs
       result = tests_green? ? :passed : :failed
       build_part.build_part_results.create(:result => result)
+      collect_artifacts
     end
   end
 
@@ -21,4 +22,11 @@ class BuildPartJob < JobBase
     system(BUILD_COMMAND.call build_part)
   end
 
+  def collect_artifacts
+    Dir[*BUILD_ARTIFACTS].each do |path|
+      if File.file? path
+        build_part.build_artifacts.create!(:content => File.read(path), :name => path)
+      end
+    end
+  end
 end

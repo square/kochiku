@@ -22,6 +22,7 @@ Kochiku::Application.configure do
 
   # Only use best-standards-support built into browsers
   config.action_dispatch.best_standards_support = :builtin
-  BUILD_COMMAND = lambda {"ruby -e 'exit(Time.now.usec.even? ? 1 : 0)'"}
+  BUILD_COMMAND = lambda {"ruby -e 'now = Time.now.usec; File.open(\\'now.log\\', \\'w\\') {|f|f.write(now)}; exit(now.even? ? 1 : 0)'"}
+  BUILD_ARTIFACTS = ["now.log"]
 end
 

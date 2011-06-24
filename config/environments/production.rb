@@ -54,6 +54,8 @@ Kochiku::Application.configure do
                 " PATH=/usr/bin:/bin:/usr/sbin:/sbin:/usr/local/bin:/usr/X11/bin"+
                 " TEST_RUNNER=#{build_part.kind}"+
                 " RUN_LIST=#{build_part.paths.join(',')}"+
-         " bash --noprofile --norc -c 'ruby -v ; source ~/.rvm/scripts/rvm ; rvm use ree ; script/ci worker'"
+         " bash --noprofile --norc -c 'ruby -v ; source ~/.rvm/scripts/rvm ; rvm use ree ; script/ci worker 2>log/stderr.log 1>log/stdout.log'"
   end
+
+  BUILD_ARTIFACTS = ['log/*log']
 end
