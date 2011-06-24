@@ -11,7 +11,9 @@
     = csrf_meta_tag
     = favicon_link_tag
   %body
-    %header
-      = link_to "Resque Admin", "/resque"
-    %content
+    #root
       = yield
+    #root_footer
+    #footer
+      = link_to "Resque Admin", "/resque"
+
