@@ -1,12 +1,14 @@
-%tr
-  %td
-    = link_to build.id, build_path(build)
-  %td
-    = build.sha
-  %td
-    = build.state
-  %td
-    = build.queue
-  %td
-    = time_ago_in_words build.created_at
-    ago
+.build
+  %h3= link_to build.id, build_path(build)
+  %dl
+    %dt sha
+    %dd= build.sha
+    %dt state
+    %dd= build.state
+    %dt queue
+    %dd= build.queue
+    %dt time
+    %dd
+      = time_ago_in_words build.created_at
+      ago
+  .parts= render build.build_parts

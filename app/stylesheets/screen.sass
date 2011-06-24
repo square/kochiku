@@ -5,6 +5,46 @@
   <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css" />
 
 @import compass/reset
+@import compass/css3/gradient
+@import compass/css3/border-radius
 
-@import "compass/layout"
-@include sticky-footer(54px)
+
+html
+  font-family: sans-serif
+
+body
+#nav
+  max-width: 600px
+  margin: 20px auto
+  a
+    float: right
+#content
+  margin: 20px auto
+  max-width: 600px
+
+.build
+  overflow: hidden
+  margin: 10px 0
+  @include border-radius(5px, 5px)
+  border: 1px solid black
+  padding: 10px
+  dl
+    dt, dd
+      display: inline-block
+    dt
+      width: 20%
+    dd
+      width: 70%
+.parts
+  .part
+    overflow: hidden
+    height: 6em
+    width: 6em
+    float: left
+    @include border-radius(2px, 4px)
+    border: 1px solid black
+    padding: 4px
+
+.results
+  .results
+    overflow: hidden
