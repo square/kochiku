@@ -38,4 +38,21 @@ describe BuildPartJob do
       end
     end
   end
+
+  describe "#collect_artifacts" do
+    it "stores specified artifacts to the database" do
+      Dir.mktmpdir do |dir|
+        Dir.chdir(dir) do
+          wanted_logs = ['a.wantedlog', 'b.wantedlog', 'd/c.wantedlog']
+          FileUtils.mkdir 'd'
+          FileUtils.touch wanted_logs
+          FileUtils.touch 'e.unwantedlog'
+          result = build_part.build_part_results.create!(:result => :passed)
+          subject.collect_artifacts(result, '**/*.wantedlog')
+
+          result.build_artifacts.map(&:name).should =~ wanted_logs
+        end
+      end
+    end
+  end
 end
