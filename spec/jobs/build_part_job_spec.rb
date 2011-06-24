@@ -21,6 +21,15 @@ describe BuildPartJob do
       GitRepo.stub(:run!)
     end
 
+    it "sets the builder on its build part result" do
+      hostname = "i-am-a-compooter"
+      subject.stub(:tests_green?)
+      subject.stub(:hostname => hostname)
+      
+      subject.perform
+      build_part_result.reload.builder.should == hostname
+    end
+
     context "build is successful" do
       before { subject.stub(:tests_green? => true) }
 

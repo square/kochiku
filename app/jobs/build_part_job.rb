@@ -9,6 +9,7 @@ class BuildPartJob < JobBase
 
   def perform
     build_part_result.start!
+    build_part_result.update_attributes(:builder => hostname)
     GitRepo.inside_copy('web-cache', build.sha, true) do
       # TODO:
       # collect stdout, stderr, and any logs
@@ -30,5 +31,10 @@ class BuildPartJob < JobBase
         build_part_result.build_artifacts.create!(:content => File.read(path), :name => path)
       end
     end
+  end
+
+  private
+  def hostname
+    `hostname`
   end
 end
