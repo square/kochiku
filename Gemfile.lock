@@ -43,10 +43,16 @@ GEM
     autotest-fsevent (0.2.5)
       sys-uname
     builder (2.1.2)
+    chunky_png (1.2.0)
     columnize (0.3.2)
+    compass (0.11.3)
+      chunky_png (~> 1.2)
+      fssm (>= 0.2.7)
+      sass (~> 3.1)
     diff-lcs (1.1.2)
     erubis (2.6.6)
       abstract (>= 1.0.0)
+    fssm (0.2.7)
     haml (3.1.1)
     haml-rails (0.3.4)
       actionpack (~> 3.0)
@@ -118,6 +124,7 @@ GEM
       linecache (>= 0.3)
     rufus-scheduler (2.0.9)
       tzinfo (>= 0.3.23)
+    sass (3.1.3)
     sinatra (1.2.6)
       rack (~> 1.1)
       tilt (>= 1.2.2, < 2.0)
@@ -137,6 +144,7 @@ DEPENDENCIES
   SystemTimer
   autotest
   autotest-fsevent
+  compass
   haml
   haml-rails
   mysql2 (>= 0.2, < 0.3)
@@ -146,4 +154,5 @@ DEPENDENCIES
   resque-scheduler
   rspec-rails
   ruby-debug
+  sass
   symbolize!

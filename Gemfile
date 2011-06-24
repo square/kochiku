@@ -11,6 +11,8 @@ gem "symbolize",              :git => "git@github.com:square/activerecord_symbol
 
 gem 'haml'
 gem 'haml-rails'
+gem 'sass'
+gem 'compass'
 
 gem "resque"
 gem "resque-lock"
