@@ -12,7 +12,8 @@ describe BuildPartJob do
   let(:sha) { "abcdef" }
   let(:queue) { "master" }
   let(:build_part) { BuildPart.create!(valid_attributes) }
-  subject { BuildPartJob.new(build_part.id) }
+  let(:build_part_result) { build_part.build_part_results.create!(:state => :runnable) }
+  subject { BuildPartJob.new(build_part_result.id) }
 
   describe "#perform" do
     before do
@@ -24,8 +25,7 @@ describe BuildPartJob do
       before { subject.stub(:tests_green? => true) }
 
       it "creates a build result with a passed result" do
-        expect { subject.perform }.to change(build_part.build_part_results, :count).by(1)
-        build_part.build_part_results.last.state.should == :passed
+        expect { subject.perform }.to change{build_part_result.reload.state}.from(:runnable).to(:passed)
       end
     end
 
@@ -33,8 +33,7 @@ describe BuildPartJob do
       before { subject.stub(:tests_green? => false) }
 
       it "creates a build result with a failed result" do
-        expect { subject.perform }.to change(build_part.build_part_results, :count).by(1)
-        build_part.build_part_results.last.state.should == :failed
+        expect { subject.perform }.to change{build_part_result.reload.state}.from(:runnable).to(:failed)
       end
     end
   end
@@ -47,10 +46,9 @@ describe BuildPartJob do
           FileUtils.mkdir 'd'
           FileUtils.touch wanted_logs
           FileUtils.touch 'e.unwantedlog'
-          result = build_part.build_part_results.create!(:state => :passed)
-          subject.collect_artifacts(result, '**/*.wantedlog')
+          subject.collect_artifacts('**/*.wantedlog')
 
-          result.build_artifacts.map(&:name).should =~ wanted_logs
+          build_part_result.build_artifacts.map(&:name).should =~ wanted_logs
         end
       end
     end

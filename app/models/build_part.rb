@@ -10,17 +10,15 @@ class BuildPart < ActiveRecord::Base
   scope :passed, joins(:build_part_results).merge(BuildPartResult.passed)
 
   def enqueue_build_part_job
-    BuildPartJob.enqueue_on(build.queue, id)
+    build_part_result = build_part_results.create!(:state => :runnable)
+    BuildPartJob.enqueue_on(build.queue, build_part_result.id)
+  end
+
+  def rebuild!
+    enqueue_build_part_job
   end
 
   def status
-    passed = build_part_results.passed.count
-    if 0 == passed && 0 == build_part_results.failed.count
-      :runnable
-    elsif passed > 0
-      :passed
-    else
-      :failed
-    end
+    build_part_results.order(:created_at).last.state
   end
 end

@@ -1,7 +1,7 @@
 class BuildPartsController < ApplicationController
   before_filter :load_build_and_part, :only => [:rebuild, :show]
   def rebuild
-    @build_part.enqueue_build_part_job
+    @build_part.rebuild!
     redirect_to @build
   end
 

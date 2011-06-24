@@ -45,12 +45,13 @@ class Build < ActiveRecord::Base
 #    build_part_results.all.sort_by(&:finished_at).last
   end
 
-  def finished?
-    state == :succeeded || state == :failed
+  def succeeded?
+    state == :succeeded
   end
 
   def promotable?
     queue == :master
+    false #TODO remove this line when we're confident in build
   end
 
   def promotion_ref

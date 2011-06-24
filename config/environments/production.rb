@@ -56,6 +56,10 @@ Kochiku::Application.configure do
                 " RUN_LIST=#{build_part.paths.join(',')}"+
          " bash --noprofile --norc -c 'ruby -v ; source ~/.rvm/scripts/rvm ; rvm use ree ; script/ci worker 2>log/stderr.log 1>log/stdout.log'"
   end
+  PROMOTION_COMMAND = lambda  do |build|
+    # TODO enable when we're the primary build
+    # "git push -f destination #{build.sha}:refs/heads/#{build.promotion_ref}"
 
+  end
   BUILD_ARTIFACTS = ['log/*log']
 end
