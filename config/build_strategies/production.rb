@@ -8,10 +8,14 @@ class BuildStrategy
   end
 
   def promote_build(build)
-    system "git push -f destination #{build.sha}:refs/heads/#{build.promotion_ref}"
+    system "git push -f destination #{build.sha}:refs/heads/#{promotion_ref}"
   end
 
   def artifacts_glob
     ['log/*log']
+  end
+
+  def promotion_ref
+    "ci-kochiku-latest"
   end
 end

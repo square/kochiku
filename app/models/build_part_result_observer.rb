@@ -1,5 +1,5 @@
 class BuildPartResultObserver < ActiveRecord::Observer
-  def after_create(record)
+  def after_save(record)
     BuildStateUpdateJob.enqueue(record.build_part.build_id)
   end
 end
