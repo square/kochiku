@@ -1,3 +1,5 @@
+require 'webrick'
+
 class BuildPartJob < JobBase
   attr_reader :build_part_result, :build_part, :build
 
@@ -11,12 +13,13 @@ class BuildPartJob < JobBase
     build_part_result.start!
     build_part_result.update_attributes(:builder => hostname)
     GitRepo.inside_copy('web-cache', build.sha, true) do
-      # TODO:
-      # collect stdout, stderr, and any logs
+      start_live_artifact_server
       result = tests_green? ? :passed : :failed
       build_part_result.finish!(result)
       collect_artifacts(BUILD_ARTIFACTS)
     end
+  ensure
+    kill_live_artifact_server
   end
 
   def tests_green?
@@ -36,5 +39,26 @@ class BuildPartJob < JobBase
   private
   def hostname
     `hostname`
+  end
+
+  def start_live_artifact_server
+    pid = fork
+    if pid.nil?
+      begin
+        server = WEBrick::HTTPServer.new(
+              :Port => 55555,
+              :DocumentRoot => "log",
+              :FancyIndexing => true)
+        server.start
+      rescue Interrupt
+        server.stop
+      end
+    else
+      @artifact_server_pid = pid
+    end
+  end
+
+  def kill_live_artifact_server
+    Process.kill("KILL", @artifact_server_pid)
   end
 end
