@@ -3,13 +3,13 @@
 
 %table
   %tr
-    %th result
+    %th state
     %th started at
     %th elapsed time
     %th artifacts
   - @build_part.build_part_results.each do |result|
     %tr
-      %td= result.result
+      %td= result.state
       %td= result.started_at
       %td= result.elapsed_time
       %td= result.build_artifacts.map(&:name)

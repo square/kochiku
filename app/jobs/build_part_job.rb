@@ -11,7 +11,7 @@ class BuildPartJob < JobBase
       # TODO:
       # collect stdout, stderr, and any logs
       result = tests_green? ? :passed : :failed
-      build_part_result = build_part.build_part_results.create!(:result => result)
+      build_part_result = build_part.build_part_results.create!(:state => result)
       collect_artifacts(build_part_result, BUILD_ARTIFACTS)
     end
   end

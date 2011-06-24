@@ -20,20 +20,20 @@ describe BuildPart do
     end
 
     context "with a failed status" do
-      before {build_part.build_part_results.create!(:result => :failed)}
+      before {build_part.build_part_results.create!(:state => :failed)}
       it "should be failed" do
         build_part.status.should == :failed
       end
 
       context "with another failed status" do
-        before {build_part.build_part_results.create!(:result => :failed)}
+        before {build_part.build_part_results.create!(:state => :failed)}
         it "should be failed" do
           build_part.status.should == :failed
         end
       end
 
       context "with another passed status" do
-        before {build_part.build_part_results.create!(:result => :passed)}
+        before {build_part.build_part_results.create!(:state => :passed)}
         it "should be passed" do
           build_part.status.should == :passed
         end
@@ -42,13 +42,13 @@ describe BuildPart do
     end
 
     context "with a passed status" do
-      before {build_part.build_part_results.create!(:result => :passed)}
+      before {build_part.build_part_results.create!(:state => :passed)}
       it "should be passed" do
         build_part.status.should == :passed
       end
 
       context "with another failed status" do
-        before {build_part.build_part_results.create!(:result => :failed)}
+        before {build_part.build_part_results.create!(:state => :failed)}
         it "should be passed" do
           build_part.status.should == :passed
         end

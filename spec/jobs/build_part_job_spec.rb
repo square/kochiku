@@ -25,7 +25,7 @@ describe BuildPartJob do
 
       it "creates a build result with a passed result" do
         expect { subject.perform }.to change(build_part.build_part_results, :count).by(1)
-        build_part.build_part_results.last.result.should == :passed
+        build_part.build_part_results.last.state.should == :passed
       end
     end
 
@@ -34,7 +34,7 @@ describe BuildPartJob do
 
       it "creates a build result with a failed result" do
         expect { subject.perform }.to change(build_part.build_part_results, :count).by(1)
-        build_part.build_part_results.last.result.should == :failed
+        build_part.build_part_results.last.state.should == :failed
       end
     end
   end
@@ -47,7 +47,7 @@ describe BuildPartJob do
           FileUtils.mkdir 'd'
           FileUtils.touch wanted_logs
           FileUtils.touch 'e.unwantedlog'
-          result = build_part.build_part_results.create!(:result => :passed)
+          result = build_part.build_part_results.create!(:state => :passed)
           subject.collect_artifacts(result, '**/*.wantedlog')
 
           result.build_artifacts.map(&:name).should =~ wanted_logs

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20110624003418) do
+ActiveRecord::Schema.define(:version => 20110624015709) do
 
   create_table "build_artifacts", :force => true do |t|
     t.integer  "build_part_result_id"
@@ -25,7 +25,7 @@ ActiveRecord::Schema.define(:version => 20110624003418) do
     t.datetime "started_at"
     t.datetime "finished_at"
     t.string   "builder"
-    t.string   "result"
+    t.string   "state"
     t.datetime "created_at"
     t.datetime "updated_at"
   end
