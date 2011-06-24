@@ -15,14 +15,14 @@ class BuildPartJob < JobBase
       # collect stdout, stderr, and any logs
       result = tests_green? ? :passed : :failed
       build_part_result.finish!(result)
-      collect_artifacts(BUILD_ARTIFACTS)
+      collect_artifacts(build_part.artifacts_glob)
     end
   end
 
   def tests_green?
     ENV["TEST_RUNNER"] = build_part.kind
     ENV["RUN_LIST"] = build_part.paths.join(",")
-    system(BUILD_COMMAND.call build_part)
+    build_part.execute
   end
 
   def collect_artifacts(artifacts_glob)

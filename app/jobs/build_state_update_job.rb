@@ -13,7 +13,7 @@ class BuildStateUpdateJob < JobBase
       if build.promotable?
         GitRepo.inside_copy("web-cache", build.sha) do
           `git remote add destination git@github.com:square/web.git`
-          system(PROMOTION_COMMAND(build))
+          build.promote!
         end
       end
     end

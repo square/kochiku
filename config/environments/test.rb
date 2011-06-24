@@ -36,7 +36,4 @@ Kochiku::Application.configure do
   config.after_initialize do
     Resque.redis.namespace = "resque:kochiku:test"
   end
-  BUILD_COMMAND = lambda {"true"}
-  PROMOTION_COMMAND = lambda  {}
-  BUILD_ARTIFACTS = []
 end

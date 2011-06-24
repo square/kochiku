@@ -21,4 +21,12 @@ class BuildPart < ActiveRecord::Base
   def status
     build_part_results.order(:created_at).last.state
   end
+
+  def execute
+    BuildStrategy.new.execute_build(self)
+  end
+
+  def artifacts_glob
+    BuildStrategy.new.artifacts_glob
+  end
 end

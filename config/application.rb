@@ -46,5 +46,9 @@ module Kochiku
 
     # Configure sensitive parameters which will be filtered from the log file.
     config.filter_parameters += [:password]
+
+    config.after_initialize do
+      require "#{config.root}/config/build_strategies/#{Rails.env}"
+    end
   end
 end

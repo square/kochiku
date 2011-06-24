@@ -56,4 +56,8 @@ class Build < ActiveRecord::Base
   def promotion_ref
     "ci-kochiku-latest" if promotable?
   end
+
+  def promote!
+    BuildStrategy.new.promote_build(self)
+  end
 end
