@@ -78,6 +78,7 @@ namespace :kochiku do
           <key>LaunchOnlyOnce</key>       <false/>
           <key>EnvironmentVariables</key> <dict>
                                             <key>RAILS_ENV</key> <string>production</string>
+                                            <key>PATH</key> <string>/usr/bin:/bin:/usr/sbin:/sbin:/usr/local/bin:/usr/X11/bin</string>
                                           </dict>
         </dict>
       </plist>
