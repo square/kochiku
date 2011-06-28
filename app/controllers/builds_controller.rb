@@ -10,6 +10,13 @@ class BuildsController < ApplicationController
 
   def create
     Build.build_sha!(params[:build])
-    head :ok
+    respond_to do |format|
+      format.json {head :ok}
+      format.html {redirect_to root_path}
+    end
+  end
+
+  def new
+    @build = Build.new(:queue => "dogfood")
   end
 end
