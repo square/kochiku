@@ -1,14 +1,14 @@
 .build
-  %h3= link_to build.id, build_path(build)
-  %dl
-    %dt sha
-    %dd= build.sha
-    %dt state
-    %dd= build.state
-    %dt queue
-    %dd= build.queue
-    %dt time
-    %dd
-      = time_ago_in_words build.created_at
+  %a{:href => build_path(build), :class => "build-wrapper"}
+    .build-info
+      .sha= build.sha
+      .build-state
+        %span.state{:class => build.state}= build.state.to_s.capitalize
+        on
+        %span.queue= build.queue.to_s.capitalize
+    %h3.build-id{:class => build.state}= build.id
+    .time-elapsed
+      &hellip;#{time_ago_in_words build.created_at}
       ago
+
   .parts= render build.build_parts

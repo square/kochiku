@@ -7,34 +7,139 @@
 @import compass/reset
 @import compass/css3/gradient
 @import compass/css3/border-radius
+@import _avantgarde
 
+/* Variables */
+$font-base: Helvetica, Arial, sans-serif
+$font-code: Inconsolata, Menlo, Monaco, monospace
+$color-base: #52585D
+$color-title: #52585D
+$color-link: #2D81C5
 
+/* Mixins */
+=has-layout
+  display: block
+  zoom: 1
+
+=envelope
+  +has-layout
+  position: relative
+  overflow: hidden
+
+=safe-envelope
+  +has-layout
+  &:after
+    content: " "
+    display: block
+    height: 0
+    clear: both
+    overflow: hidden
+    visibility: hidden
+
+=text-shadow
+  text-shadow: 0 1px 0 rgba(0, 0, 0, 0.5)
+
+/* Styles */
 html
-  font-family: sans-serif
+  font-family: $font-base
+
+h1, h2, h3, h4, h5, h6
+  font-family: "agb", $font-base
 
 body
-#nav
-  max-width: 600px
-  margin: 20px auto
-  a
+  font-size: 12px
+
+a
+  color: $color-link
+  text-decoration: none
+
+.section-wrapper
+  overflow: hidden
+  background: url(../images/section-bottom.png) no-repeat bottom center
+  background: url(../images/section-top.png) no-repeat top center, url(../images/section-bottom.png) no-repeat bottom center
+.section
+  +envelope
+  margin: 15px auto
+  width: 960px
+
+$logo-padding: 45px
+#header
+  a.logo
+    float: left
+    h1
+      background: url(../images/logo.png) no-repeat left center
+      padding-left: $logo-padding
+      font-size: 28px
+      line-height: 38px
+      .title-first
+        color: $color-title
+      .title-second
+        color: $color-title + #666
+
+  #nav
     float: right
+    line-height: 30px
+    a
+      text-align: right
+      padding-left: 20px
+
+h2.subheader
+  color: $color-title + #222
+  font-size: 175%
+  padding: 0 0 25px
+
 #content
-  margin: 20px auto
-  max-width: 600px
+  .builds
 
 .build
   overflow: hidden
-  margin: 10px 0
-  @include border-radius(5px, 5px)
-  border: 1px solid black
-  padding: 10px
+  margin: 0 0 50px
+
+  .build-wrapper
+    +envelope
+    color: #666
+    display: block
+
+    .error, .doomed, .failed
+      color: #f66
+    .partitioning, .runnable, .running
+      color: #66f
+    .succeeded
+      color: #6f6
+
+    .build-info
+      float: left
+      .sha
+        +text-shadow
+        font-size: 180%
+        font-family: $font-code
+        line-height: 40px
+        &:hover
+          color: $color-link
+
+    .time-elapsed
+      float: right
+      margin-right: 20px
+      line-height: 50px
+
+    .build-id
+      +text-shadow
+      font-family: $font-base
+      float: right
+      font-size: 400%
+      font-weight: bold
+      width: 100px
+      text-align: right
+
   dl
+    float: left
     dt, dd
       display: inline-block
     dt
       width: 20%
     dd
       width: 70%
+
 .parts
   .part
     overflow: hidden

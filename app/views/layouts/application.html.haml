@@ -1,7 +1,8 @@
 !!!
 %html
   %head
-    %title Kochiku
+    %title
+      Kochiku
     = stylesheet_link_tag 'screen.css', :media => 'screen, projection'
     = stylesheet_link_tag 'print.css', :media => 'print'
     /[if IE]
@@ -11,9 +12,15 @@
     = csrf_meta_tag
     = favicon_link_tag
   %body
-    #nav
-      = link_to "Resque Admin", "/resque"
-      = link_to "Dogfood Build", new_build_path
-    #content
-      = yield
+    #header.section-wrapper
+      .section
+        %a{:href => root_path, :class => "logo"}
+          %h1
+            <span class="title-first">Kochi</span><span class="title-second">ku</span>
+        #nav
+          = link_to "Dogfood Build", new_build_path
+          = link_to "Resque Admin", "/resque"
 
+    #content.section-wrapper
+      .section
+        = yield
