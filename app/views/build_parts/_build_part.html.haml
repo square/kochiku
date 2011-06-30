@@ -1,4 +1,4 @@
-.part{:class => build_part.kind}
+.part{:class => build_part.kind, :paths => build_part.paths.join("|")}
   %a.part-wrapper{:href => build_build_part_path(build_part.build, build_part)}
     .kind
       - if build_part.kind == "spec"
@@ -6,4 +6,3 @@
       - elsif build_part.kind == "cucumber"
         Cu
     .results= render build_part.build_part_results
-    %abbr{:title => build_part.paths}
