@@ -40,8 +40,11 @@ $color-link: #2D81C5
   text-shadow: 0 1px 0 rgba(0, 0, 0, 0.5)
 
 /* Styles */
+$default-background: #b4b5b7 url(../images/body-noise.png) center left fixed
 html
   font-family: $font-base
+  background: $default-background
+  background: url(../images/body-noise-shadow.png) repeat-y center top fixed, $default-background
 
 h1, h2, h3, h4, h5, h6
   font-family: "agb", $font-base
@@ -111,11 +114,16 @@ h2.subheader
       float: left
       .sha
         +text-shadow
-        font-size: 180%
+        font-size: 175%
         font-family: $font-code
         line-height: 40px
+        letter-spacing: 1px
         &:hover
           color: $color-link
+      .state
+        font-weight: bold
+      .queue
+        font-weight: bold
 
     .time-elapsed
       float: right
@@ -131,24 +139,57 @@ h2.subheader
       width: 100px
       text-align: right
 
-  dl
-    float: left
-    dt, dd
-      display: inline-block
-    dt
-      width: 20%
-    dd
-      width: 70%
-
+$part-margin: 1px
+$color-spec: rgba(135, 184, 232, 0.6)
+$color-cuke: rgba(198, 232, 135, 0.6)
 .parts
+  +envelope
+  margin: 10px (-$part-margin)
   .part
     overflow: hidden
-    height: 6em
-    width: 6em
     float: left
-    @include border-radius(2px, 4px)
-    border: 1px solid black
-    padding: 4px
+    border: 1px solid rgba(0, 0, 0, 0.5)
+    margin: $part-margin
+    box-shadow: 0 1px 1px rgba(0, 0, 0, 0.3)
+  .part.spec
+    background-color: $color-spec
+  .part.cucumber
+    background-color: $color-cuke
+
+  .part-wrapper
+    +envelope
+    display: block
+    margin: 5px
+    width: 105px
+    height: 25px
+    color: #333
+    .kind
+      float: left
+      font-size: 175%
+      font-weight: bold
+      line-height: 27px
+    .result
+      float: right
+      text-transform: uppercase
+      color: #444
+      line-height: 40px
+      font-size: 90%
+      &::before
+        content: "\00A0"
+        display: block
+        border: 1px solid #666
+        border-radius: 8px
+        width: 10px
+        height: 10px
+        float: right
+        margin: 13px 0 0 3px
+        box-shadow: 0 1px 1px rgba(0, 0, 0, 0.3)
+    .result.runnable::before, .result.running::before
+      background-color: #66f
+    .result.failed::before, .result.error::before
+      background-color: #f66
+    .result.passed::before
+      background-color: #6f6
 
 .results
   .results

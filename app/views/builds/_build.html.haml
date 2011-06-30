@@ -8,7 +8,6 @@
         %span.queue= build.queue.to_s.capitalize
     %h3.build-id{:class => build.state}= build.id
     .time-elapsed
-      &hellip;#{time_ago_in_words build.created_at}
-      ago
+      &hellip;#{time_ago_in_words build.created_at} ago
 
   .parts= render build.build_parts
