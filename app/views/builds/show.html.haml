@@ -1,26 +1,28 @@
-%h1= @build.sha
-%h2= @build.state
+%h2.subheader= @build.sha
 
-%table
+.build-info.build-info-subheader
+  %span.state{:class => 'build-' + @build.state.to_s}= @build.state.to_s.capitalize
+  on
+  %span.queue= @build.queue.to_s.capitalize
+  &nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;Created #{time_ago_in_words @build.created_at} ago&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;Updated #{time_ago_in_words @build.updated_at} ago
+
+%table.build-summary
   %tr
-    %th Result
-    %th Id
-    %th Kind
+    %th.id-column Id
+    %th.result-column Result
+    %th Build Type
     %th Elapsed Time
-    %th Rerun
-  - @build.build_parts.each do |part|
-    %tr
-      %td= part.status
-      %td= link_to part.id, build_build_part_path(@build, part)
-      %td= part.kind
-      %td= "x"
+    %th Actions
+  - @build.build_parts.each_index do |index|
+    - part = @build.build_parts[index]
+    %tr{:class => (index.even? ? 'even-row' : '')}
+      %td.id-column= link_to part.id, build_build_part_path(@build, part)
+      %td.result-column
+        %span.part-status{:class => part.status}= part.status.to_s.capitalize
+      %td{:class => part.kind}= part.kind.to_s.capitalize
+      %td
+        #{time_ago_in_words part.updated_at}
       - if part.status == :failed
         %td= link_to("Rebuild", rebuild_build_build_part_path(@build, part), :method => :post)
       - else
         %td
-
-
-
-%hr
-=  @build.inspect
-

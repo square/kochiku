@@ -183,6 +183,13 @@ input[type=submit]
   &:hover:active
     @extend .active-button
 
+.build-error, .build-doomed, .build-failed
+  color: #f66
+.build-partitioning, .build-runnable, .build-running
+  color: #66f
+.build-succeeded
+  color: #6f6
+
 /* Index */
 .section-wrapper
   overflow: hidden
@@ -219,8 +226,11 @@ h2.subheader
   font-size: 175%
   padding: 0 0 25px
 
-#content
-  .builds
+.build-info
+  .state
+    font-weight: bold
+  .queue
+    font-weight: bold
 
 .build
   overflow: hidden
@@ -230,13 +240,6 @@ h2.subheader
     +envelope
     color: #666
     display: block
-
-    .error, .doomed, .failed
-      color: #f66
-    .partitioning, .runnable, .running
-      color: #66f
-    .succeeded
-      color: #6f6
 
     .build-info
       float: left
@@ -248,10 +251,6 @@ h2.subheader
         letter-spacing: 1px
         &:hover
           color: $color-link
-      .state
-        font-weight: bold
-      .queue
-        font-weight: bold
 
     .time-elapsed
       float: right
@@ -342,3 +341,47 @@ input.build-button
   font-size: 120%
   padding: 3px 25px 5px
   border: none
+
+/* Build show */
+.build-info-subheader
+  margin: -15px 0 25px
+.build-summary
+  width: 80%
+  font-size: 110%
+
+  .id-column
+    text-align: left
+    width: 50px
+  .result-column
+    text-align: right
+    width: 80px
+  tr.even-row
+    background-color: rgba(243, 246, 250, 1)
+  th
+    font-weight: bold
+    border-bottom: 1px solid rgba(0, 0, 0, 0.4)
+    text-align: right
+    padding: 0 15px 5px
+
+  td
+    text-align: right
+    padding: 5px 15px
+
+    .part-status
+      float: right
+    .part-status::before
+      content: "\00A0"
+      border: 1px solid #666
+      border-radius: 8px
+      display: block
+      float: right
+      width: 10px
+      height: 10px
+      margin: 0 0 0 5px
+      box-shadow: 0 1px 1px rgba(0, 0, 0, 0.3)
+    .part-status.runnable::before, .part-status.running::before
+      background-color: #66f
+    .part-status.failed::before, .part-status.error::before
+      background-color: #f66
+    .part-status.passed::before
+      background-color: #6f6

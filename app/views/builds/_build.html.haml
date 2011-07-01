@@ -3,7 +3,7 @@
     .build-info
       .sha= build.sha
       .build-state
-        %span.state{:class => build.state}= build.state.to_s.capitalize
+        %span.state{:class => 'build-' + build.state.to_s}= build.state.to_s.capitalize
         on
         %span.queue= build.queue.to_s.capitalize
     %h3.build-id{:class => build.state}= build.id
