@@ -6,6 +6,7 @@ class BuildPartsController < ApplicationController
   end
 
   def show
+    @build = Build.find params[:build_id]
   end
 
   def load_build_and_part

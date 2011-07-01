@@ -1,3 +1,7 @@
+%h2.subheader
+  =link_to @build.sha, build_path(@build)
+  &mdash; Part #{@build_part.id}
+
 %p= @build_part.kind
 %p= @build_part.paths
 
