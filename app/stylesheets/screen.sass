@@ -39,6 +39,16 @@ $color-link: #2D81C5
 =text-shadow
   text-shadow: 0 1px 0 rgba(0, 0, 0, 0.5)
 
+=box-sizing($box-sizing: border-box)
+  box-sizing: $box-sizing
+  -webkit-box-sizing: $box-sizing
+  -moz-box-sizing: $box-sizing
+
+=border-radius($radius: 0)
+  -webkit-border-radius: $radius
+  -moz-border-radius: $radius
+  border-radius: $radius
+
 /* Styles */
 $default-background: #b4b5b7 url(../images/body-noise.png) center left fixed
 html
@@ -56,6 +66,124 @@ a
   color: $color-link
   text-decoration: none
 
+.structure
+  display: table-cell
+  display: inline-block
+  position: relative
+  overflow: visible
+  width: auto
+  height: 28px
+  margin: 2px 0
+  outline: none !important
+  border: none
+  padding: 4px 6px
+  line-height: 20px
+  vertical-align: middle
+  -webkit-appearance: none
+  -moz-appearance: none
+  zoom: 1
+  +box-sizing(border-box)
+
+$text-box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.4), inset 0 2px 1px 0 rgba(0, 0, 0, 0.2), inset 0 2px 3px 0 rgba(0, 0, 0, 0.2), 0 1px 0 0 rgba(255, 255, 255, 0.8)
+$text-box-width: 150px
+$input-inset-border: 0 0 0 1px rgba(115, 189, 250, 1) inset
+$input-focus-shadow: 0 0 2px 0 rgba(115, 189, 250, 0.9) // remove when forms are refactored to place padding around all form fields
+$input-focus-shadow: $input-inset-border, $input-focus-shadow
+input[type=text],
+input[type=email],
+input[type=password]
+  @extend .structure
+  width: $text-box-width
+  border-radius: 4px
+  -webkit-box-shadow: $text-box-shadow
+  -moz-box-shadow:    $text-box-shadow
+  padding: 6px 6px 4px
+  line-height: 18px
+  background: white
+  color: #202122
+  &:focus
+    -webkit-box-shadow: $input-focus-shadow
+    -moz-box-shadow:    $input-focus-shadow
+
+$focus-shadow: 0 0 7px 0 rgba(104, 189, 244, 0.9)
+
+// Button Shadow
+// Note: "inset spread distance" effects border-radius in Safari. See hack below.
+$button-inset-border: 0 0 0 1px rgba(190, 191, 194, 1) inset
+$button-inset-inner: 0 0 0 2px rgba(255, 255, 255, .3) inset
+$button-inset-shadow-gradient: 0 27px 20px -18px white inset
+$button-bottom: 0 1px 2px 0 rgba(255, 255, 255, 1)
+$button-shadow: $button-inset-border, $button-inset-inner, $button-inset-shadow-gradient, $button-bottom
+$button-focus-shadow: $button-inset-border, $button-inset-inner, $button-inset-shadow-gradient, $focus-shadow
+
+$input-inset-border: 0 0 0 1px rgba(115, 189, 250, 1) inset
+$input-focus-shadow: 0 0 2px 0 rgba(115, 189, 250, 0.9) // remove when forms are refactored to place padding around all form fields
+$input-focus-shadow: $input-inset-border, $input-focus-shadow
+
+$input-error-inset-border: 0 0 0 2px rgba(255, 153, 0, 1) inset
+$input-error-focus-shadow: 0 0 2px 0 rgba(255, 153, 0, .5) // remove when forms are refactored to place padding around all form fields
+$input-error-focus-shadow: $input-error-inset-border, $input-error-focus-shadow
+
+$input-disabled-border: 0 0 0 1px rgba(192, 192, 192, 1) inset
+$input-disabled-shadow: $input-disabled-border, $button-inset-inner, $button-inset-shadow-gradient
+
+// Active Button Shadow
+$button-inset-inner: 0 2px 0 0 rgba(0, 0, 0, .05) inset
+$button-inset-shadow-gradient: 0 -28px 20px -18px white inset
+$active-button-shadow: $button-inset-border, $button-inset-inner, $button-inset-shadow-gradient, $button-bottom
+$active-button-focus-shadow: $button-inset-border, $button-inset-inner, $button-inset-shadow-gradient, $focus-shadow
+
+// Primary Button Shadow
+// Note: "inset spread distance" effects border-radius in Safari. See hack below.
+$button-inset-border: 0 0 0 1px #2c7cd1 inset
+$button-inset-inner-top: 0 1px 0 1px rgba(143, 228, 255, .6) inset
+$button-inset-shadow-gradient: 0 28px 20px -18px rgba(143, 228, 255, .65) inset
+$button-inset-inner: 0 0 0 2px rgba(47, 148, 255, 1) inset
+$primary-button-shadow: $button-inset-border, $button-inset-inner-top, $button-inset-shadow-gradient, $button-inset-inner, $button-bottom
+$primary-button-focus-shadow: $button-inset-border, $button-inset-inner-top, $button-inset-shadow-gradient, $button-inset-inner, $focus-shadow
+
+// Primary Active Button Shadow
+$button-inset-inner: 0 2px 0 0 rgba(0, 0, 0, .04) inset
+$button-inset-shadow-gradient: 0 -31px 20px -18px rgba(143, 228, 255, .55) inset
+$primary-active-button-shadow: $button-inset-border, $button-inset-inner, $button-inset-shadow-gradient, $button-bottom
+$primary-active-button-focus-shadow: $button-inset-border, $button-inset-inner, $button-inset-shadow-gradient, $focus-shadow
+
+.button
+  +border-radius(4px) // Safari hack: reset back to .button-structure border-radius.
+  -webkit-box-shadow: $active-button-shadow
+  -moz-box-shadow:    $active-button-shadow
+  &:focus
+    -webkit-box-shadow: $active-button-focus-shadow
+    -moz-box-shadow:    $active-button-focus-shadow
+
+.active-button
+  +border-radius(4px) // Safari hack: reset back to .button-structure border-radius.
+  -webkit-box-shadow: $primary-active-button-shadow
+  -moz-box-shadow:    $primary-active-button-shadow
+  &:focus
+    -webkit-box-shadow: $primary-active-button-focus-shadow
+    -moz-box-shadow:    $primary-active-button-focus-shadow
+
+.primary-button
+  color: white
+  text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.2)
+  background: #2e8cf0
+  -webkit-border-radius: 7px // hack for Safari adjusting border-radius based upon "inset spread distance" value in box-shadow.
+  -webkit-box-shadow: $primary-button-shadow
+  -moz-box-shadow:    $primary-button-shadow
+  &:focus
+    -webkit-box-shadow: $primary-button-focus-shadow
+    -moz-box-shadow:    $primary-button-focus-shadow
+
+input[type=submit]
+  @extend .button
+  @extend .primary-button
+  font-family: $font-base
+  &.active,
+  &:hover:active
+    @extend .active-button
+
+/* Index */
 .section-wrapper
   overflow: hidden
   background: url(../images/section-bottom.png) no-repeat bottom center
@@ -204,3 +332,13 @@ $color-cuke: rgba(198, 232, 135, 0.6)
   max-width: 500px !important
   li
     margin: 5px 0
+
+/* New build */
+input.sha
+  width: 500px
+  font-family: $font-code
+  font-size: 150%
+input.build-button
+  font-size: 120%
+  padding: 3px 25px 5px
+  border: none
