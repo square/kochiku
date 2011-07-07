@@ -37,7 +37,7 @@ namespace :kochiku do
       tmp_dir = Rails.root.join('tmp', 'build-partition', 'web-cache')
       unless File.exists?(tmp_dir)
         FileUtils.mkdir_p tmp_dir
-        `cd #{tmp_dir} && git clone git@github.com:square/web .`
+        `cd #{tmp_dir} && git clone git@git.squareup.com:square/web .`
       end
 
       puts "adding plist..."
