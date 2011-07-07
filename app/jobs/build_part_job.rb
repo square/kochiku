@@ -42,7 +42,7 @@ class BuildPartJob < JobBase
 
   private
   def hostname
-    `hostname`
+    `hostname`.strip
   end
 
   def start_live_artifact_server
