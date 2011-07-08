@@ -1,5 +1,6 @@
-.bundle
+/.bundle
 db/*.sqlite3
 log/*.log
 tmp/
-.idea
+public/uploads
+public/log_files

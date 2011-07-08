@@ -14,7 +14,7 @@
       %td= result.elapsed_time
       %td
         - result.build_artifacts.map do |artifact|
-          = link_to artifact.name, artifact
+          = link_to artifact.log_file.to_s, artifact
 
 %hr
 = @build_part.inspect
