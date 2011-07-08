@@ -10,12 +10,11 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20110624015709) do
+ActiveRecord::Schema.define(:version => 20110708203120) do
 
   create_table "build_artifacts", :force => true do |t|
     t.integer  "build_part_result_id"
-    t.string   "name"
-    t.text     "content"
+    t.string   "log_file"
     t.datetime "created_at"
     t.datetime "updated_at"
   end

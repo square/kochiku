@@ -30,7 +30,7 @@ class BuildPartJob < JobBase
   def collect_artifacts(artifacts_glob)
     Dir[*artifacts_glob].each do |path|
       if File.file? path
-        build_part_result.build_artifacts.create!(:content => File.read(path), :name => path)
+        build_part_result.build_artifacts.create!(:log_file => File.open(path))
       end
     end
   end

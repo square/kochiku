@@ -52,12 +52,16 @@ describe BuildPartJob do
       Dir.mktmpdir do |dir|
         Dir.chdir(dir) do
           wanted_logs = ['a.wantedlog', 'b.wantedlog', 'd/c.wantedlog']
-          FileUtils.mkdir 'd'
-          FileUtils.touch wanted_logs
-          FileUtils.touch 'e.unwantedlog'
-          subject.collect_artifacts('**/*.wantedlog')
 
-          build_part_result.build_artifacts.map(&:name).should =~ wanted_logs
+          FileUtils.mkdir 'd'
+          (wanted_logs + ['e.unwantedlog']).each do |file_path|
+            File.open(file_path, 'w') do |file|
+              file.puts "Carrierwave won't save blank files"
+            end
+          end
+
+          subject.collect_artifacts('**/*.wantedlog')
+          build_part_result.build_artifacts(true).collect{|ba| File.basename(ba.log_file.to_s)}.should =~ wanted_logs.map{|f| File.basename(f)}
         end
       end
     end

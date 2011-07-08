@@ -3,6 +3,7 @@ source 'http://mirrors.squareup.com/rubygems'
 
 gem 'rails', '3.0.9'
 
+gem 'carrierwave', '~> 0.5.4'
 gem 'mysql2', '~> 0.2.7'
 gem "symbolize"
 
