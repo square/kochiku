@@ -1,5 +1,5 @@
 source 'http://mirrors.squareup.com/rubygems'
-#source 'https://rubygems.org/'
+# source 'https://rubygems.org/'
 
 gem 'rails', '3.0.9'
 
@@ -15,10 +15,11 @@ gem 'compass'
 gem "resque"
 gem "resque-lock"
 gem "resque-scheduler"
-gem "system_timer"      # used by redis gem
+gem "system_timer", :platforms => :mri_18    # used by redis gem
 
 group :development do
-  gem 'ruby-debug'
+  gem 'ruby-debug', :platforms => :mri_18
+  gem 'ruby-debug19', :require => 'ruby-debug', :platforms => :mri_19
 end
 
 group :test, :development do
