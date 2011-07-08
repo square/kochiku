@@ -45,10 +45,9 @@ module Kochiku
     config.encoding = "utf-8"
 
     # Configure sensitive parameters which will be filtered from the log file.
-    config.filter_parameters += [:password]
+    # config.filter_parameters += [:password]
 
-    config.after_initialize do
-      require "#{config.root}/config/build_strategies/#{Rails.env}"
-    end
+    # config.after_initialize do
+    # end
   end
 end
