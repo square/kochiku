@@ -44,9 +44,11 @@ GEM
       chunky_png (~> 1.2)
       fssm (>= 0.2.7)
       sass (~> 3.1)
+    daemon_controller (0.2.6)
     diff-lcs (1.1.2)
     erubis (2.6.6)
       abstract (>= 1.0.0)
+    fastthread (1.0.7)
     fssm (0.2.7)
     haml (3.1.2)
     haml-rails (0.3.4)
@@ -67,6 +69,11 @@ GEM
       treetop (~> 1.4.8)
     mime-types (1.16)
     mysql2 (0.2.11)
+    passenger (3.0.7)
+      daemon_controller (>= 0.2.5)
+      fastthread (>= 1.0.1)
+      rack
+      rake (>= 0.8.1)
     polyglot (0.3.1)
     rack (1.2.3)
     rack-mount (0.6.14)
@@ -159,6 +166,7 @@ DEPENDENCIES
   haml
   haml-rails
   mysql2 (~> 0.2.7)
+  passenger (~> 3.0.7)
   rails (= 3.0.9)
   resque
   resque-lock

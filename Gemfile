@@ -2,6 +2,7 @@ source 'http://mirrors.squareup.com/rubygems'
 # source 'https://rubygems.org/'
 
 gem 'rails', '3.0.9'
+gem 'passenger', '~> 3.0.7', :group => :production
 
 gem 'carrierwave', '~> 0.5.4'
 gem 'mysql2', '~> 0.2.7'
