@@ -21,6 +21,8 @@ gem "system_timer", :platforms => :mri_18    # used by redis gem
 group :development do
   gem 'ruby-debug', :platforms => :mri_18
   gem 'ruby-debug19', :require => 'ruby-debug', :platforms => :mri_19
+
+  gem 'capistrano', :require => false
 end
 
 group :test, :development do
