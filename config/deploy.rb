@@ -15,6 +15,7 @@ set :deploy_to, "/Users/square/kochiku"
 set :use_sudo, false
 
 server "macbuild-master.sfo", :app, :web, :db, :primary => true
+role :worker, "macbuild24.sfo", "macbuild25.sfo", "macbuild26.sfo"
 
 set :rails_env,      "production"
 set :passenger_port, 3000
@@ -31,5 +32,17 @@ namespace :deploy do
 
   task :restart, :roles => :app, :except => { :no_release => true } do
     run "touch #{File.join(current_path,'tmp','restart.txt')}"
+  end
+end
+
+namespace :workers do
+  task :update, :roles => :worker do
+    run <<-CMD
+      cd ~/Development/kochiku &&\
+      #{scm_command} fetch origin &&\
+      #{scm_command} reset --hard origin/master &&\
+      bundle --deployment --quiet --without development test &&\
+      launchctl stop com.squareup.kochiku-slave
+    CMD
   end
 end
