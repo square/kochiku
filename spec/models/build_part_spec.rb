@@ -10,9 +10,9 @@ describe BuildPart do
       BuildPartJob.should_receive(:enqueue_on).with(queue, anything)
       build_part.should be_present
     end
-    it "creates a runnable build part result" do
-      build_part.build_part_results.should be_present
-      build_part.build_part_results.first.state.should == :runnable
+    it "creates a runnable build attempt" do
+      build_part.build_attempts.should be_present
+      build_part.build_attempts.first.state.should == :runnable
     end
   end
 end

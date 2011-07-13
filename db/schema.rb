@@ -10,16 +10,16 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20110708203120) do
+ActiveRecord::Schema.define(:version => 20110713175724) do
 
   create_table "build_artifacts", :force => true do |t|
-    t.integer  "build_part_result_id"
+    t.integer  "build_attempt_id"
     t.string   "log_file"
     t.datetime "created_at"
     t.datetime "updated_at"
   end
 
-  create_table "build_part_results", :force => true do |t|
+  create_table "build_attempts", :force => true do |t|
     t.integer  "build_part_id"
     t.datetime "started_at"
     t.datetime "finished_at"

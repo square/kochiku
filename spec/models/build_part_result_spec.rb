@@ -1,4 +1,4 @@
 require 'spec_helper'
 
-describe BuildPartResult do
+describe BuildAttempt do
 end

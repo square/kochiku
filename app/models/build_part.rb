@@ -1,17 +1,17 @@
 class BuildPart < ActiveRecord::Base
-  has_many :build_part_results
+  has_many :build_attempts
   belongs_to :build
   after_commit :enqueue_build_part_job
   validates_presence_of :kind, :paths
 
   serialize :paths, Array
 
-  scope :failed, joins(:build_part_results).merge(BuildPartResult.failed)
-  scope :passed, joins(:build_part_results).merge(BuildPartResult.passed)
+  scope :failed, joins(:build_attempts).merge(BuildAttempt.failed)
+  scope :passed, joins(:build_attempts).merge(BuildAttempt.passed)
 
   def enqueue_build_part_job
-    build_part_result = build_part_results.create!(:state => :runnable)
-    BuildPartJob.enqueue_on(build.queue, build_part_result.id)
+    build_attempt = build_attempts.create!(:state => :runnable)
+    BuildPartJob.enqueue_on(build.queue, build_attempt.id)
   end
 
   def rebuild!
@@ -19,7 +19,7 @@ class BuildPart < ActiveRecord::Base
   end
 
   def status
-    build_part_results.order(:created_at).last.state
+    build_attempts.order(:created_at).last.state
   end
 
   def execute

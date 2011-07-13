@@ -12,8 +12,8 @@ describe BuildPartJob do
   let(:sha) { "abcdef" }
   let(:queue) { "master" }
   let(:build_part) { BuildPart.create!(valid_attributes) }
-  let(:build_part_result) { build_part.build_part_results.create!(:state => :runnable) }
-  subject { BuildPartJob.new(build_part_result.id) }
+  let(:build_attempt) { build_part.build_attempts.create!(:state => :runnable) }
+  subject { BuildPartJob.new(build_attempt.id) }
 
   describe "#perform" do
     before do
@@ -21,20 +21,20 @@ describe BuildPartJob do
       GitRepo.stub(:run!)
     end
 
-    it "sets the builder on its build part result" do
+    it "sets the builder on its build attempt" do
       hostname = "i-am-a-compooter"
       subject.stub(:tests_green?)
       subject.stub(:hostname => hostname)
       
       subject.perform
-      build_part_result.reload.builder.should == hostname
+      build_attempt.reload.builder.should == hostname
     end
 
     context "build is successful" do
       before { subject.stub(:tests_green? => true) }
 
       it "creates a build result with a passed result" do
-        expect { subject.perform }.to change{build_part_result.reload.state}.from(:runnable).to(:passed)
+        expect { subject.perform }.to change{build_attempt.reload.state}.from(:runnable).to(:passed)
       end
     end
 
@@ -42,7 +42,7 @@ describe BuildPartJob do
       before { subject.stub(:tests_green? => false) }
 
       it "creates a build result with a failed result" do
-        expect { subject.perform }.to change{build_part_result.reload.state}.from(:runnable).to(:failed)
+        expect { subject.perform }.to change{build_attempt.reload.state}.from(:runnable).to(:failed)
       end
     end
   end
@@ -61,7 +61,7 @@ describe BuildPartJob do
           end
 
           subject.collect_artifacts('**/*.wantedlog')
-          build_part_result.build_artifacts(true).collect{|ba| File.basename(ba.log_file.to_s)}.should =~ wanted_logs.map{|f| File.basename(f)}
+          build_attempt.build_artifacts(true).collect{|ba| File.basename(ba.log_file.to_s)}.should =~ wanted_logs.map{|f| File.basename(f)}
         end
       end
     end

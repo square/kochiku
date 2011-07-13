@@ -1,6 +1,6 @@
 class Build < ActiveRecord::Base
   has_many :build_parts
-  has_many :build_part_results, :through => :build_parts
+  has_many :build_attempts, :through => :build_parts
   symbolize :state, :in => [:partitioning, :runnable, :running, :doomed, :failed, :succeeded, :error]
   symbolize :queue
   validates_presence_of :queue
@@ -38,11 +38,11 @@ class Build < ActiveRecord::Base
   end
 
   def started_at
-    build_part_results.order('started_at asc').first.started_at
+    build_attempts.order('started_at asc').first.started_at
   end
 
   def finished_at
-#    build_part_results.all.sort_by(&:finished_at).last
+#    build_attempts.all.sort_by(&:finished_at).last
   end
 
   def succeeded?

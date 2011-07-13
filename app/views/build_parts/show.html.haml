@@ -7,16 +7,16 @@
     %th started at
     %th elapsed time
     %th artifacts
-  - @build_part.build_part_results.each do |result|
+  - @build_part.build_attempts.each do |attempt|
     %tr
-      %td= result.state
-      %td= result.started_at
-      %td= result.elapsed_time
+      %td= attempt.state
+      %td= attempt.started_at
+      %td= attempt.elapsed_time
       %td
-        - result.build_artifacts.map do |artifact|
+        - attempt.build_artifacts.map do |artifact|
           = link_to artifact.log_file.to_s, artifact.log_file.url
 
 %hr
 = @build_part.inspect
 %br
-= @build_part.build_part_results.inspect
+= @build_part.build_attempts.inspect
