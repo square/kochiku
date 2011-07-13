@@ -7,6 +7,7 @@ require 'bundler/capistrano' # bundler bootstrap
 
 set :application, "Kochiku"
 set :repository,  "git@git.squareup.com:square/kochiku.git"
+set :branch, "rob-exp"
 set :scm, :git
 set :scm_command, '/usr/local/bin/git'
 
@@ -41,7 +42,7 @@ namespace :workers do
     run <<-CMD
       cd ~/Development/kochiku &&\
       #{scm_command} fetch origin &&\
-      #{scm_command} reset --hard origin/master &&\
+      #{scm_command} reset --hard origin/#{branch} &&\
       bundle --deployment --quiet --without development test &&\
       launchctl stop com.squareup.kochiku-slave
     CMD
