@@ -47,6 +47,7 @@ Kochiku::Application.configure do
   # Send deprecation notices to registered listeners
   config.active_support.deprecation = :notify
 
+  config.master_host = "macbuild-master.sfo.squareup.com"
 
-  Resque.redis = Redis.new(:host => "macbuild-master.sfo.squareup.com")
+  Resque.redis = Redis.new(:host => config.master_host)
 end

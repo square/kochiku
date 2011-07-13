@@ -33,6 +33,8 @@ Kochiku::Application.configure do
   # Print deprecation notices to the stderr
   config.active_support.deprecation = :stderr
 
+  config.master_host = "test.local"
+  
   config.after_initialize do
     Resque.redis.namespace = "resque:kochiku:test"
   end

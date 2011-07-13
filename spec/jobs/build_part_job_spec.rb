@@ -48,7 +48,9 @@ describe BuildPartJob do
   end
 
   describe "#collect_artifacts" do
-    it "stores specified artifacts to the database" do
+    it "posts the artifacts back to the master server" do
+      stub_request(:any, /#{master_host}.*/)
+
       Dir.mktmpdir do |dir|
         Dir.chdir(dir) do
           wanted_logs = ['a.wantedlog', 'b.wantedlog', 'd/c.wantedlog']
@@ -59,9 +61,14 @@ describe BuildPartJob do
               file.puts "Carrierwave won't save blank files"
             end
           end
-
+          master_host = "http://" + Rails.application.config.master_host
+          
           subject.collect_artifacts('**/*.wantedlog')
-          build_attempt.build_artifacts(true).collect{|ba| File.basename(ba.log_file.to_s)}.should =~ wanted_logs.map{|f| File.basename(f)}
+
+          wanted_logs.each do |artifact|
+            log_name = File.basename(artifact)
+            WebMock.should have_requested(:post, master_host + "/build_attempts/#{build_attempt.to_param}/build_artifacts").with { |req| req.body.include?(log_name) }
+          end
         end
       end
     end

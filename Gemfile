@@ -18,6 +18,8 @@ gem "resque-lock"
 gem "resque-scheduler"
 gem "system_timer", :platforms => :mri_18    # used by redis gem
 
+gem "rest-client"
+
 group :development do
   gem 'ruby-debug', :platforms => :mri_18
   gem 'ruby-debug19', :require => 'ruby-debug', :platforms => :mri_19
@@ -29,4 +31,5 @@ group :test, :development do
   gem 'autotest'
   gem 'autotest-fsevent'
   gem 'rspec-rails'
+  gem 'webmock'
 end

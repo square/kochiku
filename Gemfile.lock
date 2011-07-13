@@ -29,6 +29,7 @@ GEM
       activemodel (= 3.0.9)
       activesupport (= 3.0.9)
     activesupport (3.0.9)
+    addressable (2.2.6)
     archive-tar-minitar (0.5.2)
     arel (2.0.10)
     autotest (4.4.6)
@@ -50,6 +51,7 @@ GEM
       chunky_png (~> 1.2)
       fssm (>= 0.2.7)
       sass (~> 3.1)
+    crack (0.1.8)
     daemons (1.1.4)
     diff-lcs (1.1.2)
     erubis (2.6.6)
@@ -119,6 +121,8 @@ GEM
       redis (>= 2.0.1)
       resque (>= 1.8.0)
       rufus-scheduler
+    rest-client (1.6.3)
+      mime-types (>= 1.16)
     rspec (2.6.0)
       rspec-core (~> 2.6.0)
       rspec-expectations (~> 2.6.0)
@@ -167,6 +171,9 @@ GEM
     tzinfo (0.3.29)
     vegas (0.1.8)
       rack (>= 1.0.0)
+    webmock (1.6.4)
+      addressable (~> 2.2, > 2.2.5)
+      crack (>= 0.1.7)
 
 PLATFORMS
   ruby
@@ -184,6 +191,7 @@ DEPENDENCIES
   resque
   resque-lock
   resque-scheduler
+  rest-client
   rspec-rails
   ruby-debug
   ruby-debug19
@@ -191,3 +199,4 @@ DEPENDENCIES
   symbolize
   system_timer
   thin
+  webmock

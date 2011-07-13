@@ -9,6 +9,7 @@ Bundler.require(:default, Rails.env) if defined?(Bundler)
 
 module Kochiku
   class Application < Rails::Application
+    config.master_host = "http://localhost"
 
     config.generators do |g|
       g.template_engine :haml
