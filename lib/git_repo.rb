@@ -3,17 +3,26 @@ class GitRepo
 
   class << self
     def inside_copy(cached_repo_name, ref = "master", submodules = false)
+      cached_repo_path = File.join(WORKING_DIR, cached_repo_name)
       # update local repo
-      run! "cd #{WORKING_DIR}/#{cached_repo_name} && git fetch"
+      run! "cd #{cached_repo_path} && git fetch && git submodule update --init"
 
       Dir.mktmpdir(nil, WORKING_DIR) do |dir|
         Dir.chdir(dir) do
           # clone local repo (fast!)
-          run! "git clone #{WORKING_DIR}/web-cache ."
+          run! "git clone #{cached_repo_path} ."
 
-          # checkout
           run! "git checkout #{ref}"
-          run! "git submodule update --init" if submodules
+
+          run! "git submodule init"
+          # redirect the submodules to the cached_repo
+          submodules = `git config --get-regexp "^submodule\\..*\\.url$"`
+          submodules.each_line do |config_line|
+            submodule_path = config_line.match(/submodule\.(.*?)\.url/)[1]
+            `git config --replace-all submodule.#{submodule_path}.url "#{cached_repo_path}/#{submodule_path}"`
+          end
+
+          run! "git submodule update"
 
           yield
         end
