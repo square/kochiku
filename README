@@ -28,7 +28,7 @@ Promotes a tag if the build is successful. Enqueued by BuildAttemptObserver.
 
 
 = Future Work =
-- fix workers to upload build artifacts
+X - fix workers to upload build artifacts
 - fix log display to not suck
 - redeploy to servers
 - email on build failures
