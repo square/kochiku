@@ -12,6 +12,7 @@ set :scm_command, '/usr/local/bin/git'
 
 set :user, "square"
 set :deploy_to, "/Users/square/kochiku"
+set :deploy_via, :remote_cache
 set :use_sudo, false
 
 server "macbuild-master.sfo", :app, :web, :db, :primary => true
