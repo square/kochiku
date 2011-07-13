@@ -49,6 +49,7 @@ describe BuildPartJob do
 
   describe "#collect_artifacts" do
     it "posts the artifacts back to the master server" do
+      master_host = "http://" + Rails.application.config.master_host
       stub_request(:any, /#{master_host}.*/)
 
       Dir.mktmpdir do |dir|
@@ -61,8 +62,7 @@ describe BuildPartJob do
               file.puts "Carrierwave won't save blank files"
             end
           end
-          master_host = "http://" + Rails.application.config.master_host
-          
+
           subject.collect_artifacts('**/*.wantedlog')
 
           wanted_logs.each do |artifact|

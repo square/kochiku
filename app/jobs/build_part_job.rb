@@ -28,7 +28,6 @@ class BuildPartJob < JobBase
     Dir[*artifacts_glob].each do |path|
       if File.file? path
         RestClient.post "http://#{Rails.application.config.master_host}/build_attempts/#{build_attempt.id}/build_artifacts", :build_artifact => {:log_file => File.open(path)}, :accept => :xml
-        build_attempt.build_artifacts.create!(:log_file => File.open(path))
       end
     end
   end
