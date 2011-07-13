@@ -18,20 +18,20 @@ server "macbuild-master.sfo", :app, :web, :db, :primary => true
 role :worker, "macbuild24.sfo", "macbuild25.sfo", "macbuild26.sfo"
 
 set :rails_env,      "production"
-set :passenger_port, 3000
-set :passenger_cmd,  "bundle exec passenger"
 
 namespace :deploy do
   task :start, :roles => :app, :except => { :no_release => true } do
-    run "cd #{current_path} && #{passenger_cmd} start -e #{rails_env} -p #{passenger_port} -d"
+    run "cd #{current_path} && rails server thin -e #{rails_env} -p 3000 -d"
   end
 
   task :stop, :roles => :app, :except => { :no_release => true } do
-    run "cd #{current_path} && #{passenger_cmd} stop -p #{passenger_port}"
+    pid = run("cd #{current_path} && cat tmp/pids/server.pid")
+    run "kill #{pid}"
   end
 
   task :restart, :roles => :app, :except => { :no_release => true } do
-    run "touch #{File.join(current_path,'tmp','restart.txt')}"
+    stop
+    start
   end
 end
 
