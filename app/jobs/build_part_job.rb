@@ -12,13 +12,10 @@ class BuildPartJob < JobBase
   def perform
     build_part_result.start!(hostname)
     GitRepo.inside_copy('web-cache', build.sha, true) do
-      start_live_artifact_server
       result = tests_green? ? :passed : :failed
       build_part_result.finish!(result)
       collect_artifacts(build_part.artifacts_glob)
     end
-  ensure
-    kill_live_artifact_server
   end
 
   def tests_green?
@@ -43,26 +40,5 @@ class BuildPartJob < JobBase
   private
   def hostname
     `hostname`.strip
-  end
-
-  def start_live_artifact_server
-    pid = fork
-    if pid.nil?
-      begin
-        server = WEBrick::HTTPServer.new(
-              :Port => 55555,
-              :DocumentRoot => "log",
-              :FancyIndexing => true)
-        server.start
-      rescue Interrupt
-        server.stop
-      end
-    else
-      @artifact_server_pid = pid
-    end
-  end
-
-  def kill_live_artifact_server
-    Process.kill("KILL", @artifact_server_pid) if @artifact_server_pid
   end
 end
