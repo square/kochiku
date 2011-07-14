@@ -7,7 +7,7 @@ require 'bundler/capistrano' # bundler bootstrap
 
 set :application, "Kochiku"
 set :repository,  "git@git.squareup.com:square/kochiku.git"
-set :branch, "rob-exp"
+set :branch, "master"
 set :scm, :git
 set :scm_command, '/usr/local/bin/git'
 
@@ -27,8 +27,11 @@ namespace :deploy do
   end
 
   task :stop, :roles => :app, :except => { :no_release => true } do
-    pid = run("cd #{current_path} && cat tmp/pids/server.pid")
-    run "kill #{pid}"
+    @pid = nil
+    run("cd #{current_path} && cat tmp/pids/server.pid") do |channel, stream, data|
+      @pid = data if stream == :out
+    end
+    run "kill #{@pid}"
   end
 
   task :restart, :roles => :app, :except => { :no_release => true } do
