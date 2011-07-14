@@ -21,6 +21,8 @@ role :worker, "macbuild24.sfo", "macbuild25.sfo", "macbuild26.sfo"
 
 set :rails_env,      "production"
 
+after "deploy:finalize_update", "kochiku:symlinks"
+
 namespace :deploy do
   task :start, :roles => :app, :except => { :no_release => true } do
     run "cd #{current_path} && rails server thin -e #{rails_env} -p 3000 -d"
@@ -46,5 +48,13 @@ namespace :deploy do
 
   task :restart_workers, :roles => :worker, :except => { :no_release => true } do
     run "launchctl stop com.squareup.kochiku-slave"
+  end
+end
+
+namespace :kochiku do
+  task :symlinks, :roles => [:app, :worker] do
+    run <<-CMD
+      ln -nfs #{shared_path}/build-partition #{release_path}/tmp/build-partition
+    CMD
   end
 end
