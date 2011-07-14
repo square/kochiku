@@ -3,24 +3,29 @@
   &mdash; Part #{@build_part.id}
 
 %p= @build_part.kind
-%p= @build_part.paths
 
-%table
-  %tr
-    %th state
-    %th started at
-    %th elapsed time
-    %th artifacts
-  - @build_part.build_attempts.each do |attempt|
+%ol
+  - @build_part.paths.each do |path|
+    %li=path
+
+%table.build-part-info
+  %thead
     %tr
-      %td= attempt.state
-      %td= attempt.started_at
-      %td= attempt.elapsed_time
-      %td
-        - attempt.build_artifacts.map do |artifact|
-          = link_to artifact.log_file.to_s, artifact.log_file.url
+      %th state
+      %th started at
+      %th elapsed time
+      %th artifacts
+  %tbody
+    - @build_part.build_attempts.each do |attempt|
+      %tr
+        %td= attempt.state
+        %td= attempt.started_at
+        %td= attempt.elapsed_time
+        %td
+          - attempt.build_artifacts.each do |artifact|
+            = link_to File.basename(artifact.log_file.to_s), artifact.log_file.url
+            %br
 
-%hr
-= @build_part.inspect
-%br
-= @build_part.build_attempts.inspect
+
+%hr{:style => 'margin-top: 60px'}}
+= debug(@build_part)
