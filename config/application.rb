@@ -9,6 +9,7 @@ Bundler.require(:default, Rails.env) if defined?(Bundler)
 
 module Kochiku
   class Application < Rails::Application
+    config.master_host = "http://localhost"
 
     config.generators do |g|
       g.template_engine :haml
@@ -21,14 +22,14 @@ module Kochiku
     # -- all .rb files in that directory are automatically loaded.
 
     # Custom directories with classes and modules you want to be autoloadable.
-    config.autoload_paths += %W(#{config.root}/app/jobs #{config.root}/lib)
+    # config.autoload_paths += %W(#{config.root}/lib)
 
     # Only load the plugins named here, in the order given (default is alphabetical).
     # :all can be used as a placeholder for all plugins not explicitly named.
     # config.plugins = [ :exception_notification, :ssl_requirement, :all ]
 
     # Activate observers that should always be running.
-    config.active_record.observers = :build_part_result_observer
+    config.active_record.observers = :build_attempt_observer
 
     # Set Time.zone default to the specified zone and make Active Record auto-convert to this zone.
     # Run "rake -D time" for a list of tasks for finding time zone names. Default is UTC.
@@ -45,10 +46,9 @@ module Kochiku
     config.encoding = "utf-8"
 
     # Configure sensitive parameters which will be filtered from the log file.
-    config.filter_parameters += [:password]
+    # config.filter_parameters += [:password]
 
-    config.after_initialize do
-      require "#{config.root}/config/build_strategies/#{Rails.env}"
-    end
+    # config.after_initialize do
+    # end
   end
 end

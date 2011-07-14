@@ -1,12 +1,11 @@
-source 'http://mirrors.squareup.com/rubygems'
-#source 'https://rubygems.org/'
+# source 'http://mirrors.squareup.com/rubygems'
+source 'https://rubygems.org/'
 
 gem 'rails', '3.0.9'
+gem 'thin', :require => false
 
-# Bundle edge Rails instead:
-# gem 'rails', :git => 'git://github.com/rails/rails.git'
-
-gem 'mysql2', '>=0.2', '<0.3'
+gem 'carrierwave', '~> 0.5.4'
+gem 'mysql2', '~> 0.2.7'
 gem "symbolize"
 
 gem 'haml'
@@ -17,27 +16,20 @@ gem 'compass'
 gem "resque"
 gem "resque-lock"
 gem "resque-scheduler"
-gem "SystemTimer"
+gem "system_timer", :platforms => :mri_18    # used by redis gem
+
+gem "rest-client"
 
 group :development do
-  gem 'ruby-debug'
+  gem 'ruby-debug', :platforms => :mri_18
+  gem 'ruby-debug19', :require => 'ruby-debug', :platforms => :mri_19
+
+  gem 'capistrano', :require => false
 end
 
 group :test, :development do
   gem 'autotest'
   gem 'autotest-fsevent'
   gem 'rspec-rails'
+  gem 'webmock'
 end
-
-# Bundle the extra gems:
-# gem 'bj'
-# gem 'nokogiri'
-# gem 'sqlite3-ruby', :require => 'sqlite3'
-# gem 'aws-s3', :require => 'aws/s3'
-
-# Bundle gems for the local environment. Make sure to
-# put test-only gems in this group so their generators
-# and rake tasks are available in development mode:
-# group :development, :test do
-#   gem 'webrat'
-# end

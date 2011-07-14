@@ -12,8 +12,8 @@ describe BuildPartJob do
   let(:sha) { "abcdef" }
   let(:queue) { "master" }
   let(:build_part) { BuildPart.create!(valid_attributes) }
-  let(:build_part_result) { build_part.build_part_results.create!(:state => :runnable) }
-  subject { BuildPartJob.new(build_part_result.id) }
+  let(:build_attempt) { build_part.build_attempts.create!(:state => :runnable) }
+  subject { BuildPartJob.new(build_attempt.id) }
 
   describe "#perform" do
     before do
@@ -21,20 +21,20 @@ describe BuildPartJob do
       GitRepo.stub(:run!)
     end
 
-    it "sets the builder on its build part result" do
+    it "sets the builder on its build attempt" do
       hostname = "i-am-a-compooter"
       subject.stub(:tests_green?)
       subject.stub(:hostname => hostname)
       
       subject.perform
-      build_part_result.reload.builder.should == hostname
+      build_attempt.reload.builder.should == hostname
     end
 
     context "build is successful" do
       before { subject.stub(:tests_green? => true) }
 
       it "creates a build result with a passed result" do
-        expect { subject.perform }.to change{build_part_result.reload.state}.from(:runnable).to(:passed)
+        expect { subject.perform }.to change{build_attempt.reload.state}.from(:runnable).to(:passed)
       end
     end
 
@@ -42,22 +42,33 @@ describe BuildPartJob do
       before { subject.stub(:tests_green? => false) }
 
       it "creates a build result with a failed result" do
-        expect { subject.perform }.to change{build_part_result.reload.state}.from(:runnable).to(:failed)
+        expect { subject.perform }.to change{build_attempt.reload.state}.from(:runnable).to(:failed)
       end
     end
   end
 
   describe "#collect_artifacts" do
-    it "stores specified artifacts to the database" do
+    it "posts the artifacts back to the master server" do
+      master_host = "http://" + Rails.application.config.master_host
+      stub_request(:any, /#{master_host}.*/)
+
       Dir.mktmpdir do |dir|
         Dir.chdir(dir) do
           wanted_logs = ['a.wantedlog', 'b.wantedlog', 'd/c.wantedlog']
+
           FileUtils.mkdir 'd'
-          FileUtils.touch wanted_logs
-          FileUtils.touch 'e.unwantedlog'
+          (wanted_logs + ['e.unwantedlog']).each do |file_path|
+            File.open(file_path, 'w') do |file|
+              file.puts "Carrierwave won't save blank files"
+            end
+          end
+
           subject.collect_artifacts('**/*.wantedlog')
 
-          build_part_result.build_artifacts.map(&:name).should =~ wanted_logs
+          wanted_logs.each do |artifact|
+            log_name = File.basename(artifact)
+            WebMock.should have_requested(:post, master_host + "/build_attempts/#{build_attempt.to_param}/build_artifacts").with { |req| req.body.include?(log_name) }
+          end
         end
       end
     end

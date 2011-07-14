@@ -9,7 +9,7 @@ describe BuildStateUpdateJob do
   describe "#perform" do
     context "when incomplete but nothing has failed" do
       before do
-        @build.build_parts.first.build_part_results.create!(:state => :passed)
+        @build.build_parts.first.build_attempts.create!(:state => :passed)
       end
 
       it "should be running" do
@@ -22,7 +22,7 @@ describe BuildStateUpdateJob do
     context "when all parts have passed" do
       before do
         @build.build_parts.each do |part|
-          part.build_part_results.create!(:state => :passed)
+          part.build_attempts.create!(:state => :passed)
         end
       end
 
@@ -35,7 +35,7 @@ describe BuildStateUpdateJob do
 
     context "when a part has failed but some are still running" do
       before do
-        @build.build_parts.first.build_part_results.create!(:state => :failed)
+        @build.build_parts.first.build_attempts.create!(:state => :failed)
       end
 
       it "should pass the build" do
@@ -49,9 +49,9 @@ describe BuildStateUpdateJob do
     context "when all parts have run and some have failed" do
       before do
         @build.build_parts.each do |part|
-          part.build_part_results.create!(:state => :passed)
+          part.build_attempts.create!(:state => :passed)
         end
-        @build.build_parts.first.build_part_results.create!(:state => :failed)
+        @build.build_parts.first.build_attempts.create!(:state => :failed)
       end
       it "should pass the build" do
         expect {
