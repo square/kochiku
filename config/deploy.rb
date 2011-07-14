@@ -22,7 +22,7 @@ role :worker, "macbuild24.sfo", "macbuild25.sfo", "macbuild26.sfo"
 set :rails_env,      "production"
 
 after "deploy:setup", "kochiku:setup"
-after "deploy:finalize_update", "kochiku:symlinks"
+after "deploy:symlink", "kochiku:symlinks"
 
 namespace :deploy do
   task :start, :roles => :app, :except => { :no_release => true } do
