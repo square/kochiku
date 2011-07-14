@@ -6,7 +6,7 @@ class BuildArtifactsController < ApplicationController
 
     respond_to do |format|
       if @build_artifact.save
-        format.xml  { render :xml => @build_artifact, :status => :created, :location => @build_artifact }
+        format.xml  { head :created, :location => @build_artifact.log_file.url }
       else
         format.xml  { render :xml => @build_artifact.errors, :status => :unprocessable_entity }
       end
