@@ -34,20 +34,17 @@ namespace :deploy do
     run "kill #{@pid}"
   end
 
-  task :restart, :roles => :app, :except => { :no_release => true } do
+  task :restart do
+    restart_app
+    restart_workers
+  end
+
+  task :restart_app, :roles => :app, :except => { :no_release => true } do
     stop
     start
   end
-end
 
-namespace :workers do
-  task :update, :roles => :worker do
-    run <<-CMD
-      cd ~/Development/kochiku &&\
-      #{scm_command} fetch origin &&\
-      #{scm_command} reset --hard origin/#{branch} &&\
-      bundle --deployment --quiet --without development test &&\
-      launchctl stop com.squareup.kochiku-slave
-    CMD
+  task :restart_workers, :roles => :worker, :except => { :no_release => true } do
+    run "launchctl stop com.squareup.kochiku-slave"
   end
 end
