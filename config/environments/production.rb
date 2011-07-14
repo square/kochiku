@@ -49,5 +49,5 @@ Kochiku::Application.configure do
 
   config.master_host = "macbuild-master.sfo.squareup.com:3000"
 
-  Resque.redis = Redis.new(:host => config.master_host)
+  Resque.redis = Redis.new(:host => "macbuild-master.sfo.squareup.com")
 end
