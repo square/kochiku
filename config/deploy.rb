@@ -21,6 +21,7 @@ role :worker, "macbuild24.sfo", "macbuild25.sfo", "macbuild26.sfo"
 
 set :rails_env,      "production"
 
+after "deploy:setup", "kochiku:setup"
 after "deploy:finalize_update", "kochiku:symlinks"
 
 namespace :deploy do
@@ -52,6 +53,18 @@ namespace :deploy do
 end
 
 namespace :kochiku do
+  task :setup, :roles => [:app, :worker] do
+    run <<-CMD
+      if [ ! -d #{shared_path}/build-partition ]; then
+        mkdir -p #{shared_path}/build-partition
+      fi
+
+      if [ ! -d #{shared_path}/build-partition/web-cache ]; then
+        git clone git@git.squareup.com:square/web.git web-cache
+      fi
+    CMD
+  end
+
   task :symlinks, :roles => [:app, :worker] do
     run <<-CMD
       ln -nfs #{shared_path}/build-partition #{current_path}/tmp/build-partition
