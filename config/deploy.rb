@@ -60,7 +60,7 @@ namespace :kochiku do
 
   task :symlinks, :roles => [:app, :worker] do
     run <<-CMD
-      ln -nfs #{shared_path}/build-partition #{current_path}/tmp/build-partition
+      ln -nfFs #{shared_path}/build-partition #{current_path}/tmp/build-partition
     CMD
   end
 end
