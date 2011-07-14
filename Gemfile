@@ -3,6 +3,7 @@ source 'https://rubygems.org/'
 
 gem 'rails', '3.0.9'
 gem 'thin', :require => false
+gem 'square-hoptoad_notifier', :require => "hoptoad_notifier"
 
 gem 'carrierwave', '~> 0.5.4'
 gem 'mysql2', '~> 0.2.7'

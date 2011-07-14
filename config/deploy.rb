@@ -3,7 +3,8 @@ require "rvm/capistrano"
 set :rvm_type, :user
 set :rvm_ruby_string, 'ree@kochiku'
 
-require 'bundler/capistrano' # bundler bootstrap
+require 'bundler/capistrano' # adds bundle:install step to deploy pipeline
+require 'hoptoad_notifier/capistrano'
 
 set :application, "Kochiku"
 set :repository,  "git@git.squareup.com:square/kochiku.git"
