@@ -25,7 +25,7 @@ describe BuildPartJob do
       hostname = "i-am-a-compooter"
       subject.stub(:tests_green?)
       subject.stub(:hostname => hostname)
-      
+
       subject.perform
       build_attempt.reload.builder.should == hostname
     end
@@ -48,10 +48,12 @@ describe BuildPartJob do
   end
 
   describe "#collect_artifacts" do
-    it "posts the artifacts back to the master server" do
-      master_host = "http://" + Rails.application.config.master_host
+    let(:master_host) { "http://" + Rails.application.config.master_host }
+    before do
       stub_request(:any, /#{master_host}.*/)
+    end
 
+    it "posts the artifacts back to the master server" do
       Dir.mktmpdir do |dir|
         Dir.chdir(dir) do
           wanted_logs = ['a.wantedlog', 'b.wantedlog', 'd/c.wantedlog']
@@ -69,6 +71,17 @@ describe BuildPartJob do
             log_name = File.basename(artifact)
             WebMock.should have_requested(:post, master_host + "/build_attempts/#{build_attempt.to_param}/build_artifacts").with { |req| req.body.include?(log_name) }
           end
+        end
+      end
+    end
+
+    it "should not attempt to save blank files" do
+      Dir.mktmpdir do |dir|
+        Dir.chdir(dir) do
+          log_name = 'empty.log'
+          system("touch #{log_name}")
+          subject.collect_artifacts('*.log')
+          WebMock.should_not have_requested(:post, master_host + "/build_attempts/#{build_attempt.to_param}/build_artifacts").with { |req| req.body.include?(log_name) }
         end
       end
     end
