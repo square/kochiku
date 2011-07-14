@@ -37,4 +37,14 @@ class BuildPart < ActiveRecord::Base
   def finished_at
     build_attempts.last.try(:finished_at)
   end
+
+  def elapsed_time
+    if finished_at && started_at
+      finished_at - started_at
+    elsif started_at
+      Time.now - started_at
+    else
+      nil
+    end
+  end
 end

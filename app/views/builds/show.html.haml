@@ -21,7 +21,7 @@
         %span.part-status{:class => part.status}= part.status.to_s.capitalize
       %td{:class => part.kind}= part.kind.to_s.capitalize
       %td
-        #{distance_of_time_in_words(part.started_at, part.finished_at || Time.now)}
+        #{duration_strftime(part.elapsed_time)}
       - if part.status == :failed
         %td= link_to("Rebuild", rebuild_build_build_part_path(@build, part), :method => :post)
       - else

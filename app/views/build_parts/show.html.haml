@@ -20,7 +20,7 @@
       %tr
         %td= attempt.state
         %td= attempt.started_at
-        %td= attempt.elapsed_time
+        %td= duration_strftime(attempt.elapsed_time)
         %td
           - attempt.build_artifacts.each do |artifact|
             = link_to File.basename(artifact.log_file.to_s), artifact.log_file.url
