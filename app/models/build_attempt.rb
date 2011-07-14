@@ -9,7 +9,13 @@ class BuildAttempt < ActiveRecord::Base
   end
 
   def elapsed_time
-    finished_at - started_at if finished_at && started_at
+    if finished_at && started_at
+      finished_at - started_at
+    elsif started_at
+      Time.now - started_at
+    else
+      nil
+    end
   end
 
   def start!(builder)

@@ -29,4 +29,12 @@ class BuildPart < ActiveRecord::Base
   def artifacts_glob
     BuildStrategy.new.artifacts_glob
   end
+
+  def started_at
+    build_attempts.last.try(:started_at)
+  end
+
+  def finished_at
+    build_attempts.last.try(:finished_at)
+  end
 end
