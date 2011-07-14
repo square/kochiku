@@ -54,15 +54,8 @@ end
 
 namespace :kochiku do
   task :setup, :roles => [:app, :worker] do
-    run <<-CMD
-      if [ ! -d #{shared_path}/build-partition ]; then
-        mkdir -p #{shared_path}/build-partition
-      fi
-
-      if [ ! -d #{shared_path}/build-partition/web-cache ]; then
-        git clone git@git.squareup.com:square/web.git web-cache
-      fi
-    CMD
+    run "[ -d #{shared_path}/build-partition ] || mkdir -p #{shared_path}/build-partition"
+    run "[ -d #{shared_path}/build-partition/web-cache ] || #{scm_command} clone git@git.squareup.com:square/web.git #{shared_path}/build-partition/web-cache"
   end
 
   task :symlinks, :roles => [:app, :worker] do
