@@ -7,44 +7,381 @@
 @import compass/reset
 @import compass/css3/gradient
 @import compass/css3/border-radius
+@import _avantgarde
 
+/* Variables */
+$font-base: Helvetica, Arial, sans-serif
+$font-code: Inconsolata, Menlo, Monaco, monospace
+$color-base: #52585D
+$color-title: #52585D
+$color-link: #2D81C5
 
+/* Mixins */
+=has-layout
+  display: block
+  zoom: 1
+
+=envelope
+  +has-layout
+  position: relative
+  overflow: hidden
+
+=safe-envelope
+  +has-layout
+  &:after
+    content: " "
+    display: block
+    height: 0
+    clear: both
+    overflow: hidden
+    visibility: hidden
+
+=text-shadow
+  text-shadow: 0 1px 0 rgba(0, 0, 0, 0.5)
+
+=box-sizing($box-sizing: border-box)
+  box-sizing: $box-sizing
+  -webkit-box-sizing: $box-sizing
+  -moz-box-sizing: $box-sizing
+
+=border-radius($radius: 0)
+  -webkit-border-radius: $radius
+  -moz-border-radius: $radius
+  border-radius: $radius
+
+/* Styles */
+$default-background: #b4b5b7 url(../images/body-noise.png) center left fixed
 html
-  font-family: sans-serif
+  font-family: $font-base
+  background: $default-background
+  background: url(../images/body-noise-shadow.png) repeat-y center top fixed, $default-background
+
+h1, h2, h3, h4, h5, h6
+  font-family: "agb", $font-base
 
 body
-#nav
-  max-width: 600px
-  margin: 20px auto
-  a
+  font-size: 12px
+
+a
+  color: $color-link
+  text-decoration: none
+
+.structure
+  display: table-cell
+  display: inline-block
+  position: relative
+  overflow: visible
+  width: auto
+  height: 28px
+  margin: 2px 0
+  outline: none !important
+  border: none
+  padding: 4px 6px
+  line-height: 20px
+  vertical-align: middle
+  -webkit-appearance: none
+  -moz-appearance: none
+  zoom: 1
+  +box-sizing(border-box)
+
+$text-box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.4), inset 0 2px 1px 0 rgba(0, 0, 0, 0.2), inset 0 2px 3px 0 rgba(0, 0, 0, 0.2), 0 1px 0 0 rgba(255, 255, 255, 0.8)
+$text-box-width: 150px
+$input-inset-border: 0 0 0 1px rgba(115, 189, 250, 1) inset
+$input-focus-shadow: 0 0 2px 0 rgba(115, 189, 250, 0.9) // remove when forms are refactored to place padding around all form fields
+$input-focus-shadow: $input-inset-border, $input-focus-shadow
+input[type=text],
+input[type=email],
+input[type=password]
+  @extend .structure
+  width: $text-box-width
+  border-radius: 4px
+  -webkit-box-shadow: $text-box-shadow
+  -moz-box-shadow:    $text-box-shadow
+  padding: 6px 6px 4px
+  line-height: 18px
+  background: white
+  color: #202122
+  &:focus
+    -webkit-box-shadow: $input-focus-shadow
+    -moz-box-shadow:    $input-focus-shadow
+
+$focus-shadow: 0 0 7px 0 rgba(104, 189, 244, 0.9)
+
+// Button Shadow
+// Note: "inset spread distance" effects border-radius in Safari. See hack below.
+$button-inset-border: 0 0 0 1px rgba(190, 191, 194, 1) inset
+$button-inset-inner: 0 0 0 2px rgba(255, 255, 255, .3) inset
+$button-inset-shadow-gradient: 0 27px 20px -18px white inset
+$button-bottom: 0 1px 2px 0 rgba(255, 255, 255, 1)
+$button-shadow: $button-inset-border, $button-inset-inner, $button-inset-shadow-gradient, $button-bottom
+$button-focus-shadow: $button-inset-border, $button-inset-inner, $button-inset-shadow-gradient, $focus-shadow
+
+$input-inset-border: 0 0 0 1px rgba(115, 189, 250, 1) inset
+$input-focus-shadow: 0 0 2px 0 rgba(115, 189, 250, 0.9) // remove when forms are refactored to place padding around all form fields
+$input-focus-shadow: $input-inset-border, $input-focus-shadow
+
+$input-error-inset-border: 0 0 0 2px rgba(255, 153, 0, 1) inset
+$input-error-focus-shadow: 0 0 2px 0 rgba(255, 153, 0, .5) // remove when forms are refactored to place padding around all form fields
+$input-error-focus-shadow: $input-error-inset-border, $input-error-focus-shadow
+
+$input-disabled-border: 0 0 0 1px rgba(192, 192, 192, 1) inset
+$input-disabled-shadow: $input-disabled-border, $button-inset-inner, $button-inset-shadow-gradient
+
+// Active Button Shadow
+$button-inset-inner: 0 2px 0 0 rgba(0, 0, 0, .05) inset
+$button-inset-shadow-gradient: 0 -28px 20px -18px white inset
+$active-button-shadow: $button-inset-border, $button-inset-inner, $button-inset-shadow-gradient, $button-bottom
+$active-button-focus-shadow: $button-inset-border, $button-inset-inner, $button-inset-shadow-gradient, $focus-shadow
+
+// Primary Button Shadow
+// Note: "inset spread distance" effects border-radius in Safari. See hack below.
+$button-inset-border: 0 0 0 1px #2c7cd1 inset
+$button-inset-inner-top: 0 1px 0 1px rgba(143, 228, 255, .6) inset
+$button-inset-shadow-gradient: 0 28px 20px -18px rgba(143, 228, 255, .65) inset
+$button-inset-inner: 0 0 0 2px rgba(47, 148, 255, 1) inset
+$primary-button-shadow: $button-inset-border, $button-inset-inner-top, $button-inset-shadow-gradient, $button-inset-inner, $button-bottom
+$primary-button-focus-shadow: $button-inset-border, $button-inset-inner-top, $button-inset-shadow-gradient, $button-inset-inner, $focus-shadow
+
+// Primary Active Button Shadow
+$button-inset-inner: 0 2px 0 0 rgba(0, 0, 0, .04) inset
+$button-inset-shadow-gradient: 0 -31px 20px -18px rgba(143, 228, 255, .55) inset
+$primary-active-button-shadow: $button-inset-border, $button-inset-inner, $button-inset-shadow-gradient, $button-bottom
+$primary-active-button-focus-shadow: $button-inset-border, $button-inset-inner, $button-inset-shadow-gradient, $focus-shadow
+
+.button
+  +border-radius(4px) // Safari hack: reset back to .button-structure border-radius.
+  -webkit-box-shadow: $active-button-shadow
+  -moz-box-shadow:    $active-button-shadow
+  &:focus
+    -webkit-box-shadow: $active-button-focus-shadow
+    -moz-box-shadow:    $active-button-focus-shadow
+
+.active-button
+  +border-radius(4px) // Safari hack: reset back to .button-structure border-radius.
+  -webkit-box-shadow: $primary-active-button-shadow
+  -moz-box-shadow:    $primary-active-button-shadow
+  &:focus
+    -webkit-box-shadow: $primary-active-button-focus-shadow
+    -moz-box-shadow:    $primary-active-button-focus-shadow
+
+.primary-button
+  color: white
+  text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.2)
+  background: #2e8cf0
+  -webkit-border-radius: 7px // hack for Safari adjusting border-radius based upon "inset spread distance" value in box-shadow.
+  -webkit-box-shadow: $primary-button-shadow
+  -moz-box-shadow:    $primary-button-shadow
+  &:focus
+    -webkit-box-shadow: $primary-button-focus-shadow
+    -moz-box-shadow:    $primary-button-focus-shadow
+
+input[type=submit]
+  @extend .button
+  @extend .primary-button
+  font-family: $font-base
+  &.active,
+  &:hover:active
+    @extend .active-button
+
+.build-error, .build-doomed, .build-failed
+  color: #f66
+.build-partitioning, .build-runnable, .build-running
+  color: #66f
+.build-succeeded
+  color: #6f6
+
+/* Index */
+.section-wrapper
+  overflow: hidden
+  background: url(../images/section-bottom.png) no-repeat bottom center
+  background: url(../images/section-top.png) no-repeat top center, url(../images/section-bottom.png) no-repeat bottom center
+.section
+  +envelope
+  margin: 15px auto
+  width: 960px
+
+$logo-padding: 45px
+#header
+  a.logo
+    float: left
+    h1
+      background: url(../images/logo.png) no-repeat left center
+      padding-left: $logo-padding
+      font-size: 28px
+      line-height: 38px
+      .title-first
+        color: $color-title
+      .title-second
+        color: $color-title + #666
+
+  #nav
     float: right
-#content
-  margin: 20px auto
-  max-width: 600px
+    line-height: 30px
+    a
+      text-align: right
+      padding-left: 20px
+
+h2.subheader
+  color: $color-title + #222
+  font-size: 175%
+  padding: 0 0 25px
+
+.build-info
+  .state
+    font-weight: bold
+  .queue
+    font-weight: bold
 
 .build
   overflow: hidden
-  margin: 10px 0
-  @include border-radius(5px, 5px)
-  border: 1px solid black
-  padding: 10px
-  dl
-    dt, dd
-      display: inline-block
-    dt
-      width: 20%
-    dd
-      width: 70%
+  margin: 0 0 50px
+
+  .build-wrapper
+    +envelope
+    color: #666
+    display: block
+
+    .build-info
+      float: left
+      .sha
+        +text-shadow
+        font-size: 175%
+        font-family: $font-code
+        line-height: 40px
+        letter-spacing: 1px
+        &:hover
+          color: $color-link
+
+    .time-elapsed
+      float: right
+      margin-right: 20px
+      line-height: 50px
+
+    .build-id
+      +text-shadow
+      font-family: $font-base
+      float: right
+      font-size: 400%
+      font-weight: bold
+      width: 100px
+      text-align: right
+
+$part-margin: 1px
+$color-spec: rgba(135, 184, 232, 0.6)
+$color-cuke: rgba(198, 232, 135, 0.6)
 .parts
+  +envelope
+  margin: 10px (-$part-margin)
   .part
     overflow: hidden
-    height: 6em
-    width: 6em
     float: left
-    @include border-radius(2px, 4px)
-    border: 1px solid black
-    padding: 4px
+    border: 1px solid rgba(0, 0, 0, 0.5)
+    margin: $part-margin
+    box-shadow: 0 1px 1px rgba(0, 0, 0, 0.3)
+  .part.spec
+    background-color: $color-spec
+  .part.cucumber
+    background-color: $color-cuke
+
+  .part-wrapper
+    +envelope
+    display: block
+    margin: 5px
+    width: 105px
+    height: 25px
+    color: #333
+    .kind
+      float: left
+      font-size: 175%
+      font-weight: bold
+      line-height: 27px
+    .result
+      float: right
+      text-transform: uppercase
+      color: #444
+      line-height: 40px
+      font-size: 90%
+      &::before
+        content: "\00A0"
+        display: block
+        border: 1px solid #666
+        border-radius: 8px
+        width: 10px
+        height: 10px
+        float: right
+        margin: 13px 0 0 3px
+        box-shadow: 0 1px 1px rgba(0, 0, 0, 0.3)
+    .result.runnable::before, .result.running::before
+      background-color: #66f
+    .result.failed::before, .result.error::before
+      background-color: #f66
+    .result.passed::before
+      background-color: #6f6
 
 .attempts
   .attempt
     overflow: hidden
+
+.paths-tooltip
+  border: 1px solid rgba(0, 0, 0, 0.5)
+  background-color: #fff
+  color: #333
+  font-size: 120%
+  font-family: $font-code
+  max-width: 500px !important
+  li
+    margin: 5px 0
+
+/* New build */
+input.sha
+  width: 500px
+  font-family: $font-code
+  font-size: 150%
+input.build-button
+  font-size: 120%
+  padding: 3px 25px 5px
+  border: none
+
+/* Build show */
+.build-info-subheader
+  margin: -15px 0 25px
+.build-summary
+  width: 80%
+  font-size: 110%
+
+  .id-column
+    text-align: left
+    width: 50px
+  .result-column
+    text-align: right
+    width: 80px
+  tr.even-row
+    background-color: rgba(243, 246, 250, 1)
+  th
+    font-weight: bold
+    border-bottom: 1px solid rgba(0, 0, 0, 0.4)
+    text-align: right
+    padding: 0 15px 5px
+
+  td
+    text-align: right
+    padding: 5px 15px
+
+    .part-status
+      float: right
+    .part-status::before
+      content: "\00A0"
+      border: 1px solid #666
+      border-radius: 8px
+      display: block
+      float: right
+      width: 10px
+      height: 10px
+      margin: 0 0 0 5px
+      box-shadow: 0 1px 1px rgba(0, 0, 0, 0.3)
+    .part-status.runnable::before, .part-status.running::before
+      background-color: #66f
+    .part-status.failed::before, .part-status.error::before
+      background-color: #f66
+    .part-status.passed::before
+      background-color: #6f6

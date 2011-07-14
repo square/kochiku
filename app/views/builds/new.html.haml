@@ -1,5 +1,8 @@
+%h2.subheader
+  Kick off a new Dogfood build
+
+
 = form_for @build do |f|
-  =  f.label :sha
-  =  f.text_field :sha
+  =  f.text_field :sha, {:placeholder => 'SHA', :class => 'sha', :autocapitalize => 'off', :autocorrect => 'off', :spellcheck => 'false'}
   =  f.hidden_field :queue
-  =  f.submit "start building"
+  =  f.submit "Build", {:class => 'build-button'}

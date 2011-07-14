@@ -31,5 +31,8 @@ group :test, :development do
   gem 'autotest'
   gem 'autotest-fsevent'
   gem 'rspec-rails'
-  gem 'webmock'
+end
+
+group :test do
+  gem "webmock"
 end

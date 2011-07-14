@@ -1,3 +1,8 @@
-.part
-  %abbr{:title => build_part.paths}= link_to build_part.kind, build_build_part_path(build_part.build, build_part)
-  .attempts= render build_part.build_attempts
+.part{:class => build_part.kind, :paths => build_part.paths.join("|")}
+  %a.part-wrapper{:href => build_build_part_path(build_part.build, build_part)}
+    .kind
+      - if build_part.kind == "spec"
+        Sp
+      - elsif build_part.kind == "cucumber"
+        Cu
+    .attempts= render build_part.build_attempts
