@@ -183,6 +183,10 @@ input[type=submit]
   &:hover:active
     @extend .active-button
 
+// Tooltip overrides
+#tiptip_content
+  font-size: 14px
+
 .build-error, .build-doomed, .build-failed
   color: #f66
 .build-partitioning, .build-runnable, .build-running
@@ -287,7 +291,7 @@ $color-cuke: rgba(198, 232, 135, 0.6)
     +envelope
     display: block
     margin: 5px
-    width: 105px
+    width: 115px
     height: 25px
     color: #333
     .kind
@@ -392,3 +396,4 @@ table.build-part-info
     padding: 0 15px 5px
   td
     padding: 5px 15px
+
