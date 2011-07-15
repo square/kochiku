@@ -2,8 +2,8 @@
   =link_to @build.sha, build_path(@build)
   &mdash; Part #{@build_part.id}
 
-%h3 Kind
-%div.kind
+%h3 Type
+%div.type
   =@build_part.kind.capitalize
 
 %h3 Paths
@@ -15,11 +15,11 @@
 %table.build-part-info
   %thead
     %tr
-      %th attempt
-      %th state
-      %th started at
-      %th elapsed time
-      %th artifacts
+      %th Attempt #
+      %th Status
+      %th Started At
+      %th Elapsed Time
+      %th Build Artifacts
   %tbody
     - @build_part.build_attempts.each_with_index do |attempt, index|
       %tr{:class => cycle("odd-row", "even-row")}
