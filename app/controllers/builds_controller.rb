@@ -1,8 +1,12 @@
 class BuildsController < ApplicationController
-
   def index
     @build = Build.new(:queue => "dogfood")
-    @builds = Build.order('id desc')
+    @builds = Build.order('id desc', :limit => 20)
+
+    respond_to do |format|
+      format.html
+      format.rss
+    end
   end
 
   def show
