@@ -32,14 +32,24 @@ X - fix workers to upload build artifacts
 X - fix log display to not suck
 X - make ui pretty
 - email on build failures
+- Rebuild button on part page
+- Fix colors on index page to be related to status, not kind
+- rename "dogfood" to "feature_branch" or "staging"
+- run different queues on master and slaves
 - increase granularity of parts
+- A new master build should cancel any pending builds on master
+- Cancel button for pending builds
+- Factories
+- integration tests
 - Additional reporting for build parts in ui
  - frequent failures
  - change in build time for a part
 - Auto retry failed parts
 - sort build parts based on previous build times (front load slow parts)
+- speed up test start up (sql cache, ram disk, etc)
 - reduce overhead for spinning up a new worker
   - Add apis so build part workers don't have to talk to database
   - split queues so internal queues (updating state and partitioning) run on master machine only
   - make sure we have minimal prereqs for a worker
+- Add details about our architecture to README
 - open source
