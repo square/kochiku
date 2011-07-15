@@ -20,6 +20,7 @@
       %th Started At
       %th Elapsed Time
       %th Build Artifacts
+      %th Actions
   %tbody
     - @build_part.build_attempts.each_with_index do |attempt, index|
       %tr{:class => cycle("odd-row", "even-row")}
@@ -32,4 +33,6 @@
           - attempt.build_artifacts.each do |artifact|
             = link_to File.basename(artifact.log_file.to_s), artifact.log_file.url
             %br
-
+        %td
+          - if attempt.state == :failed || attempt.state == :error && attempt == @build_part.build_attempts.last
+            = link_to("Rebuild", rebuild_build_build_part_path(@build, @build_part), :method => :post)

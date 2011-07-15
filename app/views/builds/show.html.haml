@@ -13,15 +13,16 @@
     %th.result-column Status
     %th Build Type
     %th Elapsed Time
+    %th Attempt #
     %th Actions
-  - @build.build_parts.each_index do |index|
-    - part = @build.build_parts[index]
+  - @build.build_parts.each do |part|
     %tr{:class => cycle("odd-row", "even-row")}
       %td.id-column= link_to part.id, build_build_part_path(@build, part)
       %td.result-column
         %span.part-status{:class => part.status}= part.status.to_s.capitalize
       %td{:class => part.kind}= part.kind.to_s.capitalize
       %td= part.elapsed_time ? duration_strftime(part.elapsed_time) : "pending"
+      %td= part.build_attempts.size
       - if part.status == :failed || part.status == :error
         %td= link_to("Rebuild", rebuild_build_build_part_path(@build, part), :method => :post)
       - else
