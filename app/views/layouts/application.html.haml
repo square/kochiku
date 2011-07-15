@@ -18,14 +18,14 @@
         %a{:href => root_path, :class => "logo"}
           %h1
             <span class="title-first">Kochi</span><span class="title-second">ku</span>
-        #nav
-          = link_to "Dogfood Build", new_build_path
-          = link_to "Resque Admin", "/resque"
-
+        %div.header-right
+          = yield :header
     #content.section-wrapper
       .section
         = yield
 
+    #nav
+      = link_to "Resque Admin", "/resque", :class => "button"
 
   :javascript
     $(document).ready(function() {

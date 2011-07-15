@@ -1,3 +1,9 @@
+- content_for :header do
+  = form_for @build do |f|
+    =  f.text_field :sha, {:placeholder => 'SHA to dogfood', :class => 'sha', :autocapitalize => 'off', :autocorrect => 'off', :spellcheck => 'false'}
+    =  f.hidden_field :queue
+    =  f.submit "Build", {:class => 'build-button'}
+
 %h2.subheader
   Builds
 

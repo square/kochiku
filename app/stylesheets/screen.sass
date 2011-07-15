@@ -175,7 +175,7 @@ $primary-active-button-focus-shadow: $button-inset-border, $button-inset-inner, 
     -webkit-box-shadow: $primary-button-focus-shadow
     -moz-box-shadow:    $primary-button-focus-shadow
 
-input[type=submit]
+input[type=submit], a.button
   @extend .button
   @extend .primary-button
   font-family: $font-base
@@ -218,12 +218,22 @@ $logo-padding: 45px
       .title-second
         color: $color-title + #666
 
-  #nav
+#nav
+  line-height: 30px
+  width: 960px
+  margin: 15px auto
+  a
     float: right
-    line-height: 30px
-    a
-      text-align: right
-      padding-left: 20px
+    background: #3B98F2
+    font-weight: bold
+    color: white
+    text-decoration: none
+    margin-right: 0
+    display: inline-block
+    padding: 0px 10px
+    -webkit-border-radius: 6px
+    -moz-border-radius: 6px
+    border-radius: 6px 6px
 
 h2.subheader
   color: $color-title + #222
@@ -342,7 +352,19 @@ $color-cuke: rgba(198, 232, 135, 0.6)
   li
     margin: 5px 0
 
-/* New build */
+
+/* New build in header */
+.header-right
+  float: right
+  height: 34px
+  margin-top: 4px
+  line-height: 38px
+  input.sha
+    margin: 0
+    width: 200px
+    font-size: 100%
+
+/* New build page */
 input.sha
   width: 500px
   font-family: $font-code

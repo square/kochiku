@@ -1,6 +1,7 @@
 class BuildsController < ApplicationController
 
   def index
+    @build = Build.new(:queue => "dogfood")
     @builds = Build.order('id desc')
   end
 
@@ -14,9 +15,5 @@ class BuildsController < ApplicationController
       format.json {head :ok}
       format.html {redirect_to root_path}
     end
-  end
-
-  def new
-    @build = Build.new(:queue => "dogfood")
   end
 end
