@@ -6,10 +6,9 @@
   %span.queue= @build.queue.to_s.capitalize
   &nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;Created #{time_ago_in_words @build.created_at} ago&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;Updated #{time_ago_in_words @build.updated_at} ago
 
-%h3 Parts
 %table.build-summary
   %tr
-    %th.id-column Id
+    %th.id-column Part
     %th.result-column Status
     %th Build Type
     %th Elapsed Time
