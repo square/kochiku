@@ -29,8 +29,8 @@ Promotes a tag if the build is successful. Enqueued by BuildAttemptObserver.
 
 = Future Work =
 X - fix workers to upload build artifacts
-- fix log display to not suck
-- redeploy to servers
+X - fix log display to not suck
+X - make ui pretty
 - email on build failures
 - increase granularity of parts
 - Additional reporting for build parts in ui
@@ -38,7 +38,6 @@ X - fix workers to upload build artifacts
  - change in build time for a part
 - Auto retry failed parts
 - sort build parts based on previous build times (front load slow parts)
-- make ui pretty
 - reduce overhead for spinning up a new worker
   - Add apis so build part workers don't have to talk to database
   - split queues so internal queues (updating state and partitioning) run on master machine only
