@@ -38,18 +38,30 @@ namespace :deploy do
     run "kill #{@pid}"
   end
 
+  desc "Restart the web application server and all of the build slaves"
   task :restart do
     restart_app
     restart_workers
   end
 
+  desc "Restart the web application server"
   task :restart_app, :roles => :app, :except => { :no_release => true } do
     stop
     start
   end
 
+  desc "Restart the build slaves"
   task :restart_workers, :roles => :worker, :except => { :no_release => true } do
-    run "launchctl stop com.squareup.kochiku-slave"
+    # the trailing semicolons are required because this is passed to the shell as a single string
+    run <<-CMD
+      resque_parent_pid=$(ps x | grep -i 'resque-' | grep -iE 'Forked|Waiting' | grep -v grep | awk '{ print $1}');
+      kill -QUIT $resque_parent_pid;
+
+      while ps x | grep -q ^$resque_parent_pid; do
+        echo "Waiting for Resque worker to stop on $HOSTNAME...";
+        sleep 5;
+      done;
+    CMD
   end
 end
 
