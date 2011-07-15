@@ -18,8 +18,16 @@ class BuildPart < ActiveRecord::Base
     enqueue_build_part_job
   end
 
+  def last_attempt
+    build_attempts.order(:created_at).last
+  end
+
   def status
-    build_attempts.order(:created_at).last.state
+    last_attempt.state
+  end
+
+  def unsuccessful?
+    last_attempt.unsuccessful?
   end
 
   def execute

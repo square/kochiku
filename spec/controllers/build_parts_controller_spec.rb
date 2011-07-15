@@ -1,7 +1,8 @@
 require 'spec_helper'
 
 describe BuildPartsController do
-  integrate_views
+  render_views
+
   describe "#show" do
     it "renders the show template successfully even if elapsed time is nil" do
       build = Build.build_sha!(:sha => "abcdef", :queue => :master)

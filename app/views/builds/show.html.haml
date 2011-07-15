@@ -22,7 +22,7 @@
       %td{:class => part.kind}= part.kind.to_s.capitalize
       %td= part.elapsed_time ? duration_strftime(part.elapsed_time) : "pending"
       %td= part.build_attempts.size
-      - if part.status == :failed || part.status == :error
+      - if part.unsuccessful?
         %td= link_to("Rebuild", rebuild_build_build_part_path(@build, part), :method => :post)
       - else
         %td
