@@ -2,23 +2,30 @@
   =link_to @build.sha, build_path(@build)
   &mdash; Part #{@build_part.id}
 
-%p= @build_part.kind
+%h3 Kind
+%div.kind
+  =@build_part.kind.capitalize
 
-%ol
+%h3 Paths
+%ol#build-paths
   - @build_part.paths.each do |path|
     %li=path
 
+%h3 Attempts
 %table.build-part-info
   %thead
     %tr
+      %th attempt
       %th state
       %th started at
       %th elapsed time
       %th artifacts
   %tbody
-    - @build_part.build_attempts.each do |attempt|
-      %tr
-        %td= attempt.state
+    - @build_part.build_attempts.each_with_index do |attempt, index|
+      %tr{:class => cycle("odd-row", "even-row")}
+        %td= index + 1
+        %td.result-column
+          %span.attempt-status{:class => attempt.state}= attempt.state.to_s.capitalize
         %td= attempt.started_at
         %td= duration_strftime(attempt.elapsed_time)
         %td
@@ -26,6 +33,3 @@
             = link_to File.basename(artifact.log_file.to_s), artifact.log_file.url
             %br
 
-
-%hr{:style => 'margin-top: 60px'}}
-= debug(@build_part)

@@ -230,6 +230,12 @@ h2.subheader
   font-size: 175%
   padding: 0 0 25px
 
+h3
+  color: $color-title + #222
+  font-size: 125%
+  padding: 0 0 10px
+
+
 .build-info
   .state
     font-weight: bold
@@ -346,54 +352,53 @@ input.build-button
   padding: 3px 25px 5px
   border: none
 
+table
+  width: 80%
+  tr.even-row
+    background-color: #e4edfa
+  th
+    font-weight: bold
+    border-bottom: 1px solid rgba(0, 0, 0, 0.4)
+    text-align: right
+    padding: 0 15px 5px
+  td
+    text-align: right
+    padding: 5px 15px
+    .part-status, .attempt-status
+      float: right
+      &::before
+        content: "\00A0"
+        border: 1px solid #666
+        border-radius: 8px
+        display: block
+        float: right
+        width: 10px
+        height: 10px
+        margin: 0 0 0 5px
+        box-shadow: 0 1px 1px rgba(0, 0, 0, 0.3)
+      &.runnable::before, &.running::before
+        background-color: #66f
+      &.failed::before, &.error::before
+        background-color: #f66
+      &.passed::before
+        background-color: #6f6
+
+
 /* Build show */
 .build-info-subheader
   margin: -15px 0 25px
 .build-summary
-  width: 80%
   font-size: 110%
-
   .id-column
     text-align: left
     width: 50px
   .result-column
     text-align: right
     width: 80px
-  tr.even-row
-    background-color: rgba(243, 246, 250, 1)
-  th
-    font-weight: bold
-    border-bottom: 1px solid rgba(0, 0, 0, 0.4)
-    text-align: right
-    padding: 0 15px 5px
 
-  td
-    text-align: right
-    padding: 5px 15px
-
-    .part-status
-      float: right
-    .part-status::before
-      content: "\00A0"
-      border: 1px solid #666
-      border-radius: 8px
-      display: block
-      float: right
-      width: 10px
-      height: 10px
-      margin: 0 0 0 5px
-      box-shadow: 0 1px 1px rgba(0, 0, 0, 0.3)
-    .part-status.runnable::before, .part-status.running::before
-      background-color: #66f
-    .part-status.failed::before, .part-status.error::before
-      background-color: #f66
-    .part-status.passed::before
-      background-color: #6f6
-
-/* Build part show */
-table.build-part-info
-  th
-    padding: 0 15px 5px
-  td
-    padding: 5px 15px
-
+/* Build parts show*/
+ol#build-paths
+  margin-bottom: 20px
+  list-style: square inside none
+div.kind
+  margin-bottom: 20px

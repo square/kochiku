@@ -1,4 +1,4 @@
-%h2.subheader= @build.sha
+%h2.subheader Build #{@build.id} - #{@build.sha}
 
 .build-info.build-info-subheader
   %span.state{:class => 'build-' + @build.state.to_s}= @build.state.to_s.capitalize
@@ -6,6 +6,7 @@
   %span.queue= @build.queue.to_s.capitalize
   &nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;Created #{time_ago_in_words @build.created_at} ago&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;Updated #{time_ago_in_words @build.updated_at} ago
 
+%h3 Parts
 %table.build-summary
   %tr
     %th.id-column Id
@@ -15,7 +16,7 @@
     %th Actions
   - @build.build_parts.each_index do |index|
     - part = @build.build_parts[index]
-    %tr{:class => (index.even? ? 'even-row' : '')}
+    %tr{:class => cycle("odd-row", "even-row")}
       %td.id-column= link_to part.id, build_build_part_path(@build, part)
       %td.result-column
         %span.part-status{:class => part.status}= part.status.to_s.capitalize
