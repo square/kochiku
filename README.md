@@ -4,7 +4,7 @@ Kochiku is "Build" in Japanese (according to google translate).
 
 Kochiku consists of two pieces. There is a master process and a number of slave workers. The slave workers check out a copy of your project into a directory and run a subset of the tests inside of it. They then report status, any build artifacts (logs, etc) and statistical information back to the master server.
 
-## Models
+### Models
  - Build: a sha to build
  - Build parts: A build has many of these, each one corresponds to the atomic unit of your tests
  - Build attempts: Each build part can have many build attempts. This records state so we can retry parts.
