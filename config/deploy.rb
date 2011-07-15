@@ -55,13 +55,12 @@ end
 
 namespace :kochiku do
   task :setup, :roles => [:app, :worker] do
-    run "[ -d #{shared_path}/build-partition ] || mkdir -p #{shared_path}/build-partition"
+    run "mkdir -p #{shared_path}/{build-partition,log_files}"
     run "[ -d #{shared_path}/build-partition/web-cache ] || #{scm_command} clone git@git.squareup.com:square/web.git #{shared_path}/build-partition/web-cache"
   end
 
   task :symlinks, :roles => [:app, :worker] do
-    run <<-CMD
-      ln -nfFs #{shared_path}/build-partition #{current_path}/tmp/build-partition
-    CMD
+    run "ln -nfFs #{shared_path}/build-partition #{current_path}/tmp/build-partition"
+    run "ln -nfFs #{shared_path}/log_files #{current_path}/public/log_files"
   end
 end
