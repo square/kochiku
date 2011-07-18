@@ -1,5 +1,5 @@
 - content_for :header do
-  = form_for @build do |f|
+  = form_for Build.new(:queue => "dogfood") do |f|
     =  f.text_field :sha, {:placeholder => 'SHA to dogfood', :class => 'sha', :autocapitalize => 'off', :autocorrect => 'off', :spellcheck => 'false'}
     =  f.hidden_field :queue
     =  f.submit "Build", {:class => 'build-button'}
