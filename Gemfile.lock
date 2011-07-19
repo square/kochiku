@@ -32,10 +32,10 @@ GEM
     addressable (2.2.6)
     archive-tar-minitar (0.5.2)
     arel (2.0.10)
-    autotest (4.4.6)
-      ZenTest (>= 4.4.1)
     autotest-fsevent (0.2.5)
       sys-uname
+    autotest-rails (4.1.0)
+      ZenTest
     builder (2.1.2)
     capistrano (2.6.0)
       highline
@@ -183,8 +183,8 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
-  autotest
   autotest-fsevent
+  autotest-rails
   capistrano
   carrierwave (~> 0.5.4)
   compass
