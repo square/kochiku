@@ -73,4 +73,33 @@ describe BuildsController do
       end
     end
   end
+
+  describe "#push_receive_hook" do
+    before do
+      @payload = JSON.load(FIXTURE_PATH.join("sample_github_webhook_payload.json").read)
+    end
+
+    context "on the master branch" do
+      before do
+        @payload["ref"] = "refs/heads/master"
+      end
+
+      it "should create a new build" do
+        post :push_receive_hook, :payload => @payload
+        Build.where(:sha => @payload["after"]).exists?.should be_true
+      end
+    end
+
+    context "on the master branch" do
+      before do
+        @payload["ref"] = "refs/heads/topic"
+      end
+
+      it "should create a new build" do
+        expect {
+          post :push_receive_hook, :payload => @payload
+        }.to_not change(Build, :count)
+      end
+    end
+  end
 end

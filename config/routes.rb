@@ -4,6 +4,8 @@ Kochiku::Application.routes.draw do
   mount Resque::Server.new, :at => '/resque'
 
   resources :builds do
+    post 'push_receive_hook', :on => :collection
+
     resources :build_parts do
       member do
         post 'rebuild'
