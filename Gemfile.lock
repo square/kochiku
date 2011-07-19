@@ -117,11 +117,6 @@ GEM
       redis-namespace (~> 1.0.2)
       sinatra (>= 0.9.2)
       vegas (~> 0.1.2)
-    resque-lock (0.1.1)
-    resque-scheduler (1.9.9)
-      redis (>= 2.0.1)
-      resque (>= 1.8.0)
-      rufus-scheduler
     rest-client (1.6.3)
       mime-types (>= 1.16)
     rspec (2.6.0)
@@ -152,8 +147,6 @@ GEM
       ruby-debug-base19 (>= 0.11.19)
     ruby_core_source (0.1.5)
       archive-tar-minitar (>= 0.5.2)
-    rufus-scheduler (2.0.10)
-      tzinfo (>= 0.3.23)
     sass (3.1.4)
     sinatra (1.2.6)
       rack (~> 1.1)
@@ -194,8 +187,6 @@ DEPENDENCIES
   nokogiri
   rails (= 3.0.9)
   resque
-  resque-lock
-  resque-scheduler
   rest-client
   rspec-rails
   ruby-debug

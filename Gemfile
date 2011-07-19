@@ -15,8 +15,6 @@ gem 'sass'
 gem 'compass'
 
 gem "resque"
-gem "resque-lock"
-gem "resque-scheduler"
 gem "system_timer", :platforms => :mri_18    # used by redis gem
 
 gem "rest-client", :require => false
