@@ -14,4 +14,15 @@ module ApplicationHelper
       build.state.to_s
     end
   end
+  
+  def build_activity(build)
+    return "Unknown" unless build.is_a?(Build)
+
+    case build.state
+    when :partitioning, :runnable, :running
+      "Building"
+    when :doomed, :failed, :succeeded, :error
+      "CheckingModifications"
+    end
+  end
 end

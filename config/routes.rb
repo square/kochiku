@@ -10,6 +10,7 @@ Kochiku::Application.routes.draw do
       end
     end
   end
+  match '/XmlStatusReport.aspx', :to => "builds#status_report", :defaults => { :format => 'xml' }
 
   resources :build_attempts, :only => :update do
     resources :build_artifacts, :only => :create

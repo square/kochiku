@@ -35,4 +35,42 @@ describe BuildsController do
       items.last.elements.to_a("title").first.text.should == "Build Number #{@build1.id} success"
     end
   end
+
+  describe "#status_report" do
+    render_views
+
+    context "without any builds" do
+      it "should return 'Unknown' for activity" do
+        get :status_report, :format => :xml
+        doc = Nokogiri::XML(response.body)
+        element = doc.at_xpath("/Projects/Project[@name='web-master']")
+
+        element['activity'].should == 'Unknown'
+      end
+    end
+
+    context "with a in-progress build" do
+      before { Build.create!(:queue => 'master', :state => :running, :sha => 'abc') }
+
+      it "should return 'Building' for activity" do
+        get :status_report, :format => :xml
+        doc = Nokogiri::XML(response.body)
+        element = doc.at_xpath("/Projects/Project[@name='web-master']")
+
+        element['activity'].should == 'Building'
+      end
+    end
+
+    context "with a completed build" do
+      before { Build.create!(:queue => 'master', :state => :failed, :sha => 'abc') }
+
+      it "should return 'CheckingModifications' for activity" do
+        get :status_report, :format => :xml
+        doc = Nokogiri::XML(response.body)
+        element = doc.at_xpath("/Projects/Project[@name='web-master']")
+
+        element['activity'].should == 'CheckingModifications'
+      end
+    end
+  end
 end

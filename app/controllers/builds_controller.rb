@@ -19,4 +19,10 @@ class BuildsController < ApplicationController
       format.html {redirect_to root_path}
     end
   end
+
+  # GET /XmlStatusReport.aspx
+  def status_report
+    @build = Build.last
+  end
+
 end

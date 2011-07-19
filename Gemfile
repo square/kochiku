@@ -36,4 +36,5 @@ end
 
 group :test do
   gem "webmock"
+  gem "nokogiri"
 end
