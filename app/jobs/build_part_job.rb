@@ -1,4 +1,4 @@
-require 'webrick'
+require 'rest-client'
 
 class BuildPartJob < JobBase
   attr_reader :build_attempt, :build_part, :build
