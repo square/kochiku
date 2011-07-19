@@ -1,6 +1,6 @@
 class BuildsController < ApplicationController
   def index
-    @builds = Build.order('id desc', :limit => 20)
+    @builds = Build.order('id desc').limit(20)
 
     respond_to do |format|
       format.html
