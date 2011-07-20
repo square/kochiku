@@ -1,23 +1,23 @@
 class BuildsController < ApplicationController
-  def index
-    @builds = Build.order('id desc').limit(20)
-
-    respond_to do |format|
-      format.html
-      format.rss
-    end
-  end
+  before_filter :load_project
 
   def show
-    @build = Build.find(params[:id])
+    @build = @project.builds.find(params[:id])
   end
 
   def create
-    Build.build_sha!(params[:build])
-    respond_to do |format|
-      format.json {head :ok}
-      format.html {redirect_to root_path}
+    payload = params['payload']
+
+    requested_branch = payload['ref'].split('/').last
+
+    if @project.branch == requested_branch
+      @project.builds.create!(:state => :partitioning, :sha => payload['after'], :queue => "master")
     end
+    head :ok
   end
 
+private
+  def load_project
+    @project = Project.find_by_name!(params[:project_id])
+  end
 end

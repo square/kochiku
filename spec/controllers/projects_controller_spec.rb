@@ -1,6 +1,26 @@
 require 'spec_helper'
+require 'rexml/document'
 
 describe ProjectsController do
+  describe "#show" do
+    render_views
+
+    before do
+      @project = projects(:big_rails_app)
+      @build1 = Build.create!(:queue => 'master', :state => :succeeded, :sha => 'abc', :project => @project)
+      @build2 = Build.create!(:queue => 'master', :state => :error, :sha => 'def', :project => @project)
+    end
+
+    it "should return an rss feed of builds" do
+      get :show, :id => @project.to_param, :format => :rss
+      doc = REXML::Document.new(response.body)
+      items = doc.elements.to_a("//channel/item")
+      items.length.should == Build.count
+      items.first.elements.to_a("title").first.text.should == "Build Number #{@build2.id} failed"
+      items.last.elements.to_a("title").first.text.should == "Build Number #{@build1.id} success"
+    end
+  end
+
   describe "#status_report" do
     render_views
     before do
@@ -44,36 +64,6 @@ describe ProjectsController do
         element = doc.at_xpath("/Projects/Project[@name='#{@project.name_with_branch}']")
 
         element['activity'].should == 'CheckingModifications'
-      end
-    end
-  end
-
-  describe "#push_receive_hook" do
-    before do
-      @project = projects(:big_rails_app)
-      @payload = JSON.load(FIXTURE_PATH.join("sample_github_webhook_payload.json").read)
-    end
-
-    context "for a branch that Kochiku is tracking" do
-      before do
-        @payload["ref"] = "refs/heads/#{@project.branch}"
-      end
-
-      it "should create a new build" do
-        post :push_receive_hook, :id => @project.to_param, :payload => @payload
-        Build.where(:project_id => @project.id, :sha => @payload["after"]).exists?.should be_true
-      end
-    end
-
-    context "for a branch that Kochiku is not tracking" do
-      before do
-        @payload["ref"] = "refs/heads/topic"
-      end
-
-      it "should create a new build" do
-        expect {
-          post :push_receive_hook, :id => @project.to_param, :payload => @payload
-        }.to_not change(Build, :count)
       end
     end
   end

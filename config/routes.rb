@@ -1,27 +1,19 @@
 Kochiku::Application.routes.draw do
-  root :to => "builds#index"
-
   mount Resque::Server.new, :at => '/resque'
 
-  resources :projects do
-    collection do
-      get 'status-report', :action => 'status_report'
-    end
-    member do
-      post 'push-receive-hook', :action => 'push_receive_hook'
-    end
-  end
-  match '/XmlStatusReport.aspx', :to => "builds#status_report", :defaults => { :format => 'xml' }
+  root :to => "projects#index"
 
-  resources :builds do
-    resources :build_parts do
-      member do
-        post 'rebuild'
+  resources :projects, :only => [:index, :new, :show] do
+    get 'status-report', :action => "status_report", :on => :collection
+
+    resources :builds, :only => [:create, :show] do
+      resources :build_parts, :as => 'parts', :path => 'parts', :only => [:show] do
+        post 'rebuild', :on => :member
       end
     end
   end
+  match '/XmlStatusReport.aspx', :to => "builds#status", :defaults => { :format => 'xml' }
 
-  resources :build_attempts, :only => :update do
-    resources :build_artifacts, :only => :create
-  end
+  match '/build_attempts/:build_attempt_id/build_artifacts' => "build_artifacts#create", :via => :post
 end
+# TODO routing specs

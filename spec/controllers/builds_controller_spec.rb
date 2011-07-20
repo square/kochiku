@@ -1,40 +1,35 @@
 require 'spec_helper'
-require 'rexml/document'
 
 describe BuildsController do
-  let(:project) { projects(:big_rails_app) }
 
   describe "#create" do
-    it "should create a build" do
-      post :create, :build => {:sha => "deadbeef", :queue => "master", :project => project}
-
-      b = Build.last
-      b.queue.should == :master
-      b.sha.should == "deadbeef"
-      b.state.should == :partitioning
-    end
-
-    it "should enqueue a build partitioning job" do
-      Resque.should_receive(:enqueue).with(BuildPartitioningJob, kind_of(Integer))
-      post :create, :build => {:sha => "deadbeef", :queue => "master", :project => project}
-    end
-  end
-
-  describe "#index" do
-    render_views
-
     before do
-      @build1 = Build.create!(:queue => 'master', :state => :succeeded, :sha => 'abc', :project => project)
-      @build2 = Build.create!(:queue => 'master', :state => :error, :sha => 'def', :project => project)
+      @project = projects(:big_rails_app)
+      @payload = JSON.load(FIXTURE_PATH.join("sample_github_webhook_payload.json").read)
     end
 
-    it "should return an rss feed of builds" do
-      get :index, :format => :rss
-      doc = REXML::Document.new(response.body)
-      items = doc.elements.to_a("//channel/item")
-      items.length.should == Build.count
-      items.first.elements.to_a("title").first.text.should == "Build Number #{@build2.id} failed"
-      items.last.elements.to_a("title").first.text.should == "Build Number #{@build1.id} success"
+    context "when the pushed branch matches the project branch" do
+      before do
+        @payload["ref"] = "refs/heads/#{@project.branch}"
+      end
+
+      it "should create a new build" do
+        post :create, :project_id => @project.to_param, :payload => @payload
+        Build.where(:project_id => @project.id, :sha => @payload["after"]).exists?.should be_true
+      end
+    end
+
+    context "when the pushed branch does not match the project branch" do
+      before do
+        @payload["ref"] = "refs/heads/topic"
+      end
+
+      it "should have no effect" do
+        expect {
+          post :create, :project_id => @project.to_param, :payload => @payload
+        }.to_not change(Build, :count)
+      end
     end
   end
+
 end

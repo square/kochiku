@@ -1,5 +1,5 @@
 .build
-  %a{:href => build_path(build), :class => "build-wrapper"}
+  %a{:href => project_build_path(build.project, build), :class => "build-wrapper"}
     .build-info
       .sha= build.sha
       .build-state

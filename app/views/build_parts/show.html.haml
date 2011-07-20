@@ -1,5 +1,5 @@
 %h2.subheader
-  =link_to @build.sha, build_path(@build)
+  =link_to @build.sha, project_build_path(@project, @build)
   &mdash; Part #{@build_part.id}
 
 %h3 Type
@@ -35,4 +35,4 @@
             %br
         %td
           - if attempt.unsuccessful? && @build_part.unsuccessful?
-            = link_to("Rebuild", rebuild_build_build_part_path(@build, @build_part), :method => :post)
+            = link_to("Rebuild", rebuild_project_build_part_path(@project, @build, @build_part), :method => :post)
