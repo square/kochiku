@@ -3,8 +3,8 @@ require 'spec_helper'
 describe BuildArtifactsController do
   describe "#create" do
     let(:project) { projects(:big_rails_app) }
-    let(:build) {Build.build_sha!(:project => project, :sha => "abcdef", :queue => "master") }
-    let(:build_part) { BuildPart.create!(:build => build, :paths => ["a"], :kind => "test") }
+    let(:build) { project.builds.create!(:state => :partitioning, :sha => "abcdef", :queue => "master") }
+    let(:build_part) { build.build_parts.create!(:paths => ["a"], :kind => "test") }
     let(:build_attempt) { build_part.build_attempts.create!(:state => :failed) }
     let(:log_file) { File.open(FIXTURE_PATH.join("build_artifact.log")) }
 
@@ -13,7 +13,7 @@ describe BuildArtifactsController do
       log_contents.should_not be_empty
 
       expect {
-        post :create, :build_attempt_id => build_attempt.id, :build_artifact => {:log_file => log_file}, :format => :xml
+        post :create, :build_attempt_id => build_attempt.to_param, :build_artifact => {:log_file => log_file}, :format => :xml
       }.to change{build_attempt.build_artifacts.count}.by(1)
 
       artifact = assigns(:build_artifact)
@@ -21,7 +21,7 @@ describe BuildArtifactsController do
     end
 
     it "should return the correct location" do
-      post :create, :build_attempt_id => build_attempt.id, :build_artifact => {:log_file => log_file}, :format => :xml
+      post :create, :build_attempt_id => build_attempt.to_param, :build_artifact => {:log_file => log_file}, :format => :xml
       response.should be_success
       response.location.should == assigns(:build_artifact).log_file.url
     end

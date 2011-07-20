@@ -1,5 +1,5 @@
 .part{:class => build_part.kind, :title => build_part.paths.map{|path| "-#{path}"}.join("<br>")}
-  %a.part-wrapper{:href => project_build_part_path(build_part.build.project, build_part.build, build_part)}
+  %a.part-wrapper{:href => project_build_part_path(build_part.project, build_part.build_instance, build_part)}
     .kind
       - if build_part.kind == "spec"
         Specs

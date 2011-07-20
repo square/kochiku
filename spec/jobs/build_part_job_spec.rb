@@ -4,9 +4,9 @@ describe BuildPartJob do
   let(:project) { projects(:big_rails_app) }
   let(:valid_attributes) do
     {
-        :build => Build.build_sha!(:project => project, :sha => sha, :queue => queue),
-        :paths => ["a", "b"],
-        :kind => "test",
+        :build_instance => Build.build_sha!(:project => project, :sha => sha, :queue => queue),
+        :paths          => ["a", "b"],
+        :kind           => "test",
     }
   end
 

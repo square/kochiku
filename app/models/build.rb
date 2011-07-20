@@ -1,6 +1,6 @@
 class Build < ActiveRecord::Base
   belongs_to :project
-  has_many :build_parts
+  has_many :build_parts, :dependent => :destroy
   has_many :build_attempts, :through => :build_parts
   symbolize :state, :in => [:partitioning, :runnable, :running, :doomed, :failed, :succeeded, :error]
   symbolize :queue

@@ -1,5 +1,5 @@
 class BuildAttempt < ActiveRecord::Base
-  has_many :build_artifacts
+  has_many :build_artifacts, :dependent => :destroy
   belongs_to :build_part
 
   STATES = [:runnable, :running, :passed, :failed, :error]

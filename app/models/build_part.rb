@@ -1,6 +1,7 @@
 class BuildPart < ActiveRecord::Base
-  has_many :build_attempts
-  belongs_to :build
+  belongs_to :build_instance, :class_name => "Build", :foreign_key => "build_id"    # using build_instance because AR defines #build for associations, and it wins
+  has_many :build_attempts, :dependent => :destroy
+  has_one :project, :through => :build_instance
   after_commit :enqueue_build_part_job
   validates_presence_of :kind, :paths
 
@@ -11,7 +12,7 @@ class BuildPart < ActiveRecord::Base
 
   def enqueue_build_part_job
     build_attempt = build_attempts.create!(:state => :runnable)
-    BuildPartJob.enqueue_on(build.queue, build_attempt.id)
+    BuildPartJob.enqueue_on(build_instance.queue, build_attempt.id)
   end
 
   def rebuild!
