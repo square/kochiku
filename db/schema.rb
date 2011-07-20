@@ -10,7 +10,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20110713191536) do
+ActiveRecord::Schema.define(:version => 20110719205413) do
 
   create_table "build_artifacts", :force => true do |t|
     t.integer  "build_attempt_id"
@@ -49,6 +49,18 @@ ActiveRecord::Schema.define(:version => 20110713191536) do
     t.string   "queue"
     t.datetime "created_at"
     t.datetime "updated_at"
+    t.integer  "project_id"
   end
+
+  add_index "builds", ["project_id"], :name => "index_builds_on_project_id"
+
+  create_table "projects", :force => true do |t|
+    t.string   "name"
+    t.string   "branch"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  add_index "projects", ["name", "branch"], :name => "index_projects_on_name_and_branch"
 
 end

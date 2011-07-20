@@ -1,7 +1,8 @@
 require 'spec_helper'
 
 describe Build do
-  let(:build) { Build.create(:sha => "deadbeef", :state => :partitioning, :queue => :q) }
+  let(:project) { projects(:big_rails_app) }
+  let(:build) { Build.create(:project => project, :sha => "deadbeef", :state => :partitioning, :queue => :q) }
   let(:parts) { [{'type' => 'cucumber', 'files' => ['a', 'b']}, {'type' => 'rspec', 'files' => ['c', 'd']}] }
 
   describe "#partition" do

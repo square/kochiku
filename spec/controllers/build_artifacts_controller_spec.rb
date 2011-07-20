@@ -2,8 +2,8 @@ require 'spec_helper'
 
 describe BuildArtifactsController do
   describe "#create" do
-    let(:queue) { :master }
-    let(:build) {Build.build_sha!(:sha => "abcdef", :queue => queue) }
+    let(:project) { projects(:big_rails_app) }
+    let(:build) {Build.build_sha!(:project => project, :sha => "abcdef", :queue => "master") }
     let(:build_part) { BuildPart.create!(:build => build, :paths => ["a"], :kind => "test") }
     let(:build_attempt) { build_part.build_attempts.create!(:state => :failed) }
     let(:log_file) { File.open(FIXTURE_PATH.join("build_artifact.log")) }

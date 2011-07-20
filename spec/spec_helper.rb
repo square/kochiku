@@ -22,6 +22,9 @@ RSpec.configure do |config|
   # instead of true.
   config.use_transactional_fixtures = true
 
+  # Define which fixtures should be globally available. Set to :all to load everything
+  # config.global_fixtures = :all
+  config.global_fixtures = :projects
 
   config.before :each do
     WebMock.disable_net_connect!

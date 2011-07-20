@@ -2,9 +2,11 @@ require 'spec_helper'
 require 'rexml/document'
 
 describe BuildsController do
+  let(:project) { projects(:big_rails_app) }
+
   describe "#create" do
     it "should create a build" do
-      post :create, :build => {:sha => "deadbeef", :queue => "master"}
+      post :create, :build => {:sha => "deadbeef", :queue => "master", :project => project}
 
       b = Build.last
       b.queue.should == :master
@@ -14,7 +16,7 @@ describe BuildsController do
 
     it "should enqueue a build partitioning job" do
       Resque.should_receive(:enqueue).with(BuildPartitioningJob, kind_of(Integer))
-      post :create, :build => {:sha => "deadbeef", :queue => "master"}
+      post :create, :build => {:sha => "deadbeef", :queue => "master", :project => project}
     end
   end
 
@@ -22,8 +24,8 @@ describe BuildsController do
     render_views
 
     before do
-      @build1 = Build.create!(:queue => 'master', :state => :succeeded, :sha => 'abc')
-      @build2 = Build.create!(:queue => 'master', :state => :error, :sha => 'def')
+      @build1 = Build.create!(:queue => 'master', :state => :succeeded, :sha => 'abc', :project => project)
+      @build2 = Build.create!(:queue => 'master', :state => :error, :sha => 'def', :project => project)
     end
 
     it "should return an rss feed of builds" do
@@ -50,7 +52,7 @@ describe BuildsController do
     end
 
     context "with a in-progress build" do
-      before { Build.create!(:queue => 'master', :state => :running, :sha => 'abc') }
+      before { Build.create!(:queue => 'master', :state => :running, :sha => 'abc', :project => project) }
 
       it "should return 'Building' for activity" do
         get :status_report, :format => :xml
@@ -62,7 +64,7 @@ describe BuildsController do
     end
 
     context "with a completed build" do
-      before { Build.create!(:queue => 'master', :state => :failed, :sha => 'abc') }
+      before { Build.create!(:queue => 'master', :state => :failed, :sha => 'abc', :project => project) }
 
       it "should return 'CheckingModifications' for activity" do
         get :status_report, :format => :xml
