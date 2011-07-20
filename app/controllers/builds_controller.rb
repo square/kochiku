@@ -20,17 +20,4 @@ class BuildsController < ApplicationController
     end
   end
 
-  # GET /XmlStatusReport.aspx
-  def status_report
-    @build = Build.last
-  end
-
-  # POST /builds/push_receive_hook
-  def push_receive_hook
-    payload = params['payload']
-    if payload['ref'] == "refs/heads/master"
-      Build.build_sha!(:sha => payload['after'], :queue => "master")
-    end
-    head :ok
-  end
 end

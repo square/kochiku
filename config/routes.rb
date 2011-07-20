@@ -3,16 +3,23 @@ Kochiku::Application.routes.draw do
 
   mount Resque::Server.new, :at => '/resque'
 
-  resources :builds do
-    post 'push_receive_hook', :on => :collection
+  resources :projects do
+    collection do
+      get 'status-report', :action => 'status_report'
+    end
+    member do
+      post 'push-receive-hook', :action => 'push_receive_hook'
+    end
+  end
+  match '/XmlStatusReport.aspx', :to => "builds#status_report", :defaults => { :format => 'xml' }
 
+  resources :builds do
     resources :build_parts do
       member do
         post 'rebuild'
       end
     end
   end
-  match '/XmlStatusReport.aspx', :to => "builds#status_report", :defaults => { :format => 'xml' }
 
   resources :build_attempts, :only => :update do
     resources :build_artifacts, :only => :create
