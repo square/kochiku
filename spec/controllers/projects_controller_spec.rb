@@ -33,7 +33,7 @@ describe ProjectsController do
       it "should return 'Unknown' for activity" do
         get :status_report, :format => :xml
         doc = Nokogiri::XML(response.body)
-        element = doc.at_xpath("/Projects/Project[@name='#{@project.name_with_branch}']")
+        element = doc.at_xpath("/Projects/Project[@name='#{@project.name}']")
 
         element['activity'].should == 'Unknown'
       end
@@ -47,7 +47,7 @@ describe ProjectsController do
       it "should return 'Building' for activity" do
         get :status_report, :format => :xml
         doc = Nokogiri::XML(response.body)
-        element = doc.at_xpath("/Projects/Project[@name='#{@project.name_with_branch}']")
+        element = doc.at_xpath("/Projects/Project[@name='#{@project.name}']")
 
         element['activity'].should == 'Building'
       end
@@ -61,7 +61,7 @@ describe ProjectsController do
       it "should return 'CheckingModifications' for activity" do
         get :status_report, :format => :xml
         doc = Nokogiri::XML(response.body)
-        element = doc.at_xpath("/Projects/Project[@name='#{@project.name_with_branch}']")
+        element = doc.at_xpath("/Projects/Project[@name='#{@project.name}']")
 
         element['activity'].should == 'CheckingModifications'
       end
