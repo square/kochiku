@@ -45,7 +45,7 @@ namespace :kochiku do
       tmp_dir = Rails.root.join('tmp', 'build-partition', 'web-cache')
       unless File.exists?(tmp_dir)
         FileUtils.mkdir_p tmp_dir
-        `cd #{tmp_dir} && git clone git@git.squareup.com:square/web.git .`
+        `git clone --recurse-submodules git@git.squareup.com:square/web.git #{tmp_dir}`
       end
 
       FileUtils.mkdir_p(log_dir)
