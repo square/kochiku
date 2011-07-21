@@ -9,10 +9,6 @@ class Build < ActiveRecord::Base
 
   after_create :enqueue_partitioning_job
 
-  def self.build_ref!(attributes)
-    Build.create!(attributes.merge(:state => :partitioning))
-  end
-
   def enqueue_partitioning_job
     Resque.enqueue(BuildPartitioningJob, self.id)
   end

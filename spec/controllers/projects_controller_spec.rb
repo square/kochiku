@@ -7,8 +7,8 @@ describe ProjectsController do
 
     before do
       @project = projects(:big_rails_app)
-      @build1 = Build.create!(:queue => 'master', :state => :succeeded, :ref => 'abc', :project => @project)
-      @build2 = Build.create!(:queue => 'master', :state => :error, :ref => 'def', :project => @project)
+      @build1 = Build.create!(:queue => :ci, :state => :succeeded, :ref => 'abc', :project => @project)
+      @build2 = Build.create!(:queue => :ci, :state => :error, :ref => 'def', :project => @project)
     end
 
     it "should return an rss feed of builds" do
@@ -41,7 +41,7 @@ describe ProjectsController do
 
     context "with a in-progress build" do
       before do
-        @project.builds.create!(:queue => 'master', :state => :running, :ref => 'abc')
+        @project.builds.create!(:queue => :ci, :state => :running, :ref => 'abc')
       end
 
       it "should return 'Building' for activity" do
@@ -55,7 +55,7 @@ describe ProjectsController do
 
     context "with a completed build" do
       before do
-        @project.builds.create!(:queue => 'master', :state => :failed, :ref => 'abc')
+        @project.builds.create!(:queue => :ci, :state => :failed, :ref => 'abc')
       end
 
       it "should return 'CheckingModifications' for activity" do

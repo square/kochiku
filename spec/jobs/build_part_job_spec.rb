@@ -4,14 +4,12 @@ describe BuildPartJob do
   let(:project) { projects(:big_rails_app) }
   let(:valid_attributes) do
     {
-        :build_instance => Build.build_ref!(:project => project, :ref => ref, :queue => queue),
+        :build_instance => project.builds.create!(:ref => "abcdef", :queue => :ci),
         :paths          => ["a", "b"],
         :kind           => "test",
     }
   end
 
-  let(:ref) { "abcdef" }
-  let(:queue) { "master" }
   let(:build_part) { BuildPart.create!(valid_attributes) }
   let(:build_attempt) { build_part.build_attempts.create!(:state => :runnable) }
   subject { BuildPartJob.new(build_attempt.id) }
