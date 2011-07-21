@@ -41,7 +41,6 @@ namespace :kochiku do
     end
 
     task :setup do
-      puts "checking out the web repo..."
       tmp_dir = Rails.root.join('tmp', 'build-partition', 'web-cache')
       unless File.exists?(tmp_dir)
         FileUtils.mkdir_p tmp_dir
