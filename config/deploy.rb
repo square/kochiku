@@ -27,16 +27,12 @@ after "deploy:setup", "kochiku:setup"
 after "deploy:symlink", "kochiku:symlinks"
 
 namespace :deploy do
-  task :start, :roles => :app, :except => { :no_release => true } do
-    run "cd #{current_path} && rails server thin -e #{rails_env} -p 3000 -d"
+  task :start, :roles => :app do
+    run "touch #{current_release}/tmp/restart.txt"
   end
 
-  task :stop, :roles => :app, :except => { :no_release => true } do
-    @pid = nil
-    run("cd #{current_path} && cat tmp/pids/server.pid") do |channel, stream, data|
-      @pid = data if stream == :out
-    end
-    run "kill #{@pid}"
+  task :stop, :roles => :app do
+    # Do nothing.
   end
 
   desc "Restart the web application server and all of the build slaves"
@@ -46,13 +42,12 @@ namespace :deploy do
   end
 
   desc "Restart the web application server"
-  task :restart_app, :roles => :app, :except => { :no_release => true } do
-    stop
-    start
+  task :restart, :roles => :app do
+    run "touch #{current_release}/tmp/restart.txt"
   end
 
   desc "Restart the build slaves"
-  task :restart_workers, :roles => :worker, :except => { :no_release => true } do
+  task :restart_workers, :roles => :worker do
     # the trailing semicolons are required because this is passed to the shell as a single string
     run <<-CMD
       resque_parent_pid=$(ps x | grep -i 'resque-' | grep -iE 'Forked|Waiting' | grep -v grep | awk '{ print $1}');
