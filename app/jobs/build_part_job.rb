@@ -10,7 +10,7 @@ class BuildPartJob < JobBase
 
   def perform
     @build_attempt.start!(hostname)
-    GitRepo.inside_copy('web-cache', @build.sha, true) do
+    GitRepo.inside_copy('web-cache', @build.ref, true) do
       result = tests_green? ? :passed : :failed
       @build_attempt.finish!(result)
       collect_artifacts(@build_part.artifacts_glob)

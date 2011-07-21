@@ -2,7 +2,7 @@ require 'spec_helper'
 
 describe BuildStateUpdateJob do
   before do
-    @build = Build.create!(:project => projects(:big_rails_app), :sha => "sha", :state => :runnable, :queue => "q")
+    @build = Build.create!(:project => projects(:big_rails_app), :ref => "asdfgh", :state => :runnable, :queue => "q")
     @build.build_parts.create!(:kind => :spec, :paths => ["foo", "bar"])
     @build.build_parts.create!(:kind => :cucumber, :paths => ["baz"])
   end

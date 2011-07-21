@@ -1,4 +1,4 @@
-%h2.subheader Build #{@build.id} - #{@build.sha}
+%h2.subheader Build #{@build.id} - #{@build.ref}
 
 .build-info.build-info-subheader
   %span.state{:class => 'build-' + @build.state.to_s}= @build.state.to_s.capitalize

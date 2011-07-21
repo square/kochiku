@@ -17,7 +17,7 @@ describe BuildsController do
 
         it "should create a new build" do
           post :create, :project_id => @project.to_param, :payload => @payload
-          Build.where(:project_id => @project, :sha => @payload["after"]).exists?.should be_true
+          Build.where(:project_id => @project, :ref => @payload["after"]).exists?.should be_true
         end
       end
 
@@ -62,15 +62,15 @@ describe BuildsController do
       end
 
       it "should create a new build" do
-        Build.exists?(:sha => build_info[:ref]).should be_false
+        Build.exists?(:ref => build_info[:ref]).should be_false
         post :create, :project_id => project_param, :build => build_info
-        Build.exists?(:project_id => assigns(:project), :sha => build_info[:ref]).should be_true
+        Build.exists?(:project_id => assigns(:project), :ref => build_info[:ref]).should be_true
       end
 
       it "should return the build info page in the location header" do
         post :create, :project_id => project_param, :build => build_info
 
-        new_build = Build.where(:project_id => assigns(:project), :sha => build_info[:ref]).first
+        new_build = Build.where(:project_id => assigns(:project), :ref => build_info[:ref]).first
         new_build.should be_present
 
         response.location.should == project_build_url(project_param, new_build)

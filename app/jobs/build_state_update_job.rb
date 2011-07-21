@@ -11,7 +11,7 @@ class BuildStateUpdateJob < JobBase
       build.update_state_from_parts!
 
       if build.promotable?
-        GitRepo.inside_copy("web-cache", build.sha) do
+        GitRepo.inside_copy("web-cache", build.ref) do
           `git remote add destination git@git.squareup.com:square/web.git`
           build.promote!
         end

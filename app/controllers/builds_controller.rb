@@ -31,7 +31,7 @@ private
     requested_branch = payload['ref'].split('/').last
 
     if @project.branch == requested_branch
-      @project.builds.create!(:state => :partitioning, :sha => payload['after'], :queue => "master")
+      @project.builds.create!(:state => :partitioning, :ref => payload['after'], :queue => "master")
     end
   end
 
@@ -41,6 +41,6 @@ private
       @project = Project.create!(:name => params[:project_id])
     end
 
-    @project.builds.create!(:state => :partitioning, :sha => params[:build][:ref], :queue => :developer)
+    @project.builds.create!(:state => :partitioning, :ref => params[:build][:ref], :queue => :developer)
   end
 end

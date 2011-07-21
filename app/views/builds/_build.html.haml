@@ -1,7 +1,7 @@
 .build
   %a{:href => project_build_path(build.project, build), :class => "build-wrapper"}
     .build-info
-      .sha= build.sha
+      .ref= build.ref
       .build-state
         %span.state{:class => 'build-' + build.state.to_s}= build.state.to_s.capitalize
         on

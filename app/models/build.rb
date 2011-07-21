@@ -9,7 +9,7 @@ class Build < ActiveRecord::Base
 
   after_create :enqueue_partitioning_job
 
-  def self.build_sha!(attributes)
+  def self.build_ref!(attributes)
     Build.create!(attributes.merge(:state => :partitioning))
   end
 

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20110719205413) do
+ActiveRecord::Schema.define(:version => 20110721185201) do
 
   create_table "build_artifacts", :force => true do |t|
     t.integer  "build_attempt_id"
@@ -44,7 +44,7 @@ ActiveRecord::Schema.define(:version => 20110719205413) do
   add_index "build_parts", ["build_id"], :name => "index_build_parts_on_build_id"
 
   create_table "builds", :force => true do |t|
-    t.string   "sha"
+    t.string   "ref"
     t.string   "state"
     t.string   "queue"
     t.datetime "created_at"
