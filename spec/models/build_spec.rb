@@ -27,5 +27,11 @@ describe Build do
 
       expect { build.partition(parts) }.to_not change { build.reload.state }
     end
+
+    it "requires a ref to be set" do
+      build.ref = nil
+      build.should_not be_valid
+      build.should have(1).errors_on(:ref)
+    end
   end
 end

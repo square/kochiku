@@ -8,6 +8,7 @@ class Build < ActiveRecord::Base
   symbolize :queue
   validates_presence_of :queue
   validates_presence_of :project_id
+  validates_presence_of :ref
 
   after_create :enqueue_partitioning_job
 
