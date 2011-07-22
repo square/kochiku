@@ -22,6 +22,12 @@
           = yield :header
     #content.section-wrapper
       .section
+        - if flash[:error].present?
+          .flash.error
+            = flash[:error]
+        - if flash[:message].present?
+          .flash.message
+            = flash[:message]
         = yield
 
     #nav
