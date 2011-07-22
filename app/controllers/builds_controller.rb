@@ -6,11 +6,7 @@ class BuildsController < ApplicationController
   end
 
   def create
-    if params['payload']
-      @build = create_build_from_github
-    elsif params['build']
-      @build = create_developer_build
-    end
+    make_build
 
     if @build
       head :ok, :location => project_build_url(@build.project, @build)
@@ -19,7 +15,26 @@ class BuildsController < ApplicationController
     end
   end
 
+  def request_build
+    make_build
+    if @build
+      flash[:message] = "Build added!"
+    else
+      flash[:error] = "Error adding build!"
+    end
+    redirect_to project_path(params[:project_id])
+
+  end
+
 private
+  def make_build
+    if params['payload']
+      @build = create_build_from_github
+    elsif params['build']
+      @build = create_developer_build
+    end
+  end
+
   def load_project
     @project = Project.find_by_name!(params[:project_id])
   end

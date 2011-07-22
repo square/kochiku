@@ -5,6 +5,7 @@ class ProjectsController < ApplicationController
 
   def show
     @project = Project.find_by_name!(params[:id])
+    @build = @project.builds.build(:queue => "dogfood")
     @builds = @project.builds.order('id desc').limit(20)
 
     respond_to do |format|

@@ -1,3 +1,9 @@
+- content_for :header do
+  = form_for :build, @build, :url => request_project_builds_path(@project) do |f|
+    =  f.text_field :ref, {:placeholder => 'SHA to build', :class => 'sha', :autocapitalize => 'off', :autocorrect => 'off', :spellcheck => 'false'}
+    =  f.hidden_field :queue
+    =  f.submit "Build", {:class => 'build-button'}
+
 %h2.subheader
   Builds
 
