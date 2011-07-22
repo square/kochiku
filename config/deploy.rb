@@ -19,7 +19,7 @@ set :keep_releases, 5
 set :use_sudo, false
 
 server "macbuild-master.sfo", :app, :web, :db, :primary => true
-role :worker, "macbuild24.sfo", "macbuild25.sfo", "macbuild26.sfo"
+role :worker, "macbuild-master.sfo", "macbuild24.sfo", "macbuild25.sfo", "macbuild26.sfo"
 
 set :rails_env,      "production"
 
