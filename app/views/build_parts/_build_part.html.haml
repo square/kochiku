@@ -1,8 +1,11 @@
-.part{:class => build_part.kind, :title => build_part.paths.map{|path| "-#{path}"}.join("<br>")}
+.part{:class => build_part.status, :title => build_part.paths.map{|path| "-#{path}"}.join("<br>")}
   %a.part-wrapper{:href => project_build_part_path(build_part.project, build_part.build_instance, build_part)}
     .kind
       - if build_part.kind == "spec"
         Specs
       - elsif build_part.kind == "cucumber"
         Cukes
-    .attempts= render build_part.build_attempts
+    .attempts
+      = render build_part.last_attempt
+      - if build_part.build_attempts.count > 1
+        = "..."

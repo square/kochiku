@@ -287,8 +287,12 @@ h3
       text-align: right
 
 $part-margin: 1px
-$color-spec: rgba(135, 184, 232, 0.6)
-$color-cuke: rgba(198, 232, 135, 0.6)
+$color-passed: #D5FA8E
+$color-runnable: #FAF79D
+$color-running: #84A6D9
+$color-failed: #EB926C
+$color-error: #E36666
+
 .parts
   +envelope
   margin: 10px (-$part-margin)
@@ -298,10 +302,16 @@ $color-cuke: rgba(198, 232, 135, 0.6)
     border: 1px solid rgba(0, 0, 0, 0.5)
     margin: $part-margin
     box-shadow: 0 1px 1px rgba(0, 0, 0, 0.3)
-  .part.spec
-    background-color: $color-spec
-  .part.cucumber
-    background-color: $color-cuke
+  .part.runnable
+    background-color: $color-runnable
+  .part.running
+    background-color: $color-running
+  .part.passed
+    background-color: $color-passed
+  .part.failed
+    background-color: $color-failed
+  .part.error
+    background-color: $color-error
 
   .part-wrapper
     +envelope
