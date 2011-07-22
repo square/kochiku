@@ -55,7 +55,7 @@ class Build < ActiveRecord::Base
   end
 
   def promotable?
-    succeeded? && queue == :master
+    succeeded? && queue == :ci
   end
 
   def promote!
