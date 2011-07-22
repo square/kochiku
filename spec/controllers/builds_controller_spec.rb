@@ -78,4 +78,29 @@ describe BuildsController do
     end
   end
 
+  describe "#request_build" do
+    context "when a non existent project is specified" do
+      it "creates the project" do
+        expect{ post :create, :project_id => "foobar", :build => {:ref => "asdf"} }.to change{Project.count}.by(1)
+      end
+
+      it "creates a build if a ref is given" do
+        expect{ post :create, :project_id => "foobar", :build => {:ref => "asdf"} }.to change{Build.count}.by(1)
+      end
+
+      it "doesn't create a build if no ref is given" do
+        expect{ post :create, :project_id => "foobar", :build => {:ref => nil }}.to_not change{Build.count}
+      end
+    end
+
+    context "when the project exists" do
+      it "creates the build if a ref is given" do
+        expect{ post :create, :project_id => Project.last, :build => {:ref => "asdf"} }.to change{Build.count}.by(1)
+      end
+      it "doesn't create a build if no ref is given" do
+        expect{ post :create, :project_id => Project.last, :build => {:ref => nil} }.to_not change{Build.count}
+      end
+    end
+
+  end
 end
