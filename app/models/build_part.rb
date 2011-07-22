@@ -32,11 +32,11 @@ class BuildPart < ActiveRecord::Base
   end
 
   def execute
-    BuildStrategy.new.execute_build(self)
+    BuildStrategy.execute_build(self)
   end
 
   def artifacts_glob
-    BuildStrategy.new.artifacts_glob
+    BuildStrategy.artifacts_glob
   end
 
   def started_at
