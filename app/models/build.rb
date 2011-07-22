@@ -2,7 +2,9 @@ class Build < ActiveRecord::Base
   belongs_to :project
   has_many :build_parts, :dependent => :destroy
   has_many :build_attempts, :through => :build_parts
-  symbolize :state, :in => [:partitioning, :runnable, :running, :doomed, :failed, :succeeded, :error]
+  TERMINAL_STATES = [:failed, :succeeded, :error]
+  STATES = [:partitioning, :runnable, :running, :doomed] + TERMINAL_STATES
+  symbolize :state, :in => STATES
   symbolize :queue
   validates_presence_of :queue
   validates_presence_of :project_id
@@ -40,7 +42,11 @@ class Build < ActiveRecord::Base
   end
 
   def finished_at
-#    build_attempts.all.sort_by(&:finished_at).last
+    build_attempts.all.sort_by(&:finished_at).last
+  end
+
+  def elapsed_time
+    build_attempts.all.map(&:elapsed_time).compact.sort.last
   end
 
   def succeeded?
@@ -53,5 +59,9 @@ class Build < ActiveRecord::Base
 
   def promote!
     BuildStrategy.new.promote_build(self)
+  end
+
+  def completed?
+    TERMINAL_STATES.include?(state)
   end
 end
