@@ -9,6 +9,8 @@
     %h3.build-id{:class => build.state}= build.id
     - if build.completed?
       .time-elapsed
-        &hellip;built in #{number_with_precision(build.elapsed_time, :precision => 0)} seconds
+        &hellip;built in
+        %strong
+          =duration_strftime(build.elapsed_time, "%Mm %Ss")
 
   .parts= render build.build_parts
