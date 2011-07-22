@@ -18,6 +18,7 @@ gem "resque"
 gem "system_timer", :platforms => :mri_18    # used by redis gem
 
 gem "rest-client", :require => false
+gem "cocaine"
 
 group :development do
   gem 'ruby-debug', :platforms => :mri_18

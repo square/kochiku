@@ -11,8 +11,8 @@ class BuildStateUpdateJob < JobBase
       build.update_state_from_parts!
 
       if build.promotable?
-        GitRepo.inside_copy("web-cache", build.ref) do
-          `git remote add destination git@git.squareup.com:square/web.git`
+        GitRepo.inside_repo("web-cache") do
+          Cocaine::CommandLine.new("git remote add destination git@git.squareup.com:square/web.git", :expected_outcodes => [0, 128], :swallow_stderr => true).run
           build.promote!
         end
       end

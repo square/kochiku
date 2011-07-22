@@ -59,7 +59,7 @@ class Build < ActiveRecord::Base
   end
 
   def promote!
-    BuildStrategy.promote_build(self)
+    BuildStrategy.promote_build(self.ref)
   end
 
   def completed?

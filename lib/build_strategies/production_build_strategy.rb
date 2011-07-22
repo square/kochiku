@@ -8,8 +8,8 @@ class BuildStrategy
       " bash --noprofile --norc -c 'ruby -v ; source ~/.rvm/scripts/rvm ; rvm use ree ; mkdir log ; script/ci worker 2>log/stderr.log 1>log/stdout.log'"
     end
 
-    def promote_build(build)
-      system "git push -f destination #{build.ref}:refs/heads/#{promotion_ref}"
+    def promote_build(build_ref)
+      system "git push -f destination #{build_ref}:refs/heads/#{promotion_ref}"
     end
 
     def artifacts_glob

@@ -29,6 +29,17 @@ class GitRepo
       end
     end
 
+    def inside_repo(cached_repo_name, ref = nil)
+      cached_repo_path = File.join(WORKING_DIR, cached_repo_name)
+
+      Dir.chdir(cached_repo_path) do
+        run! "git fetch --quiet && git submodule --quiet update --init"
+        run!("git checkout --quiet #{ref}") if ref
+
+        yield
+      end
+    end
+
     def run!(cmd)
       unless system(cmd)
         raise "non-0 exit code #{$?} returned from [#{cmd}]"
