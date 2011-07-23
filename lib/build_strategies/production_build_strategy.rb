@@ -8,8 +8,15 @@ class BuildStrategy
       " bash --noprofile --norc -c 'ruby -v ; source ~/.rvm/scripts/rvm ; rvm use ree ; mkdir log ; script/ci worker 2>log/stderr.log 1>log/stdout.log'"
     end
 
+    # The primary function of promote_build is to push a new tag or update a branch
+    #
+    # A feature of promote build is that it will not cause the promotion ref to move
+    # backwards. For instance, if build 1 finishes after build 2, we don't cause the promotion ref to move
+    # backwards by overwriting promotion_ref with build 1
     def promote_build(build_ref)
-      system "git push -f destination #{build_ref}:refs/heads/#{promotion_ref}"
+      unless included_in_promotion_ref?(build_ref)
+        Cocaine::CommandLine.new("git", "push", "-f", "destination", "#{build_ref}:refs/heads/#{promotion_ref}").run
+      end
     end
 
     def artifacts_glob
@@ -18,6 +25,13 @@ class BuildStrategy
 
     def promotion_ref
       "ci-kochiku-latest"
+    end
+
+  private
+
+    def included_in_promotion_ref?(build_ref)
+      cherry_cmd = Cocaine::CommandLine.new("git", "cherry", "destination:refs/heads/#{promotion_ref}", build_ref)
+      cherry_cmd.run.lines.count == 0
     end
   end
 end
