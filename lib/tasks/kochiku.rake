@@ -40,6 +40,7 @@ namespace :kochiku do
       File.join(kochiku_dir, "log")
     end
 
+    desc "Setup a development environment to run a kochiku worker. Use capistrano for remote hosts"
     task :setup do
       tmp_dir = Rails.root.join('tmp', 'build-partition', 'web-cache')
       unless File.exists?(tmp_dir)
