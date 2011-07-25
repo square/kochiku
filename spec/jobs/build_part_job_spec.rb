@@ -1,7 +1,7 @@
 require 'spec_helper'
 
 describe BuildPartJob do
-  let(:project) { projects(:big_rails_app) }
+  let(:project) { FactoryGirl.create(:big_rails_project) }
   let(:valid_attributes) do
     {
         :build_instance => project.builds.create!(:state => :partitioning, :ref => "abcdef", :queue => :ci),

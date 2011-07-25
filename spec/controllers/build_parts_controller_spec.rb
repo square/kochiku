@@ -5,7 +5,7 @@ describe BuildPartsController do
 
   describe "#show" do
     it "renders the show template successfully even if elapsed time is nil" do
-      project = projects(:big_rails_app)
+      project = FactoryGirl.create(:big_rails_project)
       build = project.builds.create!(:ref => "abcdef", :queue => :ci, :state => :partitioning)
       build_part = build.build_parts.create!(:paths => ["a"], :kind => "test")
       build_part.elapsed_time.should == nil

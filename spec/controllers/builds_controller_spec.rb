@@ -6,7 +6,7 @@ describe BuildsController do
 
     context "via github" do
       before do
-        @project = projects(:big_rails_app)
+        @project = FactoryGirl.create(:big_rails_project)
         @payload = JSON.load(FIXTURE_PATH.join("sample_github_webhook_payload.json").read)
       end
 
@@ -94,11 +94,14 @@ describe BuildsController do
     end
 
     context "when the project exists" do
+      let(:project){ FactoryGirl.create(:project) }
+
       it "creates the build if a ref is given" do
-        expect{ post :create, :project_id => Project.last, :build => {:ref => "asdf"} }.to change{Build.count}.by(1)
+        expect{ post :create, :project_id => project.id, :build => {:ref => "asdf"} }.to change{Build.count}.by(1)
       end
+
       it "doesn't create a build if no ref is given" do
-        expect{ post :create, :project_id => Project.last, :build => {:ref => nil} }.to_not change{Build.count}
+        expect{ post :create, :project_id => project.id, :build => {:ref => nil} }.to_not change{Build.count}
       end
     end
 

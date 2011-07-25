@@ -6,7 +6,7 @@ describe ProjectsController do
     render_views
 
     before do
-      @project = projects(:big_rails_app)
+      @project = FactoryGirl.create(:big_rails_project)
       @build1 = Build.create!(:queue => :ci, :state => :succeeded, :ref => 'abc', :project => @project)
       @build2 = Build.create!(:queue => :ci, :state => :error, :ref => 'def', :project => @project)
     end
@@ -24,7 +24,7 @@ describe ProjectsController do
   describe "#status_report" do
     render_views
     before do
-      @project = projects(:big_rails_app)
+      @project = FactoryGirl.create(:big_rails_project)
     end
 
     context "when a project has no builds" do

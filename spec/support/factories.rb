@@ -3,6 +3,11 @@ FactoryGirl.define do
     sequence(:name) {|n| "Project ##{n}" }
   end
 
+  factory :big_rails_project, :class => :project do
+    name "web"
+    branch "master"
+  end
+
   factory :build do
     project
     state :partitioning

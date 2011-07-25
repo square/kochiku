@@ -1,7 +1,7 @@
 require 'spec_helper'
 
 describe BuildPart do
-  let(:project) { projects(:big_rails_app) }
+  let(:project) { FactoryGirl.create(:big_rails_project) }
   let(:queue) { :ci }
   let(:build) { project.builds.create!(:ref => "abcdef", :queue => queue, :state => :partitioning) }
   let(:build_part) { build.build_parts.create!(:paths => ["a", "b"], :kind => "test") }
