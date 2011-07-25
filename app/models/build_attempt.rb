@@ -4,6 +4,7 @@ class BuildAttempt < ActiveRecord::Base
 
   STATES = [:runnable, :running, :passed, :failed, :error]
   symbolize :state, :in => STATES
+
   STATES.each do |state|
     scope state, where(:state => state.to_s)
   end
