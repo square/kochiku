@@ -24,7 +24,7 @@ class BuildStrategy
     end
 
     def promotion_ref
-      "ci-kochiku-latest"
+      "ci-master-distributed-latest"
     end
 
   private
