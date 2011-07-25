@@ -7,5 +7,6 @@
         Cukes
     .attempts
       = render build_part.last_attempt
-      - if build_part.build_attempts.count > 1
+      -#You'd think build_part.build_attempts.count would be better here, but thanks to eager loading it's actually worse
+      - if build_part.build_attempts.size > 1
         = "..."
