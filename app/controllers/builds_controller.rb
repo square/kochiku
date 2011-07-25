@@ -2,7 +2,7 @@ class BuildsController < ApplicationController
   before_filter :load_project, :only => :show
 
   def show
-    @build = @project.builds.find(params[:id])
+    @build = @project.builds.find(params[:id], :include => {:build_parts => [:last_attempt, :build_attempts]})
   end
 
   def create

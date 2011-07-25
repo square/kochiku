@@ -6,7 +6,7 @@ class ProjectsController < ApplicationController
   def show
     @project = Project.find_by_name!(params[:id])
     @build = @project.builds.build(:queue => "dogfood")
-    @builds = @project.builds.order('id desc').limit(20)
+    @builds = @project.builds.order('id desc').limit(20).includes(:build_parts => [:last_attempt, :build_attempts])
 
     respond_to do |format|
       format.html
