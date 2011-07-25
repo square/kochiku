@@ -9,7 +9,6 @@ describe BuildStateUpdateJob do
     @cocaine = double()
     @cocaine.stub(:run)
     Cocaine::CommandLine.stub(:new) { @cocaine }
-
     BuildStrategy.stub(:promote_build)
   end
 
