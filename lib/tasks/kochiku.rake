@@ -55,7 +55,7 @@ namespace :kochiku do
       rvmrc = File.read(File.join(kochiku_dir, ".rvmrc"))
       wanted_rvm = rvmrc.split(" ").grep(/kochiku/).first
 
-      puts "Creating wrapper for fidelius using #{wanted_rvm}"
+      puts "Creating wrapper for kochiku using #{wanted_rvm}"
       `rvm wrapper #{wanted_rvm} kochiku`
 
       label                = "com.squareup.kochiku-slave"
@@ -74,10 +74,10 @@ namespace :kochiku do
                                     <string>--trace</string>
                                     </array>
     <key>RunAtLoad</key>            <true/>
-    <key>WorkingDirectory</key>     <string>#{kochiku_dir}</string>
+    <key>WorkingDirectory</key>     <string>/Users/square/kochiku/current</string>
     <key>KeepAlive</key>            <true/>
-    <key>StandardOutPath</key>      <string>#{log_dir}/slave.log</string>
-    <key>StandardErrorPath</key>    <string>#{log_dir}/slave-error.log</string>
+    <key>StandardOutPath</key>      <string>/Users/square/kochiku/current/slave.log</string>
+    <key>StandardErrorPath</key>    <string>/Users/square/kochiku/current/slave-error.log</string>
     <key>LaunchOnlyOnce</key>       <false/>
     <key>EnvironmentVariables</key> <dict>
                                       <key>RAILS_ENV</key> <string>production</string>
