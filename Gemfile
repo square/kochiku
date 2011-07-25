@@ -2,6 +2,7 @@
 source 'https://rubygems.org/'
 
 gem 'rails', '3.0.9'
+gem 'rake'
 gem 'passenger', :group => :production
 gem 'square-hoptoad_notifier', :require => "hoptoad_notifier"
 

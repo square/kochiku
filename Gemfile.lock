@@ -190,6 +190,7 @@ DEPENDENCIES
   nokogiri
   passenger
   rails (= 3.0.9)
+  rake
   resque
   rest-client
   rspec-rails
