@@ -32,9 +32,11 @@ group :test, :development do
   gem 'autotest-fsevent', :require => false
   gem 'rspec-rails'
   gem 'factory_girl_rails'
+  gem "launchy"
 end
 
 group :test do
   gem "webmock", :require => false
   gem "nokogiri", :require => false
+  gem "capybara"
 end
