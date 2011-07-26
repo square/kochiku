@@ -94,11 +94,13 @@ describe BuildsController do
     end
 
     context "when the project exists" do
+      let(:project) { projects(:big_rails_app) }
+
       it "creates the build if a ref is given" do
-        expect{ post :create, :project_id => Project.last.to_param, :build => {:ref => "asdf"} }.to change{Build.count}.by(1)
+        expect{ post :create, :project_id => projects(:big_rails_app).to_param, :build => {:ref => "asdf"} }.to change{Build.count}.by(1)
       end
       it "doesn't create a build if no ref is given" do
-        expect{ post :create, :project_id => Project.last.to_param, :build => {:ref => nil} }.to_not change{Build.count}
+        expect{ post :create, :project_id => projects(:big_rails_app).to_param, :build => {:ref => nil} }.to_not change{Build.count}
       end
     end
 
