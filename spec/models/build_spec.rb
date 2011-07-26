@@ -1,8 +1,8 @@
 require 'spec_helper'
 
 describe Build do
-  let(:project) { projects(:big_rails_app) }
-  let(:build) { Build.create!(:project => project, :ref => "deadbeef", :state => :partitioning, :queue => :ci) }
+  let(:project) { FactoryGirl.create(:big_rails_project) }
+  let(:build) { FactoryGirl.create(:build, :project => project) }
   let(:parts) { [{'type' => 'cucumber', 'files' => ['a', 'b']}, {'type' => 'rspec', 'files' => ['c', 'd']}] }
 
   describe "#partition" do

@@ -1,16 +1,10 @@
 require 'spec_helper'
 
 describe BuildPartJob do
-  let(:project) { projects(:big_rails_app) }
-  let(:valid_attributes) do
-    {
-        :build_instance => project.builds.create!(:state => :partitioning, :ref => "abcdef", :queue => :ci),
-        :paths          => ["a", "b"],
-        :kind           => "test",
-    }
-  end
+  let(:project) { FactoryGirl.create(:big_rails_project) }
+  let(:build) { FactoryGirl.create(:build, :state => :partitioning, :project => project) }
 
-  let(:build_part) { BuildPart.create!(valid_attributes) }
+  let(:build_part) { FactoryGirl.create(:build_part, :build_instance => build) }
   let(:build_attempt) { build_part.build_attempts.create!(:state => :runnable) }
   subject { BuildPartJob.new(build_attempt.id) }
 

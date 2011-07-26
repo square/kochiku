@@ -6,9 +6,9 @@ describe ProjectsController do
     render_views
 
     before do
-      @project = projects(:big_rails_app)
-      @build1 = Build.create!(:queue => :ci, :state => :succeeded, :ref => 'abc', :project => @project)
-      @build2 = Build.create!(:queue => :ci, :state => :error, :ref => 'def', :project => @project)
+      @project = FactoryGirl.create(:big_rails_project)
+      @build1 = FactoryGirl.create(:build, :project => @project, :state => :succeeded)
+      @build2 = FactoryGirl.create(:build, :project => @project, :state => :error)
     end
 
     it "should return an rss feed of builds" do
@@ -24,7 +24,7 @@ describe ProjectsController do
   describe "#status_report" do
     render_views
     before do
-      @project = projects(:big_rails_app)
+      @project = FactoryGirl.create(:big_rails_project)
     end
 
     context "when a project has no builds" do
@@ -41,7 +41,7 @@ describe ProjectsController do
 
     context "with a in-progress build" do
       before do
-        @project.builds.create!(:queue => :ci, :state => :running, :ref => 'abc')
+        FactoryGirl.create(:build, :state => :running, :project => @project)
       end
 
       it "should return 'Building' for activity" do
@@ -55,7 +55,7 @@ describe ProjectsController do
 
     context "with a completed build" do
       before do
-        @project.builds.create!(:queue => :ci, :state => :failed, :ref => 'abc')
+        FactoryGirl.create(:build, :state => :failed, :project => @project)
       end
 
       it "should return 'CheckingModifications' for activity" do

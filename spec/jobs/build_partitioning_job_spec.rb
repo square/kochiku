@@ -2,7 +2,7 @@ require 'spec_helper'
 
 describe BuildPartitioningJob do
   before do
-    @build = Build.create!(:project => projects(:big_rails_app), :ref => "asdfgh", :state => :runnable, :queue => :ci)
+    @build = FactoryGirl.create(:build, :state => :runnable)
   end
 
   describe "#perform" do
