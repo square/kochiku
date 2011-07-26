@@ -2,7 +2,7 @@ class BuildPart < ActiveRecord::Base
   belongs_to :build_instance, :class_name => "Build", :foreign_key => "build_id", :inverse_of => :build_parts    # using build_instance because AR defines #build for associations, and it wins
   has_many :build_attempts, :dependent => :destroy, :inverse_of => :build_part
   has_one :project, :through => :build_instance
-  has_one :last_attempt, :class_name => "BuildAttempt", :order => "created_at DESC"
+  has_one :last_attempt, :class_name => "BuildAttempt", :order => "id DESC"
   after_commit :enqueue_build_part_job
   validates_presence_of :kind, :paths
 
@@ -37,11 +37,11 @@ class BuildPart < ActiveRecord::Base
   end
 
   def started_at
-    build_attempts.last.try(:started_at)
+    last_attempt.try(:started_at)
   end
 
   def finished_at
-    build_attempts.last.try(:finished_at)
+    last_attempt.try(:finished_at)
   end
 
   def elapsed_time
