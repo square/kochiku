@@ -1,5 +1,6 @@
 .part{:class => build_part.status, :title => build_part.paths.map{|path| "-#{path}"}.join("<br>")}
-  %a.part-wrapper{:href => project_build_part_path(project, build, build_part)}
+  -# build_part.build_instance.project is important to prevent n+1 queries here. Using the :through does a bunch of SQL.
+  %a.part-wrapper{:href => project_build_part_path(build_part.build_instance.project, build_part.build_instance, build_part)}
     .kind
       - if build_part.kind == "spec"
         Specs

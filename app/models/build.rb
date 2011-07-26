@@ -1,6 +1,6 @@
 class Build < ActiveRecord::Base
-  belongs_to :project
-  has_many :build_parts, :dependent => :destroy
+  belongs_to :project, :inverse_of => :builds
+  has_many :build_parts, :dependent => :destroy, :inverse_of => :build_instance
   has_many :build_attempts, :through => :build_parts
   TERMINAL_STATES = [:failed, :succeeded, :error]
   STATES = [:partitioning, :runnable, :running, :doomed] + TERMINAL_STATES

@@ -1,6 +1,6 @@
 class BuildAttempt < ActiveRecord::Base
-  has_many :build_artifacts, :dependent => :destroy
-  belongs_to :build_part
+  has_many :build_artifacts, :dependent => :destroy, :inverse_of => :build_attempt
+  belongs_to :build_part, :inverse_of => :build_attempts
 
   STATES = [:runnable, :running, :passed, :failed, :error]
   symbolize :state, :in => STATES
