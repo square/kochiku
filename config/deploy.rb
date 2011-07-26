@@ -19,7 +19,9 @@ set :keep_releases, 5
 set :use_sudo, false
 
 server "macbuild-master.sfo", :app, :web, :db, :primary => true
-role :worker, "macbuild-master.sfo", "macbuild24.sfo", "macbuild25.sfo", "macbuild26.sfo"
+
+macbuilds = (1..26).to_a.reject{|n| n==14}.map {|n| "macbuild%02d.sfo" % n }
+role :worker, "macbuild-master.sfo", *macbuilds
 
 set :rails_env,      "production"
 
