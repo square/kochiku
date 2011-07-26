@@ -30,5 +30,8 @@ RSpec.configure do |config|
     WebMock.disable_net_connect!
     Resque.stub(:enqueue)
     JobBase.stub(:enqueue_in)
+
+    Cocaine::CommandLine.stub(:new).with('git fetch', anything) { double('git fetch', :run => nil) }
+    Cocaine::CommandLine.stub(:new).with('git submodule update', anything) { double('git submodule update', :run => nil) }
   end
 end

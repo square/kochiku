@@ -1,11 +1,15 @@
 class GitRepo
-  WORKING_DIR="#{Rails.root}/tmp/build-partition"
+  WORKING_DIR = Rails.root.join('tmp', 'build-partition')
 
   class << self
     def inside_copy(cached_repo_name, ref = "master", submodules = false)
-      cached_repo_path = File.join(WORKING_DIR, cached_repo_name)
-      # update local repo
-      run! "cd #{cached_repo_path} && git fetch --quiet && git submodule --quiet update --init"
+      cached_repo_path = WORKING_DIR.join(cached_repo_name)
+
+      Dir.chdir(cached_repo_path) do
+        # update the cached repo
+        Cocaine::CommandLine.new("git fetch", "--quiet").run
+        Cocaine::CommandLine.new("git submodule update", "--init --quiet").run
+      end
 
       Dir.mktmpdir(nil, WORKING_DIR) do |dir|
         # clone local repo (fast!)
@@ -33,8 +37,10 @@ class GitRepo
       cached_repo_path = File.join(WORKING_DIR, cached_repo_name)
 
       Dir.chdir(cached_repo_path) do
-        run! "git fetch --quiet && git submodule --quiet update --init"
-        run!("git checkout --quiet #{ref}") if ref
+        Cocaine::CommandLine.new("git fetch", "--quiet").run
+        Cocaine::CommandLine.new("git submodule update", "--init --quiet").run
+
+        Cocaine::CommandLine.new("git checkout", "--quiet").run if ref
 
         yield
       end
