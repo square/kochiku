@@ -2,6 +2,7 @@ class BuildPart < ActiveRecord::Base
   belongs_to :build_instance, :class_name => "Build", :foreign_key => "build_id"    # using build_instance because AR defines #build for associations, and it wins
   has_many :build_attempts, :dependent => :destroy
   has_one :project, :through => :build_instance
+  has_one :last_attempt, :class_name => "BuildAttempt", :order => "created_at DESC"
   after_commit :enqueue_build_part_job
   validates_presence_of :kind, :paths
 
@@ -17,10 +18,6 @@ class BuildPart < ActiveRecord::Base
 
   def rebuild!
     enqueue_build_part_job
-  end
-
-  def last_attempt
-    build_attempts.order(:created_at).last
   end
 
   def status
