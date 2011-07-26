@@ -1,6 +1,6 @@
 - if @project.name != 'web'   # temporary hack until a field is added to project to indicate that it is not a developer project
   - content_for :header do
-    = form_for :build, @build, :url => request_project_builds_path(@project) do |f|
+    = form_for @build, :url => request_project_builds_path(@project) do |f|
       =  f.text_field :ref, {:placeholder => 'SHA to build', :class => 'sha', :autocapitalize => 'off', :autocorrect => 'off', :spellcheck => 'false'}
       =  f.submit "Build", {:class => 'build-button'}
 
