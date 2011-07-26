@@ -5,6 +5,14 @@ describe Build do
   let(:build) { FactoryGirl.create(:build, :project => project) }
   let(:parts) { [{'type' => 'cucumber', 'files' => ['a', 'b']}, {'type' => 'rspec', 'files' => ['c', 'd']}] }
 
+  describe "validations" do
+    it "requires a ref to be set" do
+      build.ref = nil
+      build.should_not be_valid
+      build.should have(1).errors_on(:ref)
+    end
+  end
+
   describe "#partition" do
     it "should create a BuildPart for each path" do
       build.partition(parts)
@@ -16,7 +24,7 @@ describe Build do
       build.partition(parts)
       build.state.should == :runnable
     end
-    
+
     it "should enqueue build part jobs" do
       BuildPartJob.should_receive(:enqueue_on).twice
       build.partition(parts)
@@ -27,13 +35,6 @@ describe Build do
 
       expect { build.partition(parts) }.to_not change { build.reload.state }
     end
-
-  end
-
-  it "requires a ref to be set" do
-    build.ref = nil
-    build.should_not be_valid
-    build.should have(1).errors_on(:ref)
   end
 
   describe "#completed?" do
@@ -49,6 +50,53 @@ describe Build do
         build.state = state
         build.should_not be_completed
       end
+    end
+  end
+
+  describe "#update_state_from_parts!" do
+    let(:parts) { [{'type' => 'cucumber', 'files' => ['a']}, {'type' => 'rspec', 'files' => ['b']}] }
+    before do
+      build.partition(parts)
+      build.state.should == :runnable
+    end
+
+    it "should set a build state to running if it is successful so far, but still incomplete" do
+      build.build_parts[0].last_attempt.finish!(:passed)
+      build.update_state_from_parts!
+
+      build.state.should == :running
+    end
+
+    it "should set build state to error if any of its parts errored" do
+      build.build_parts[0].last_attempt.finish!(:error)
+      build.build_parts[1].last_attempt.finish!(:passed)
+      build.update_state_from_parts!
+
+      build.state.should == :error
+    end
+
+    it "should set build state to succeeded all of its parts passed" do
+      build.build_parts[0].last_attempt.finish!(:passed)
+      build.build_parts[1].last_attempt.finish!(:passed)
+      build.update_state_from_parts!
+
+      build.state.should == :succeeded
+    end
+
+    it "should set a build state to doomed if it has a failed part but is still has more parts to process" do
+      build.build_parts[0].last_attempt.finish!(:failed)
+      build.update_state_from_parts!
+      build.state.should == :doomed
+    end
+
+    it "should change a doomed build to failed once it is complete" do
+      build.build_parts[0].last_attempt.finish!(:failed)
+      build.update_state_from_parts!
+      build.state.should == :doomed
+
+      build.build_parts[1].last_attempt.finish!(:passed)
+      build.update_state_from_parts!
+      build.state.should == :failed
     end
   end
 

@@ -8,9 +8,6 @@ class BuildPart < ActiveRecord::Base
 
   serialize :paths, Array
 
-  scope :failed, joins(:build_attempts).merge(BuildAttempt.failed)
-  scope :passed, joins(:build_attempts).merge(BuildAttempt.passed)
-
   def enqueue_build_part_job
     build_attempt = build_attempts.create!(:state => :runnable)
     BuildPartJob.enqueue_on(build_instance.queue, build_attempt.id)

@@ -28,7 +28,7 @@ class BuildAttempt < ActiveRecord::Base
   end
 
   def error!
-    update_attributes(:state => :error, :finished_at => Time.now)
+    finish!(:error)
   end
 
   def unsuccessful?

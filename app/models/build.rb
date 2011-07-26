@@ -1,6 +1,16 @@
 class Build < ActiveRecord::Base
   belongs_to :project, :inverse_of => :builds
-  has_many :build_parts, :dependent => :destroy, :inverse_of => :build_instance
+  has_many :build_parts, :dependent => :destroy, :inverse_of => :build_instance do
+    def passed
+      joins(:build_attempts).where('build_attempts.state' => 'passed')
+    end
+    def failed
+      joins(:build_attempts).where('build_attempts.state' => 'failed')
+    end
+    def errored
+      joins(:build_attempts).where('build_attempts.state' => 'error')
+    end
+  end
   has_many :build_attempts, :through => :build_parts
   TERMINAL_STATES = [:failed, :succeeded, :error]
   STATES = [:partitioning, :runnable, :running, :doomed] + TERMINAL_STATES
@@ -25,15 +35,20 @@ class Build < ActiveRecord::Base
 
   def update_state_from_parts!
     return if build_parts.empty?
+
+    errored = build_parts.errored
     passed = build_parts.passed
     failed = build_parts.failed
-    state =
-      if (build_parts - passed).empty?
+
+    state = case
+      when errored.any?
+        :error
+      when (build_parts - passed).empty?
         :succeeded
-      elsif (passed | failed) == build_parts
+      when (passed | failed).count == build_parts.count
         :failed
       else
-         failed.empty? ? :running : :doomed
+        failed.empty? ? :running : :doomed
       end
     update_attributes!(:state => state)
   end
