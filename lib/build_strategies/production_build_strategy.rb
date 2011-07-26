@@ -14,8 +14,10 @@ class BuildStrategy
     # backwards. For instance, if build 1 finishes after build 2, we don't cause the promotion ref to move
     # backwards by overwriting promotion_ref with build 1
     def promote_build(build_ref)
+      synchronize_with_remote(:origin)
+
       unless included_in_promotion_ref?(build_ref)
-        Cocaine::CommandLine.new("git push", "destination :build_ref:refs/heads/#{promotion_ref} -f", :build_ref => build_ref).run
+        Cocaine::CommandLine.new("git push", "origin :build_ref:refs/heads/#{promotion_ref} -f", :build_ref => build_ref).run
       end
     end
 
@@ -30,8 +32,12 @@ class BuildStrategy
   private
 
     def included_in_promotion_ref?(build_ref)
-      cherry_cmd = Cocaine::CommandLine.new("git cherry", "destination:refs/heads/#{promotion_ref} :build_ref", :build_ref => build_ref)
+      cherry_cmd = Cocaine::CommandLine.new("git cherry", "origin/#{promotion_ref} :build_ref", :build_ref => build_ref)
       cherry_cmd.run.lines.count == 0
+    end
+
+    def synchronize_with_remote(name)
+      Cocaine::CommandLine.new("git fetch", "#{name} --quiet").run
     end
   end
 end

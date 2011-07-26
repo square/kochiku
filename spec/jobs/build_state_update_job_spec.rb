@@ -6,10 +6,6 @@ describe BuildStateUpdateJob do
     @build.build_parts.create!(:kind => :spec, :paths => ["foo", "bar"])
     @build.build_parts.create!(:kind => :cucumber, :paths => ["baz"])
 
-    @cocaine = double()
-    @cocaine.stub(:run)
-    Cocaine::CommandLine.stub(:new) { @cocaine }
-
     BuildStrategy.stub(:promote_build)
   end
 
@@ -48,7 +44,6 @@ describe BuildStateUpdateJob do
       end
 
       it "should promote the build" do
-        @cocaine.should_receive(:run)
         BuildStrategy.should_receive(:promote_build).with(@build.ref)
         BuildStateUpdateJob.perform(@build.id)
       end
