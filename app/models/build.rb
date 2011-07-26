@@ -47,7 +47,9 @@ class Build < ActiveRecord::Base
   end
 
   def elapsed_time
-    build_attempts.all.map(&:elapsed_time).compact.sort.last
+    last_finished_at = build_attempts.maximum(:finished_at)
+    return nil if last_finished_at.blank?
+    last_finished_at - created_at
   end
 
   def succeeded?

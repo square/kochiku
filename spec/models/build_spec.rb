@@ -53,14 +53,12 @@ describe Build do
   end
 
   describe "#elapsed_time" do
-    it "returns the greatest elapsed time of all the build parts" do
+    it "returns the difference between the build creation time and the last finished time" do
       build.partition(parts)
       build.elapsed_time.should be_nil
       last_attempt = BuildAttempt.find(build.build_attempts.last.id)
-      another_attempt = BuildAttempt.find(build.build_attempts.first.id)
-      last_attempt.update_attributes(:started_at => 10.minutes.ago, :finished_at => Time.current)
-      another_attempt.update_attributes(:started_at => 8.minutes.ago, :finished_at => Time.current)
-      build.elapsed_time.should == 10.minutes
+      last_attempt.update_attributes(:finished_at => build.created_at + 10.minutes)
+      build.elapsed_time.should be_within(1.second).of(10.minutes)
     end
   end
 end
