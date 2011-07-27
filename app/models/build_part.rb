@@ -3,7 +3,7 @@ class BuildPart < ActiveRecord::Base
   has_many :build_attempts, :dependent => :destroy, :inverse_of => :build_part
   has_one :project, :through => :build_instance
   has_one :last_attempt, :class_name => "BuildAttempt", :order => "id DESC"
-  after_commit :enqueue_build_part_job
+  after_commit :enqueue_build_part_job, :on => :create
   validates_presence_of :kind, :paths
 
   serialize :paths, Array
