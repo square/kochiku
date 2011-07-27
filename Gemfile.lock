@@ -36,6 +36,7 @@ GEM
       sys-uname
     autotest-rails (4.1.0)
       ZenTest
+    awesome_print (0.4.0)
     builder (2.1.2)
     capistrano (2.6.0)
       highline
@@ -206,6 +207,7 @@ PLATFORMS
 DEPENDENCIES
   autotest-fsevent
   autotest-rails
+  awesome_print
   capistrano
   capybara
   carrierwave (~> 0.5.4)
