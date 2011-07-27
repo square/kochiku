@@ -55,7 +55,7 @@ describe BuildStateUpdateJob do
         @build.build_parts.first.build_attempts.create!(:state => :failed)
       end
 
-      it "should pass the build" do
+      it "should doom the build" do
         expect {
           BuildStateUpdateJob.perform(@build.id)
         }.to change { @build.reload.state }.from(:runnable).to(:doomed)
@@ -72,10 +72,10 @@ describe BuildStateUpdateJob do
         @build.build_parts.first.build_attempts.create!(:state => :failed)
       end
 
-      it "should pass the build" do
+      it "should fail the build" do
         expect {
           BuildStateUpdateJob.perform(@build.id)
-        }.to change { @build.reload.state }.from(:runnable).to(:succeeded)
+        }.to change { @build.reload.state }.from(:runnable).to(:failed)
       end
 
       it_behaves_like "a non promotable state"

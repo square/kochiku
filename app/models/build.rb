@@ -1,14 +1,17 @@
 class Build < ActiveRecord::Base
   belongs_to :project, :inverse_of => :builds
   has_many :build_parts, :dependent => :destroy, :inverse_of => :build_instance do
+    def last_attempt_in_state(state)
+      joins(:build_attempts).joins("LEFT JOIN build_attempts AS r ON build_attempts.build_part_id = r.build_part_id AND build_attempts.id < r.id").where("build_attempts.state" => state, "r.build_part_id" => nil)
+    end
     def passed
-      joins(:build_attempts).where('build_attempts.state' => 'passed')
+      last_attempt_in_state(:passed)
     end
     def failed
-      joins(:build_attempts).where('build_attempts.state' => 'failed')
+      last_attempt_in_state(:failed)
     end
     def errored
-      joins(:build_attempts).where('build_attempts.state' => 'error')
+      last_attempt_in_state(:error)
     end
   end
   has_many :build_attempts, :through => :build_parts
@@ -51,14 +54,6 @@ class Build < ActiveRecord::Base
         failed.empty? ? :running : :doomed
       end
     update_attributes!(:state => state)
-  end
-
-  def started_at
-    build_attempts.order('started_at asc').first.started_at
-  end
-
-  def finished_at
-    build_attempts.all.sort_by(&:finished_at).last
   end
 
   def elapsed_time

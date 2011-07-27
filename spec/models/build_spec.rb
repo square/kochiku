@@ -98,6 +98,15 @@ describe Build do
       build.update_state_from_parts!
       build.state.should == :failed
     end
+
+    it "should ignore the old build_attempts" do
+      build.build_parts[0].last_attempt.finish!(:passed)
+      build.build_parts[1].last_attempt.finish!(:error)
+      build.build_parts[1].build_attempts.create!(:state => :passed)
+      build.update_state_from_parts!
+
+      build.state.should == :succeeded
+    end
   end
 
   describe "#elapsed_time" do
