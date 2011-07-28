@@ -6,13 +6,10 @@ class BuildPartitioningJob < JobBase
   end
 
   def perform
-    # TODO: some error checking on the shell-outs
-
     GitRepo.inside_copy("web-cache", @build.ref) do
       build_info = YAML.load_file("config/ci/build.yml")
       @build.partition(build_info.values.select {|part| part['type']})
     end
-
   end
 
   def on_exception(e)
