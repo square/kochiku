@@ -2,7 +2,7 @@ class GitRepo
   WORKING_DIR = Rails.root.join('tmp', 'build-partition')
 
   class << self
-    def inside_copy(cached_repo_name, ref = "master", submodules = false)
+    def inside_copy(cached_repo_name, ref = "master")
       cached_repo_path = WORKING_DIR.join(cached_repo_name)
 
       Dir.chdir(cached_repo_path) do
