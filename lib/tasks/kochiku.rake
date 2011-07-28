@@ -17,7 +17,7 @@ namespace :kochiku do
 
     desc 'Start a Build worker'
     task :start do
-      ENV['QUEUES'] ||= "high,partition,ci,developer"
+      ENV['QUEUES'] ||= "ci,developer"
       ENV['VVERBOSE'] ||= "1" if Rails.env.development?
       Rake::Task['resque:work'].invoke
     end
