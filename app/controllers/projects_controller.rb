@@ -5,8 +5,13 @@ class ProjectsController < ApplicationController
 
   def show
     @project = Project.find_by_name!(params[:id])
-    @build = @project.builds.build(:queue => "dogfood")
+    @build = @project.builds.build(:queue => "developer")
     @builds = @project.builds.order('id desc').limit(20).includes(:build_parts => [:last_attempt, :build_attempts])
+
+    if params[:format] == 'rss'
+      # remove recent builds that are pending or in progress (cimonitor expects this)
+      @builds = @builds.drop_while {|build| [:partitioning, :runnable, :running].include?(build.state) }
+    end
 
     respond_to do |format|
       format.html
