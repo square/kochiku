@@ -190,7 +190,7 @@ input[type=submit], a.button
 #tiptip_content
   font-size: 14px
 
-.build-error, .build-doomed, .build-failed
+.build-errored, .build-doomed, .build-failed
   color: #f66
 .build-partitioning, .build-runnable, .build-running
   color: #66f
@@ -316,7 +316,7 @@ $color-passed: #D5FA8E
 $color-runnable: #FAF79D
 $color-running: #84A6D9
 $color-failed: #EB926C
-$color-error: #E36666
+$color-errored: #E36666
 
 .parts
   +envelope
@@ -335,8 +335,8 @@ $color-error: #E36666
     background-color: $color-passed
   .part.failed
     background-color: $color-failed
-  .part.error
-    background-color: $color-error
+  .part.errored
+    background-color: $color-errored
 
   .part-wrapper
     +envelope
@@ -368,7 +368,7 @@ $color-error: #E36666
         box-shadow: 0 1px 1px rgba(0, 0, 0, 0.3)
     .result.runnable::before, .result.running::before
       background-color: #66f
-    .result.failed::before, .result.error::before
+    .result.failed::before, .result.errored::before
       background-color: #f66
     .result.passed::before
       background-color: #6f6
@@ -435,7 +435,7 @@ table
         box-shadow: 0 1px 1px rgba(0, 0, 0, 0.3)
       &.runnable::before, &.running::before
         background-color: #66f
-      &.failed::before, &.error::before
+      &.failed::before, &.errored::before
         background-color: #f66
       &.passed::before
         background-color: #6f6

@@ -8,7 +8,7 @@ describe ProjectsController do
     before do
       @project = FactoryGirl.create(:big_rails_project)
       @build1 = FactoryGirl.create(:build, :project => @project, :state => :succeeded)
-      @build2 = FactoryGirl.create(:build, :project => @project, :state => :error)
+      @build2 = FactoryGirl.create(:build, :project => @project, :state => :errored)
     end
 
     it "should return an rss feed of builds" do

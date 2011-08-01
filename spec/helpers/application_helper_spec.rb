@@ -14,8 +14,8 @@ describe ApplicationHelper do
       build_success_in_words(@build).should == 'success'
     end
 
-    it "should return failed when state = :error" do
-      @build.state = :error
+    it "should return failed when state = :errored" do
+      @build.state = :errored
       build_success_in_words(@build).should == 'failed'
     end
 

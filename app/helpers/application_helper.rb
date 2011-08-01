@@ -8,7 +8,7 @@ module ApplicationHelper
     case build.state
     when :succeeded
       'success'
-    when :error, :doomed
+    when :errored, :doomed
       'failed'
     else
       build.state.to_s
@@ -21,7 +21,7 @@ module ApplicationHelper
     case build.state
     when :partitioning, :runnable, :running
       "Building"
-    when :doomed, :failed, :succeeded, :error
+    when :doomed, :failed, :succeeded, :errored
       "CheckingModifications"
     end
   end

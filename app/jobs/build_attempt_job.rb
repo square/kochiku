@@ -30,7 +30,7 @@ class BuildAttemptJob < JobBase
   end
 
   def on_exception(e)
-    @build_attempt.error!
+    @build_attempt.error_occurred!
     raise e
   end
 

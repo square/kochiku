@@ -13,7 +13,7 @@ class BuildPartitioningJob < JobBase
   end
 
   def on_exception(e)
-    @build.update_attributes!(:state => :error)
+    @build.update_attributes!(:state => :errored)
     super
   end
 end

@@ -11,11 +11,11 @@ class Build < ActiveRecord::Base
       last_attempt_in_state(:failed)
     end
     def errored
-      last_attempt_in_state(:error)
+      last_attempt_in_state(:errored)
     end
   end
   has_many :build_attempts, :through => :build_parts
-  TERMINAL_STATES = [:failed, :succeeded, :error]
+  TERMINAL_STATES = [:failed, :succeeded, :errored]
   STATES = [:partitioning, :runnable, :running, :doomed] + TERMINAL_STATES
   symbolize :state, :in => STATES
   symbolize :queue
@@ -48,7 +48,7 @@ class Build < ActiveRecord::Base
 
     state = case
       when errored.any?
-        :error
+        :errored
       when (build_parts - passed).empty?
         :succeeded
       when (passed | failed).count == build_parts.count

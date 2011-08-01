@@ -72,12 +72,12 @@ describe Build do
       build.state.should == :running
     end
 
-    it "should set build state to error if any of its parts errored" do
-      build.build_parts[0].last_attempt.finish!(:error)
+    it "should set build state to errored if any of its parts errored" do
+      build.build_parts[0].last_attempt.finish!(:errored)
       build.build_parts[1].last_attempt.finish!(:passed)
       build.update_state_from_parts!
 
-      build.state.should == :error
+      build.state.should == :errored
     end
 
     it "should set build state to succeeded all of its parts passed" do
@@ -106,7 +106,7 @@ describe Build do
 
     it "should ignore the old build_attempts" do
       build.build_parts[0].last_attempt.finish!(:passed)
-      build.build_parts[1].last_attempt.finish!(:error)
+      build.build_parts[1].last_attempt.finish!(:errored)
       build.build_parts[1].build_attempts.create!(:state => :passed)
       build.update_state_from_parts!
 

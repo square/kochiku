@@ -2,7 +2,7 @@ class BuildAttempt < ActiveRecord::Base
   has_many :build_artifacts, :dependent => :destroy, :inverse_of => :build_attempt
   belongs_to :build_part, :inverse_of => :build_attempts
 
-  STATES = [:runnable, :running, :passed, :failed, :error]
+  STATES = [:runnable, :running, :passed, :failed, :errored]
   symbolize :state, :in => STATES
 
   STATES.each do |state|
@@ -27,11 +27,11 @@ class BuildAttempt < ActiveRecord::Base
     update_attributes(:state => state, :finished_at => Time.now)
   end
 
-  def error!
-    finish!(:error)
+  def error_occurred!
+    finish!(:errored)
   end
 
   def unsuccessful?
-    state == :failed || state == :error
+    state == :failed || state == :errored
   end
 end
