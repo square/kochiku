@@ -1,19 +1,19 @@
 require 'spec_helper'
 
 describe BuildPart do
-  let(:project) { FactoryGirl.create(:big_rails_project) }
-  let(:queue) { :ci }
-  let(:build) { FactoryGirl.create(:build, :project => project, :queue => queue)}
+  let(:build) { FactoryGirl.create(:build) }
   let(:build_part) { build.build_parts.create!(:paths => ["a", "b"], :kind => "test") }
 
-  describe "when created" do
-    it "enqueues a build part job" do
-      BuildPartJob.should_receive(:enqueue_on).with(queue, anything)
-      build_part.should be_present
+  describe "#rebuild!" do
+    it "should create a fresh build attempt" do
+      expect {
+        build_part.rebuild!
+      }.to change(build_part.build_attempts, :count).by(1)
     end
-    it "creates a runnable build attempt" do
-      build_part.build_attempts.should be_present
-      build_part.build_attempts.first.state.should == :runnable
+
+    it "should enqueue the build attempt for building" do
+      BuildPartJob.should_receive(:enqueue_on).once.with(build.queue, kind_of(Integer))
+      build_part.rebuild!
     end
   end
 end

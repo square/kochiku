@@ -32,7 +32,10 @@ class Build < ActiveRecord::Base
   def partition(parts)
     transaction do
       update_attributes!(:state => :runnable)
-      parts.each { |part| build_parts.create!(:kind => part['type'], :paths => part['files']) }
+      parts.each do |part|
+        build_part = build_parts.create!(:kind => part['type'], :paths => part['files'])
+        build_part.create_and_enqueue_new_build_attempt!
+      end
     end
   end
 

@@ -3,7 +3,8 @@ require "spec_helper"
 
 describe "viewing an in process build", :type => :request do
   before :each do
-    @build_part = FactoryGirl.create(:build_part)
+    @build_attempt = FactoryGirl.create(:build_attempt, :state => :runnable)
+    @build_part = @build_attempt.build_part
     @build = @build_part.build_instance
     @project = @build.project
   end
@@ -42,9 +43,8 @@ end
 
 describe "a failed build", :type => :request do
   before :each do
-    @build_part = FactoryGirl.create(:build_part)
-    @build_attempt = @build_part.build_attempts.first
-    @build_attempt.update_attributes(:state => :failed)
+    @build_attempt = FactoryGirl.create(:build_attempt, :state => :failed)
+    @build_part = @build_attempt.build_part
   end
 
   it "can be rebuilt" do

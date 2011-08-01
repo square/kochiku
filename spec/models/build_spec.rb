@@ -25,6 +25,11 @@ describe Build do
       build.state.should == :runnable
     end
 
+    it "should create build attempts for each build part" do
+      build.partition(parts)
+      build.build_parts.all {|bp| bp.build_attempts.should have(1).item }
+    end
+
     it "should enqueue build part jobs" do
       BuildPartJob.should_receive(:enqueue_on).twice
       build.partition(parts)

@@ -3,26 +3,25 @@ class BuildPart < ActiveRecord::Base
   has_many :build_attempts, :dependent => :destroy, :inverse_of => :build_part
   has_one :project, :through => :build_instance
   has_one :last_attempt, :class_name => "BuildAttempt", :order => "id DESC"
-  after_commit :enqueue_build_part_job, :on => :create
   validates_presence_of :kind, :paths
 
   serialize :paths, Array
 
-  def enqueue_build_part_job
+  def create_and_enqueue_new_build_attempt!
     build_attempt = build_attempts.create!(:state => :runnable)
     BuildPartJob.enqueue_on(build_instance.queue, build_attempt.id)
   end
 
   def rebuild!
-    enqueue_build_part_job
+    create_and_enqueue_new_build_attempt!
   end
 
   def status
-    last_attempt.state
+    last_attempt.try(:state) || "unknown"
   end
 
   def unsuccessful?
-    last_attempt.unsuccessful?
+    last_attempt.try(:unsuccessful?)
   end
 
   def execute
@@ -50,4 +49,5 @@ class BuildPart < ActiveRecord::Base
       nil
     end
   end
+
 end
