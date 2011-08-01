@@ -1,12 +1,12 @@
 require 'spec_helper'
 
-describe BuildPartJob do
+describe BuildAttemptJob do
   let(:project) { FactoryGirl.create(:big_rails_project) }
   let(:build) { FactoryGirl.create(:build, :state => :partitioning, :project => project) }
 
   let(:build_part) { FactoryGirl.create(:build_part, :build_instance => build) }
   let(:build_attempt) { build_part.build_attempts.create!(:state => :runnable) }
-  subject { BuildPartJob.new(build_attempt.id) }
+  subject { BuildAttemptJob.new(build_attempt.id) }
 
   describe "#perform" do
     before do

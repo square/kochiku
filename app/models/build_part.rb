@@ -9,7 +9,7 @@ class BuildPart < ActiveRecord::Base
 
   def create_and_enqueue_new_build_attempt!
     build_attempt = build_attempts.create!(:state => :runnable)
-    BuildPartJob.enqueue_on(build_instance.queue, build_attempt.id)
+    BuildAttemptJob.enqueue_on(build_instance.queue, build_attempt.id)
     build_attempt
   end
 
@@ -23,14 +23,6 @@ class BuildPart < ActiveRecord::Base
 
   def unsuccessful?
     last_attempt.try(:unsuccessful?)
-  end
-
-  def execute
-    BuildStrategy.execute_build(self)
-  end
-
-  def artifacts_glob
-    BuildStrategy.artifacts_glob
   end
 
   def started_at

@@ -31,7 +31,7 @@ describe Build do
     end
 
     it "should enqueue build part jobs" do
-      BuildPartJob.should_receive(:enqueue_on).twice
+      BuildAttemptJob.should_receive(:enqueue_on).twice
       build.partition(parts)
     end
 

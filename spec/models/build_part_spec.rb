@@ -12,7 +12,7 @@ describe BuildPart do
     end
 
     it "should enqueue the build attempt for building" do
-      BuildPartJob.should_receive(:enqueue_on).once.with(build.queue, kind_of(Integer))
+      BuildAttemptJob.should_receive(:enqueue_on).once.with(build.queue, kind_of(Integer))
       build_part.rebuild!
     end
   end

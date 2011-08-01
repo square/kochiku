@@ -1,6 +1,6 @@
 require 'rest-client'
 
-class BuildPartJob < JobBase
+class BuildAttemptJob < JobBase
 
   def initialize(build_attempt_id)
     @build_attempt = BuildAttempt.find(build_attempt_id)
@@ -13,12 +13,12 @@ class BuildPartJob < JobBase
     GitRepo.inside_copy('web-cache', @build.ref) do
       result = tests_green? ? :passed : :failed
       @build_attempt.finish!(result)
-      collect_artifacts(@build_part.artifacts_glob)
+      collect_artifacts(BuildStrategy.artifacts_glob)
     end
   end
 
   def tests_green?
-    @build_part.execute
+    BuildStrategy.execute_build(@build_part)
   end
 
   def collect_artifacts(artifacts_glob)
