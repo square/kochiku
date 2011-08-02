@@ -10,7 +10,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20110721185201) do
+ActiveRecord::Schema.define(:version => 20110801215540) do
 
   create_table "build_artifacts", :force => true do |t|
     t.integer  "build_attempt_id"
