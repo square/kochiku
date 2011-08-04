@@ -22,6 +22,7 @@ class Build < ActiveRecord::Base
   validates_presence_of :queue
   validates_presence_of :project_id
   validates_presence_of :ref
+  validates_uniqueness_of :ref, :scope => :project_id
 
   after_create :enqueue_partitioning_job
 

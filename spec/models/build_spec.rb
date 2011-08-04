@@ -9,7 +9,22 @@ describe Build do
     it "requires a ref to be set" do
       build.ref = nil
       build.should_not be_valid
-      build.should have(1).errors_on(:ref)
+      build.should have(1).error_on(:ref)
+    end
+    it "requires a project_id to be set" do
+      build.project_id = nil
+      build.should_not be_valid
+      build.should have(1).error_on(:project_id)
+    end
+    it "requires a queue to be set" do
+      build.queue = nil
+      build.should_not be_valid
+      build.should have(1).error_on(:queue)
+    end
+    it "should force uniqueness on project_id and ref pairs" do
+      build2 = build.clone
+      build2.should_not be_valid
+      build2.should have(1).error_on(:ref)
     end
   end
 
