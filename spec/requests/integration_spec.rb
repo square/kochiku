@@ -11,6 +11,10 @@ describe "viewing an in process build", :type => :request do
 
   it "view the current status of the build attempts" do
     visit('/')
+
+    page.should have_content(@project.name)
+    page.should have_content("Runnable")
+
     click_link(@project.name)
     page.should have_content(@build.ref)
     click_link(@build.ref)
