@@ -44,7 +44,7 @@ namespace :deploy do
   end
 
   desc "Restart the web application server"
-  task :restart, :roles => :app do
+  task :restart_app, :roles => :app do
     run "touch #{current_release}/tmp/restart.txt"
   end
 
