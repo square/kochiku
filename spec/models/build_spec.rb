@@ -36,9 +36,16 @@ describe Build do
     end
 
     it "rolls back any changes to the database if an error occurs" do
-      build.stub(:build_parts).and_raise(ActiveRecord::Rollback)
+      # set parts to an illegal value
+      parts = [{'type' => 'rspec', 'files' => []}]
 
-      expect { build.partition(parts) }.to_not change { build.reload.state }
+      build.build_parts.should be_empty
+      build.state.should == :partitioning
+
+      expect { build.partition(parts) }.to raise_error
+
+      build.build_parts(true).should be_empty
+      build.state.should == :runnable
     end
   end
 
