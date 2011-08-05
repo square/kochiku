@@ -105,7 +105,7 @@ GEM
     net-ssh-gateway (1.1.0)
       net-ssh (>= 1.99.1)
     nokogiri (1.5.0)
-    passenger (3.0.7)
+    passenger (3.0.8)
       daemon_controller (>= 0.2.5)
       fastthread (>= 1.0.1)
       rack
