@@ -270,8 +270,17 @@ h3
   font-size: 125%
   padding: 0 0 10px
 
+.info
+  padding-right: 10px
+.info:after
+  padding-left: 10px
+  content: "|"
+.info.last:after
+  content: ""
 
-.build-info
+
+.build-state
+  margin-top: -15px
   .state
     font-weight: bold
   .queue

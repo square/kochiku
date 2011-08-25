@@ -2,15 +2,18 @@
   %a{:href => project_build_path(build.project, build), :class => "build-wrapper"}
     .build-info
       .ref= build.ref
-      .build-state
-        %span.state{:class => 'build-' + build.state.to_s}= build.state.to_s.capitalize
-        on
-        %span.queue= build.queue.to_s.capitalize
     %h3.build-id{:class => build.state}= build.id
     - if build.completed?
       .time-elapsed
         &hellip;built in
         %strong
           =duration_strftime(build.elapsed_time, "%Mm %Ss")
+  .build-state
+    %span.info
+      %span.state{:class => 'build-' + build.state.to_s}= build.state.to_s.capitalize
+      on
+      %span.queue= build.queue.to_s.capitalize
+    %a.info.last{:href => show_link_to_commit(build.ref), :title => 'show commit changes'}
+      Show changes
 
   .parts= render build.build_parts

@@ -1,10 +1,14 @@
 %h2.subheader Build #{@build.id} - #{@build.ref}
 
 .build-info.build-info-subheader
-  %span.state{:class => 'build-' + @build.state.to_s}= @build.state.to_s.capitalize
-  on
-  %span.queue= @build.queue.to_s.capitalize
-  &nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;Created #{time_ago_in_words @build.created_at} ago&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;Updated #{time_ago_in_words @build.updated_at} ago
+  %span.info
+    %span.state{:class => 'build-' + @build.state.to_s}= @build.state.to_s.capitalize
+    on
+    %span.queue= @build.queue.to_s.capitalize
+  %span.info= "Created #{time_ago_in_words @build.created_at} ago"
+  %span.info= "Updated #{time_ago_in_words @build.updated_at} ago"
+  %a.info.last{:href => show_link_to_commit(@build.ref), :title => 'show commit changes'}
+    Show changes
 
 %table.build-summary
   %tr

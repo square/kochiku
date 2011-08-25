@@ -25,4 +25,8 @@ module ApplicationHelper
       "CheckingModifications"
     end
   end
+
+  def show_link_to_commit(commit_hash)
+    "https://git.squareup.com/square/web/commit/#{commit_hash}"
+  end
 end
