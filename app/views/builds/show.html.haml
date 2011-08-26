@@ -10,23 +10,30 @@
   %a.info.last{:href => show_link_to_commit(@build.ref), :title => 'show commit changes'}
     Show changes
 
-%table.build-summary
-  %tr
-    %th.id-column Part
-    %th.result-column Status
-    %th Build Type
-    %th Elapsed Time
-    %th Attempt #
-    %th Actions
-  - @build.build_parts.each do |part|
-    %tr{:class => cycle("odd-row", "even-row")}
-      %td.id-column= link_to part.id, project_build_part_path(@project, @build, part)
-      %td.result-column
-        %span.part-status{:class => part.status}= part.status.to_s.capitalize
-      %td{:class => part.kind}= part.kind.to_s.capitalize
-      %td= part.elapsed_time ? duration_strftime(part.elapsed_time) : "pending"
-      %td= part.build_attempts.size
-      - if part.unsuccessful?
-        %td= link_to("Rebuild", rebuild_project_build_part_path(@project, @build, part), :method => :post)
-      - else
-        %td
+%table.build-summary#build-summary
+  %thead
+    %tr
+      %th.id-column Part
+      %th.result-column Status
+      %th Build Type
+      %th Elapsed Time
+      %th Attempt #
+      %th Actions
+  %tbody
+    - @build.build_parts.each do |part|
+      %tr{:class => cycle("odd-row", "even-row")}
+        %td.id-column= link_to part.id, project_build_part_path(@project, @build, part)
+        %td.result-column
+          %span.part-status{:class => part.status}= part.status.to_s.capitalize
+        %td{:class => part.kind}= part.kind.to_s.capitalize
+        %td= part.elapsed_time ? duration_strftime(part.elapsed_time) : "pending"
+        %td= part.build_attempts.size
+        - if part.unsuccessful?
+          %td= link_to("Rebuild", rebuild_project_build_part_path(@project, @build, part), :method => :post)
+        - else
+          %td
+
+:javascript
+  $(document).ready(function() {
+    $("#build-summary").tablesorter();
+  });
