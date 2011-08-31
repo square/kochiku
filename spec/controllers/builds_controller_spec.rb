@@ -75,6 +75,17 @@ describe BuildsController do
 
         response.location.should == project_build_url(project_param, new_build)
       end
+
+      it "should find an existing build" do
+        post :create, :project_id => project_param, :build => build_info
+        expected_url = response.location
+
+        expect {
+          post :create, :project_id => project_param, :build => build_info
+        }.to_not change { Build.count }
+
+        response.location.should == expected_url
+      end
     end
   end
 

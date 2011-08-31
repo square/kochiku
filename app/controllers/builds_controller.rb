@@ -15,6 +15,7 @@ class BuildsController < ApplicationController
     end
   end
 
+  # Used to request a developer build through the Web UI
   def request_build
     if developer_build.save
       flash[:message] = "Build added!"
@@ -22,7 +23,6 @@ class BuildsController < ApplicationController
       flash[:error] = "Error adding build!"
     end
     redirect_to project_path(params[:project_id])
-
   end
 
 private
@@ -55,6 +55,6 @@ private
       @project = Project.create!(:name => params[:project_id])
     end
 
-    @project.builds.build(:state => :partitioning, :ref => params[:build][:ref], :queue => :developer)
+    @project.builds.find_or_initialize_by_ref(params[:build][:ref], :state => :partitioning, :queue => :developer)
   end
 end
