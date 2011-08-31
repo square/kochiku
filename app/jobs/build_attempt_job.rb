@@ -24,7 +24,9 @@ class BuildAttemptJob < JobBase
   def collect_artifacts(artifacts_glob)
     Dir[*artifacts_glob].each do |path|
       if File.file?(path) && !File.zero?(path)
-        RestClient.post "http://#{Rails.application.config.master_host}/build_attempts/#{@build_attempt.id}/build_artifacts", :build_artifact => {:log_file => File.open(path)}, :accept => :xml
+        url = "http://#{Rails.application.config.master_host}/build_attempts/#{@build_attempt.id}/build_artifacts"
+        payload = {:build_artifact => {:log_file => File.open(path)}}
+        RestClient::Request.execute(:method => :post, :url => url, :payload => payload, :headers => {:accept => :xml}, :timeout => 60 * 5)
       end
     end
   end
