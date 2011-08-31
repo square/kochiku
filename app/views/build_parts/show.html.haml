@@ -19,6 +19,7 @@
       %th Status
       %th Started At
       %th Elapsed Time
+      %th Builder
       %th Build Artifacts
       %th Actions
   %tbody
@@ -29,6 +30,7 @@
           %span.attempt-status{:class => attempt.state}= attempt.state.to_s.capitalize
         %td= attempt.started_at
         %td= duration_strftime(attempt.elapsed_time)
+        %td= attempt.builder
         %td
           - attempt.build_artifacts.each do |artifact|
             = link_to File.basename(artifact.log_file.to_s), artifact.log_file.url
