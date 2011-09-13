@@ -7,6 +7,7 @@ describe BuildStateUpdateJob do
     @build.build_parts.create!(:kind => :spec, :paths => ["foo", "bar"])
     @build.build_parts.create!(:kind => :cucumber, :paths => ["baz"])
 
+    GitRepo.stub(:run!)
     BuildStrategy.stub(:promote_build)
   end
 
