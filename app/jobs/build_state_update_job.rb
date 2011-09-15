@@ -10,7 +10,7 @@ class BuildStateUpdateJob < JobBase
     build.update_state_from_parts!
 
     if build.promotable?
-      GitRepo.inside_copy("web-cache") do
+      GitRepo.inside_repo("web-cache") do
         build.promote!
       end
     end
