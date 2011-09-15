@@ -18,10 +18,10 @@ set :deploy_via, :remote_cache
 set :keep_releases, 5
 set :use_sudo, false
 
-server "macbuild-master.sfo", :app, :web, :db, :primary => true
+server "macbuild-master.sfo.squareup.com", :app, :web, :db, :primary => true
 
-macbuilds = (1..26).map {|n| "macbuild%02d.sfo" % n }
-role :worker, "macbuild-master.sfo", *macbuilds
+macbuilds = (1..26).map {|n| "macbuild%02d.sfo.squareup.com" % n }
+role :worker, "macbuild-master.sfo.squareup.com", *macbuilds
 
 set :rails_env,      "production"
 
