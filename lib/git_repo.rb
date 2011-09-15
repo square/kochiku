@@ -33,11 +33,15 @@ class GitRepo
       end
     end
 
-    def inside_bare(bare_repo_name)
-      bare_repo_name = File.join(WORKING_DIR, bare_repo_name)
+    def inside_repo(cached_repo_name, ref = nil)
+      cached_repo_path = File.join(WORKING_DIR, cached_repo_name)
 
-      Dir.chdir(bare_repo_name) do
+      Dir.chdir(cached_repo_path) do
         Cocaine::CommandLine.new("git fetch", "--quiet").run
+        Cocaine::CommandLine.new("git submodule update", "--init --quiet").run
+
+        Cocaine::CommandLine.new("git checkout", "--quiet").run if ref
+
         yield
       end
     end
