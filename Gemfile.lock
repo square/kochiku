@@ -56,7 +56,7 @@ GEM
     childprocess (0.2.0)
       ffi (~> 1.0.6)
     chunky_png (1.2.0)
-    cocaine (0.1.0)
+    cocaine (0.2.0)
     columnize (0.3.4)
     compass (0.11.5)
       chunky_png (~> 1.2)
