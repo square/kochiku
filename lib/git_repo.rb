@@ -7,7 +7,7 @@ class GitRepo
 
       Dir.chdir(cached_repo_path) do
         # update the cached repo
-        Cocaine::CommandLine.new("git fetch", "--quiet").run
+        Cocaine::CommandLine.new("git fetch", "--quiet", :expected_outcodes => [0, 128]).run
         Cocaine::CommandLine.new("git submodule update", "--init --quiet").run
       end
 
@@ -37,7 +37,7 @@ class GitRepo
       cached_repo_path = File.join(WORKING_DIR, cached_repo_name)
 
       Dir.chdir(cached_repo_path) do
-        Cocaine::CommandLine.new("git fetch", "--quiet").run
+        Cocaine::CommandLine.new("git fetch", "--quiet", :expected_outcodes => [0, 128]).run
 
         yield
       end
