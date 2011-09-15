@@ -52,11 +52,13 @@ namespace :deploy do
   task :restart_workers, :roles => :worker do
     # the trailing semicolons are required because this is passed to the shell as a single string
     run <<-CMD
-      resque_parent_pid=$(cat #{shared_path}/pids/resque.pid);
-      kill -QUIT $resque_parent_pid;
+      resque1_pid=$(cat #{shared_path}/pids/resque1.pid);
+      resque2_pid=$(cat #{shared_path}/pids/resque2.pid);
+      kill -QUIT $resque1_pid;
+      kill -QUIT $resque2_pid;
 
-      while ps x | grep -q ^$resque_parent_pid; do
-        echo "Waiting for Resque worker to stop on $HOSTNAME...";
+      while ps x | egrep -q "^($resque1_pid|$resque2_pid)"; do
+        echo "Waiting for Resque workers to stop on $HOSTNAME...";
         sleep 5;
       done;
     CMD
