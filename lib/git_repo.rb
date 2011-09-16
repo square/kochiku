@@ -7,7 +7,7 @@ class GitRepo
 
       Dir.chdir(cached_repo_path) do
         # update the cached repo
-        Cocaine::CommandLine.new("git fetch", "--quiet", :expected_outcodes => [0, 128]).run
+        synchronize_with_remote
         Cocaine::CommandLine.new("git submodule update", "--init --quiet").run
       end
 
@@ -37,20 +37,32 @@ class GitRepo
       cached_repo_path = File.join(WORKING_DIR, cached_repo_name)
 
       Dir.chdir(cached_repo_path) do
-        Cocaine::CommandLine.new("git fetch", "--quiet", :expected_outcodes => [0, 128]).run
+        synchronize_with_remote
 
         yield
       end
     end
 
+    def create_working_dir
+      FileUtils.mkdir_p(WORKING_DIR)
+    end
+
+  private
     def run!(cmd)
       unless system(cmd)
         raise "non-0 exit code #{$?} returned from [#{cmd}]"
       end
     end
 
-    def create_working_dir
-      FileUtils.mkdir_p(WORKING_DIR)
+    def synchronize_with_remote(name = 'origin')
+      Cocaine::CommandLine.new("git fetch", "#{name} --quiet").run
+    rescue Cocaine::ExitStatusError
+      # likely caused by another 'git fetch' that is currently in progress. Wait a few seconds and try again
+      tries = (tries || 0) + 1
+      if tries < 2
+        sleep 15
+        retry
+      end
     end
   end
 end
