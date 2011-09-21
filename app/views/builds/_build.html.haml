@@ -3,11 +3,16 @@
     .build-info
       .ref= build.ref
     %h3.build-id{:class => build.state}= build.id
-    - if build.completed?
+    .times
+      .time-started
+        Started at
+        =time_for(build.created_at)
       .time-elapsed
-        &hellip;built in
-        %strong
-          =duration_strftime(build.elapsed_time, "%Mm %Ss")
+        - if build.completed?
+          Built in
+          %strong
+            =duration_strftime(build.elapsed_time, "%Mm %Ss")
+
   .build-state
     %span.info
       %span.state{:class => 'build-' + build.state.to_s}= build.state.to_s.capitalize

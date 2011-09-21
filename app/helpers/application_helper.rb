@@ -4,6 +4,10 @@ module ApplicationHelper
     (Time.mktime(0)+duration_in_seconds).strftime(format)
   end
 
+  def time_for(time, format="%H:%M")
+    time.strftime(format)
+  end
+
   def build_success_in_words(build)
     case build.state
     when :succeeded
