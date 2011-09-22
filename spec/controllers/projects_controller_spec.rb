@@ -21,6 +21,21 @@ describe ProjectsController do
     end
   end
 
+  describe "#build_time_history" do
+    it "should render json of time histories" do
+      project = FactoryGirl.create(:big_rails_project)
+      build1 = FactoryGirl.create(:build, :project => project, :state => :succeeded, :created_at => Time.now - 1200.seconds)
+      part1 = FactoryGirl.create(:build_part, :build_instance => build1)
+      attempt1 = FactoryGirl.create(:build_attempt, :build_part => part1, :finished_at => Time.now)
+      build2 = FactoryGirl.create(:build, :project => project, :state => :succeeded, :created_at => Time.now - 600.seconds)
+      part2 = FactoryGirl.create(:build_part, :build_instance => build2)
+      attempt2 = FactoryGirl.create(:build_attempt, :build_part => part2, :finished_at => Time.now)
+
+      get :build_time_history, {:format => 'json', :project_id => 'web'}
+      JSON.parse(response.body).should == [[build1.id,20], [build2.id,10]]
+    end
+  end
+
   describe "#status_report" do
     render_views
     before do
