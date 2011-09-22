@@ -43,6 +43,7 @@ describe BuildAttemptJob do
   describe "#collect_artifacts" do
     let(:master_host) { "http://" + Rails.application.config.master_host }
     before do
+      Cocaine::CommandLine.unstub!(:new)    # it is desired that the gzip command to go through
       stub_request(:any, /#{master_host}.*/)
     end
 
