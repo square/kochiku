@@ -22,7 +22,7 @@ class ProjectsController < ApplicationController
   def build_time_history
     @project = Project.find_by_name!(params[:project_id])
     respond_to do |format|
-      format.json { render :json => @project.builds.map {|b| [b.id, b.elapsed_time/60]}.to_json }
+      format.json { render :json => @project.builds.map {|b| [b.id, (b.elapsed_time/60).round]}.to_json }
     end
   end
 
