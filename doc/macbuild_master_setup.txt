@@ -1,17 +1,18 @@
 # Nginx #
 
-## Enable HttpGzipStaticModule http://wiki.nginx.org/NginxHttpGzipStaticModule
-
-When compiling passenger select the "advanced" setup
-Add '--with-http_gzip_static_module' as a compile option.
+## Install nginx normally
+passenger-install-nginx-module
 
 ## Changes to nginx configuration ##
-
-# enable the gzip-static module
-gzip_static on;
 
 # Up the maximum size allowed for requests (allows us to POST large log files)
 client_max_body_size 100M;
 
 # Increase the http timeout above 60 seconds; necessary for large uploads
 client_body_timeout 90;
+
+# Transmit all of the .gz files under log_files as plain/text (renders then inside the browser)
+location ~* log_files.*?\.gz$ {
+    types { text/plain gz; }
+    add_header Content-Encoding gzip;
+}
