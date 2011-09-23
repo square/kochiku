@@ -1,5 +1,5 @@
 namespace :kochiku do
-  namespace :slave do
+  namespace :worker do
     desc 'Start a Build worker'
     task :start do
       ENV['QUEUES'] ||= "*"

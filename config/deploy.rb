@@ -37,7 +37,7 @@ namespace :deploy do
     # Do nothing.
   end
 
-  desc "Restart the web application server and all of the build slaves"
+  desc "Restart the web application server and all of the build workers"
   task :restart do
     restart_app
     restart_workers
@@ -48,7 +48,7 @@ namespace :deploy do
     run "touch #{current_release}/tmp/restart.txt"
   end
 
-  desc "Restart the build slaves"
+  desc "Restart the build workers"
   task :restart_workers, :roles => :worker do
     # the trailing semicolons are required because this is passed to the shell as a single string
     run <<-CMD
