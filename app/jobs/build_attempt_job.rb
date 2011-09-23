@@ -30,7 +30,11 @@ class BuildAttemptJob < JobBase
         path += '.gz'
 
         payload = {:build_artifact => {:log_file => File.new(path)}}
-        RestClient::Request.execute(:method => :post, :url => artifact_upload_url, :payload => payload, :headers => {:accept => :xml}, :timeout => 60 * 5)
+        begin
+          RestClient::Request.execute(:method => :post, :url => artifact_upload_url, :payload => payload, :headers => {:accept => :xml}, :timeout => 60 * 5)
+        rescue RestClient::Exception => e
+          Rails.logger.error("Upload of artifact (#{path}) failed: #{e.message}")
+        end
       end
     end
   end
