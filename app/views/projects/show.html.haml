@@ -4,13 +4,15 @@
       =  f.text_field :ref, {:placeholder => 'SHA to build', :class => 'sha', :autocapitalize => 'off', :autocorrect => 'off', :spellcheck => 'false'}
       =  f.submit "Build", {:class => 'build-button'}
 
-%h2.subheader Build time (min)
-#plot
+- if @project.name == 'web'
+  %h2.subheader Build time (min)
+  #plot
 
 %h2.subheader Builds
 
 .builds
   = render @builds
 
-:javascript
-  $(document).ready(Kochiku.graphBuildTimes("#{@project.name}"));
+- if @project.name == 'web'
+  :javascript
+    $(document).ready(Kochiku.graphBuildTimes("#{@project.name}"));
