@@ -39,6 +39,21 @@ describe ProjectsController do
       get :build_time_history, {:format => 'json', :project_id => 'web'}
       JSON.parse(response.body).should == [[build1.id,21], [build2.id,10]]
     end
+
+    it "should not include incomplete builds" do
+      attempt = FactoryGirl.create(:build_attempt, :finished_at => nil)
+      build = attempt.build_part.build_instance
+      get :build_time_history, {:format => 'json', :project_id => build.project.to_param}
+      response.body.should_not include(build.id)
+    end
+
+    it "should not included errored builds" do
+      attempt = FactoryGirl.create(:build_attempt)
+      build = attempt.build_part.build_instance
+      build.update_attributes!(:state => :errored)
+      get :build_time_history, {:format => 'json', :project_id => build.project.to_param}
+      response.body.should_not include(build.id)
+    end
   end
 
   describe "#status_report" do
