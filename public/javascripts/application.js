@@ -1,6 +1,6 @@
 Kochiku = {};
 Kochiku.graphBuildTimes = function(projectName) {
-  $.getJSON('/projects/' + projectName + '/build_time_history.json', function(dataseries) {
+  $.getJSON('/projects/' + projectName + '/build-time-history.json', function(dataseries) {
     $.plot($('#plot'),
       [{color: '#52585D', data: dataseries}],
       {
