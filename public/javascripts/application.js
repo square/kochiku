@@ -11,16 +11,8 @@ Kochiku.graphBuildTimes = function(projectName) {
     });
     function showTooltip(x, y, contents) {
       $('<div id="tooltip">' + contents + '</div>').css( {
-         position: 'absolute',
-         display: 'none',
          top: y + 5,
-         left: x + 5,
-         border: '1px solid #52585D',
-         padding: '2px',
-         'background-color': '#B8BEC3',
-         'font-size': '130%',
-         'font-family': "agb",
-         opacity: 0.80
+         left: x + 5
       }).appendTo("body").fadeIn(10);
     }
     var previousPoint = null;
