@@ -1,5 +1,5 @@
 class BuildsController < ApplicationController
-  before_filter :load_project, :only => :show
+  before_filter :load_project, :only => [:show, :abort]
 
   def show
     @build = @project.builds.find(params[:id], :include => {:build_parts => [:last_attempt, :build_attempts]})
@@ -23,6 +23,12 @@ class BuildsController < ApplicationController
       flash[:error] = "Error adding build!"
     end
     redirect_to project_path(params[:project_id])
+  end
+
+  def abort
+    @build = @project.builds.find(params[:id])
+    @build.abort!
+    redirect_to project_build_path(@project, @build)
   end
 
 private

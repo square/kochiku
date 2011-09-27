@@ -117,4 +117,12 @@ describe BuildsController do
     end
 
   end
+
+  describe "#abort" do
+    it "redirects back to the build page" do
+      build = FactoryGirl.create(:build)
+      put :abort, :project_id => build.project.to_param, :id => build.to_param
+      response.should redirect_to(project_build_path(build.project, build))
+    end
+  end
 end

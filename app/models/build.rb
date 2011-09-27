@@ -15,8 +15,9 @@ class Build < ActiveRecord::Base
     end
   end
   has_many :build_attempts, :through => :build_parts
-  TERMINAL_STATES = [:failed, :succeeded, :errored]
-  STATES = [:partitioning, :runnable, :running, :doomed] + TERMINAL_STATES
+  TERMINAL_STATES = [:failed, :succeeded, :errored, :aborted]
+  IN_PROGRESS_STATES = [:partitioning, :runnable, :running, :doomed]
+  STATES = IN_PROGRESS_STATES + TERMINAL_STATES
   symbolize :state, :in => STATES
   symbolize :queue
   validates_presence_of :queue
@@ -42,7 +43,7 @@ class Build < ActiveRecord::Base
   end
 
   def update_state_from_parts!
-    return if build_parts.empty?
+    return if build_parts.empty? || self.state == :aborted
 
     errored = build_parts.errored
     passed = build_parts.passed
@@ -81,5 +82,17 @@ class Build < ActiveRecord::Base
 
   def completed?
     TERMINAL_STATES.include?(state)
+  end
+
+  def abort!
+    update_attributes!(:state => :aborted)
+
+    eligible_build_attempt_ids = build_parts.select { |build_part| build_part.status == :runnable }.collect { |build_part| build_part.last_attempt.id }
+    queue_namespace = self.project.name == 'web' ? 'ci' : 'developer'
+
+    ResqueQueueHelper.remove_enqueued_build_attempt_jobs("#{queue_namespace}-spec", eligible_build_attempt_ids)
+    ResqueQueueHelper.remove_enqueued_build_attempt_jobs("#{queue_namespace}-cucumber", eligible_build_attempt_ids)
+
+    BuildAttempt.update_all({:state => :aborted, :finished_at => Time.now}, {:id => eligible_build_attempt_ids})
   end
 end

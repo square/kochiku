@@ -178,7 +178,7 @@ $primary-active-button-focus-shadow: $button-inset-border, $button-inset-inner, 
     -webkit-box-shadow: $primary-button-focus-shadow
     -moz-box-shadow:    $primary-button-focus-shadow
 
-input[type=submit], a.button
+input.build-button, a.button
   @extend .button
   @extend .primary-button
   font-family: $font-base
@@ -339,6 +339,7 @@ $color-runnable: #FAF79D
 $color-running: #84A6D9
 $color-failed: #EB926C
 $color-errored: #E36666
+$color-aborted: #CCCCCC
 
 .parts
   +envelope
@@ -359,6 +360,8 @@ $color-errored: #E36666
     background-color: $color-failed
   .part.errored
     background-color: $color-errored
+  .part.aborted
+    background-color: $color-aborted
 
   .part-wrapper
     +envelope
@@ -462,6 +465,8 @@ table
         background-color: #f66
       &.passed::before
         background-color: #6f6
+      &.aborted::before
+        background-color: #CCC
 
 
 /* Build show */
@@ -469,6 +474,7 @@ table
   margin: -15px 0 25px
 .build-summary
   font-size: 110%
+  margin-bottom: 10px
   .id-column
     text-align: left
     width: 50px
@@ -482,3 +488,6 @@ ol#build-paths
   list-style: square inside none
 div.type
   margin-bottom: 20px
+
+.abort-build
+  font-size: 130%

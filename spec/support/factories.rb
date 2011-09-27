@@ -1,6 +1,6 @@
 FactoryGirl.define do
   factory :project do
-    sequence(:name) {|n| "Project ##{n}" }
+    sequence(:name) {|n| "Project_#{n}" }
 
     factory :big_rails_project do
       name "web"

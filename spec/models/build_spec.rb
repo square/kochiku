@@ -145,4 +145,28 @@ describe Build do
       build.elapsed_time.should be_within(1.second).of(10.minutes)
     end
   end
+
+  describe "#abort!" do
+    let(:build) { FactoryGirl.create(:build, :state => :runnable, :queue => :developer) }
+
+    it "should mark the build as aborted" do
+      expect{ build.abort! }.to change(build, :state).from(:runnable).to(:aborted)
+    end
+
+    it "should mark all of the build's unstarted build_attempts as aborted" do
+      build_part1 = FactoryGirl.create(:build_part, :build_instance => build)
+      build_part2 = FactoryGirl.create(:build_part, :build_instance => build)
+      build_attempt_started = FactoryGirl.create(:build_attempt, :build_part => build_part1, :state => :running)
+      build_attempt_unstarted = FactoryGirl.create(:build_attempt, :build_part => build_part2, :state => :runnable)
+      build.abort!
+
+      build_attempt_started.reload.state.should == :running
+      build_attempt_unstarted.reload.state.should == :aborted
+    end
+
+    it "should remove the unstarted build_attempts from the Resque queue" do
+      ResqueQueueHelper.should_receive(:remove_enqueued_build_attempt_jobs).twice
+      build.abort!
+    end
+  end
 end

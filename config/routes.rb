@@ -9,6 +9,7 @@ Kochiku::Application.routes.draw do
 
     resources :builds, :only => [:create, :show] do
       post 'request', :action => "request_build", :on => :collection
+      put 'abort', :action => "abort", :on => :member
       resources :build_parts, :as => 'parts', :path => 'parts', :only => [:show] do
         post 'rebuild', :on => :member
       end

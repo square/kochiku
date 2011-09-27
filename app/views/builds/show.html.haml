@@ -33,6 +33,9 @@
         - else
           %td
 
+- if Build::IN_PROGRESS_STATES.include?(@build.state)
+  = button_to "Abort Build", abort_project_build_path(@build.project, @build), :method => "put", :class => "abort-build"
+
 :javascript
   $(document).ready(function() {
     $("#build-summary").tablesorter();
