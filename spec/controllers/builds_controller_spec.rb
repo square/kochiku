@@ -119,10 +119,17 @@ describe BuildsController do
   end
 
   describe "#abort" do
+    before do
+      @build = FactoryGirl.create(:build)
+      put :abort, :project_id => @build.project.to_param, :id => @build.to_param
+    end
+
     it "redirects back to the build page" do
-      build = FactoryGirl.create(:build)
-      put :abort, :project_id => build.project.to_param, :id => build.to_param
-      response.should redirect_to(project_build_path(build.project, build))
+      response.should redirect_to(project_build_path(@build.project, @build))
+    end
+
+    it "sets the build's state to aborted" do
+      @build.reload.state.should == :aborted
     end
   end
 end
