@@ -87,12 +87,10 @@ class Build < ActiveRecord::Base
   def abort!
     update_attributes!(:state => :aborted)
 
-    eligible_build_attempt_ids = build_parts.select { |build_part| build_part.status == :runnable }.collect { |build_part| build_part.last_attempt.id }
-    queue_namespace = self.project.name == 'web' ? 'ci' : 'developer'
-
-    ResqueQueueHelper.remove_enqueued_build_attempt_jobs("#{queue_namespace}-spec", eligible_build_attempt_ids)
-    ResqueQueueHelper.remove_enqueued_build_attempt_jobs("#{queue_namespace}-cucumber", eligible_build_attempt_ids)
-
-    BuildAttempt.update_all({:state => :aborted, :finished_at => Time.now}, {:id => eligible_build_attempt_ids})
+    all_build_part_ids = build_parts.select('id').collect(&:id)
+    BuildAttempt.update_all(
+        {:state => :aborted, :updated_at => Time.now},
+        {:state => :runnable, :build_part_id => all_build_part_ids}
+    )
   end
 end

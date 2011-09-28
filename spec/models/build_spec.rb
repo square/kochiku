@@ -163,10 +163,5 @@ describe Build do
       build_attempt_started.reload.state.should == :running
       build_attempt_unstarted.reload.state.should == :aborted
     end
-
-    it "should remove the unstarted build_attempts from the Resque queue" do
-      ResqueQueueHelper.should_receive(:remove_enqueued_build_attempt_jobs).twice
-      build.abort!
-    end
   end
 end

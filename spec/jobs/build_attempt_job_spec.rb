@@ -10,8 +10,17 @@ describe BuildAttemptJob do
 
   describe "#perform" do
     before do
-      subject.stub(:tests_green? => true)
       GitRepo.stub(:run!)
+    end
+
+    context "build_attempt has been aborted" do
+      let(:build_attempt) { FactoryGirl.create(:build_attempt, :state => :aborted) }
+
+      it "should return without running the tests" do
+        subject.should_not_receive(:tests_green?)
+        subject.perform
+        build_attempt.reload.started_at.should be_nil
+      end
     end
 
     it "sets the builder on its build attempt" do

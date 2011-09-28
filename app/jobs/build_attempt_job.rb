@@ -9,6 +9,8 @@ class BuildAttemptJob < JobBase
   end
 
   def perform
+    return if @build_attempt.state == :aborted
+
     @build_attempt.start!(hostname)
     GitRepo.inside_copy('web-cache', @build.ref) do
       result = tests_green? ? :passed : :failed

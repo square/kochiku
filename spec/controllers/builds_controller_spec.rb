@@ -128,6 +128,7 @@ describe BuildsController do
       response.should redirect_to(project_build_path(@build.project, @build))
     end
 
+    # spot-check that it does some abort action
     it "sets the build's state to aborted" do
       @build.reload.state.should == :aborted
     end
