@@ -1,10 +1,13 @@
 class Partitioner
-  def initialize(config)
-    @config = config
-  end
+  BUILD_YML   = 'config/ci/build.yml'
+  KOCHIKU_YML = 'config/ci/kochiku.yml'
 
   def partitions
-    @config.map { |subset| partitions_for(subset) }.flatten
+    if File.exist?(KOCHIKU_YML)
+      YAML.load_file(KOCHIKU_YML).map { |subset| partitions_for(subset) }.flatten
+    else
+      YAML.load_file(BUILD_YML).values.select { |part| part['type'].present? }
+    end
   end
 
   private
@@ -14,10 +17,10 @@ class Partitioner
     type    = subset.fetch('type')
     workers = subset.fetch('workers')
 
-    partitions = Dir[glob].in_groups(workers).map do |files|
+    parts = Dir[glob].in_groups(workers).map do |files|
       { 'type' => type, 'files' => files.compact }
     end
 
-    partitions.reject { |p| p['files'].empty? }
+    parts.select { |p| p['files'].present? }
   end
 end
