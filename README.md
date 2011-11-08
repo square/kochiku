@@ -28,3 +28,10 @@ Runs the tests for a particular part of the build. Updates status.
 
 ### BuildStateUpdateJob
 Promotes a tag if the build is successful. Enqueued by BuildAttemptObserver.
+
+
+## Getting Started
+
+    rake db:setup
+    rake kochiku:worker:setup
+    rake
