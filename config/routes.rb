@@ -6,6 +6,7 @@ Kochiku::Application.routes.draw do
   resources :projects, :only => [:index, :new, :show] do
     get 'status-report', :action => "status_report", :on => :collection
     get 'build-time-history', :action => "build_time_history", :defaults => { :format => 'json' }
+    get 'better-build-time-history', :action => "better_build_time_history", :defaults => { :format => 'json' }
 
     resources :builds, :only => [:create, :show] do
       post 'request', :action => "request_build", :on => :collection
