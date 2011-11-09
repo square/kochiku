@@ -21,17 +21,6 @@ class ProjectsController < ApplicationController
 
   def build_time_history
     @project = Project.find_by_name!(params[:project_id])
-    respond_to do |format|
-      format.json {
-        # Not including errored builds because they are not accurate representations of build time
-        finished_builds = @project.builds.select { |b| b.state == :failed || b.state == :succeeded }
-        render :json => finished_builds.map { |b| [b.id, (b.elapsed_time/60).round]}.to_json
-      }
-    end
-  end
-
-  def better_build_time_history
-    @project = Project.find_by_name!(params[:project_id])
 
     respond_to do |format|
       format.json do
