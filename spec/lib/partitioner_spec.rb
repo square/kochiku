@@ -47,9 +47,9 @@ describe Partitioner do
       context 'when there are many files matching the glob' do
         let(:matches) { %w(a b c d e f g h i j k l m n o p) }
         it { should == [
-          { 'type' => 'rspec', 'files' => %w(a d g j m p) },
-          { 'type' => 'rspec', 'files' => %w(b e h k n) },
-          { 'type' => 'rspec', 'files' => %w(c f i l o) },
+          { 'type' => 'rspec', 'files' => %w(a b c d e f) },
+          { 'type' => 'rspec', 'files' => %w(g h i j k) },
+          { 'type' => 'rspec', 'files' => %w(l m n o p) },
         ] }
       end
     end

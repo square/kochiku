@@ -17,7 +17,7 @@ class Partitioner
     type    = subset.fetch('type')
     workers = subset.fetch('workers')
 
-    parts = Dir[glob].in_groups_of(workers).transpose.map do |files|
+    parts = Dir[glob].in_groups(workers).map do |files|
       { 'type' => type, 'files' => files.compact }
     end
 
