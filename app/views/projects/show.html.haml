@@ -15,4 +15,4 @@
 
 - if @project.name == 'web'
   :javascript
-    $(document).ready(Kochiku.graphBetterBuildTimes("#{escape_javascript @project.name}"));
+    $(document).ready(Kochiku.graphBuildTimes("#{escape_javascript @project.name}"));

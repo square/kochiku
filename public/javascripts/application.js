@@ -1,46 +1,12 @@
 Kochiku = {};
-Kochiku.graphBuildTimes = function(projectName) {
-  $.getJSON('/projects/' + projectName + '/build-time-history.json', function(dataseries) {
-    $.plot($('#plot'),
-      [{color: '#52585D', data: dataseries}],
-      {
-      grid: { hoverable: true, clickable: true },
-      yaxis: {
-        min: 0, max: 100
-      }
-    });
-    function showTooltip(x, y, contents) {
-      $('<div id="tooltip">' + contents + '</div>').css( {
-         top: y + 5,
-         left: x + 5
-      }).appendTo("body").fadeIn(10);
-    }
-    var previousPoint = null;
-    $("#plot").bind("plothover", function (event, pos, item) {
-      if (item) {
-        if (previousPoint != item.dataIndex) {
-          previousPoint = item.dataIndex;
-          $("#tooltip").remove();
-          var buildNum = item.datapoint[0].toFixed(), duration = item.datapoint[1].toFixed();
-          showTooltip(item.pageX, item.pageY, "Build " + buildNum + ": " + duration + " min");
-        }
-      }
-    });
-    $("#plot").bind("plotclick", function (event, pos, item) {
-      if (item) {
-        window.location = '/projects/' + projectName + '/builds/' + item.datapoint[0].toFixed();
-      }
-    });
-  });
-};
 
-Kochiku.graphBetterBuildTimes = function(projectName) {
-  var url = '/projects/' + projectName + '/better-build-time-history.json';
+Kochiku.graphBuildTimes = function(projectName) {
+  var url = '/projects/' + projectName + '/build-time-history.json';
+
   $.getJSON(url, function(data) {
-    var max = data.max;
     var min = data.min;
-    var logmax = max + 10;
-    var difference = max - min;
+    var max = data.max + 10; // bump up the max so the graph doesn't get
+                             // *really* wide at the right edge.
 
     $.plot($('#plot'), [
       {color: '#00802D', data: data.cucumber},
@@ -51,14 +17,16 @@ Kochiku.graphBetterBuildTimes = function(projectName) {
         fill: true
       },
       xaxis: {
-        transform: function (v) { return Math.log(difference) - Math.log(logmax - v); },
-        inverseTransform: function (v) { return difference * Math.exp(-v) * ( (logmax/difference) - Math.exp(v) - 1); },
+        // logarithmically scale the x axis to increase resolution for more
+        // recent builds
+        transform: function (value) {
+          return Math.log(max - min) - Math.log(max - value);
+        }
       },
       yaxis: {
         min: 0,
         max: 50
       },
     });
-
   });
 };
