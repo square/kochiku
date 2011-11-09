@@ -1,11 +1,12 @@
 Kochiku = {};
+
 Kochiku.graphBuildTimes = function(projectName) {
   var url = '/projects/' + projectName + '/build-time-history.json';
+
   $.getJSON(url, function(data) {
-    var max = data.max;
     var min = data.min;
-    var logmax = max + 10;
-    var difference = max - min;
+    var max = data.max + 10; // bump up the max so the graph doesn't get
+                             // *really* wide at the right edge.
 
     $.plot($('#plot'), [
       {color: '#00802D', data: data.cucumber},
@@ -16,14 +17,16 @@ Kochiku.graphBuildTimes = function(projectName) {
         fill: true
       },
       xaxis: {
-        transform: function (v) { return Math.log(difference) - Math.log(logmax - v); },
-        inverseTransform: function (v) { return difference * Math.exp(-v) * ( (logmax/difference) - Math.exp(v) - 1); },
+        // logarithmically scale the x axis to increase resolution for more
+        // recent builds
+        transform: function (value) {
+          return Math.log(max - min) - Math.log(max - value);
+        }
       },
       yaxis: {
         min: 0,
         max: 50
       },
     });
-
   });
 };
