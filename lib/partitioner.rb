@@ -34,4 +34,12 @@ class Partitioner
   def round_robin(glob, workers)
     Dir[glob].in_groups_of(workers).transpose
   end
+
+  def shuffle(glob, workers)
+    Dir[glob].shuffle.in_groups(workers)
+  end
+
+  def size(glob, workers)
+    Dir[glob].sort_by { |path| File.size(path) }.reverse.in_groups_of(workers).transpose
+  end
 end
