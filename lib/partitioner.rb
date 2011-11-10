@@ -58,6 +58,27 @@ class Partitioner
         end
         return results
       end
+
+      def size_average_partitioning(files, workers)
+        threshold = files.sum{|file| File.size(file)} / workers
+        results = []
+        this_bucket = []
+        this_bucket_size = 0
+
+        files.each do |file|
+          if this_bucket_size > threshold && results.size < workers
+            results << this_bucket
+            this_bucket = []
+            this_bucket_size = this_bucket_size - threshold
+          end
+
+          this_bucket << file
+          this_bucket_size += File.size(file)
+        end
+
+        results << this_bucket
+        return results
+      end
     end
   end
 

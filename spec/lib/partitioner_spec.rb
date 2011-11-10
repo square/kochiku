@@ -96,6 +96,23 @@ describe Partitioner do
             { 'type' => 'rspec', 'files' => %w(d a) },
           ] }
         end
+
+        context 'and balance is size_average_partitioning' do
+          let(:balance) { 'size_average_partitioning' }
+
+          before do
+            File.stub(:size).with('a').and_return(1)
+            File.stub(:size).with('b').and_return(1000)
+            File.stub(:size).with('c').and_return(100)
+            File.stub(:size).with('d').and_return(10)
+          end
+
+          it { should == [
+            { 'type' => 'rspec', 'files' => %w(a b) },
+            { 'type' => 'rspec', 'files' => %w(c) },
+            { 'type' => 'rspec', 'files' => %w(d) },
+          ] }
+        end
       end
     end
   end
