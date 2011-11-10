@@ -18,8 +18,10 @@ describe Partitioner do
   }}
 
   let(:kochiku_yml) {[
-    { 'type' => 'rspec', 'glob' => 'spec/**/*_spec.rb', 'workers' => 3 }
+    { 'type' => 'rspec', 'glob' => 'spec/**/*_spec.rb', 'workers' => 3, 'balance' => balance }
   ]}
+
+  let(:balance) { 'alphabetically' }
 
   describe '#partitions' do
     subject { partitioner.partitions }
@@ -51,6 +53,15 @@ describe Partitioner do
           { 'type' => 'rspec', 'files' => %w(g h i j k) },
           { 'type' => 'rspec', 'files' => %w(l m n o p) },
         ] }
+
+        context 'and balance is round_robin' do
+          let(:balance) { 'round_robin' }
+          it { should == [
+            { 'type' => 'rspec', 'files' => %w(a d g j m p) },
+            { 'type' => 'rspec', 'files' => %w(b e h k n) },
+            { 'type' => 'rspec', 'files' => %w(c f i l o) },
+          ] }
+        end
       end
     end
   end
