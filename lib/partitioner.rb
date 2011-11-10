@@ -47,7 +47,7 @@ class Partitioner
       end
 
       def size_greedy_partitioning(files, workers)
-        files = files.sort_by { |path| 0  File.size(path) }
+        files = files.sort_by { |path| 0 - File.size(path) }
         numbers = (0...workers).to_a
         results = numbers.map{ [] }
         sizes   = numbers.map{  0 }
