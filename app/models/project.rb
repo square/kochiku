@@ -35,7 +35,7 @@ class Project < ActiveRecord::Base
         JOIN build_parts ON build_parts.build_id = builds.id
         JOIN build_attempts ON build_attempts.build_part_id = build_parts.id
        WHERE builds.project_id = #{id}
-         AND builds.state IN ('succeeded', 'errored')
+         AND builds.state IN ('succeeded', 'failed')
          AND build_attempts.id = (
                SELECT id
                  FROM build_attempts
