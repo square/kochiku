@@ -18,28 +18,35 @@ class Partitioner
     workers  = subset.fetch('workers')
 
     strategy = subset.fetch('balance', 'alphabetically')
-    strategy = 'alphabetically' unless private_methods.include?(strategy)
+    strategy = 'alphabetically' unless Strategies.respond_to?(strategy)
 
-    parts = send(strategy, glob, workers).map do |files|
+    files = Dir[glob]
+    parts = Strategies.send(strategy, files, workers).map do |files|
       { 'type' => type, 'files' => files.compact }
     end
 
     parts.select { |p| p['files'].present? }
   end
 
-  def alphabetically(glob, workers)
-    Dir[glob].in_groups(workers)
+  module Strategies
+    class << self
+      def alphabetically(files, workers)
+        files.in_groups(workers)
+      end
+
+      def round_robin(files, workers)
+        files.in_groups_of(workers).transpose
+      end
+
+      def shuffle(files, workers)
+        files.shuffle.in_groups(workers)
+      end
+
+      def size(files, workers)
+        files.sort_by { |path| File.size(path) }.reverse.in_groups_of(workers).transpose
+      end
+
+    end
   end
 
-  def round_robin(glob, workers)
-    Dir[glob].in_groups_of(workers).transpose
-  end
-
-  def shuffle(glob, workers)
-    Dir[glob].shuffle.in_groups(workers)
-  end
-
-  def size(glob, workers)
-    Dir[glob].sort_by { |path| File.size(path) }.reverse.in_groups_of(workers).transpose
-  end
 end
