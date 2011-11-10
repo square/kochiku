@@ -46,6 +46,18 @@ class Partitioner
         files.sort_by { |path| File.size(path) }.reverse.in_groups_of(workers).transpose
       end
 
+      def size_greedy_partitioning(files, workers)
+        files = files.sort_by { |path| 0  File.size(path) }
+        numbers = (0...workers).to_a
+        results = numbers.map{ [] }
+        sizes   = numbers.map{  0 }
+        files.each do |file|
+          dest = numbers.sort_by{|n| sizes[n]}.first
+          sizes[dest] += File.size(file)
+          results[dest] << file
+        end
+        return results
+      end
     end
   end
 
