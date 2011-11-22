@@ -1,5 +1,5 @@
 class BuildsController < ApplicationController
-  before_filter :load_project, :only => [:show, :abort]
+  before_filter :load_project, :only => [:show, :abort, :status]
 
   def show
     @build = @project.builds.find(params[:id], :include => {:build_parts => [:last_attempt, :build_attempts]})
