@@ -31,6 +31,15 @@ class BuildsController < ApplicationController
     redirect_to project_build_path(@project, @build)
   end
 
+  def status
+    @build = @project.builds.find(params[:id])
+    respond_to do |format|
+      format.json do
+        render :json => @build
+      end
+    end
+  end
+
 private
   def make_build
     if params['payload']
