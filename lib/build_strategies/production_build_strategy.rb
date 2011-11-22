@@ -20,7 +20,7 @@ class BuildStrategy
     end
 
     def artifacts_glob
-      ['log/*log']
+      ['log/*log', 'spec/reports/*.xml', 'features/reports/*.xml']
     end
 
     def promotion_ref
