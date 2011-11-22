@@ -76,4 +76,8 @@ namespace :kochiku do
     run "ln -nfFs #{shared_path}/build-partition #{current_path}/tmp/build-partition"
     run "ln -nfFs #{shared_path}/log_files #{current_path}/public/log_files"
   end
+
+  task :cleanup_zombies, :roles => [:worker] do
+    run "ps -eo 'pid ppid comm' |grep -i resque |grep Paused | awk '$2 == 1 { print $1 }' | xargs kill"
+  end
 end
