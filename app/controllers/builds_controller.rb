@@ -1,5 +1,5 @@
 class BuildsController < ApplicationController
-  before_filter :load_project, :only => [:show, :abort, :status]
+  before_filter :load_project, :only => [:show, :abort, :build_status]
 
   def show
     @build = @project.builds.find(params[:id], :include => {:build_parts => [:last_attempt, :build_attempts]})
@@ -31,7 +31,7 @@ class BuildsController < ApplicationController
     redirect_to project_build_path(@project, @build)
   end
 
-  def status
+  def build_status
     @build = @project.builds.find(params[:id])
     respond_to do |format|
       format.json do
