@@ -11,6 +11,7 @@ Kochiku.graphBuildTimes = function(projectName) {
     $.plot($('#plot'), [
       {color: '#00802D', data: data.cucumber},
       {color: '#2D80C5', data: data.spec},
+      {color: '#F8DE7E', data: data.jasmine},
     ], {
       lines: {
         show: true,

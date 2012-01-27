@@ -6,6 +6,8 @@
         Specs
       - elsif build_part.kind == "cucumber"
         Cukes
+      - elsif build_part.kind == "jasmine"
+        Jasmine
     - if build_part.build_attempts.any?
       .attempts
         = render build_part.last_attempt
