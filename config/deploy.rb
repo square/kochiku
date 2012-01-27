@@ -10,10 +10,10 @@ set :application, "Kochiku"
 set :repository,  "git@git.squareup.com:square/kochiku.git"
 set :branch, "master"
 set :scm, :git
-set :scm_command, '/usr/local/bin/git'
+set :scm_command, 'git'
 
 set :user, "square"
-set :deploy_to, "/Users/#{user}/kochiku"
+set :deploy_to, "$HOME/kochiku"
 set :deploy_via, :remote_cache
 set :keep_releases, 5
 set :use_sudo, false
