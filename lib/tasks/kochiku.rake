@@ -14,7 +14,7 @@ namespace :kochiku do
 
       unless File.exists?(tmp_dir)
         FileUtils.mkdir_p tmp_dir
-        `git clone --recurse-submodules git@git.squareup.com:square/web.git #{tmp_dir}`
+        `git clone --recursive git@git.squareup.com:square/web.git #{tmp_dir}`
       end
 
       FileUtils.mkdir_p(log_dir)

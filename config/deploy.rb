@@ -69,7 +69,7 @@ namespace :kochiku do
   task :setup, :roles => [:app, :worker] do
     run "gem install bundler -v 1.0.15 --conservative"
     run "mkdir -p #{shared_path}/{build-partition,log_files}"
-    run "[ -d #{shared_path}/build-partition/web-cache ] || #{scm_command} clone --recurse-submodules git@git.squareup.com:square/web.git #{shared_path}/build-partition/web-cache"
+    run "[ -d #{shared_path}/build-partition/web-cache ] || #{scm_command} clone --recursive git@git.squareup.com:square/web.git #{shared_path}/build-partition/web-cache"
   end
 
   task :symlinks, :roles => [:app, :worker] do
