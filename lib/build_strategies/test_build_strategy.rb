@@ -1,6 +1,6 @@
 class BuildStrategy
   class << self
-    def execute_build(build_part)
+    def execute_build(build_kind, test_files)
       true
     end
 

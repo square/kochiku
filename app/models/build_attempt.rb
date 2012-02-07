@@ -3,11 +3,7 @@ class BuildAttempt < ActiveRecord::Base
   belongs_to :build_part, :inverse_of => :build_attempts
 
   STATES = [:runnable, :running, :passed, :failed, :errored, :aborted]
-  symbolize :state, :in => STATES
-
-  STATES.each do |state|
-    scope state, where(:state => state.to_s)
-  end
+  symbolize :state, :in => STATES, :scopes => true
 
   def elapsed_time
     if finished_at && started_at
@@ -24,14 +20,14 @@ class BuildAttempt < ActiveRecord::Base
   end
 
   def finish!(state)
-    update_attributes!(:state => state, :finished_at => Time.now)
-  end
-
-  def error_occurred!
-    finish!(:errored)
+    update_attributes(:state => state, :finished_at => Time.now)
   end
 
   def unsuccessful?
     state == :failed || state == :errored
+  end
+
+  def aborted?
+    state == :aborted
   end
 end
