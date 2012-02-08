@@ -9,7 +9,7 @@ class BuildPart < ActiveRecord::Base
 
   def create_and_enqueue_new_build_attempt!
     build_attempt = build_attempts.create!(:state => :runnable)
-    BuildAttemptJob.enqueue_on("#{build_instance.queue}-#{self.kind}", build_attempt.id)
+    BuildAttemptJob.enqueue_on("#{build_instance.queue}-#{self.kind}", build_attempt.id, self.kind, build_instance.ref, self.paths)
     build_attempt
   end
 
