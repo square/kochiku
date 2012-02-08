@@ -1,7 +1,7 @@
 # source 'http://mirrors.squareup.com/rubygems'
 source 'https://rubygems.org/'
 
-gem 'rails', '3.0.10'
+gem 'rails', '3.0.11'
 gem 'rake'
 gem 'passenger', :group => :production
 gem 'square-hoptoad_notifier', :require => "hoptoad_notifier"
