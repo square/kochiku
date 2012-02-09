@@ -5,7 +5,7 @@ class BuildAttemptJob < JobBase
   def initialize(build_attempt_id, build_kind, build_ref, test_files)
     @build_attempt_id = build_attempt_id
     @build_ref = build_ref
-    @build_type = build_kind
+    @build_kind = build_kind
     @test_files = test_files
   end
 
