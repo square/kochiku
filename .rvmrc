@@ -1,1 +1,1 @@
-rvm use --create ree@kochiku
+rvm use --create 1.9.3@kochiku

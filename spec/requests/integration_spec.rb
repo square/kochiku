@@ -1,5 +1,5 @@
+# coding: utf-8
 require "spec_helper"
-
 
 describe "viewing an in process build", :type => :request do
   before :each do
