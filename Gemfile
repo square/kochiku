@@ -24,8 +24,9 @@ gem "cocaine"
 gem "awesome_print", :require => false
 
 group :development do
-  gem 'ruby-debug', :platforms => :mri_18
-  gem 'ruby-debug19', :require => 'ruby-debug', :platforms => :mri_19
+  # ruby-debug19 for 1.9.3 is still considered unstable. Reenable this once
+  # linecache19-0.5.13 and ruby-debug-base19-0.11.26 have been released
+  #gem 'ruby-debug19', :require => 'ruby-debug', :platforms => :mri_19
 
   gem 'capistrano', :require => false
 end
