@@ -2,15 +2,19 @@ class Project < ActiveRecord::Base
   has_many :builds, :dependent => :destroy, :inverse_of => :project
   validates_uniqueness_of :name
 
-  def build_time_history
+  # The fuzzy_limit is used to set a upper bound on the amount of time that the
+  # sql query will take
+  def build_time_history(fuzzy_limit=1000)
     result = Hash.new { |hash, key| hash[key] = [] }
 
-    execute(build_time_history_sql).each do |value|
+    result['max'] = builds.order(:id).last.try(:id).to_i
+    id_cutoff = result['max'] - fuzzy_limit
+    result['min'] = builds.order(:id).where("id >= #{id_cutoff}").first.try(:id).to_i
+
+    execute(build_time_history_sql(id_cutoff)).each do |value|
       result[value.shift] << value
     end
 
-    result['min'] = builds.order(:id).first.try(:id).to_i
-    result['max'] = builds.order(:id).last.try(:id).to_i
 
     result
   end
@@ -25,7 +29,7 @@ class Project < ActiveRecord::Base
     self.class.connection.execute(sql)
   end
 
-  def build_time_history_sql
+  def build_time_history_sql(min_build_id)
     return <<-SQL
       SELECT build_parts.kind,
              builds.id,
@@ -35,6 +39,7 @@ class Project < ActiveRecord::Base
         JOIN build_parts ON build_parts.build_id = builds.id
         JOIN build_attempts ON build_attempts.build_part_id = build_parts.id
        WHERE builds.project_id = #{id}
+         AND builds.id >= #{min_build_id}
          AND builds.state IN ('succeeded', 'failed')
          AND build_attempts.id = (
                SELECT id
