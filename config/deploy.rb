@@ -6,6 +6,8 @@ set :rvm_ruby_string, '1.9.3@kochiku'
 require 'bundler/capistrano' # adds bundle:install step to deploy pipeline
 require 'hoptoad_notifier/capistrano'
 
+default_run_options[:env] = {'PATH' => '/usr/local/bin:$PATH'}
+
 set :application, "Kochiku"
 set :repository,  "git@git.squareup.com:square/kochiku.git"
 set :branch, "master"
