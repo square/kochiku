@@ -12,7 +12,7 @@ function install_ruby_if_needed() {
 
 function install_bundler_if_needed() {
   echo "Checking for Bundler..."
-  gem install bundler "$bundler_version" --conservative || exit 1
+  gem install bundler --conservative || exit 1
 }
 
 function update_gems_if_needed() {
