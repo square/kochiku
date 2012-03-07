@@ -5,7 +5,7 @@ class BuildStrategy
       " PATH=/usr/bin:/bin:/usr/sbin:/sbin:/usr/local/bin:/usr/X11/bin"+
       " TEST_RUNNER=#{build_kind}"+
       " RUN_LIST=#{test_files.join(',')}"+
-      " bash --noprofile --norc -c 'ruby -v ; source ~/.rvm/scripts/rvm ; rvm use ree-1.8.7-2011.12 ; mkdir log ; script/ci worker 2>log/stderr.log 1>log/stdout.log'"
+      " bash --noprofile --norc -c 'ruby -v ; source ~/.rvm/scripts/rvm ; source .rvmrc ; mkdir log ; script/ci worker 2>log/stderr.log 1>log/stdout.log'"
     end
 
     # The primary function of promote_build is to push a new tag or update a branch
