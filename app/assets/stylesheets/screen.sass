@@ -5,7 +5,6 @@
   <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css" />
 
 @import compass/reset
-@import compass/css3/gradient
 @import compass/css3/border-radius
 @import _avantgarde
 
@@ -50,11 +49,11 @@ $color-link: #2D81C5
   border-radius: $radius
 
 /* Styles */
-$default-background: #b4b5b7 url(../images/body-noise.png) center left fixed
+$default-background: #b4b5b7 image-url("body-noise.png") center left fixed
 html
   font-family: $font-base
   background: $default-background
-  background: url(../images/body-noise-shadow.png) repeat-y center top fixed, $default-background
+  background: image-url("body-noise-shadow.png") repeat-y center top fixed, $default-background
 
 h1, h2, h3, h4, h5, h6
   font-family: "agb", $font-base
@@ -200,8 +199,8 @@ input.build-button, a.button
 /* Index */
 .section-wrapper
   overflow: hidden
-  background: url(../images/section-bottom.png) no-repeat bottom center
-  background: url(../images/section-top.png) no-repeat top center, url(../images/section-bottom.png) no-repeat bottom center
+  background: image-url("section-bottom.png") no-repeat bottom center
+  background: image-url("section-top.png") no-repeat top center, image-url("section-bottom.png") no-repeat bottom center
 .section
   +envelope
   margin: 15px auto
@@ -225,7 +224,7 @@ $logo-padding: 45px
   a.logo
     float: left
     h1
-      background: url(../images/logo.png) no-repeat left center
+      background: image-url("logo.png") no-repeat left center
       padding-left: $logo-padding
       font-size: 28px
       line-height: 39px
