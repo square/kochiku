@@ -141,8 +141,6 @@ GEM
       redis-namespace (~> 1.0.2)
       sinatra (>= 0.9.2)
       vegas (~> 0.1.2)
-    rest-client (1.6.7)
-      mime-types (>= 1.16)
     rspec (2.9.0)
       rspec-core (~> 2.9.0)
       rspec-expectations (~> 2.9.0)
@@ -215,7 +213,6 @@ DEPENDENCIES
   rails (= 3.2.2)
   rake
   resque
-  rest-client
   rspec-rails
   sass
   square-hoptoad_notifier

@@ -19,7 +19,6 @@ gem "resque"
 gem "json"                                   # used by resque
 gem "system_timer", :platforms => :mri_18    # used by redis gem
 
-gem "rest-client", :require => false
 gem "cocaine"
 gem "awesome_print", :require => false
 

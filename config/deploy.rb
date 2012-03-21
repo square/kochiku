@@ -1,10 +1,9 @@
 $:.unshift(File.expand_path('./lib', ENV['rvm_path'])) # Add RVM's lib directory to the load path.
 require "rvm/capistrano"
 set :rvm_type, :user
-set :rvm_ruby_string, '1.9.3@kochiku'
+set :rvm_ruby_string, 'ruby-1.9.3-p125@kochiku'
 
 require 'bundler/capistrano' # adds bundle:install step to deploy pipeline
-require 'hoptoad_notifier/capistrano'
 
 default_run_options[:env] = {'PATH' => '/usr/local/bin:$PATH'}
 
@@ -20,12 +19,9 @@ set :deploy_via, :remote_cache
 set :keep_releases, 5
 set :use_sudo, false
 
-server "macbuild-master.sfo.squareup.com", :app, :web, :db, :primary => true
+server "macbuild-master.sfo.squareup.com", :app, :web, :db, :worker, :primary => true
 
-macbuilds = (1..26).map {|n| "macbuild%02d.sfo.squareup.com" % n }
-role :worker, "macbuild-master.sfo.squareup.com", *macbuilds
-
-set :rails_env,      "production"
+set :rails_env, "production"
 
 after "deploy:setup", "kochiku:setup"
 after "deploy:symlink", "kochiku:symlinks"
@@ -69,6 +65,7 @@ end
 
 namespace :kochiku do
   task :setup, :roles => [:app, :worker] do
+    run "rvm gemset create 'kochiku'"
     run "gem install bundler -v '~> 1.0.21' --conservative"
     run "mkdir -p #{shared_path}/{build-partition,log_files}"
     run "[ -d #{shared_path}/build-partition/web-cache ] || #{scm_command} clone --recursive git@git.squareup.com:square/web.git #{shared_path}/build-partition/web-cache"
