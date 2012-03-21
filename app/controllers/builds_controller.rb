@@ -1,5 +1,6 @@
 class BuildsController < ApplicationController
   before_filter :load_project, :only => [:show, :abort, :build_status]
+  skip_before_filter :verify_authenticity_token, :only => [:create]
 
   def show
     @build = @project.builds.find(params[:id], :include => {:build_parts => [:last_attempt, :build_attempts]})
@@ -40,7 +41,8 @@ class BuildsController < ApplicationController
     end
   end
 
-private
+  private
+
   def make_build
     if params['payload']
       build_from_github
