@@ -1,14 +1,14 @@
 # source 'http://mirrors.squareup.com/rubygems'
 source 'https://rubygems.org/'
 
-gem 'rails', '3.0.11'
+gem 'rails', '3.2.2'
 gem 'rake'
 gem 'passenger', :group => :production
 gem 'square-hoptoad_notifier', :require => "hoptoad_notifier"
 
-gem 'carrierwave', '~> 0.5.4'
-gem 'mysql2', '~> 0.2.7'
-gem "symbolize"
+gem 'carrierwave'
+gem 'mysql2'
+gem "symbolize", :require => "symbolize/active_record"
 
 gem 'haml'
 gem 'haml-rails'

@@ -1,4 +1,6 @@
 class BuildAttemptsController < ApplicationController
+  skip_before_filter :verify_authenticity_token
+
   def start
     @build_attempt = BuildAttempt.find(params[:id])
 

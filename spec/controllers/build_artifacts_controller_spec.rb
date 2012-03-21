@@ -6,7 +6,7 @@ describe BuildArtifactsController do
     let(:build) { FactoryGirl.create(:build, :project => project) }
     let(:build_part) { build.build_parts.create!(:paths => ["a"], :kind => "test") }
     let(:build_attempt) { build_part.build_attempts.create!(:state => :failed) }
-    let(:log_file) { File.open(FIXTURE_PATH.join("build_artifact.log")) }
+    let(:log_file) { fixture_file_upload("/build_artifact.log", 'text/xml') }
 
     it "should create a build artifact for the build attempt" do
       log_contents = log_file.read

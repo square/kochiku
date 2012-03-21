@@ -1,4 +1,6 @@
 class BuildArtifactsController < ApplicationController
+  skip_before_filter :verify_authenticity_token
+
   def create
     @build_artifact = BuildArtifact.new
     @build_artifact.build_attempt_id = params[:build_attempt_id]

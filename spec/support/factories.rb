@@ -12,7 +12,7 @@ FactoryGirl.define do
     project
     state :partitioning
     queue :ci
-    ref { ActiveSupport::SecureRandom.hex }
+    ref { SecureRandom.hex }
   end
 
   factory :build_part do

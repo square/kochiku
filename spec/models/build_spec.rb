@@ -22,7 +22,7 @@ describe Build do
       build.should have(1).error_on(:queue)
     end
     it "should force uniqueness on project_id and ref pairs" do
-      build2 = build.clone
+      build2 = FactoryGirl.build(:build, :project => project, :ref => build.ref)
       build2.should_not be_valid
       build2.should have(1).error_on(:ref)
     end
