@@ -24,7 +24,7 @@ server "macbuild-master.sfo.squareup.com", :app, :web, :db, :worker, :primary =>
 set :rails_env, "production"
 
 after "deploy:setup", "kochiku:setup"
-after "deploy:symlink", "kochiku:symlinks"
+after "deploy:create_symlink", "kochiku:symlinks"
 
 namespace :deploy do
   task :start, :roles => :app do
