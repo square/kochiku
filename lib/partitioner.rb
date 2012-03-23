@@ -34,6 +34,10 @@ class Partitioner
         files.in_groups(workers)
       end
 
+      def isolated(files, workers)
+        files.in_groups_of(1)
+      end
+
       def round_robin(files, workers)
         files.in_groups_of(workers).transpose
       end
