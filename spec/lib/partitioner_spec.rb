@@ -113,6 +113,17 @@ describe Partitioner do
             { 'type' => 'rspec', 'files' => %w(d) },
           ] }
         end
+
+        context 'and balance is isolated' do
+          let(:balance) { 'isolated' }
+
+          it { should == [
+            { 'type' => 'rspec', 'files' => %w(a) },
+            { 'type' => 'rspec', 'files' => %w(b) },
+            { 'type' => 'rspec', 'files' => %w(c) },
+            { 'type' => 'rspec', 'files' => %w(d) },
+          ] }
+        end
       end
     end
   end
