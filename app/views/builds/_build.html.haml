@@ -6,7 +6,7 @@
     .times
       .time-started
         Started at
-        =time_for(build.created_at)
+        =time_for(build.created_at, "%m/%d %I:%M%P")
       .time-elapsed
         - if build.completed?
           Built in
