@@ -1,1 +1,1 @@
-rvm use --create ruby-1.9.3-p125@kochiku
+rvm use --create ruby-1.9.3@kochiku
