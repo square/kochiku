@@ -1,4 +1,3 @@
-$:.unshift(File.expand_path('./lib', ENV['rvm_path'])) # Add RVM's lib directory to the load path.
 require "rvm/capistrano"
 set :rvm_type, :user
 set :rvm_ruby_string, 'ruby-1.9.3-p125@kochiku'

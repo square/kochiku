@@ -169,6 +169,8 @@ GEM
       railties (>= 3.0)
       rspec (~> 2.9.0)
     rubyzip (0.9.6.1)
+    rvm-capistrano (1.1.0)
+      capistrano (>= 2.0.0)
     sass (3.1.15)
     sass-rails (3.2.5)
       railties (~> 3.2.0)
@@ -238,6 +240,7 @@ DEPENDENCIES
   rake
   resque
   rspec-rails
+  rvm-capistrano
   sass
   sass-rails (~> 3.2.3)
   square-hoptoad_notifier

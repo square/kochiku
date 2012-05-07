@@ -36,6 +36,7 @@ group :development do
   #gem 'ruby-debug19', :require => 'ruby-debug', :platforms => :mri_19
 
   gem 'capistrano', :require => false
+  gem 'rvm-capistrano', :require => false
 end
 
 group :test, :development do
