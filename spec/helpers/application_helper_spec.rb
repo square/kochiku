@@ -29,10 +29,16 @@ describe ApplicationHelper do
       build_success_in_words(@build).should == 'partitioning'
     end
   end
- 
+
   describe "#show_link_to_commit" do
     it "should create a url to github based on config" do
       show_link_to_commit('SHA1').should == 'https://git.squareup.com/square/web/commit/SHA1'
+    end
+  end
+
+  describe "#show_link_to_compare" do
+    it "creates a url to github based on config" do
+      show_link_to_compare('SHA1', 'SHA2').should == 'https://git.squareup.com/square/web/compare/SHA1...SHA2'
     end
   end
 end

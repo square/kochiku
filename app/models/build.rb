@@ -27,6 +27,12 @@ class Build < ActiveRecord::Base
 
   after_create :enqueue_partitioning_job
 
+  scope :successful_for_project, lambda { |project_id| where(:project_id => project_id, :state => :succeeded) }
+
+  def previous_successful_build
+    Build.successful_for_project(project_id).order("updated_at DESC").where("updated_at < ?", updated_at).limit(1).first
+  end
+
   def enqueue_partitioning_job
     Resque.enqueue(BuildPartitioningJob, self.id)
   end

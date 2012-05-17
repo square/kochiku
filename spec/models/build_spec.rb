@@ -164,4 +164,28 @@ describe Build do
       build_attempt_unstarted.reload.state.should == :aborted
     end
   end
+
+  describe "#previous_successful_build" do
+    let(:successful_build) {
+      build.partition(parts)
+      build.build_parts.each { |part| part.last_attempt.finish!(:passed) }
+      build.update_state_from_parts!
+      build.update_attribute(:updated_at, 1.minute.ago)
+      build
+    }
+
+    it "returns nil when there are no previous successful builds for the project" do
+      build.succeeded?.should be_false
+      build2 = FactoryGirl.create(:build, :project => project)
+
+      build.previous_successful_build.should be_nil
+      build2.previous_successful_build.should be_nil
+    end
+
+    it "returns the most recent build in state == :succeeded prior to this build" do
+      successful_build.succeeded?.should be_true
+      build2 = FactoryGirl.create(:build, :project => project)
+      build2.previous_successful_build.should == successful_build
+    end
+  end
 end
