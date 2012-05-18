@@ -36,6 +36,7 @@ class GitRepo
     def inside_repo(cached_repo_name)
       cached_repo_path = File.join(WORKING_DIR, cached_repo_name)
 
+      FileUtils.mkdir_p(cached_repo_path)
       Dir.chdir(cached_repo_path) do
         synchronize_with_remote
 

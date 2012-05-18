@@ -18,7 +18,7 @@ module ApplicationHelper
       build.state.to_s
     end
   end
-  
+
   def build_activity(build)
     return "Unknown" unless build.is_a?(Build)
 
@@ -32,5 +32,9 @@ module ApplicationHelper
 
   def show_link_to_commit(commit_hash)
     "https://git.squareup.com/square/web/commit/#{commit_hash}"
+  end
+
+  def show_link_to_compare(first_commit_hash, second_commit_hash)
+    "https://git.squareup.com/square/web/compare/#{first_commit_hash}...#{second_commit_hash}"
   end
 end
