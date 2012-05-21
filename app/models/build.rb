@@ -30,7 +30,7 @@ class Build < ActiveRecord::Base
   scope :successful_for_project, lambda { |project_id| where(:project_id => project_id, :state => :succeeded) }
 
   def previous_successful_build
-    Build.successful_for_project(project_id).order("updated_at DESC").where("updated_at < ?", updated_at).limit(1).first
+    Build.successful_for_project(project_id).order("id DESC").where("id < ?", self.id).first
   end
 
   def enqueue_partitioning_job
