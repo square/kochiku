@@ -21,7 +21,10 @@
     - if @project.name == 'web'
       %a.info{:href => show_link_to_compare(build.previous_successful_build.try(:ref), build.ref), :title => 'show changes since last green build'}
         Compare to last green build
-    %a.info.last{:href => show_link_to_commit(build.ref), :title => 'show commit changes'}
+    - elsif build.succeeded?
+      %a.info{:href => show_link_to_create_pull_request(build.ref), :title => 'create a pull request against master'}
+        Create pull request
+    %a.info.last{:href => show_link_to_commit(build.ref)}
       Show HEAD commit
 
   .parts= render build.build_parts
