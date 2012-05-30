@@ -37,8 +37,14 @@ describe ApplicationHelper do
   end
 
   describe "#show_link_to_compare" do
-    it "creates a url to github based on config" do
-      show_link_to_compare('SHA1', 'SHA2').should == 'https://git.squareup.com/square/web/compare/SHA1...SHA2'
+    it "creates a url to github showing the diff between 2 SHAs" do
+      show_link_to_compare('SHA1', 'SHA2').should == 'https://git.squareup.com/square/web/pull/new/square:SHA1...SHA2#files_bucket'
+    end
+  end
+
+  describe "#show_link_to_create_pull_request" do
+    it "creates a url to github for a pull request" do
+      show_link_to_create_pull_request('SHA1').should == 'https://git.squareup.com/square/web/pull/new/square:master...SHA1'
     end
   end
 end
