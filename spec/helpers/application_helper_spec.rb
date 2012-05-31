@@ -38,7 +38,7 @@ describe ApplicationHelper do
 
   describe "#show_link_to_compare" do
     it "creates a url to github showing the diff between 2 SHAs" do
-      show_link_to_compare('SHA1', 'SHA2').should == 'https://git.squareup.com/square/web/pull/new/square:SHA1...SHA2#files_bucket'
+      show_link_to_compare('SHA1', 'SHA2').should == 'https://git.squareup.com/square/web/compare/SHA1...SHA2#files_bucket'
     end
   end
 

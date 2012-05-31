@@ -35,7 +35,7 @@ module ApplicationHelper
   end
 
   def show_link_to_compare(first_commit_hash, second_commit_hash)
-    "https://git.squareup.com/square/web/pull/new/square:#{first_commit_hash}...#{second_commit_hash}#files_bucket"
+    "https://git.squareup.com/square/web/compare/#{first_commit_hash}...#{second_commit_hash}#files_bucket"
   end
 
   def show_link_to_create_pull_request(commit_hash)
