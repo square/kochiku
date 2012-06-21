@@ -4,6 +4,16 @@ class BuildsController < ApplicationController
 
   def show
     @build = @project.builds.find(params[:id], :include => {:build_parts => [:last_attempt, :build_attempts]})
+
+    respond_to do |format|
+      format.html
+      format.png do
+        # See http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.21
+        headers['Expires'] = CGI.rfc1123_date(Time.now.utc)
+
+        send_data(@build.to_png, :type => 'image/png', :disposition => 'inline')
+      end
+    end
   end
 
   def create
