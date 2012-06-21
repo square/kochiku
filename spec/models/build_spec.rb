@@ -165,6 +165,44 @@ describe Build do
     end
   end
 
+  describe '#to_png' do
+    let(:build)     { FactoryGirl.create(:build, :state => state) }
+    let(:png)       { build.to_png }
+    let(:png_color) { png.get_pixel(png.width/2, png.height/2) }
+
+    let(:red)   { 4284901119 }
+    let(:green) { 1728014079 }
+    let(:blue)  { 1718026239 }
+
+    context 'with succeeded state' do
+      let(:state) { :succeeded }
+
+      it 'returns a green status png' do
+        png_color.should == green
+      end
+    end
+
+    %w(failed errored aborted).each do |current_state|
+      context "with #{current_state} state" do
+        let(:state) { current_state }
+
+        it 'returns a red status png' do
+          png_color.should == red
+        end
+      end
+    end
+
+    Build::IN_PROGRESS_STATES.each do |current_state|
+      context "with #{current_state} state" do
+        let(:state) { current_state }
+
+        it 'returns a blue status png' do
+          png_color.should == blue
+        end
+      end
+    end
+  end
+
   describe "#previous_successful_build" do
     let(:successful_build) {
       build.partition(parts)
