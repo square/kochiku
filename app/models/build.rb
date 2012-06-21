@@ -99,4 +99,21 @@ class Build < ActiveRecord::Base
         {:state => :runnable, :build_part_id => all_build_part_ids}
     )
   end
+
+  def to_png
+    if state == :succeeded
+      status_png(102, 255, 102) # green
+    elsif TERMINAL_STATES.include?(state)
+      status_png(255, 102, 102) # red
+    else
+      status_png(102, 102, 255) # blue
+    end
+  end
+
+  private
+
+  def status_png(r, g, b)
+    ChunkyPNG::Canvas.new(13, 13, ChunkyPNG::Color::TRANSPARENT).
+      circle(6, 6, 5, ChunkyPNG::Color::BLACK, ChunkyPNG::Color.rgb(r, g, b))
+  end
 end
