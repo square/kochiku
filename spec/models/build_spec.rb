@@ -182,7 +182,7 @@ describe Build do
       end
     end
 
-    %w(failed errored aborted).each do |current_state|
+    %w(failed errored aborted doomed).each do |current_state|
       context "with #{current_state} state" do
         let(:state) { current_state }
 
@@ -192,7 +192,7 @@ describe Build do
       end
     end
 
-    Build::IN_PROGRESS_STATES.each do |current_state|
+    %w(partitioning runnable running).each do |current_state|
       context "with #{current_state} state" do
         let(:state) { current_state }
 
