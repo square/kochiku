@@ -103,7 +103,7 @@ class Build < ActiveRecord::Base
   def to_png
     if state == :succeeded
       status_png(102, 255, 102) # green
-    elsif TERMINAL_STATES.include?(state)
+    elsif [:failed, :errored, :aborted, :doomed].include?(state)
       status_png(255, 102, 102) # red
     else
       status_png(102, 102, 255) # blue
