@@ -11,7 +11,7 @@
         - if build.completed?
           Built in
           %strong
-            =duration_strftime(build.elapsed_time, "%Mm %Ss")
+            =duration_strftime(build.elapsed_time, "%Hh %Mm %Ss")
 
   .build-state
     %span.info
