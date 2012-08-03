@@ -226,4 +226,33 @@ describe Build do
       build2.previous_successful_build.should == successful_build
     end
   end
+
+  describe "#auto_mergable?" do
+    it "is true if it is a passed developer build with auto_merge" do
+      build.queue = :developer
+      build.auto_merge = true
+      build.state = :succeeded
+      build.auto_mergable?.should be_true
+    end
+    it "is false if it is a failed developer build with auto_merge" do
+      build.queue = :developer
+      build.auto_merge = true
+      (Build::TERMINAL_STATES - [:succeeded]).each do |failed_state|
+        build.state = failed_state
+        build.auto_mergable?.should be_false
+      end
+    end
+    it "is false if it is a passed developer build without auto_merge" do
+      build.queue = :developer
+      build.auto_merge = false
+      build.state = :succeeded
+      build.auto_mergable?.should be_false
+    end
+    it "is false if it is a ci build" do
+      build.queue = :ci
+      build.auto_merge = true
+      build.state = :succeeded
+      build.auto_mergable?.should be_false
+    end
+  end
 end

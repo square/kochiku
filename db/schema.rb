@@ -1,3 +1,4 @@
+# encoding: UTF-8
 # This file is auto-generated from the current state of the database. Instead
 # of editing this file, please use the migrations feature of Active Record to
 # incrementally modify your database, and then regenerate this schema definition.
@@ -10,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20110801215540) do
+ActiveRecord::Schema.define(:version => 20120803005242) do
 
   create_table "build_artifacts", :force => true do |t|
     t.integer  "build_attempt_id"
@@ -50,6 +51,7 @@ ActiveRecord::Schema.define(:version => 20110801215540) do
     t.datetime "created_at"
     t.datetime "updated_at"
     t.integer  "project_id"
+    t.boolean  "auto_merge"
   end
 
   add_index "builds", ["project_id"], :name => "index_builds_on_project_id"

@@ -1,3 +1,5 @@
+require 'open3'
+
 class BuildStrategy
   class << self
     # The primary function of promote_build is to push a new tag or update a branch
@@ -13,6 +15,15 @@ class BuildStrategy
 
     def promotion_ref
       "ci-master-distributed-latest"
+    end
+
+    def merge_ref(ref)
+      command = "git checkout master && git pull && git merge --no-ff #{ref} && git push origin master"
+      stdout_and_stderr_str, status = Open3.capture2e(command)
+      p stdout_and_stderr_str
+      # TODO: If exit status == 0, yay!
+      # TODO: If exit status nonzero, email?
+      p status.exitstatus
     end
 
   private

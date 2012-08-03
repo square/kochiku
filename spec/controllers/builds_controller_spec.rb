@@ -61,6 +61,17 @@ describe BuildsController do
         }.to change { Project.exists?(:name => project_param) }.from(false).to(true)
       end
 
+      it "sets automerge when param given" do
+        post :create, :project_id => project_param, :build => build_info, :auto_merge => "1"
+        Build.last.auto_merge.should == true
+      end
+
+
+      it "defaults to false automerge when param not given" do
+        post :create, :project_id => project_param, :build => build_info
+        Build.last.auto_merge.should == false
+      end
+
       it "should create a new build" do
         Build.exists?(:ref => build_info[:ref]).should be_false
         post :create, :project_id => project_param, :build => build_info

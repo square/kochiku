@@ -49,6 +49,12 @@ describe BuildStateUpdateJob do
         BuildStrategy.should_receive(:promote_build).with(@build.ref)
         BuildStateUpdateJob.perform(@build.id)
       end
+
+      it "should automerge the build" do
+        @build.update_attributes(:auto_merge => true, :queue => :developer)
+        BuildStrategy.should_receive(:merge_ref).with(@build.ref)
+        BuildStateUpdateJob.perform(@build.id)
+      end
     end
 
     context "when a part has failed but some are still running" do
