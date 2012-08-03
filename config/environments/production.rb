@@ -66,4 +66,5 @@ Kochiku::Application.configure do
   # config.active_record.auto_explain_threshold_in_seconds = 0.5
 
   Resque.redis = Redis.new(:host => "macbuild-master.sfo.squareup.com")
+  Rails.application.routes.default_url_options[:host] = "macbuild-master.sfo.squareup.com"
 end

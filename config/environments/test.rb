@@ -38,4 +38,5 @@ Kochiku::Application.configure do
   config.after_initialize do
     Resque.redis.namespace = "resque:kochiku:test"
   end
+  Rails.application.routes.default_url_options[:host] = "localhost:3001"
 end

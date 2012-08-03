@@ -52,7 +52,7 @@ describe BuildStateUpdateJob do
 
       it "should automerge the build" do
         @build.update_attributes(:auto_merge => true, :queue => :developer)
-        BuildStrategy.should_receive(:merge_ref).with(@build.ref)
+        BuildStrategy.should_receive(:merge_ref).with(@build)
         BuildStateUpdateJob.perform(@build.id)
       end
     end

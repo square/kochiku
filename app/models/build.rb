@@ -87,7 +87,7 @@ class Build < ActiveRecord::Base
   end
 
   def auto_merge!
-    BuildStrategy.merge_ref(self.ref)
+    BuildStrategy.merge_ref(self)
   end
 
   def promote!
