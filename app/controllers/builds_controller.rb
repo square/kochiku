@@ -82,6 +82,6 @@ class BuildsController < ApplicationController
       @project = Project.create!(:name => params[:project_id])
     end
 
-    @project.builds.find_or_initialize_by_ref(params[:build][:ref], :state => :partitioning, :queue => :developer)
+    @project.builds.find_or_initialize_by_ref(params[:build][:ref], :state => :partitioning, :queue => :developer, :auto_merge => params[:auto_merge] || false)
   end
 end

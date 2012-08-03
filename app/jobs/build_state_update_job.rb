@@ -13,6 +13,10 @@ class BuildStateUpdateJob < JobBase
       GitRepo.inside_repo("web-cache") do
         build.promote!
       end
+    elsif build.auto_mergable?
+      GitRepo.inside_repo("web-cache") do
+        build.auto_merge!
+      end
     end
   end
 end

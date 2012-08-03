@@ -82,6 +82,14 @@ class Build < ActiveRecord::Base
     succeeded? && queue == :ci
   end
 
+  def auto_mergable?
+    succeeded? && queue == :developer && self.auto_merge
+  end
+
+  def auto_merge!
+    BuildStrategy.merge_ref(self)
+  end
+
   def promote!
     BuildStrategy.promote_build(self.ref)
   end
