@@ -57,7 +57,7 @@ class BuildStrategy
         abort_merge_and_raise("git reset --hard origin/master", "Was unable to push your branch:\n\n#{second_push_log}") if status.exitstatus != 0
       end
 
-      [checkout_log, merge_log, push_log, rebase_log, second_push_log].join('\n')
+      [checkout_log, merge_log, push_log, rebase_log, second_push_log].join("\n")
     end
 
     def raise_and_log(error)
