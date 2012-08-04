@@ -19,6 +19,8 @@ class BuildStrategy
 
     def merge_ref(build)
       email, status = Open3.capture2("git show --pretty=format:%ae")
+      email = email.strip
+      email = "eng@squareup.com" if email.blank?
       begin
         log = try_to_automerge(build.ref)
         merge_ref, status = Open3.capture2e("git rev-parse HEAD")
