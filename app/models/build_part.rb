@@ -43,4 +43,7 @@ class BuildPart < ActiveRecord::Base
     end
   end
 
+  def should_reattempt?
+    build_attempts.unsuccessful.count <= 3 && kind == "cucumber" && (build_instance.auto_merge? || build_instance.queue == :ci)
+  end
 end
