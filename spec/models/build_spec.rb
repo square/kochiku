@@ -2,7 +2,7 @@ require 'spec_helper'
 
 describe Build do
   let(:project) { FactoryGirl.create(:big_rails_project) }
-  let(:build) { FactoryGirl.create(:build, :project => project) }
+  let(:build) { FactoryGirl.create(:build, :project => project, :queue => "developer") }
   let(:parts) { [{'type' => 'cucumber', 'files' => ['a', 'b']}, {'type' => 'rspec', 'files' => ['c', 'd']}] }
 
   describe "validations" do

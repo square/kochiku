@@ -2,8 +2,12 @@ class BuildAttempt < ActiveRecord::Base
   has_many :build_artifacts, :dependent => :destroy, :inverse_of => :build_attempt
   belongs_to :build_part, :inverse_of => :build_attempts
 
-  STATES = [:runnable, :running, :passed, :failed, :errored, :aborted]
+  FAILED_BUILD_STATES = [:failed, :errored]
+  STATES = [:runnable, :running, :passed, :aborted] + FAILED_BUILD_STATES
+
   symbolize :state, :in => STATES, :scopes => true
+
+  scope :unsuccessful, :conditions => {:state => FAILED_BUILD_STATES}
 
   def elapsed_time
     if finished_at && started_at
@@ -24,10 +28,14 @@ class BuildAttempt < ActiveRecord::Base
   end
 
   def unsuccessful?
-    state == :failed || state == :errored
+    FAILED_BUILD_STATES.include?(state)
   end
 
   def aborted?
     state == :aborted
+  end
+
+  def should_reattempt?
+    unsuccessful? && build_part.should_reattempt?
   end
 end
