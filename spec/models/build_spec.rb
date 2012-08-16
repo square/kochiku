@@ -228,31 +228,48 @@ describe Build do
   end
 
   describe "#auto_mergable?" do
-    it "is true if it is a passed developer build with auto_merge" do
-      build.queue = :developer
-      build.auto_merge = true
-      build.state = :succeeded
-      build.auto_mergable?.should be_true
-    end
-    it "is false if it is a failed developer build with auto_merge" do
-      build.queue = :developer
-      build.auto_merge = true
-      (Build::TERMINAL_STATES - [:succeeded]).each do |failed_state|
-        build.state = failed_state
-        build.auto_mergable?.should be_false
+    context "with auto merge enabled" do
+      before do
+        build.stub(auto_merge_enabled?: true)
+      end
+
+      it "is true if it is a passed build" do
+        build.state = :succeeded
+        build.auto_mergable?.should be_true
+      end
+
+      it "is false if it is a failed build" do
+        (Build::TERMINAL_STATES - [:succeeded]).each do |failed_state|
+          build.state = failed_state
+          build.auto_mergable?.should be_false
+        end
       end
     end
-    it "is false if it is a passed developer build without auto_merge" do
-      build.queue = :developer
-      build.auto_merge = false
+
+    it "is false if it is a passed build with auto merge disabled" do
+      build.stub(auto_merge_enabled?: false)
       build.state = :succeeded
       build.auto_mergable?.should be_false
     end
+  end
+
+  describe "#auto_merge_enabled?" do
+    it "is true if it is a developer build with auto_merge" do
+      build.queue = :developer
+      build.auto_merge = true
+      build.auto_merge_enabled?.should be_true
+    end
+
+    it "is false if it is a developer build without auto_merge" do
+      build.queue = :developer
+      build.auto_merge = false
+      build.auto_merge_enabled?.should be_false
+    end
+
     it "is false if it is a ci build" do
       build.queue = :ci
       build.auto_merge = true
-      build.state = :succeeded
-      build.auto_mergable?.should be_false
+      build.auto_merge_enabled?.should be_false
     end
   end
 end
