@@ -60,7 +60,7 @@ class BuildStrategy
 
     def raise_and_log(error)
       Rails.logger.error(error)
-      raise UnableToMergeError("Was unable checkout and pull master:\n\n#{std_err_out}")
+      raise UnableToMergeError("Was unable checkout and pull master:\n\n#{error}")
     end
 
     # Merge failed, cleanup and abort
