@@ -144,4 +144,16 @@ describe BuildsController do
       @build.reload.state.should == :aborted
     end
   end
+
+  describe "#abort_auto_merge" do
+    before do
+      @build = FactoryGirl.create(:build, :auto_merge => true)
+    end
+
+    it "aborts the auto_merge" do
+      post :abort_auto_merge, :id => @build.id, :project_id => @build.project.name
+      response.should redirect_to(project_build_path(@build.project, @build))
+      @build.reload.auto_merge.should be_false
+    end
+  end
 end

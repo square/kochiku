@@ -1,5 +1,5 @@
 class BuildsController < ApplicationController
-  before_filter :load_project, :only => [:show, :abort, :build_status]
+  before_filter :load_project, :only => [:show, :abort, :build_status, :abort_auto_merge]
   skip_before_filter :verify_authenticity_token, :only => [:create]
 
   def show
@@ -39,6 +39,12 @@ class BuildsController < ApplicationController
   def abort
     @build = @project.builds.find(params[:id])
     @build.abort!
+    redirect_to project_build_path(@project, @build)
+  end
+
+  def abort_auto_merge
+    @build = @project.builds.find(params[:id])
+    @build.update_attributes!(:auto_merge => false)
     redirect_to project_build_path(@project, @build)
   end
 
