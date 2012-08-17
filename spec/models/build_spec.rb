@@ -272,4 +272,15 @@ describe Build do
       build.auto_merge_enabled?.should be_false
     end
   end
+
+  describe "#branch_or_ref" do
+    it "returns the ref when there is no branch" do
+      Build.new(:branch => nil, :ref => "ref").branch_or_ref.should == "ref"
+      Build.new(:branch => "", :ref => "ref").branch_or_ref.should == "ref"
+    end
+
+    it "returns the ref when there is no branch" do
+      Build.new(:branch => "some-branch", :ref => "ref").branch_or_ref.should == "some-branch"
+    end
+  end
 end

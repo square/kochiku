@@ -66,6 +66,10 @@ describe BuildsController do
         Build.last.auto_merge.should == true
       end
 
+      it "sets branch when param given" do
+        post :create, :project_id => project_param, :build => build_info.merge(:branch => "sticky-buddy")
+        Build.last.branch.should == "sticky-buddy"
+      end
 
       it "defaults to false automerge when param not given" do
         post :create, :project_id => project_param, :build => build_info

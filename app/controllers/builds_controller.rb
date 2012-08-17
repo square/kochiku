@@ -87,7 +87,8 @@ class BuildsController < ApplicationController
     if !@project
       @project = Project.create!(:name => params[:project_id])
     end
-
-    @project.builds.find_or_initialize_by_ref(params[:build][:ref], :state => :partitioning, :queue => :developer, :auto_merge => params[:auto_merge] || false)
+    auto_merge = params[:auto_merge] || false
+    branch = params[:build][:branch]
+    @project.builds.find_or_initialize_by_ref(params[:build][:ref], :state => :partitioning, :queue => :developer, :auto_merge => auto_merge, :branch => branch)
   end
 end

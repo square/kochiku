@@ -21,8 +21,7 @@ class BuildStrategy
       email = 'github@squareup.com'
       begin
         log = try_to_automerge(build.ref)
-        merge_ref, status = Open3.capture2e("git rev-parse HEAD")
-        AutoMergeMailer.merge_successful(email, log, merge_ref, build).deliver
+        AutoMergeMailer.merge_successful(email, log, build).deliver
       rescue UnableToMergeError => ex
         AutoMergeMailer.merge_failed(email, ex.message, build).deliver
       end
