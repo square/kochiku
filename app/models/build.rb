@@ -83,7 +83,11 @@ class Build < ActiveRecord::Base
   end
 
   def auto_mergable?
-    succeeded? && queue == :developer && self.auto_merge
+    succeeded? && auto_merge_enabled?
+  end
+
+  def auto_merge_enabled?
+    queue == :developer && self.auto_merge
   end
 
   def auto_merge!

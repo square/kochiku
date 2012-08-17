@@ -1,4 +1,7 @@
-%h2.subheader Build #{@build.id} - #{@build.ref}
+%h2.subheader
+  Build #{@build.id} - #{@build.ref}
+  - if @build.auto_merge_enabled?
+    = image_tag 'auto-merge.png', title: 'Auto merge enabled'
 
 .build-info.build-info-subheader
   %span.info
