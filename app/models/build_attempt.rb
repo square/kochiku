@@ -35,6 +35,10 @@ class BuildAttempt < ActiveRecord::Base
     state == :aborted
   end
 
+  def running?
+    state == :running
+  end
+
   def should_reattempt?
     unsuccessful? && build_part.should_reattempt?
   end
