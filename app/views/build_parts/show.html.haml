@@ -41,4 +41,4 @@
           - if attempt.unsuccessful? && @build_part.unsuccessful?
             = link_to("Rebuild", rebuild_project_build_part_path(@project, @build, @build_part), :method => :post)
           - if attempt.running?
-            = link_to("Abort this attempt", finish_build_attempt_path(attempt, :status => :errored), :method => :post)
+            = link_to("Abort", finish_build_attempt_path(attempt, :state => :aborted), :method => :post)
