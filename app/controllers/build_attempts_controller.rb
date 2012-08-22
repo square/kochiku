@@ -23,7 +23,7 @@ class BuildAttemptsController < ApplicationController
         format.json  { head :ok }
         format.html  { redirect_to project_build_part_url(@build_attempt.build_part.project,
                                                           @build_attempt.build_part.build_instance,
-                                                          @build_attempt) }
+                                                          @build_attempt.build_part) }
       else
         format.json  { render :json => @build_attempt.errors, :status => :unprocessable_entity }
       end

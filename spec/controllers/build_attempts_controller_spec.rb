@@ -50,5 +50,15 @@ describe BuildAttemptsController do
 
       JSON.parse(response.body)['state'].should_not be_blank
     end
+
+    it "should redirect to the build_part's URL for HTML requests" do
+      build_attempt = FactoryGirl.create(:build_attempt)
+
+      post :finish, :id => build_attempt.to_param, :state => "aborted", :format => :html
+
+      response.code.should == "302"
+      build_attempt.reload
+      build_attempt.state.should == :errored
+    end
   end
 end
