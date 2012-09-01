@@ -18,10 +18,11 @@ describe Partitioner do
   }}
 
   let(:kochiku_yml) {[
-    { 'type' => 'rspec', 'glob' => 'spec/**/*_spec.rb', 'workers' => 3, 'balance' => balance }
+    { 'type' => 'rspec', 'glob' => 'spec/**/*_spec.rb', 'workers' => 3, 'balance' => balance, 'manifest' => manifest }
   ]}
 
   let(:balance) { 'alphabetically' }
+  let(:manifest) { nil }
 
   describe '#partitions' do
     subject { partitioner.partitions }
@@ -61,6 +62,19 @@ describe Partitioner do
             { 'type' => 'rspec', 'files' => %w(b) },
             { 'type' => 'rspec', 'files' => %w(c) },
           ] }
+
+          context 'and a manifest file is specified' do
+            before { YAML.stub(:load_file).with(manifest).and_return { %w(c b a) } }
+            let(:manifest) { 'manifest.yml' }
+            let(:matches) { %w(a b c d) }
+
+            it { should == [
+              { 'type' => 'rspec', 'files' => %w(c d) },
+              { 'type' => 'rspec', 'files' => %w(b) },
+              { 'type' => 'rspec', 'files' => %w(a) },
+            ]
+            }
+          end
         end
 
         context 'and balance is size' do

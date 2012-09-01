@@ -16,16 +16,21 @@ class Partitioner
     glob     = subset.fetch('glob')
     type     = subset.fetch('type')
     workers  = subset.fetch('workers')
+    manifest = subset['manifest']
 
     strategy = subset.fetch('balance', 'alphabetically')
     strategy = 'alphabetically' unless Strategies.respond_to?(strategy)
 
-    files = Dir[glob]
+    files = Array(load_manifest(manifest)) | Dir[glob]
     parts = Strategies.send(strategy, files, workers).map do |files|
       { 'type' => type, 'files' => files.compact }
     end
 
     parts.select { |p| p['files'].present? }
+  end
+
+  def load_manifest(file_name)
+    YAML.load_file(file_name) if file_name
   end
 
   module Strategies
