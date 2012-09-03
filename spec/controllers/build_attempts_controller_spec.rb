@@ -58,7 +58,7 @@ describe BuildAttemptsController do
 
       response.code.should == "302"
       build_attempt.reload
-      build_attempt.state.should == :errored
+      build_attempt.state.should == :aborted
     end
   end
 end
