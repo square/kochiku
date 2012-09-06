@@ -41,7 +41,7 @@ class BuildStrategy
       checkout_log, status = Open3.capture2e("git checkout master && git pull")
       raise_and_log("Was unable checkout and pull master:\n\n#{checkout_log}") if status.exitstatus != 0
 
-      merge_log, status = Open3.capture2e("git merge --no-ff #{ref}")
+      merge_log, status = Open3.capture2e({"GIT_AUTHOR_NAME"=>"kochiku-automerger", "GIT_AUTHOR_EMAIL"=>"noreply+kochiku-automerger@squareup.com"}, "git merge --no-ff #{ref}")
       abort_merge_and_raise("git merge --abort", "Was unable to merge your branch:\n\n#{merge_log}") if status.exitstatus != 0
 
       push_log, status = Open3.capture2e("git push origin master")
