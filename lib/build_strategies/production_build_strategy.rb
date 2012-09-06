@@ -20,7 +20,7 @@ class BuildStrategy
     def merge_ref(build)
       email = 'github@squareup.com'
       begin
-        log = try_to_automerge(build.ref)
+        log = try_to_automerge(build)
         AutoMergeMailer.merge_successful(email, log, build).deliver
       rescue UnableToMergeError => ex
         AutoMergeMailer.merge_failed(email, ex.message, build).deliver
@@ -37,11 +37,11 @@ class BuildStrategy
     class UnableToMergeError < StandardError; end
 
     # This behavior really belongs in a different object
-    def try_to_automerge(ref)
+    def try_to_automerge(build)
       checkout_log, status = Open3.capture2e("git checkout master && git pull")
       raise_and_log("Was unable checkout and pull master:\n\n#{checkout_log}") if status.exitstatus != 0
 
-      merge_log, status = Open3.capture2e("git merge --no-ff #{ref}")
+      merge_log, status = Open3.capture2e({"GIT_AUTHOR_NAME"=>"kochiku-automerger", "GIT_AUTHOR_EMAIL"=>"noreply+kochiku-automerger@squareup.com"}, "git merge --no-ff -m 'Automerge kochiku build: #{project_build_url(build.project, build)}' #{build.ref}")
       abort_merge_and_raise("git merge --abort", "Was unable to merge your branch:\n\n#{merge_log}") if status.exitstatus != 0
 
       push_log, status = Open3.capture2e("git push origin master")
