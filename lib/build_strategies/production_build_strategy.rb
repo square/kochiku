@@ -1,5 +1,3 @@
-require 'open3'
-
 class BuildStrategy
   class << self
     # The primary function of promote_build is to push a new tag or update a branch
@@ -20,7 +18,8 @@ class BuildStrategy
     def merge_ref(build)
       email = 'github@squareup.com'
       begin
-        log = try_to_automerge(build)
+        merger = GitAutomerge.new
+        log = merger.automerge(build, project_build_url(build.project, build))
         AutoMergeMailer.merge_successful(email, log, build).deliver
       rescue UnableToMergeError => ex
         AutoMergeMailer.merge_failed(email, ex.message, build).deliver
@@ -32,40 +31,6 @@ class BuildStrategy
     def included_in_promotion_ref?(build_ref)
       cherry_cmd = Cocaine::CommandLine.new("git cherry", "origin/#{promotion_ref} :build_ref", :build_ref => build_ref)
       cherry_cmd.run.lines.count == 0
-    end
-
-    class UnableToMergeError < StandardError; end
-
-    # This behavior really belongs in a different object
-    def try_to_automerge(build)
-      checkout_log, status = Open3.capture2e("git checkout master && git pull")
-      raise_and_log("Was unable checkout and pull master:\n\n#{checkout_log}") if status.exitstatus != 0
-
-      merge_log, status = Open3.capture2e({"GIT_AUTHOR_NAME"=>"kochiku-automerger", "GIT_AUTHOR_EMAIL"=>"noreply+kochiku-automerger@squareup.com"}, "git merge --no-ff -m 'Automerge kochiku build: #{project_build_url(build.project, build)}' #{build.ref}")
-      abort_merge_and_raise("git merge --abort", "Was unable to merge your branch:\n\n#{merge_log}") if status.exitstatus != 0
-
-      push_log, status = Open3.capture2e("git push origin master")
-      if status.exitstatus != 0
-        rebase_log, rebase_status = Open3.capture2e("git pull --rebase")
-        # Someone else pushed and we are conflicted, abort rebase and remove merges
-        abort_merge_and_raise("git rebase --abort; git reset --hard origin/master", "Was unable to merge your branch:\n\n#{rebase_log}") if rebase_status.exitstatus != 0
-        # Try to push once more if it fails remove merges
-        second_push_log, status = Open3.capture2e("git push origin master")
-        abort_merge_and_raise("git reset --hard origin/master", "Was unable to push your branch:\n\n#{second_push_log}") if status.exitstatus != 0
-      end
-
-      [checkout_log, merge_log, push_log, rebase_log, second_push_log].join("\n")
-    end
-
-    def raise_and_log(error)
-      Rails.logger.error(error)
-      raise UnableToMergeError("Was unable checkout and pull master:\n\n#{error}")
-    end
-
-    # Merge failed, cleanup and abort
-    def abort_merge_and_raise(reset_command, std_err_out)
-      Open3.capture2e(reset_command)
-      raise_and_log("Was unable to merge --no-ff:\n\n#{std_err_out}")
     end
   end
 end
