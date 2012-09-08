@@ -1,16 +1,17 @@
 class UnableToMergeError < StandardError; end
 
 class GitAutomerge
-  def automerge(build, build_url)
-    Rails.logger.info("Trying auto_merge to master for #{build_url}")
+  def automerge(build)
+    Rails.logger.info("Trying auto_merge to master for build id: #{build.id}  branch: #{build.branch}")
 
     checkout_log, status = Open3.capture2e("git checkout master && git pull")
     raise_and_log("Was unable checkout and pull master:\n\n#{checkout_log}") if status.exitstatus != 0
 
+    commit_message = "Automerge branch #{build.branch} for kochiku build id: #{build.id} ref: #{build.ref}"
     merge_log, status = Open3.capture2e(
       {"GIT_AUTHOR_NAME" => "kochiku-automerger",
        "GIT_AUTHOR_EMAIL" => "noreply+kochiku-automerger@squareup.com"},
-      "git merge --no-ff -m 'Automerge branch #{build.branch} for kochiku build: #{build_url}' #{build.ref}"
+      "git merge --no-ff -m '#{commit_message}' #{build.ref}"
     )
     abort_merge_and_raise("git merge --abort",
       "Was unable to merge your branch:\n\n#{merge_log}") if status.exitstatus != 0

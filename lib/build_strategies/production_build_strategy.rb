@@ -19,7 +19,7 @@ class BuildStrategy
       email = 'github@squareup.com'
       begin
         merger = GitAutomerge.new
-        log = merger.automerge(build, project_build_url(build.project, build))
+        log = merger.automerge(build)
         AutoMergeMailer.merge_successful(email, log, build).deliver
       rescue UnableToMergeError => ex
         AutoMergeMailer.merge_failed(email, ex.message, build).deliver
