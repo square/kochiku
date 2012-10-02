@@ -21,8 +21,12 @@ class BuildPart < ActiveRecord::Base
     last_attempt.try(:state) || "unknown"
   end
 
+  def successful?
+    build_attempts.any? &:successful?
+  end
+
   def unsuccessful?
-    last_attempt.try(:unsuccessful?)
+    !successful?
   end
 
   def started_at
