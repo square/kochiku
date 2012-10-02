@@ -31,6 +31,10 @@ class BuildAttempt < ActiveRecord::Base
     FAILED_BUILD_STATES.include?(state)
   end
 
+  def successful?
+    state == :passed
+  end
+
   def aborted?
     state == :aborted
   end

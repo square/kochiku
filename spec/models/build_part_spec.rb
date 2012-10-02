@@ -17,4 +17,30 @@ describe BuildPart do
       build_part.create_and_enqueue_new_build_attempt!
     end
   end
+
+  describe "#unsuccessful?" do
+    subject { build_part.unsuccessful? }
+
+    context "with all successful attempts" do
+      before {
+        2.times { Factory(:build_attempt,
+                          :build_part => build_part,
+                          :state => :passed) }
+      }
+
+      it { should be_false }
+    end
+
+    context "with one successful attempt" do
+      before {
+        2.times { Factory(:build_attempt,
+                          :build_part => build_part,
+                          :state => :failed) }
+        Factory(:build_attempt,
+                :state => :passed)
+      }
+
+      it { should be_true }
+    end
+  end
 end
