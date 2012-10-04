@@ -1,9 +1,13 @@
 class BuildPartTimeOutMailer < ActionMailer::Base
-  BULID_AND_RELEASE = 'bulid-and-release@squareup.com'
+  BUILD_AND_RELEASE = 'build-and-release@squareup.com'
+
+  default :from => BUILD_AND_RELEASE
 
   def send(build_part)
     @build_part = build_part
     @builder = build_part.build_attempts.last.builder
-    mail(:to => BULID_AND_RELEASE, :subject => "[kochiku] Build part timed out")
+    mail(:to => BUILD_AND_RELEASE,
+         :subject => "[kochiku] Build part timed out",
+         :from => 'kochiku@squareup.com')
   end
 end
