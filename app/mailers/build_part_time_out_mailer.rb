@@ -3,7 +3,7 @@ class BuildPartTimeOutMailer < ActionMailer::Base
 
   default :from => BUILD_AND_RELEASE
 
-  def send(build_part)
+  def deliver(build_part)
     @build_part = build_part
     @builder = build_part.build_attempts.last.builder
     mail(:to => BUILD_AND_RELEASE,
