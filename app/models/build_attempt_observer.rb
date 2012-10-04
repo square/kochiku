@@ -4,7 +4,7 @@ class BuildAttemptObserver < ActiveRecord::Observer
   def after_save(record)
     if record.should_reattempt?
       record.build_part.rebuild!
-    elsif record.state == :failed && record.elapsed_time >= TIMEOUT_THRESHOLD
+    elsif record.state == :failed && record.elapsed_time.try(:>=, TIMEOUT_THRESHOLD)
       BuildPartTimeOutMailer.send(record.build_part)
       BuildStateUpdateJob.enqueue(record.build_part.build_id)
     elsif record.state != :runnable && record.state != :running
