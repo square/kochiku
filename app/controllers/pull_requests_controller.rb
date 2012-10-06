@@ -1,4 +1,6 @@
 class PullRequestsController < ApplicationController
+  skip_before_filter :verify_authenticity_token, :only => [:build]
+
   def build
     project = Project.find(params[:id])
     if active_pull_request? && build_requested?
