@@ -83,6 +83,7 @@ describe Build do
   describe "#update_state_from_parts!" do
     let(:parts) { [{'type' => 'cucumber', 'files' => ['a']}, {'type' => 'rspec', 'files' => ['b']}] }
     before do
+      stub_request(:post, /https:\/\/git\.squareup\.com\/api\/v3\/repos\/square\/web\/statuses\//)
       build.partition(parts)
       build.state.should == :runnable
     end
@@ -221,6 +222,7 @@ describe Build do
     end
 
     it "returns the most recent build in state == :succeeded prior to this build" do
+      stub_request(:post, /https:\/\/git\.squareup\.com\/api\/v3\/repos\/square\/web\/statuses\//)
       successful_build.succeeded?.should be_true
       build2 = FactoryGirl.create(:build, :project => project)
       build2.previous_successful_build.should == successful_build

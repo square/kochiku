@@ -4,21 +4,40 @@ describe BuildPartitioningJob do
 
   describe "#perform" do
     subject { BuildPartitioningJob.perform(id) }
-
     let(:id)    { build.id }
     let(:build) { FactoryGirl.create(:build, :state => :runnable) }
 
-    it "uses the partitioner to partition the build" do
-      partitioner = stub
+    context "with a job runs successfully" do
+      before do
+        GitRepo.stub(:inside_copy).and_yield
+        Build.stub(:find).with(id).and_return(build)
+        Partitioner.stub(:new).and_return(partitioner)
+        partitioner.stub(:partitions).and_return('PARTITIONS')
+        build.stub(:partition).with('PARTITIONS')
+      end
 
-      GitRepo.stub(:inside_copy).and_yield
-      Build.stub(:find).with(id).and_return(build)
-      Partitioner.stub(:new).and_return(partitioner)
+      let(:partitioner) { stub }
 
-      partitioner.should_receive(:partitions).and_return('PARTITIONS')
-      build.should_receive(:partition).with('PARTITIONS')
+      it "uses the partitioner to partition the build" do
+        stub_request(:post, /https:\/\/git\.squareup\.com\/api\/v3\/repos\/square\/web\/statuses\//)
+        partitioner.should_receive(:partitions).and_return('PARTITIONS')
+        build.should_receive(:partition).with('PARTITIONS')
 
-      subject
+        subject
+      end
+
+      it "with a pull request marks a build as pending" do
+        build.update_attributes!(:pull_request => "https://git.squareup.com/square/web/pull/2753")
+        stub_request(:post, "https://git.squareup.com/api/v3/repos/square/web/statuses/#{build.ref}").with do |request|
+          request.headers["Authorization"].should == "token #{GithubCommitStatus::OAUTH_TOKEN}"
+          body = JSON.parse(request.body)
+          body["state"].should == "pending"
+          body["description"].should_not be_blank
+          body["target_url"].should_not be_blank
+          true
+        end
+        subject
+      end
     end
 
     context "when an error occurs" do
