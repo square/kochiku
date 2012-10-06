@@ -5,6 +5,7 @@ describe GithubCommitStatus do
   let(:build) { FactoryGirl.create(:build, :pull_request => "https://git.squareup.com/square/web/pull/2753")}
 
   it "marks a build as pending" do
+    build.update_attributes!(:state => :running)
     stub_request(:post, "https://git.squareup.com/api/v3/repos/square/web/statuses/#{build.ref}").with do |request|
       request.headers["Authorization"].should == "token #{GithubCommitStatus::OAUTH_TOKEN}"
       body = JSON.parse(request.body)
@@ -13,34 +14,27 @@ describe GithubCommitStatus do
       body["target_url"].should_not be_blank
       true
     end.to_return(:body => commit_status_response)
-    subject.pending!
+    subject.update_commit_status!
   end
 
   it "marks a build as success" do
+    build.update_attributes!(:state => :succeeded)
     stub_request(:post, "https://git.squareup.com/api/v3/repos/square/web/statuses/#{build.ref}").with do |request|
       body = JSON.parse(request.body)
       body["state"].should == "success"
       true
     end.to_return(:body => commit_status_response)
-    subject.success!
-  end
-
-  it "marks a build as error" do
-    stub_request(:post, "https://git.squareup.com/api/v3/repos/square/web/statuses/#{build.ref}").with do |request|
-      body = JSON.parse(request.body)
-      body["state"].should == "error"
-      true
-    end.to_return(:body => commit_status_response)
-    subject.error!
+    subject.update_commit_status!
   end
 
   it "marks a build as failure" do
+    build.update_attributes!(:state => :failed)
     stub_request(:post, "https://git.squareup.com/api/v3/repos/square/web/statuses/#{build.ref}").with do |request|
       body = JSON.parse(request.body)
       body["state"].should == "failure"
       true
     end.to_return(:body => commit_status_response)
-    subject.failure!
+    subject.update_commit_status!
   end
 
   def commit_status_response

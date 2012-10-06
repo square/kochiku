@@ -7,23 +7,18 @@ class GithubCommitStatus
   def initialize(build)
     # TODO: this should dynamically point to a github server
     @uri = URI("https://git.squareup.com/api/v3/repos/square/web/statuses/#{build.ref}")
+    @build = build
     @build_url = Rails.application.routes.url_helpers.project_build_url(build.project, build)
   end
 
-  def pending!
-    mark_as("pending", "Build is running")
-  end
-
-  def success!
-    mark_as("success", "Build passed!")
-  end
-
-  def failure!
-    mark_as("failure", "Build failed")
-  end
-
-  def error!
-    mark_as("error", "Build errored out")
+  def update_commit_status!
+    if @build.succeeded?
+      mark_as("success", "Build passed!")
+    elsif @build.failed?
+      mark_as("failure", "Build failed")
+    else
+      mark_as("pending", "Build is running")
+    end
   end
 
   private
