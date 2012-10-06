@@ -13,6 +13,7 @@ describe PullRequestsController do
       build.branch.should == "branch-name"
       build.ref.should == "Some-sha"
       build.queue.should == :developer
+      build.pull_request.should == "https://git.squareup.com/square/web/pull/2753"
     end
 
     it "does not create a pull request if not requested" do
@@ -56,6 +57,7 @@ describe PullRequestsController do
           "sha" => "Some-sha",
           "ref" => "branch-name"
         },
+        "html_url" => "https://git.squareup.com/square/web/pull/2753",
         "body" => "best pull request ever !BUILDME",
         "title" => "this is a pull request",
       },

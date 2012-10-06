@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20120817225343) do
+ActiveRecord::Schema.define(:version => 20121006021420) do
 
   create_table "build_artifacts", :force => true do |t|
     t.integer  "build_attempt_id"
@@ -48,11 +48,12 @@ ActiveRecord::Schema.define(:version => 20120817225343) do
     t.string   "ref"
     t.string   "state"
     t.string   "queue"
-    t.datetime "created_at", :null => false
-    t.datetime "updated_at", :null => false
+    t.datetime "created_at",   :null => false
+    t.datetime "updated_at",   :null => false
     t.integer  "project_id"
     t.boolean  "auto_merge"
     t.string   "branch"
+    t.string   "pull_request"
   end
 
   add_index "builds", ["project_id"], :name => "index_builds_on_project_id"
