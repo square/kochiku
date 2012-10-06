@@ -16,6 +16,7 @@ class Build < ActiveRecord::Base
   end
   has_many :build_attempts, :through => :build_parts
   TERMINAL_STATES = [:failed, :succeeded, :errored, :aborted]
+  FAILED_STATES = [:failed, :errored, :doomed]
   IN_PROGRESS_STATES = [:partitioning, :runnable, :running, :doomed]
   STATES = IN_PROGRESS_STATES + TERMINAL_STATES
   symbolize :state, :in => STATES
@@ -65,6 +66,9 @@ class Build < ActiveRecord::Base
       else
         failed.empty? ? :running : :doomed
       end
+    if self.state != state
+      GithubCommitStatus.new(self).update_commit_status!
+    end
     update_attributes!(:state => state)
   end
 
@@ -76,6 +80,10 @@ class Build < ActiveRecord::Base
 
   def succeeded?
     state == :succeeded
+  end
+
+  def failed?
+    FAILED_STATES.include?(state)
   end
 
   def promotable?
