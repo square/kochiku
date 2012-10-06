@@ -60,7 +60,7 @@ describe PullRequestsController do
         "title" => "this is a pull request",
       },
       "action" => "synchronize",
-    }.deep_merge(options)
+    }.deep_merge(options).to_json
   end
 
 end

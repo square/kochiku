@@ -22,6 +22,6 @@ class PullRequestsController < ApplicationController
   end
 
   def payload
-    params['payload']
+    @payload ||= JSON.parse(params["payload"])
   end
 end
