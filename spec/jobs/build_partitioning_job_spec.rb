@@ -27,7 +27,6 @@ describe BuildPartitioningJob do
       end
 
       it "with a pull request marks a build as pending" do
-        build.update_attributes!(:pull_request => "https://git.squareup.com/square/web/pull/2753")
         stub_request(:post, "https://git.squareup.com/api/v3/repos/square/web/statuses/#{build.ref}").with do |request|
           request.headers["Authorization"].should == "token #{GithubCommitStatus::OAUTH_TOKEN}"
           body = JSON.parse(request.body)

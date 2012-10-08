@@ -2,7 +2,7 @@ require 'spec_helper'
 
 describe GithubCommitStatus do
   subject { GithubCommitStatus.new(build) }
-  let(:build) { FactoryGirl.create(:build, :pull_request => "https://git.squareup.com/square/web/pull/2753")}
+  let(:build) { FactoryGirl.create(:build)}
 
   it "marks a build as pending" do
     build.update_attributes!(:state => :running)
