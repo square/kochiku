@@ -1,6 +1,7 @@
 FactoryGirl.define do
   factory :project do
     sequence(:name) {|n| "Project_#{n}" }
+    association :repository
 
     factory :big_rails_project do
       name "web"
@@ -29,5 +30,11 @@ FactoryGirl.define do
   factory :build_artifact do
     build_attempt
     log_file File.open(FIXTURE_PATH + "build_artifact.log")
+  end
+
+  factory :repository do
+    url "git@git.squareup.com:square/kochiku.git"
+    test_command "script/ci worker"
+    options {}
   end
 end

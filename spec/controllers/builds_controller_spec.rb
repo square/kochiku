@@ -1,8 +1,12 @@
 require 'spec_helper'
 
 describe BuildsController do
-
   describe "#create" do
+    let(:repo) { FactoryGirl.create(:repository) }
+    before do
+      @action = :create
+      @params = {:repo_url => repo.url}
+    end
 
     context "via github" do
       before do
@@ -16,7 +20,7 @@ describe BuildsController do
         end
 
         it "should create a new build" do
-          post :create, :project_id => @project.to_param, :payload => @payload
+          post @action, @params.merge(:project_id => @project.to_param, :payload => @payload)
           Build.where(:project_id => @project, :ref => @payload["after"]).exists?.should be_true
         end
       end
@@ -28,7 +32,7 @@ describe BuildsController do
 
         it "should have no effect" do
           expect {
-            post :create, :project_id => @project.to_param, :payload => @payload
+            post @action, @params.merge(:project_id => @project.to_param, :payload => @payload)
           }.to_not change(Build, :count)
 
           response.should be_success
@@ -38,52 +42,63 @@ describe BuildsController do
       context "when the project does not exist" do
         it "should raise RecordNotFound so Rails returns a 404" do
           expect {
-            post :create, :project_id => 'not_here', :payload => @payload
+            post @action, @params.merge(:project_id => 'not_here', :payload => @payload)
           }.to raise_error(ActiveRecord::RecordNotFound)
         end
       end
     end
 
     context "developer initiated" do
+      before do
+        @params = {:repo_url => repo.url}
+      end
+
       let(:project_param) { "ganymede-hammertime" }
       let(:build_info) do
         {
           :hostname => "ganymede",
           :project => "hammertime",
-          :origin_url => "git@github.com:square/hammertime.git",
           :ref => "30b111147d9a245468c6650f54de5c16584bc154"
         }
       end
 
       it "should create a new project if one does not exist" do
         expect {
-          post :create, :project_id => project_param, :build => build_info
+          post @action, @params.merge(:project_id => project_param, :build => build_info)
         }.to change { Project.exists?(:name => project_param) }.from(false).to(true)
       end
 
+      it "should create a repo if one does not exist" do
+        Repository.destroy_all
+        expect {
+          post @action, @params.merge(:project_id => project_param, :build => build_info)
+        }.to change(Repository, :count).by(1)
+        Repository.last.url.should == repo.url
+      end
+
       it "sets automerge when param given" do
-        post :create, :project_id => project_param, :build => build_info, :auto_merge => "1"
+        post @action, @params.merge(:project_id => project_param, :build => build_info, :auto_merge => "1")
         Build.last.auto_merge.should == true
       end
 
       it "sets branch when param given" do
-        post :create, :project_id => project_param, :build => build_info.merge(:branch => "sticky-buddy")
+        post @action, @params.merge(:project_id => project_param, :build => build_info.merge(:branch => "sticky-buddy"))
         Build.last.branch.should == "sticky-buddy"
       end
 
       it "defaults to false automerge when param not given" do
-        post :create, :project_id => project_param, :build => build_info
+        post @action, @params.merge(:project_id => project_param, :build => build_info)
         Build.last.auto_merge.should == false
       end
 
       it "should create a new build" do
         Build.exists?(:ref => build_info[:ref]).should be_false
-        post :create, :project_id => project_param, :build => build_info
+        post @action, @params.merge(:project_id => project_param, :build => build_info)
         Build.exists?(:project_id => assigns(:project), :ref => build_info[:ref]).should be_true
       end
 
       it "should return the build info page in the location header" do
-        post :create, :project_id => project_param, :build => build_info
+        post @action, @params.merge(:project_id => project_param, :build => build_info)
 
         new_build = Build.where(:project_id => assigns(:project), :ref => build_info[:ref]).first
         new_build.should be_present
@@ -92,11 +107,11 @@ describe BuildsController do
       end
 
       it "should find an existing build" do
-        post :create, :project_id => project_param, :build => build_info
+        post @action, @params.merge(:project_id => project_param, :build => build_info)
         expected_url = response.location
 
         expect {
-          post :create, :project_id => project_param, :build => build_info
+          post @action, @params.merge(:project_id => project_param, :build => build_info)
         }.to_not change { Build.count }
 
         response.location.should == expected_url
@@ -105,17 +120,27 @@ describe BuildsController do
   end
 
   describe "#request_build" do
+    before do
+      @action = :create
+      @params = {}
+    end
+
     context "when a non existent project is specified" do
+      let(:repo) { FactoryGirl.create(:repository) }
+
+      before do
+        @params = {:repo_url => repo.url}
+      end
       it "creates the project" do
-        expect{ post :create, :project_id => "foobar", :build => {:ref => "asdf"} }.to change{Project.count}.by(1)
+        expect{ post @action, @params.merge(:project_id => "foobar", :build => {:ref => "asdf"}) }.to change{Project.count}.by(1)
       end
 
       it "creates a build if a ref is given" do
-        expect{ post :create, :project_id => "foobar", :build => {:ref => "asdf"} }.to change{Build.count}.by(1)
+        expect{ post @action, @params.merge(:project_id => "foobar", :build => {:ref => "asdf"}) }.to change{Build.count}.by(1)
       end
 
       it "doesn't create a build if no ref is given" do
-        expect{ post :create, :project_id => "foobar", :build => {:ref => nil }}.to_not change{Build.count}
+        expect{ post @action, @params.merge(:project_id => "foobar", :build => {:ref => nil })}.to_not change{Build.count}
       end
     end
 
@@ -123,11 +148,11 @@ describe BuildsController do
       let(:project){ FactoryGirl.create(:project) }
 
       it "creates the build if a ref is given" do
-        expect{ post :create, :project_id => project.to_param, :build => {:ref => "asdf"} }.to change{Build.count}.by(1)
+        expect{ post :create, @params.merge(:project_id => project.to_param, :build => {:ref => "asdf"}) }.to change{Build.count}.by(1)
       end
 
       it "doesn't create a build if no ref is given" do
-        expect{ post :create, :project_id => project.to_param, :build => {:ref => nil} }.to_not change{Build.count}
+        expect{ post :create, @params.merge(:project_id => project.to_param, :build => {:ref => nil}) }.to_not change{Build.count}
       end
     end
 

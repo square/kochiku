@@ -1,6 +1,7 @@
 class Project < ActiveRecord::Base
   has_many :builds, :dependent => :destroy, :inverse_of => :project
   validates_uniqueness_of :name
+  belongs_to :repository
 
   # The fuzzy_limit is used to set a upper bound on the amount of time that the
   # sql query will take
