@@ -66,10 +66,11 @@ class Build < ActiveRecord::Base
       else
         failed.empty? ? :running : :doomed
       end
-    if self.state != state
+    previous_state = self.state
+    update_attributes!(:state => state)
+    if previous_state != state
       GithubCommitStatus.new(self).update_commit_status!
     end
-    update_attributes!(:state => state)
   end
 
   def elapsed_time
