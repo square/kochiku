@@ -85,7 +85,8 @@ class BuildsController < ApplicationController
   def developer_build
     @project = Project.where(:name => params[:project_id]).first
     if !@project
-      @project = Project.create!(:name => params[:project_id])
+      repository = Repository.find_or_create_by_url(params[:repo_url])
+      @project = repository.projects.create!(:name => params[:project_id])
     end
     auto_merge = params[:auto_merge] || false
     branch = params[:build][:branch]
