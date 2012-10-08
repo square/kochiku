@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20120817225343) do
+ActiveRecord::Schema.define(:version => 20121008211955) do
 
   create_table "build_artifacts", :force => true do |t|
     t.integer  "build_attempt_id"
@@ -60,10 +60,22 @@ ActiveRecord::Schema.define(:version => 20120817225343) do
   create_table "projects", :force => true do |t|
     t.string   "name"
     t.string   "branch"
-    t.datetime "created_at", :null => false
-    t.datetime "updated_at", :null => false
+    t.datetime "created_at",    :null => false
+    t.datetime "updated_at",    :null => false
+    t.integer  "repository_id"
   end
 
   add_index "projects", ["name", "branch"], :name => "index_projects_on_name_and_branch"
+  add_index "projects", ["repository_id"], :name => "index_projects_on_repository_id"
+
+  create_table "repositories", :force => true do |t|
+    t.string   "url"
+    t.string   "test_command"
+    t.text     "options"
+    t.datetime "created_at",   :null => false
+    t.datetime "updated_at",   :null => false
+  end
+
+  add_index "repositories", ["url"], :name => "index_repositories_on_url"
 
 end
