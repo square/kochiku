@@ -1,9 +1,4 @@
-require 'uri'
-require 'net/http'
-
 class GithubCommitStatus
-  OAUTH_TOKEN = "39408724f3a92bd017caa212cc7cf2bbb5ac02b6"
-
   def initialize(build)
     @uri = URI("#{build.repository.base_api_url}/statuses/#{build.ref}")
     @build = build
@@ -22,9 +17,6 @@ class GithubCommitStatus
 
   private
   def mark_as(state, description)
-    Net::HTTP.start(@uri.host, @uri.port, :use_ssl => @uri.scheme == 'https') do |http|
-      response = http.post(@uri.path, {:state => state, :target_url => @build_url, :description => description}.to_json, {"Authorization" => "token #{OAUTH_TOKEN}"})
-      Rails.logger.info("Github commit status response: " + response.inspect)
-    end
+    GithubRequest.post(@uri, {:state => state, :target_url => @build_url, :description => description})
   end
 end

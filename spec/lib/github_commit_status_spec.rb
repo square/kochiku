@@ -9,7 +9,7 @@ describe GithubCommitStatus do
   it "marks a build as pending" do
     build.update_attributes!(:state => :running)
     stub_request(:post, "https://git.squareup.com/api/v3/repos/square/web/statuses/#{build.ref}").with do |request|
-      request.headers["Authorization"].should == "token #{GithubCommitStatus::OAUTH_TOKEN}"
+      request.headers["Authorization"].should == "token #{GithubRequest::OAUTH_TOKEN}"
       body = JSON.parse(request.body)
       body["state"].should == "pending"
       body["description"].should_not be_blank

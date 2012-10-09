@@ -114,7 +114,7 @@ describe Build do
     it "updates github when a build passes" do
       states = []
       stub_request(:post, "https://git.squareup.com/api/v3/repos/square/kochiku/statuses/#{build.ref}").with do |request|
-        request.headers["Authorization"].should == "token #{GithubCommitStatus::OAUTH_TOKEN}"
+        request.headers["Authorization"].should == "token #{GithubRequest::OAUTH_TOKEN}"
         body = JSON.parse(request.body)
         states << body["state"]
         true
