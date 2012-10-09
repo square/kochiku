@@ -1,0 +1,50 @@
+#!/usr/bin/env ruby
+require 'net/http'
+require 'uri'
+require 'shellwords'
+
+# chop off everything after the first period in the hostname (eg. ganymede.sfo -> ganymede)
+hostname = `hostname`.strip.sub(/\..*/, '')
+
+# assume the web project for the moment
+# Auto merge requested?
+if ARGV.delete("--merge")
+  auto_merge = "1"
+end
+
+# If a ref is given as an argument, use that. Otherwise use the current commit
+commit_ish = "HEAD"
+branch = `git status -sb`.split("\n").first.gsub("## ", "")
+if ARGV[0]
+  commit_ish = Shellwords.escape(ARGV[0])
+  branch = ""
+end
+
+ref = `git rev-parse #{commit_ish}`.strip
+
+# verify that the ref exists on origin
+git_branch_contains = `git branch -r --contains #{ref}`
+
+# git branch --contains will return a non-zero exit code if it does not recognize
+# the sha. It will return a 0 exit code and no output if the ref only exists locally
+if ($? == 0 && git_branch_contains.empty?) || $? != 0
+  puts "Failed: please push #{ref}"
+  exit(1)
+end
+
+repo_url = `git remote -v`.split("\n").map {|r| r.split(/\s/) }.detect {|r| r.first.downcase == "origin" && r.last.include?("fetch") }[1]
+
+project = repo_url.split("/").last.split(".").first
+uri = URI.parse("http://macbuild-master.sfo.squareup.com/projects/#{hostname}-#{project}/builds")
+
+params = {
+  'build[hostname]' => hostname,
+  'build[ref]' => ref,
+  'build[branch]' => branch,
+  'auto_merge' => auto_merge,
+  'repo_url' => repo_url,
+}
+
+response = Net::HTTP.post_form(uri, params)
+puts response['location']
+`open -g #{response['location']}`
