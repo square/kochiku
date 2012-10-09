@@ -9,7 +9,7 @@ class GitRepo
       cached_repo_path = File.join(WORKING_DIR, repository.repo_cache_name)
 
       if !File.directory?(cached_repo_path)
-        clone_repo(repository.repo_url, cached_repo_path)
+        clone_repo(repository.url, cached_repo_path)
       end
       Dir.chdir(cached_repo_path) do
         # update the cached repo
