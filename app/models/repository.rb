@@ -26,6 +26,14 @@ class Repository < ActiveRecord::Base
     options.with_indifferent_access["tmp_dir"] || "#{repository_name}-cache"
   end
 
+  def build_pull_requests=(bool)
+    options["build_pull_requests"] = bool
+  end
+
+  def build_pull_requests
+    options["build_pull_requests"]
+  end
+
   private
   def github_url_params
     parser = URL_PARSERS[url.slice(0,4)]

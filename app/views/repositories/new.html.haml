@@ -3,4 +3,6 @@
   =  f.text_field :url, {:placeholder => '', :autocapitalize => 'off', :autocorrect => 'off', :spellcheck => 'false'}
   %label{:for => "test_command"} Test Command:
   =  f.text_field :test_command, {:placeholder => 'script/ci', :autocapitalize => 'off', :autocorrect => 'off', :spellcheck => 'false'}
+  %label{:for => "build_pull_requests"} Auto-build pull requests:
+  =  f.check_box :build_pull_requests
   =  f.submit "Create", {:class => 'build-button'}
