@@ -3,6 +3,8 @@ Kochiku::Application.routes.draw do
 
   root :to => "projects#index"
 
+  resources :repositories
+
   resources :projects, :only => [:index, :new, :show] do
     get 'status-report', :action => "status_report", :on => :collection
     get 'build-time-history', :action => "build_time_history", :defaults => { :format => 'json' }

@@ -1,0 +1,8 @@
+.repositories
+  .new-repository-link
+    = link_to("Add Repository", new_repository_path)
+
+  %ul
+    - @repositories.each do |repository|
+      %li.build-info
+        = link_to(repository.url, edit_repository_path(repository))
