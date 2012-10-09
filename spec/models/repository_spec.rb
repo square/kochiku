@@ -6,4 +6,23 @@ describe Repository do
     repository.reload
     repository.options.should == {'tmp_dir' => 'web-cache'}
   end
+
+  context "#base_html_url" do
+    it "handles ssh urls" do
+      repo = Repository.new(:url => "git@git.squareup.com:square/kochiku.git")
+      repo.base_html_url.should == "https://git.squareup.com/square/kochiku"
+    end
+    it "handles http urls" do
+      repo = Repository.new(:url => "http://git.squareup.com/square/kochiku.git")
+      repo.base_html_url.should == "https://git.squareup.com/square/kochiku"
+    end
+    it "handles https urls" do
+      repo = Repository.new(:url => "https://git.squareup.com/square/kochiku.git")
+      repo.base_html_url.should == "https://git.squareup.com/square/kochiku"
+    end
+    it "handles git read only urls" do
+      repo = Repository.new(:url => "git://git.squareup.com/square/kochiku.git")
+      repo.base_html_url.should == "https://git.squareup.com/square/kochiku"
+    end
+  end
 end
