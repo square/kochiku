@@ -4,4 +4,4 @@
       %li.build-info
         = link_to(project.name, project_path(project))
         \-
-        %span.state{:class => 'build-' + project.builds.last.state.to_s}=  project.builds.last.state.to_s.capitalize
+        %span.state{:class => 'build-' + project.builds.last.try(:state).to_s}=  project.builds.last.try(:state).to_s.capitalize
