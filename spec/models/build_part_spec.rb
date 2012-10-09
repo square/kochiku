@@ -1,7 +1,9 @@
 require 'spec_helper'
 
 describe BuildPart do
-  let(:build) { FactoryGirl.create(:build, :queue => :ci) }
+  let(:repository) { FactoryGirl.create(:repository) }
+  let(:project) { FactoryGirl.create(:project, :repository => repository)}
+  let(:build) { FactoryGirl.create(:build, :queue => :ci, :project => project) }
   let(:build_part) { build.build_parts.create!(:paths => ["a", "b"], :kind => "cucumber") }
 
   describe "#create_and_enqueue_new_build_attempt!" do
@@ -16,7 +18,18 @@ describe BuildPart do
       build_part.create_and_enqueue_new_build_attempt!
     end
 
+    # TODO: Please fix this code and delete this spec
+    it "enqueues onto a different queue then square web" do
+      BuildAttemptJob.should_receive(:enqueue_on).once.with do |queue, arg_hash|
+        queue.should == "not-square-web-build"
+        true
+      end
+      build_part.create_and_enqueue_new_build_attempt!
+    end
+
     it "should enqueue the build attempt for building" do
+      repository.options["use_spec_and_ci_queues"] = true
+      repository.save!
       # the queue name should include the queue name of the build instance and the type of the test file
       BuildAttemptJob.should_receive(:enqueue_on).once.with do |queue, arg_hash|
         queue.should == "ci-cucumber"

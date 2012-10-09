@@ -34,6 +34,10 @@ class Repository < ActiveRecord::Base
     options["build_pull_requests"]
   end
 
+  def use_spec_and_ci_queues
+    options["use_spec_and_ci_queues"]
+  end
+
   private
   def github_url_params
     parser = URL_PARSERS[url.slice(0,4)]

@@ -18,7 +18,15 @@ class BuildPart < ActiveRecord::Base
       "test_command" => self.project.repository.test_command,
       "repo_url" => self.project.repository.url,
     }
-    BuildAttemptJob.enqueue_on("#{build_instance.queue}-#{self.kind}", job_args)
+    # TODO: this is a hack, please fix the following and restore this code to it's former glory.
+    # We need to do 2 things before enabling this:
+    # 1) update the ssh key on ec2 builders
+    # 2) get more space on the ec2 builders
+    if build_instance.repository.use_spec_and_ci_queues
+      BuildAttemptJob.enqueue_on("#{build_instance.queue}-#{self.kind}", job_args)
+    else
+      BuildAttemptJob.enqueue_on("not-square-web-build", job_args)
+    end
     build_attempt
   end
 
