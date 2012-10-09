@@ -83,7 +83,7 @@ describe Build do
   describe "#update_state_from_parts!" do
     let(:parts) { [{'type' => 'cucumber', 'files' => ['a']}, {'type' => 'rspec', 'files' => ['b']}] }
     before do
-      stub_request(:post, /https:\/\/git\.squareup\.com\/api\/v3\/repos\/square\/web\/statuses\//)
+      stub_request(:post, /https:\/\/git\.squareup\.com\/api\/v3\/repos\/square\/kochiku\/statuses\//)
       build.partition(parts)
       build.state.should == :runnable
     end
@@ -113,7 +113,7 @@ describe Build do
 
     it "updates github when a build passes" do
       states = []
-      stub_request(:post, "https://git.squareup.com/api/v3/repos/square/web/statuses/#{build.ref}").with do |request|
+      stub_request(:post, "https://git.squareup.com/api/v3/repos/square/kochiku/statuses/#{build.ref}").with do |request|
         request.headers["Authorization"].should == "token #{GithubCommitStatus::OAUTH_TOKEN}"
         body = JSON.parse(request.body)
         states << body["state"]
@@ -237,7 +237,7 @@ describe Build do
     end
 
     it "returns the most recent build in state == :succeeded prior to this build" do
-      stub_request(:post, /https:\/\/git\.squareup\.com\/api\/v3\/repos\/square\/web\/statuses\//)
+      stub_request(:post, /https:\/\/git\.squareup\.com\/api\/v3\/repos\/square\/kochiku\/statuses\//)
       successful_build.succeeded?.should be_true
       build2 = FactoryGirl.create(:build, :project => project)
       build2.previous_successful_build.should == successful_build

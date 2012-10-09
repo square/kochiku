@@ -21,7 +21,7 @@ describe BuildStateUpdateJob do
 
   describe "#perform" do
     before do
-      stub_request(:post, /https:\/\/git\.squareup\.com\/api\/v3\/repos\/square\/web\/statuses\//)
+      stub_request(:post, /https:\/\/git\.squareup\.com\/api\/v3\/repos\/square\/kochiku\/statuses\//)
     end
 
     context "when incomplete but nothing has failed" do

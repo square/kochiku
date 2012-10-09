@@ -19,7 +19,7 @@ describe BuildPartitioningJob do
       let(:partitioner) { stub }
 
       it "uses the partitioner to partition the build" do
-        stub_request(:post, /https:\/\/git\.squareup\.com\/api\/v3\/repos\/square\/web\/statuses\//)
+        stub_request(:post, /https:\/\/git\.squareup\.com\/api\/v3\/repos\/square\/kochiku\/statuses\//)
         partitioner.should_receive(:partitions).and_return('PARTITIONS')
         build.should_receive(:partition).with('PARTITIONS')
 
@@ -27,7 +27,7 @@ describe BuildPartitioningJob do
       end
 
       it "with a pull request marks a build as pending" do
-        stub_request(:post, "https://git.squareup.com/api/v3/repos/square/web/statuses/#{build.ref}").with do |request|
+        stub_request(:post, "https://git.squareup.com/api/v3/repos/square/kochiku/statuses/#{build.ref}").with do |request|
           request.headers["Authorization"].should == "token #{GithubCommitStatus::OAUTH_TOKEN}"
           body = JSON.parse(request.body)
           body["state"].should == "pending"

@@ -2,7 +2,9 @@ require 'spec_helper'
 
 describe GithubCommitStatus do
   subject { GithubCommitStatus.new(build) }
-  let(:build) { FactoryGirl.create(:build)}
+  let(:repository) { FactoryGirl.create(:repository, :url => "git@git.squareup.com:square/web.git") }
+  let(:project) {FactoryGirl.create(:project, :repository => repository)}
+  let(:build) { FactoryGirl.create(:build, :project => project) }
 
   it "marks a build as pending" do
     build.update_attributes!(:state => :running)
@@ -30,6 +32,17 @@ describe GithubCommitStatus do
   it "marks a build as failure" do
     build.update_attributes!(:state => :failed)
     stub_request(:post, "https://git.squareup.com/api/v3/repos/square/web/statuses/#{build.ref}").with do |request|
+      body = JSON.parse(request.body)
+      body["state"].should == "failure"
+      true
+    end.to_return(:body => commit_status_response)
+    subject.update_commit_status!
+  end
+
+  it "uses a repos github url" do
+    project.update_attributes!(:repository => FactoryGirl.create(:repository, :url => "git@github.com:square/kochiku-worker.git"))
+    build.update_attributes!(:state => :failed)
+    stub_request(:post, "https://github.com/api/v3/repos/square/kochiku-worker/statuses/#{build.ref}").with do |request|
       body = JSON.parse(request.body)
       body["state"].should == "failure"
       true
