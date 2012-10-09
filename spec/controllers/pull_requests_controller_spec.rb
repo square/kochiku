@@ -22,6 +22,18 @@ describe PullRequestsController do
       build.ref.should == "Some-sha"
       build.queue.should == :developer
     end
+    it "will enqueue a build if autobuild pull requests is enabled" do
+      repository.build_pull_requests = true
+      repository.save!
+      github_payload = payload("pull_request" => {
+        "head" => { "sha" => "Some-sha", "ref" => "branch-name" },
+        "body" => "best pull request ever",
+      })
+      expect {
+        post :build, 'payload' => github_payload
+        response.should be_success
+      }.to change(Build, :count).by(1)
+    end
   end
 
   describe "post /pull-request-builder/:id" do
