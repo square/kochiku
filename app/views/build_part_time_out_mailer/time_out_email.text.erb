@@ -1,0 +1,3 @@
+Kochiku timeout for build part <%= link_to(project_build_part_path(@build_part.build_instance.project, @build_part.build_instance, @build_part), @build_part.id) %>
+
+Go take a look! Hop onto <%= @builder %> and take it out of rotation. Either `sudo monit stop kochiku-worker` on EC2 or `launchctl unload -w ~/Library/LaunchAgents/com.squareup.kochiku-worker-*` on a macbuild.
