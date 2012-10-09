@@ -23,6 +23,6 @@ Kochiku::Application.routes.draw do
   match '/build_attempts/:id/start' => "build_attempts#start", :via => :post
   match '/build_attempts/:id/finish' => "build_attempts#finish", :via => :post, :as => :finish_build_attempt
   match '/pull-request-builder/:id' => "pull_requests#build", :via => :post
-  match '/pull-request-builder' => "pull_requests#build", :via => :post
+  match '/pull-request-builder' => "pull_requests#build", :via => :post, :as => :pull_request_build
 end
 # TODO routing specs
