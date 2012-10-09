@@ -13,7 +13,17 @@ describe BuildPart do
 
     it "should enqueue the build attempt for building" do
       # the queue name should include the queue name of the build instance and the type of the test file
-      BuildAttemptJob.should_receive(:enqueue_on).once.with("ci-cucumber", anything, anything, anything, anything)
+      BuildAttemptJob.should_receive(:enqueue_on).once.with do |queue, arg_hash|
+        queue.should == "ci-cucumber"
+        arg_hash["build_attempt_id"].should_not be_blank
+        arg_hash["build_ref"].should_not be_blank
+        arg_hash["build_kind"].should_not be_blank
+        arg_hash["test_files"].should_not be_blank
+        arg_hash["repo_name"].should_not be_blank
+        arg_hash["test_command"].should_not be_blank
+        arg_hash["repo_url"].should_not be_blank
+        true
+      end
       build_part.create_and_enqueue_new_build_attempt!
     end
   end
