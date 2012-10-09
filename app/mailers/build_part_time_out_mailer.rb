@@ -1,9 +1,9 @@
 class BuildPartTimeOutMailer < ActionMailer::Base
-  BUILD_AND_RELEASE = 'build-and-release@squareup.com'
+  BUILD_AND_RELEASE = 'build-and-release+timeouts@squareup.com'
 
   default :from => BUILD_AND_RELEASE
 
-  def perform(build_part)
+  def time_out_email(build_part)
     @build_part = build_part
     @builder = build_part.build_attempts.last.builder
     mail(:to => BUILD_AND_RELEASE,

@@ -10,7 +10,7 @@ describe BuildAttemptObserver do
       let(:build_attempt) { FactoryGirl.build(:build_attempt, state: :failed, started_at: 41.minutes.ago, :build_part => build_part) }
 
       it "sends email" do
-        BuildPartTimeOutMailer.should_receive :perform
+        BuildPartTimeOutMailer.should_receive :time_out_email
 
         subject
       end
@@ -23,7 +23,7 @@ describe BuildAttemptObserver do
                                               :build_part => build_part) }
 
       it "does not send mail" do
-        BuildPartTimeOutMailer.should_not_receive :perform
+        BuildPartTimeOutMailer.should_not_receive :time_out_email
 
         subject
       end
