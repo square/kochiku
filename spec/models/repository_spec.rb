@@ -7,6 +7,13 @@ describe Repository do
     repository.options.should == {'tmp_dir' => 'web-cache'}
   end
 
+  context "#base_api_url" do
+    it "handles ssh urls" do
+      repo = Repository.new(:url => "git@git.squareup.com:square/kochiku.git")
+      repo.base_api_url.should == "https://git.squareup.com/api/v3/repos/square/kochiku"
+    end
+  end
+
   context "#base_html_url" do
     it "handles ssh urls" do
       repo = Repository.new(:url => "git@git.squareup.com:square/kochiku.git")

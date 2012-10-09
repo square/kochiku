@@ -9,11 +9,20 @@ class Repository < ActiveRecord::Base
   validates_presence_of :url
 
   def base_html_url
+    params = github_url_params
+    "https://#{params[:host]}/#{params[:username]}/#{params[:repository]}"
+  end
+
+  def base_api_url
+    params = github_url_params
+    "https://#{params[:host]}/api/v3/repos/#{params[:username]}/#{params[:repository]}"
+  end
+
+  private
+  def github_url_params
     parser = URL_PARSERS[url.slice(0,4)]
     match = url.match(parser)
-    host = match[1]
-    username = match[2]
-    repository = match[3]
-    "https://#{host}/#{username}/#{repository}"
+    {:host => match[1], :username => match[2], :repository => match[3]}
   end
+
 end
