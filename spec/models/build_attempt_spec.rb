@@ -20,11 +20,6 @@ describe BuildAttempt do
         build_attempt.update_attributes(:state => state)
       end
 
-      it "does not enqueue the BuildStateUpdateJob when it #{state}" do
-        BuildStateUpdateJob.should_not_receive(:enqueue)
-        build_attempt.update_attributes(:state => state)
-      end
-
       context "when there are already 3 failures" do
         before do
           3.times do
