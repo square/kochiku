@@ -1,9 +1,32 @@
 require 'spec_helper'
 
 describe PullRequestsController do
-  let(:project) { Factory.create(:project) }
+  let!(:repository) { Factory.create(:repository, :url => "git@git.squareup.com:square/web.git") }
 
-  describe "post /build/:id" do
+  describe "post /pull-request-builder" do
+    it "creates the pull request project" do
+      expect {
+        post :build, 'payload' => payload
+        response.should be_success
+      }.to change(Project, :count).by(1)
+      Project.last.repository.should == repository
+      Project.last.name.should == "web-pull_requests"
+    end
+    it "creates a build for a pull request" do
+      expect {
+        post :build, 'payload' => payload
+        response.should be_success
+      }.to change(Build, :count).by(1)
+      build = Build.last
+      build.branch.should == "branch-name"
+      build.ref.should == "Some-sha"
+      build.queue.should == :developer
+    end
+  end
+
+  describe "post /pull-request-builder/:id" do
+    let(:project) { Factory.create(:project, :name => "web-pull_requests", :repository => repository) }
+
     it "creates a build for a pull request" do
       expect {
         post :build, :id => project.id, 'payload' => payload
@@ -50,7 +73,7 @@ describe PullRequestsController do
   end
 
   def payload(options = {})
-    defaults = {
+    {
       "pull_request" => {
         "head" => {
           "sha" => "Some-sha",
@@ -58,6 +81,9 @@ describe PullRequestsController do
         },
         "body" => "best pull request ever !BUILDME",
         "title" => "this is a pull request",
+      },
+      "repository" => {
+        "ssh_url" => "git@git.squareup.com:square/web.git",
       },
       "action" => "synchronize",
     }.deep_merge(options).to_json

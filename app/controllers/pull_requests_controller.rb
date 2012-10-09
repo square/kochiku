@@ -2,7 +2,8 @@ class PullRequestsController < ApplicationController
   skip_before_filter :verify_authenticity_token, :only => [:build]
 
   def build
-    project = Project.find(params[:id])
+    repository = Repository.find_by_url(payload['repository']['ssh_url'])
+    project = repository.projects.find_or_create_by_name(repository.repository_name + "-pull_requests")
     if active_pull_request? && build_requested?
       sha = payload["pull_request"]["head"]["sha"]
       branch = payload["pull_request"]["head"]["ref"]
