@@ -18,8 +18,8 @@
       %span.state{:class => 'build-' + build.state.to_s}= build.state.to_s.capitalize
       on
       %span.queue= build.queue.to_s.capitalize
-    - if @project.name == 'web'
-      %a.info{:href => show_link_to_compare(build.previous_successful_build.try(:ref), build.ref), :title => 'show changes since last green build'}
+    - if @project.main_build?
+      %a.info{:href => show_link_to_compare(build, build.previous_successful_build.try(:ref), build.ref), :title => 'show changes since last green build'}
         Compare to last green build
     - elsif build.succeeded?
       %a.info{:href => show_link_to_create_pull_request(build), :title => 'create a pull request against master'}

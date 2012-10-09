@@ -64,7 +64,8 @@ end
 
 describe "requesting a developer build", :type => :request do
   before :each do
-    @project = FactoryGirl.create(:project)
+    repository = FactoryGirl.create(:repository, :url => "git@git.squareup.com:square/kochiku.git")
+    @project = FactoryGirl.create(:project, :name => "kochiku", :repository => repository)
   end
   
   it "creates a new build if a sha is given" do

@@ -1,10 +1,10 @@
-- if @project.name != 'web'   # temporary hack until a field is added to project to indicate that it is not a developer project
+- if !@project.main_build?
   - content_for :header do
     = form_for @build, :url => request_project_builds_path(@project) do |f|
       =  f.text_field :ref, {:placeholder => 'SHA to build', :class => 'sha', :autocapitalize => 'off', :autocorrect => 'off', :spellcheck => 'false'}
       =  f.submit "Build", {:class => 'build-button'}
 
-- if @project.name == 'web'
+- if @project.main_build?
   %h2.subheader Build time (min)
   #plot
 
@@ -13,6 +13,6 @@
 .builds
   = render @builds
 
-- if @project.name == 'web'
+- if @project.main_build?
   :javascript
     $(document).ready(Kochiku.graphBuildTimes("#{escape_javascript @project.name}"));
