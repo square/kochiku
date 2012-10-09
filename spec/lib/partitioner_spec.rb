@@ -33,7 +33,7 @@ describe Partitioner do
       File.stub(:exist?).with(Partitioner::BUILD_YML).and_return(false)
       partitions = partitioner.partitions
       partitions.size.should == 1
-      partitions.first["type"].should == "rspec"
+      partitions.first["type"].should == "spec"
       partitions.first["files"].should_not be_empty
     end
   end

@@ -8,7 +8,7 @@ class Partitioner
     elsif File.exist?(BUILD_YML)
       YAML.load_file(BUILD_YML).values.select { |part| part['type'].present? }
     else
-      partitions_for({"type" => "rspec", "glob" => "spec/**/*_spec.rb", "workers" => 1})
+      partitions_for({"type" => "spec", "glob" => "spec/**/*_spec.rb", "workers" => 1})
     end
   end
 
