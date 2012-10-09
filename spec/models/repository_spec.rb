@@ -39,4 +39,16 @@ describe Repository do
       repo.repository_name.should == "kochiku-name"
     end
   end
+
+  context "#repo_cache_name" do
+    it "returns the cache from the settings or the default from the repo name" do
+      repository = Repository.new(:options => {:tmp_dir => "foobar"})
+      repository.repo_cache_name.should == "foobar"
+    end
+
+    it "returns the cache from the settings or the default from the repo name" do
+      repository = Repository.new(:url => "https://git.squareup.com/square/kochiku")
+      repository.repo_cache_name.should == "kochiku-cache"
+    end
+  end
 end

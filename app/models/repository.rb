@@ -22,6 +22,10 @@ class Repository < ActiveRecord::Base
     github_url_params[:repository]
   end
 
+  def repo_cache_name
+    options.with_indifferent_access["tmp_dir"] || "#{repository_name}-cache"
+  end
+
   private
   def github_url_params
     parser = URL_PARSERS[url.slice(0,4)]
