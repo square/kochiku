@@ -6,7 +6,7 @@ class BuildPartitioningJob < JobBase
   end
 
   def perform
-    GitRepo.inside_copy("web-cache", @build.ref) do
+    GitRepo.inside_copy(@build.repository.repo_cache_name, @build.ref) do
       @build.partition(Partitioner.new.partitions)
       GithubCommitStatus.new(@build).update_commit_status!
     end

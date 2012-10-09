@@ -11,12 +11,12 @@ class BuildStateUpdateJob < JobBase
     Rails.logger.info("Build #{build.id} state is now #{build.state}")
 
     if build.promotable?
-      GitRepo.inside_repo("web-cache") do
+      GitRepo.inside_repo(build.repository.repo_cache_name) do
         build.promote!
       end
     elsif build.auto_merge_enabled?
       if build.auto_mergable?
-        GitRepo.inside_repo("web-cache") do
+        GitRepo.inside_repo(build.repository.repo_cache_name) do
           build.auto_merge!
         end
       else
