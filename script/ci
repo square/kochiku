@@ -1,0 +1,17 @@
+#!/usr/bin/env bash
+
+echo Command: $0 $*
+echo square/web is at `pwd`
+echo
+echo "Environment:"
+env
+echo
+
+# set -ex: make script verbose and exit on first failed command
+set -ex
+
+gem install bundler
+bundle
+rake db:drop db:create db:migrate
+rake db:test:prepare
+bundle exec rspec
