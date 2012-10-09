@@ -5,8 +5,10 @@ class Partitioner
   def partitions
     if File.exist?(KOCHIKU_YML)
       YAML.load_file(KOCHIKU_YML).map { |subset| partitions_for(subset) }.flatten
-    else
+    elsif File.exist?(BUILD_YML)
       YAML.load_file(BUILD_YML).values.select { |part| part['type'].present? }
+    else
+      partitions_for({"type" => "rspec", "glob" => "spec/**/*_spec.rb", "workers" => 1})
     end
   end
 

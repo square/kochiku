@@ -7,6 +7,7 @@ describe Partitioner do
     YAML.stub(:load_file).with(Partitioner::BUILD_YML).and_return(build_yml)
     YAML.stub(:load_file).with(Partitioner::KOCHIKU_YML).and_return(kochiku_yml)
     File.stub(:exist?).with(Partitioner::KOCHIKU_YML).and_return(kochiku_yml_exists)
+    File.stub(:exist?).with(Partitioner::BUILD_YML).and_return(build_yml_exists)
   end
 
   let(:build_yml) {{
@@ -21,8 +22,21 @@ describe Partitioner do
     { 'type' => 'rspec', 'glob' => 'spec/**/*_spec.rb', 'workers' => 3, 'balance' => balance, 'manifest' => manifest }
   ]}
 
+  let(:build_yml_exists) { true }
   let(:balance) { 'alphabetically' }
   let(:manifest) { nil }
+
+  context "when there is no config yml" do
+    let(:kochiku_yml_exists) { false }
+    it "should return a single partiion" do
+      File.stub(:exist?).with(Partitioner::KOCHIKU_YML).and_return(false)
+      File.stub(:exist?).with(Partitioner::BUILD_YML).and_return(false)
+      partitions = partitioner.partitions
+      partitions.size.should == 1
+      partitions.first["type"].should == "rspec"
+      partitions.first["files"].should_not be_empty
+    end
+  end
 
   describe '#partitions' do
     subject { partitioner.partitions }
