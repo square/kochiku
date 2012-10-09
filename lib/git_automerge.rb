@@ -1,4 +1,5 @@
 class UnableToMergeError < StandardError; end
+require 'open3'
 
 class GitAutomerge
   def automerge(build)
