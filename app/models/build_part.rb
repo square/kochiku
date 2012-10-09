@@ -14,7 +14,7 @@ class BuildPart < ActiveRecord::Base
       "build_kind" => self.kind,
       "build_ref" => build_instance.ref,
       "test_files" => self.paths,
-      "repo_name" => self.project.repository.repository_name,
+      "repo_name" => self.project.repository.repo_cache_name,
       "test_command" => self.project.repository.test_command,
       "repo_url" => self.project.repository.url,
     }
