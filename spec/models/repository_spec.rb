@@ -32,4 +32,11 @@ describe Repository do
       repo.base_html_url.should == "https://git.squareup.com/square/kochiku"
     end
   end
+
+  context "#repository_name" do
+    it "returns the repositories name" do
+      repo = Repository.new(:url => "git://git.squareup.com/square/kochiku-name.git")
+      repo.repository_name.should == "kochiku-name"
+    end
+  end
 end

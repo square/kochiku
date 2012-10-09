@@ -24,6 +24,10 @@ class Project < ActiveRecord::Base
     self.name.downcase
   end
 
+  def main_build?
+    self.name == repository.repository_name
+  end
+
   private
 
   def execute(sql)

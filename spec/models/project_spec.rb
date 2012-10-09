@@ -1,6 +1,18 @@
 require 'spec_helper'
 
 describe Project do
+  describe "#main_build?" do
+    let(:repository) {Factory.create(:repository, :url => "git@git.squareup.com:square/kochiku.git")}
+    it "returns true when the projects name is the same as the repo" do
+      project = Factory.create(:project, :name => "kochiku", :repository => repository)
+      project.main_build?.should be_true
+    end
+    it "returns false when the projects name different then the repo" do
+      project = Factory.create(:project, :name => "web", :repository => repository)
+      project.main_build?.should be_false
+    end
+  end
+
   describe '#build_time_history' do
     subject { project.build_time_history }
 

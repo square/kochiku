@@ -18,6 +18,10 @@ class Repository < ActiveRecord::Base
     "https://#{params[:host]}/api/v3/repos/#{params[:username]}/#{params[:repository]}"
   end
 
+  def repository_name
+    github_url_params[:repository]
+  end
+
   private
   def github_url_params
     parser = URL_PARSERS[url.slice(0,4)]
