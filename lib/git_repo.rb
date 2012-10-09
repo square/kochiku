@@ -1,10 +1,16 @@
+require 'cocaine'
+require 'fileutils'
+
 class GitRepo
   WORKING_DIR = Rails.root.join('tmp', 'build-partition')
 
   class << self
-    def inside_copy(cached_repo_name, ref = "master")
-      cached_repo_path = WORKING_DIR.join(cached_repo_name)
+    def inside_copy(repository, ref = "master")
+      cached_repo_path = File.join(WORKING_DIR, repository.repo_cache_name)
 
+      if !File.directory?(cached_repo_path)
+        clone_repo(repository.repo_url, cached_repo_path)
+      end
       Dir.chdir(cached_repo_path) do
         # update the cached repo
         synchronize_with_remote
@@ -33,10 +39,13 @@ class GitRepo
       end
     end
 
-    def inside_repo(cached_repo_name)
-      cached_repo_path = File.join(WORKING_DIR, cached_repo_name)
+    def inside_repo(repository)
+      cached_repo_path = File.join(WORKING_DIR, repository.repo_cache_name)
 
-      FileUtils.mkdir_p(cached_repo_path)
+      if !File.directory?(cached_repo_path)
+        clone_repo(repository.url, cached_repo_path)
+      end
+
       Dir.chdir(cached_repo_path) do
         synchronize_with_remote
 
@@ -53,6 +62,10 @@ class GitRepo
       unless system(cmd)
         raise "non-0 exit code #{$?} returned from [#{cmd}]"
       end
+    end
+
+    def clone_repo(repo_url, cached_repo_path)
+      Cocaine::CommandLine.new("git clone", "--recursive #{repo_url} #{cached_repo_path}").run
     end
 
     def synchronize_with_remote(name = 'origin')
