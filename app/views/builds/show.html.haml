@@ -10,11 +10,11 @@
     on
     %span.queue= @build.queue.to_s.capitalize
   - if @build.succeeded? && @project.name != 'web'
-    %a.info{:href => show_link_to_create_pull_request(@build.ref), :title => 'create a pull request against master'}
+    %a.info{:href => show_link_to_create_pull_request(@build), :title => 'create a pull request against master'}
       Create pull request
   %span.info= "Created #{time_ago_in_words @build.created_at} ago"
   %span.info= "Updated #{time_ago_in_words @build.updated_at} ago"
-  %a.info.last{:href => show_link_to_commit(@build.ref)}
+  %a.info.last{:href => show_link_to_commit(@build)}
     Show HEAD commit
 %table.build-summary#build-summary
   %thead

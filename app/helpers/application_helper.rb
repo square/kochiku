@@ -30,15 +30,15 @@ module ApplicationHelper
     end
   end
 
-  def show_link_to_commit(commit_hash)
-    "https://git.squareup.com/square/web/commit/#{commit_hash}"
+  def show_link_to_commit(build)
+    "#{build.repository.base_html_url}/commit/#{build.ref}"
   end
 
-  def show_link_to_compare(first_commit_hash, second_commit_hash)
-    "https://git.squareup.com/square/web/compare/#{first_commit_hash}...#{second_commit_hash}#files_bucket"
+  def show_link_to_compare(build, first_commit_hash, second_commit_hash)
+    "#{build.repository.base_html_url}/compare/#{first_commit_hash}...#{second_commit_hash}#files_bucket"
   end
 
-  def show_link_to_create_pull_request(commit_hash)
-    "https://git.squareup.com/square/web/pull/new/square:master...#{commit_hash}"
+  def show_link_to_create_pull_request(build)
+    "#{build.repository.base_html_url}/pull/new/square:master...#{build.ref}"
   end
 end

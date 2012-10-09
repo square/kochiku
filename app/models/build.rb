@@ -1,5 +1,6 @@
 class Build < ActiveRecord::Base
   belongs_to :project, :inverse_of => :builds
+  has_one :repository, :through => :project
   has_many :build_parts, :dependent => :destroy, :inverse_of => :build_instance do
     def last_attempt_in_state(state)
       joins(:build_attempts).joins("LEFT JOIN build_attempts AS r ON build_attempts.build_part_id = r.build_part_id AND build_attempts.id < r.id").where("build_attempts.state" => state, "r.build_part_id" => nil)

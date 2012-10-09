@@ -3,11 +3,14 @@ require 'spec_helper'
 describe ApplicationHelper do
   include ActionView::Helpers
   include Haml::Helpers
+  let(:project) { Factory.create(:project, :repository => repository)}
+  let(:repository) { Factory.create(:repository, :url => "git@git.squareup.com:square/web.git")}
+
+  before do
+    @build = Build.new(:ref => "SHA1", :project => project)
+  end
 
   describe "#build_success_in_words" do
-    before do
-      @build = Build.new
-    end
 
     it "should return success when state = :succeeded" do
       @build.state = :succeeded
@@ -32,19 +35,19 @@ describe ApplicationHelper do
 
   describe "#show_link_to_commit" do
     it "should create a url to github based on config" do
-      show_link_to_commit('SHA1').should == 'https://git.squareup.com/square/web/commit/SHA1'
+      show_link_to_commit(@build).should == 'https://git.squareup.com/square/web/commit/SHA1'
     end
   end
 
   describe "#show_link_to_compare" do
     it "creates a url to github showing the diff between 2 SHAs" do
-      show_link_to_compare('SHA1', 'SHA2').should == 'https://git.squareup.com/square/web/compare/SHA1...SHA2#files_bucket'
+      show_link_to_compare(@build, 'SHA1', 'SHA2').should == 'https://git.squareup.com/square/web/compare/SHA1...SHA2#files_bucket'
     end
   end
 
   describe "#show_link_to_create_pull_request" do
     it "creates a url to github for a pull request" do
-      show_link_to_create_pull_request('SHA1').should == 'https://git.squareup.com/square/web/pull/new/square:master...SHA1'
+      show_link_to_create_pull_request(@build).should == 'https://git.squareup.com/square/web/pull/new/square:master...SHA1'
     end
   end
 end
