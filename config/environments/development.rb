@@ -40,4 +40,5 @@ Kochiku::Application.configure do
 
   config.sass.preferred_syntax = :sass
   Rails.application.routes.default_url_options[:host] = "localhost:3000"
+  config.action_mailer.default_url_options = {:host => "localhost:3000"}
 end

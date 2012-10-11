@@ -11,5 +11,6 @@ describe BuildPartTimeOutMailer do
     ActionMailer::Base.deliveries.should_not be_empty
     email.to.should include("build-and-release+timeouts@squareup.com")
     email.body.should include("test-builder")
+    email.body.should include("http://")
   end
 end
