@@ -26,6 +26,9 @@ class BuildsController < ApplicationController
     end
   end
 
+  def rebuild_failed
+  end
+
   # Used to request a developer build through the Web UI
   def request_build
     if developer_build.save

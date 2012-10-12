@@ -25,7 +25,10 @@
       %th Build Host
       %th Elapsed Time
       %th Attempt #
-      %th Actions
+      - if @build.failed?
+        %th= link_to("Rebuild All", rebuild_failed_project_build_path(@project, @build), :method => :post)
+      - else
+        %th Actions
   %tbody
     - @build.build_parts.each do |part|
       %tr{:class => cycle("odd-row", "even-row")}
