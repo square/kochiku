@@ -51,4 +51,14 @@ describe Repository do
       repository.repo_cache_name.should == "kochiku-cache"
     end
   end
+
+  context "#build_pull_requests=" do
+    it "converts the checkbox to bool" do
+      repository = Factory.create(:repository)
+      repository.build_pull_requests="1"
+      repository.build_pull_requests.should == true
+      repository.build_pull_requests="0"
+      repository.build_pull_requests.should == false
+    end
+  end
 end

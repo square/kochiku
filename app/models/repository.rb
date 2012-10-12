@@ -26,8 +26,8 @@ class Repository < ActiveRecord::Base
     options.with_indifferent_access["tmp_dir"] || "#{repository_name}-cache"
   end
 
-  def build_pull_requests=(bool)
-    options["build_pull_requests"] = bool
+  def build_pull_requests=(checkstate)
+    options["build_pull_requests"] = (checkstate == "1")
   end
 
   def build_pull_requests

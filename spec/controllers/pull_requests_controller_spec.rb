@@ -23,7 +23,7 @@ describe PullRequestsController do
       build.queue.should == :developer
     end
     it "will enqueue a build if autobuild pull requests is enabled" do
-      repository.build_pull_requests = true
+      repository.build_pull_requests = "1"
       repository.save!
       github_payload = payload("pull_request" => {
         "head" => { "sha" => "Some-sha", "ref" => "branch-name" },
