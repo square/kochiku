@@ -52,13 +52,54 @@ describe Repository do
     end
   end
 
+  context "#run_ci=" do
+    it "converts the checkbox to bool" do
+      repository = Factory.create(:repository)
+      repository.run_ci="1"
+      repository.save
+      repository.reload
+      repository.run_ci.should == true
+      repository.run_ci="0"
+      repository.save
+      repository.reload
+      repository.run_ci.should == false
+    end
+  end
+
   context "#build_pull_requests=" do
     it "converts the checkbox to bool" do
       repository = Factory.create(:repository)
       repository.build_pull_requests="1"
+      repository.save
+      repository.reload
       repository.build_pull_requests.should == true
       repository.build_pull_requests="0"
+      repository.save
+      repository.reload
       repository.build_pull_requests.should == false
     end
+  end
+
+  context "#use_branches_on_green=" do
+    it "converts the checkbox to bool" do
+      repository = Factory.create(:repository)
+      repository.use_branches_on_green="1"
+      repository.save
+      repository.reload
+      repository.use_branches_on_green.should == true
+      repository.use_branches_on_green="0"
+      repository.save
+      repository.reload
+      repository.use_branches_on_green.should == false
+    end
+  end
+
+  it "saves build tags" do
+    repository = Factory.create(:repository)
+    repository.on_green_update.should be_nil
+    repository.on_green_update="1,2,3"
+    repository.save
+    repository.reload
+    repository.on_green_update.should == "1,2,3"
   end
 end
