@@ -1,5 +1,5 @@
 class BuildsController < ApplicationController
-  before_filter :load_project, :only => [:show, :abort, :build_status, :abort_auto_merge]
+  before_filter :load_project, :only => [:show, :abort, :build_status, :abort_auto_merge, :rebuild_failed]
   skip_before_filter :verify_authenticity_token, :only => [:create]
 
   def show
@@ -27,6 +27,10 @@ class BuildsController < ApplicationController
   end
 
   def rebuild_failed
+    @build = @project.builds.find(params[:id], :include => {:build_parts => :build_attempts})
+    @build.build_parts.failed.each { |part| part.rebuild! }
+
+    redirect_to [@project, @build]
   end
 
   # Used to request a developer build through the Web UI
