@@ -1,0 +1,11 @@
+= form_for @repository, :url => @url do |f|
+  %div
+    %label{:for => "url"} Repository Url:
+    =  f.text_field :url, {:placeholder => '', :autocapitalize => 'off', :autocorrect => 'off', :spellcheck => 'false'}
+  %div
+    %label{:for => "test_command"} Test Command:
+    =  f.text_field :test_command, {:placeholder => 'script/ci', :autocapitalize => 'off', :autocorrect => 'off', :spellcheck => 'false'}
+  %div
+    %label{:for => "build_pull_requests"} Auto-build pull requests:
+    =  f.check_box :build_pull_requests, {:id => "build_pull_requests"}
+  =  f.submit "Update", {:class => 'build-button'}
