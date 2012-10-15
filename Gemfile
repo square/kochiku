@@ -22,6 +22,7 @@ gem "system_timer", :platforms => :mri_18    # used by redis gem
 gem "chunky_png"
 gem "cocaine"
 gem "awesome_print", :require => false
+gem "nokogiri"
 
 group :assets do
   gem 'compass-rails'
@@ -50,6 +51,5 @@ end
 
 group :test do
   gem "webmock", :require => false
-  gem "nokogiri", :require => false
   gem "capybara"
 end
