@@ -1,7 +1,7 @@
 class Partitioner
   BUILD_YML   = 'config/ci/build.yml'
   KOCHIKU_YML = 'config/ci/kochiku.yml'
-  POM_XML = 'pom.yml'
+  POM_XML = 'pom.xml'
 
   def partitions
     if File.exist?(KOCHIKU_YML)
