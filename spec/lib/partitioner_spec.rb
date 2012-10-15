@@ -6,6 +6,7 @@ describe Partitioner do
   before do
     YAML.stub(:load_file).with(Partitioner::BUILD_YML).and_return(build_yml)
     YAML.stub(:load_file).with(Partitioner::KOCHIKU_YML).and_return(kochiku_yml)
+    File.stub(:exist?).with(Partitioner::POM_XML).and_return(pom_xml_exists)
     File.stub(:exist?).with(Partitioner::KOCHIKU_YML).and_return(kochiku_yml_exists)
     File.stub(:exist?).with(Partitioner::BUILD_YML).and_return(build_yml_exists)
   end
@@ -22,6 +23,7 @@ describe Partitioner do
     { 'type' => 'rspec', 'glob' => 'spec/**/*_spec.rb', 'workers' => 3, 'balance' => balance, 'manifest' => manifest }
   ]}
 
+  let(:pom_xml_exists) { false }
   let(:build_yml_exists) { true }
   let(:balance) { 'alphabetically' }
   let(:manifest) { nil }
@@ -40,6 +42,25 @@ describe Partitioner do
 
   describe '#partitions' do
     subject { partitioner.partitions }
+
+    context 'when there is a pom.xml' do
+      let(:kochiku_yml_exists) { false }
+      let(:build_yml_exists) { false }
+      let(:pom_xml_exists) { true }
+      before do
+        sample_pom = File.read(Rails.root.join("spec/fixtures/sample_pom.xml"))
+        File.stub(:read).with(Partitioner::POM_XML).and_return(sample_pom)
+      end
+
+      it "should return a list of targets" do
+        partitions = subject
+        partitions.size.should == 170
+        partitions.each do |partition|
+          partition.should have_key("type")
+          partition["files"].should_not be_empty
+        end
+      end
+    end
 
     context 'when there is not a kochiku.yml' do
       let(:kochiku_yml_exists) { false }

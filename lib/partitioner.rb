@@ -1,18 +1,29 @@
 class Partitioner
   BUILD_YML   = 'config/ci/build.yml'
   KOCHIKU_YML = 'config/ci/kochiku.yml'
+  POM_XML = 'pom.yml'
 
   def partitions
     if File.exist?(KOCHIKU_YML)
       YAML.load_file(KOCHIKU_YML).map { |subset| partitions_for(subset) }.flatten
     elsif File.exist?(BUILD_YML)
       YAML.load_file(BUILD_YML).values.select { |part| part['type'].present? }
+    elsif File.exist?(POM_XML)
+      maven_targets(File.read(POM_XML))
     else
       [{"type" => "spec", "files" => ['no-manifest']}]
     end
   end
 
   private
+  def maven_targets(pom_xml)
+    Nokogiri::XML(pom_xml).css('project modules module').map {|partition|
+      {
+        'type' => 'maven',
+        'files' => [partition.text]
+      }
+    }
+  end
 
   def partitions_for(subset)
     glob     = subset.fetch('glob')
