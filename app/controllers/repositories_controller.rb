@@ -3,6 +3,7 @@ class RepositoriesController < ApplicationController
     repository = Repository.find_or_initialize_by_url(params[:repository][:url])
     repository.update_attributes!(params[:repository])
     project = repository.projects.find_or_create_by_name("#{repository.repository_name}-pull_requests")
+    project = repository.projects.find_or_create_by_name(repository.repository_name)
     redirect_to project_url(project)
   end
 

@@ -11,6 +11,15 @@ describe RepositoriesController do
       Repository.last.url.should == "git@git.squareup.com:square/kochiku.git"
       Repository.last.test_command.should == "script/something"
     end
+
+    it "creates a ci project" do
+      expect{
+        post :create, :repository => {:url => "git@git.squareup.com:square/kochiku.git", :test_command => "script/something"}
+        response.should be_redirect
+      }.to change(Project, :count).by(2)
+      Repository.last.projects.size.should == 2
+      Repository.last.projects.map(&:name).sort.should == ["kochiku", "kochiku-pull_requests"]
+    end
   end
 
   describe "put /repositories/:id" do
