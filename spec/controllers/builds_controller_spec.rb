@@ -185,4 +185,47 @@ describe BuildsController do
       @build.reload.auto_merge.should be_false
     end
   end
+
+  describe "#rebuild_failed_parts" do
+    let(:build) { FactoryGirl.create(:build) }
+    let(:parts) { (1..3).map { FactoryGirl.create(:build_part, :build_instance => build) } }
+
+    subject { post :rebuild_failed_parts, :project_id => build.project.to_param, :id => build.id }
+
+    context "happy path" do
+      before do
+        @attempt_1 = FactoryGirl.create(:build_attempt, :build_part => parts[0], :state => :failed)
+        @attempt_2 = FactoryGirl.create(:build_attempt, :build_part => parts[1], :state => :failed)
+        @attempt_3 = FactoryGirl.create(:build_attempt, :build_part => parts[1], :state => :failed)
+        @attempt_4 = FactoryGirl.create(:build_attempt, :build_part => parts[2], :state => :passed)
+      end
+
+      it "rebuilds all failed attempts" do
+        build.build_parts.failed.count.should == 2
+        subject
+        build.reload.build_parts.failed.count.should be_zero
+        build.build_attempts.count.should == 6
+      end
+
+      it "only enqueues one build attempt for each failed build part" do
+        subject
+        parts[0].reload.build_attempts.count.should == 2
+        parts[1].reload.build_attempts.count.should == 3
+
+        expect {
+          # repost to test idempotency
+          post :rebuild_failed_parts, :project_id => build.project.to_param, :id => build.id
+        }.to_not change(BuildAttempt, :count)
+      end
+    end
+
+    context "an successful prior build attempt should not be rebuilt" do
+      it "does something" do
+        attempt_1 = FactoryGirl.create(:build_attempt, :build_part => parts[1], :state => :passed)
+        attempt_2 = FactoryGirl.create(:build_attempt, :build_part => parts[1], :state => :failed)
+
+        expect { subject }.to_not change(BuildAttempt, :count)
+      end
+    end
+  end
 end

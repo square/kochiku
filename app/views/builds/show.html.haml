@@ -16,6 +16,10 @@
   %span.info= "Updated #{time_ago_in_words @build.updated_at} ago"
   %a.info.last{:href => show_link_to_commit(@build)}
     Show HEAD commit
+  - if @build.failed?
+    = button_to "Rebuild All", rebuild_failed_parts_project_build_path(@project, @build), :method => :post, :form_class => "rebuild-parts"
+
+
 %table.build-summary#build-summary
   %thead
     %tr
