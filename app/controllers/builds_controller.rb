@@ -1,5 +1,5 @@
 class BuildsController < ApplicationController
-  before_filter :load_project, :only => [:show, :abort, :build_status, :abort_auto_merge, :rebuild_failed]
+  before_filter :load_project, :only => [:show, :abort, :build_status, :abort_auto_merge, :rebuild_failed_parts]
   skip_before_filter :verify_authenticity_token, :only => [:create]
 
   def show
@@ -26,7 +26,7 @@ class BuildsController < ApplicationController
     end
   end
 
-  def rebuild_failed
+  def rebuild_failed_parts
     @build = @project.builds.find(params[:id], :include => {:build_parts => :build_attempts})
     @build.build_parts.failed.each { |part| part.rebuild! }
 

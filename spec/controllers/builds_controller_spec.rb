@@ -186,7 +186,7 @@ describe BuildsController do
     end
   end
 
-  describe "#rebuild_failed" do
+  describe "#rebuild_failed_parts" do
     before do
       @build = FactoryGirl.create(:build)
       @parts = (1..3).map { FactoryGirl.create(:build_part, :build_instance => @build) }
@@ -198,7 +198,7 @@ describe BuildsController do
 
     it "rebuilds all failed attempts" do
       @build.build_parts.failed.count.should == 2
-      post :rebuild_failed, :project_id => @build.project.to_param, :id => @build.id
+      post :rebuild_failed_parts, :project_id => @build.project.to_param, :id => @build.id
       @build.reload.build_parts.failed.count.should be_zero
       @build.build_attempts.count.should == 6
     end

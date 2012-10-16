@@ -14,7 +14,7 @@ Kochiku::Application.routes.draw do
       post 'abort-auto-merge', :action => "abort_auto_merge", :on => :member, :as => :abort_auto_merge
       put 'abort', :action => "abort", :on => :member
       get 'status', :action => "build_status", :on => :member, :defaults => { :format => 'json' }
-      post 'rebuild-failed', :action => "rebuild_failed", :on => :member, :as => :rebuild_failed
+      post 'rebuild-failed-parts', :action => "rebuild_failed_parts", :on => :member, :as => :rebuild_failed_parts
       resources :build_parts, :as => 'parts', :path => 'parts', :only => [:show] do
         post 'rebuild', :on => :member
       end
