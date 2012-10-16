@@ -12,6 +12,7 @@ Kochiku.graphBuildTimes = function(projectName) {
       {color: '#00802D', data: data.cucumber},
       {color: '#2D80C5', data: data.spec},
       {color: '#F8DE7E', data: data.jasmine},
+      {color: '#00802D', data: data.maven}
     ], {
       lines: {
         show: true,
@@ -27,7 +28,7 @@ Kochiku.graphBuildTimes = function(projectName) {
       yaxis: {
         min: 0,
         max: 50
-      },
+      }
     });
   });
 };
