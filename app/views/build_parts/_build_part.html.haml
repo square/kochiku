@@ -8,6 +8,8 @@
         Cukes
       - elsif build_part.kind == "jasmine"
         Jasmine
+      - elsif build_part.kind == "maven"
+        Maven
     - if build_part.build_attempts.any?
       .attempts
         = render build_part.last_attempt
