@@ -5,7 +5,6 @@ class Repository < ActiveRecord::Base
     "http" => /https?:\/\/(.*)\/(.*)\/([^.]*)\.?/,
   }
   has_many :projects
-  serialize :options, Hash
   validates_presence_of :url
 
   def base_html_url
@@ -23,15 +22,11 @@ class Repository < ActiveRecord::Base
   end
 
   def repo_cache_name
-    options.with_indifferent_access["tmp_dir"] || "#{repository_name}-cache"
+    repo_cache_dir || "#{repository_name}-cache"
   end
 
   def promotion_refs
     on_green_update.split(",")
-  end
-
-  def use_spec_and_ci_queues
-    options["use_spec_and_ci_queues"]
   end
 
   private

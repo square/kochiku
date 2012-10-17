@@ -28,8 +28,7 @@ describe BuildPart do
     end
 
     it "should enqueue the build attempt for building" do
-      repository.options["use_spec_and_ci_queues"] = true
-      repository.save!
+      repository.update_attributes!(:use_spec_and_ci_queues => true)
       # the queue name should include the queue name of the build instance and the type of the test file
       BuildAttemptJob.should_receive(:enqueue_on).once.with do |queue, arg_hash|
         queue.should == "ci-cucumber"

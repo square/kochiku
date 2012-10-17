@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20121017182543) do
+ActiveRecord::Schema.define(:version => 20121017184946) do
 
   create_table "build_artifacts", :force => true do |t|
     t.integer  "build_attempt_id"
@@ -73,7 +73,6 @@ ActiveRecord::Schema.define(:version => 20121017182543) do
   create_table "repositories", :force => true do |t|
     t.string   "url"
     t.string   "test_command"
-    t.text     "options"
     t.datetime "created_at",                  :null => false
     t.datetime "updated_at",                  :null => false
     t.integer  "github_post_receive_hook_id"
