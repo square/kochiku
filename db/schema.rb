@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20121008211955) do
+ActiveRecord::Schema.define(:version => 20121017173936) do
 
   create_table "build_artifacts", :force => true do |t|
     t.integer  "build_attempt_id"
@@ -48,13 +48,15 @@ ActiveRecord::Schema.define(:version => 20121008211955) do
     t.string   "ref"
     t.string   "state"
     t.string   "queue"
-    t.datetime "created_at", :null => false
-    t.datetime "updated_at", :null => false
+    t.datetime "created_at",          :null => false
+    t.datetime "updated_at",          :null => false
     t.integer  "project_id"
     t.boolean  "auto_merge"
     t.string   "branch"
+    t.integer  "equivalent_build_id"
   end
 
+  add_index "builds", ["equivalent_build_id"], :name => "index_builds_on_equivalent_build_id"
   add_index "builds", ["project_id"], :name => "index_builds_on_project_id"
 
   create_table "projects", :force => true do |t|
@@ -72,8 +74,9 @@ ActiveRecord::Schema.define(:version => 20121008211955) do
     t.string   "url"
     t.string   "test_command"
     t.text     "options"
-    t.datetime "created_at",   :null => false
-    t.datetime "updated_at",   :null => false
+    t.datetime "created_at",                  :null => false
+    t.datetime "updated_at",                  :null => false
+    t.integer  "github_post_receive_hook_id"
   end
 
   add_index "repositories", ["url"], :name => "index_repositories_on_url"
