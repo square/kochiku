@@ -29,6 +29,10 @@ class Repository < ActiveRecord::Base
     on_green_update.split(",").map(&:strip).reject(&:blank?)
   end
 
+  def interested_github_events
+    ['pull_request']
+  end
+
   private
   def github_url_params
     parser = URL_PARSERS[url.slice(0,4)]

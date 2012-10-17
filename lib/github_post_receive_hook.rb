@@ -5,7 +5,7 @@ class GithubPostReceiveHook
     @root_uri = URI("#{repository.base_api_url}/hooks")
     @hook_uri = URI("#{repository.base_api_url}/hooks/#{repository.github_post_receive_hook_id}")
     @receive_url = Rails.application.routes.url_helpers.pull_request_build_url
-    @interested_events = ['pull_request']
+    @interested_events = @repository.interested_github_events
     @subscribe_args = {:name => "web", :config => {:url => @receive_url}, :events => @interested_events, :active => true}
   end
 
