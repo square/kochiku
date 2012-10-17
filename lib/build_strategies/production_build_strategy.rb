@@ -8,7 +8,6 @@ class BuildStrategy
     def promote_build(build_ref, repository)
       repository.promotion_refs.each do |promotion_ref|
         unless included_in_promotion_ref?(build_ref, promotion_ref)
-          return if promotion_ref.strip.blank?
           if repository.use_branches_on_green
             Cocaine::CommandLine.new("git push", "origin :build_ref:refs/heads/#{promotion_ref} -f", :build_ref => build_ref).run
           else

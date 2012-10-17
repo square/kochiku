@@ -26,7 +26,7 @@ class Repository < ActiveRecord::Base
   end
 
   def promotion_refs
-    on_green_update.split(",")
+    on_green_update.split(",").map(&:strip).reject(&:blank?)
   end
 
   private

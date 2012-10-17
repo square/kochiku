@@ -1,6 +1,24 @@
 require 'spec_helper'
 
 describe Repository do
+  context "#promotion_refs" do
+    it "is an empty array when promotion_refs is a empty string" do
+      Repository.new(:on_green_update => "").promotion_refs.should == []
+    end
+
+    it "is an empty array when promotion_refs is a blank string" do
+      Repository.new(:on_green_update => "   ").promotion_refs.should == []
+    end
+
+    it "is an empty array when promotion_refs is comma" do
+      Repository.new(:on_green_update => "  , ").promotion_refs.should == []
+    end
+
+    it "splits on comma's" do
+      Repository.new(:on_green_update => "a,b,c").promotion_refs.should == ["a", "b", "c"]
+    end
+  end
+
   context "#base_api_url" do
     it "handles ssh urls" do
       repo = Repository.new(:url => "git@git.squareup.com:square/kochiku.git")
