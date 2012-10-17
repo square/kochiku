@@ -1,6 +1,15 @@
 require 'spec_helper'
 
 describe Repository do
+  context "#interested_github_events" do
+    it 'includes push if run_ci is enabled' do
+      Repository.new(:run_ci => true).interested_github_events.should == ['pull_request', 'push']
+    end
+    it 'does not include push if run_ci is enabled' do
+      Repository.new(:run_ci => false).interested_github_events.should == ['pull_request']
+    end
+  end
+
   context "#promotion_refs" do
     it "is an empty array when promotion_refs is a empty string" do
       Repository.new(:on_green_update => "").promotion_refs.should == []

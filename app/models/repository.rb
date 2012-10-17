@@ -30,7 +30,9 @@ class Repository < ActiveRecord::Base
   end
 
   def interested_github_events
-    ['pull_request']
+    event_types = ['pull_request']
+    event_types << 'push' if run_ci
+    event_types
   end
 
   private
