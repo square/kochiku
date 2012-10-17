@@ -31,6 +31,12 @@ class Build < ActiveRecord::Base
 
   scope :successful_for_project, lambda { |project_id| where(:project_id => project_id, :state => :succeeded) }
 
+  def test_command(run_list)
+    command = repository.test_command
+    command += " #{repository.command_flag}" unless run_list.include?(target_name)
+    command
+  end
+
   def previous_successful_build
     Build.successful_for_project(project_id).order("id DESC").where("id < ?", self.id).first
   end

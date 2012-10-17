@@ -5,6 +5,22 @@ describe Build do
   let(:build) { FactoryGirl.create(:build, :project => project, :queue => "developer") }
   let(:parts) { [{'type' => 'cucumber', 'files' => ['a', 'b']}, {'type' => 'rspec', 'files' => ['c', 'd']}] }
 
+  describe "#test_command" do
+    before do
+      project.repository.update_attributes!(:command_flag => "-Dsquareup.fastTestsOnly")
+    end
+    it "does not append a custom flag" do
+      build.target_name = "foo"
+      command = build.test_command(["foo"])
+      command.should_not include("-Dsquareup.fastTestsOnly")
+    end
+    it "a custom arg is appended" do
+      build.target_name = nil
+      command = build.test_command(["foo"])
+      command.should include("-Dsquareup.fastTestsOnly")
+    end
+  end
+
   describe "validations" do
     it "requires a ref to be set" do
       build.ref = nil

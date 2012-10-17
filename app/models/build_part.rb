@@ -15,7 +15,7 @@ class BuildPart < ActiveRecord::Base
       "build_ref" => build_instance.ref,
       "test_files" => self.paths,
       "repo_name" => self.project.repository.repo_cache_name,
-      "test_command" => self.project.repository.test_command,
+      "test_command" => self.build_instance.test_command(self.paths),
       "repo_url" => self.project.repository.url,
     }
     # TODO: this is a hack, please fix the following and restore this code to it's former glory.

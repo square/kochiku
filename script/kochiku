@@ -12,6 +12,9 @@ if ARGV.delete("--merge")
   auto_merge = "1"
 end
 
+if project_index = ARGV.index("--project")
+  target_name = ARGV[project_index + 1]
+end
 # If a ref is given as an argument, use that. Otherwise use the current commit
 commit_ish = "HEAD"
 branch = `git status -sb`.split("\n").first.gsub("## ", "")
@@ -43,8 +46,10 @@ params = {
   'build[branch]' => branch,
   'auto_merge' => auto_merge,
   'repo_url' => repo_url,
+  'build[target_name]' => target_name,
 }
 
 response = Net::HTTP.post_form(uri, params)
 puts response['location']
 `open -g #{response['location']}`
+
