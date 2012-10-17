@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20121017173936) do
+ActiveRecord::Schema.define(:version => 20121017182543) do
 
   create_table "build_artifacts", :force => true do |t|
     t.integer  "build_attempt_id"
@@ -77,6 +77,12 @@ ActiveRecord::Schema.define(:version => 20121017173936) do
     t.datetime "created_at",                  :null => false
     t.datetime "updated_at",                  :null => false
     t.integer  "github_post_receive_hook_id"
+    t.boolean  "run_ci"
+    t.boolean  "use_branches_on_green"
+    t.boolean  "build_pull_requests"
+    t.string   "on_green_update"
+    t.boolean  "use_spec_and_ci_queues"
+    t.string   "repo_cache_dir"
   end
 
   add_index "repositories", ["url"], :name => "index_repositories_on_url"

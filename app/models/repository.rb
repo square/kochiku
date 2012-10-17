@@ -26,40 +26,8 @@ class Repository < ActiveRecord::Base
     options.with_indifferent_access["tmp_dir"] || "#{repository_name}-cache"
   end
 
-  def run_ci=(checkstate)
-    options["run_ci"] = (checkstate == "1")
-  end
-
-  def run_ci
-    options["run_ci"]
-  end
-
-  def use_branches_on_green=(checkstate)
-    options["use_branches_on_green"] = (checkstate == "1")
-  end
-
-  def use_branches_on_green
-    options["use_branches_on_green"]
-  end
-
   def promotion_refs
-    options["on_green_update"]
-  end
-
-  def on_green_update=(tags)
-    options["on_green_update"] = tags.split(",")
-  end
-
-  def on_green_update
-    options["on_green_update"].join(",") if options["on_green_update"]
-  end
-
-  def build_pull_requests=(checkstate)
-    options["build_pull_requests"] = (checkstate == "1")
-  end
-
-  def build_pull_requests
-    options["build_pull_requests"]
+    on_green_update.split(",")
   end
 
   def use_spec_and_ci_queues
