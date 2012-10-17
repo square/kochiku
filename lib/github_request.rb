@@ -9,6 +9,10 @@ class GithubRequest
     make_request(:post, uri, [args.to_json, AUTH])
   end
 
+  def self.patch(uri, args)
+    make_request(:patch, uri, [args.to_json, AUTH])
+  end
+
   def self.get(uri)
     make_request(:get, uri, [AUTH])
   end
