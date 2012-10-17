@@ -1,4 +1,4 @@
-class BuildPartTimeOutMailer < ActionMailer::Base
+class BuildPartMailer < ActionMailer::Base
   BUILD_AND_RELEASE = 'build-and-release+timeouts@squareup.com'
 
   default :from => BUILD_AND_RELEASE
