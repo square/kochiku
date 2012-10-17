@@ -42,6 +42,10 @@ class Repository < ActiveRecord::Base
     options["use_branches_on_green"]
   end
 
+  def promotion_refs
+    options["on_green_update"] || ["ci-master-distributed-latest"]
+  end
+
   def on_green_update=(tags)
     options["on_green_update"] = tags.split(",")
   end

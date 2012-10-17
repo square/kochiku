@@ -7,12 +7,14 @@ class BuildStrategy
     # backwards by overwriting promotion_ref with build 1
     def promote_build(build_ref, repository)
       unless included_in_promotion_ref?(build_ref)
-        Cocaine::CommandLine.new("git push", "origin :build_ref:refs/heads/#{promotion_ref} -f", :build_ref => build_ref).run
+        repository.promotion_refs.each do |promotion_ref|
+          if repository.use_branches_on_green
+            Cocaine::CommandLine.new("git push", "origin :build_ref:refs/heads/#{promotion_ref} -f", :build_ref => build_ref).run
+          else
+            Cocaine::CommandLine.new("git push", "origin :build_ref:refs/tags/#{promotion_ref} -f", :build_ref => build_ref).run
+          end
+        end
       end
-    end
-
-    def promotion_ref
-      "ci-master-distributed-latest"
     end
 
     def merge_ref(build)
