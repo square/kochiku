@@ -43,7 +43,7 @@ class Repository < ActiveRecord::Base
   end
 
   def promotion_refs
-    options["on_green_update"] || ["ci-master-distributed-latest"]
+    options["on_green_update"]
   end
 
   def on_green_update=(tags)
