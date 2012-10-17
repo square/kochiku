@@ -8,4 +8,14 @@
   %div
     %label{:for => "build_pull_requests"} Auto-build pull requests:
     =  f.check_box :build_pull_requests, {:id => "build_pull_requests"}
+  %div
+    %label{:for => "run_ci"} Run Continuous Integration for repository:
+    =  f.check_box :run_ci, {:id => "run_ci"}
+  %div
+    %label{:for => "on_green_update"} On a green build tag (Comma Separated):
+    =  f.text_field :on_green_update, {:id => "on_green_update"}
+  %div
+    %label{:for => "use_branches_on_green"} Use Branches instead of tags:
+    =  f.check_box :use_branches_on_green, {:id => "use_branches_on_green"}
+
   =  f.submit "Update", {:class => 'build-button'}

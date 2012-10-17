@@ -50,7 +50,7 @@ describe BuildStateUpdateJob do
       end
 
       it "should promote the build" do
-        BuildStrategy.should_receive(:promote_build).with(@build.ref)
+        BuildStrategy.should_receive(:promote_build).with(@build.ref, @build.repository)
         BuildStateUpdateJob.perform(@build.id)
       end
 

@@ -105,7 +105,7 @@ class Build < ActiveRecord::Base
   end
 
   def promote!
-    BuildStrategy.promote_build(self.ref)
+    BuildStrategy.promote_build(self.ref, repository)
   end
 
   def completed?
