@@ -1,0 +1,11 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta content='text/html; charset=UTF-8' http-equiv='Content-Type'/>
+</head>
+<body>
+Build Part for <%= @build_part.project.name %> failed
+
+Go to <%= project_build_part_url(@build_part.build_instance.project, @build_part.build_instance, @build_part) %> for details
+</body>
+</html>

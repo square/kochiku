@@ -2,6 +2,7 @@ FactoryGirl.define do
   factory :project do
     sequence(:name) {|n| "Project_#{n}" }
     association :repository
+    branch "master"
 
     factory :big_rails_project do
       name "web"
