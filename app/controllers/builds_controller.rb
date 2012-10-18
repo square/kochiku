@@ -28,7 +28,7 @@ class BuildsController < ApplicationController
 
   def rebuild_failed_parts
     @build = @project.builds.find(params[:id], :include => {:build_parts => :build_attempts})
-    @build.build_parts.failed.each do |part|
+    @build.build_parts.failed_or_errored.each do |part|
       # There is an exceptional case in Kochiku where a build part's prior attempt may have
       # passed but the latest attempt failed. We do not want to rebuild those parts.
       part.rebuild! if part.unsuccessful?

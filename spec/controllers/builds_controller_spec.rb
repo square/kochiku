@@ -196,12 +196,12 @@ describe BuildsController do
       before do
         @attempt_1 = FactoryGirl.create(:build_attempt, :build_part => parts[0], :state => :failed)
         @attempt_2 = FactoryGirl.create(:build_attempt, :build_part => parts[1], :state => :failed)
-        @attempt_3 = FactoryGirl.create(:build_attempt, :build_part => parts[1], :state => :failed)
+        @attempt_3 = FactoryGirl.create(:build_attempt, :build_part => parts[1], :state => :errored)
         @attempt_4 = FactoryGirl.create(:build_attempt, :build_part => parts[2], :state => :passed)
       end
 
       it "rebuilds all failed attempts" do
-        build.build_parts.failed.count.should == 2
+        build.build_parts.failed_or_errored.count.should == 2
         subject
         build.reload.build_parts.failed.count.should be_zero
         build.build_attempts.count.should == 6
