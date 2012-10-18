@@ -1,3 +1,20 @@
+
+Emails this would have been sent to:
+<% @emails.each do |email| %>
+  <%= email %>
+<% end %>
+
 Build Part for <%= @build_part.project.name %> failed
 
 Go to <%= project_build_part_url(@build_part.build_instance.project, @build_part.build_instance, @build_part) %> for details
+
+Links to log files
+<% @artifacts.each do |artifact| %>
+  <%= link_to(File.basename(artifact.log_file.to_s), artifact.log_file.url) %>
+<% end %>
+
+--------------------------------------------------------------------------------
+Changes since last success
+--------------------------------------------------------------------------------
+
+<%= @git_changes %>

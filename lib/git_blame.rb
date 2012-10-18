@@ -5,11 +5,17 @@ class GitBlame
 
   class << self
     def emails_of_build_breakers(build)
-      names_and_emails_from_git = ungreen_name_emails_from_git(build).split("\n")
-      names_and_emails_from_git.map do |name_and_email_from_git|
-        name, email = name_and_email_from_git.split(":")
+      git_names_and_emails = git_names_and_emails_since_last_green(build).split("\n")
+      git_names_and_emails.map do |git_name_and_email|
+        name, email = git_name_and_email.split(":")
         Array(email_from_git_email(email)) | Array(email_from_git_name(name))
       end.flatten.compact.uniq
+    end
+
+    def git_changes_since_last_green(build)
+      GitRepo.inside_repo(build.repository) do
+        Cocaine::CommandLine.new("git log --no-merges #{build.previous_successful_build.try(:ref)}...#{build.ref}").run
+      end
     end
 
     private
@@ -54,7 +60,7 @@ class GitBlame
       @people_from_ldap ||= JSON.parse(HTTParty.get(PEOPLE_JSON_URL))
     end
 
-    def ungreen_name_emails_from_git(build)
+    def git_names_and_emails_since_last_green(build)
       GitRepo.inside_repo(build.repository) do
         Cocaine::CommandLine.new("git log --format=%an:%ae --no-merges #{build.previous_successful_build.try(:ref)}...#{build.ref}").run
       end

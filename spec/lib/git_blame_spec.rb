@@ -13,7 +13,7 @@ describe GitBlame do
 
     context "with many build breakers" do
       before do
-        GitBlame.stub(:ungreen_name_emails_from_git).and_return("User One:userone@example.com\nUser Two:usertwo@example.com")
+        GitBlame.stub(:git_names_and_emails_since_last_green).and_return("User One:userone@example.com\nUser Two:usertwo@example.com")
         GitBlame.stub(:people_from_ldap).and_return([{"First" => "User", "Last" => "One", "Email" => "userone@example.com"},
                                                      {"First" => "User", "Last" => "Two", "Email" => "usertwo@example.com"}])
       end
@@ -28,7 +28,7 @@ describe GitBlame do
       end
 
       it "will not return the same user twice" do
-        GitBlame.stub(:ungreen_name_emails_from_git).and_return("User One:userone@example.com\nUser One:userone@example.com")
+        GitBlame.stub(:git_names_and_emails_since_last_green).and_return("User One:userone@example.com\nUser One:userone@example.com")
         subject.should == ["userone@example.com"]
       end
     end
@@ -41,37 +41,37 @@ describe GitBlame do
       end
 
       it "should look up the users by their names" do
-        GitBlame.stub(:ungreen_name_emails_from_git).and_return("User Two:git+ut@git.squareup.com")
+        GitBlame.stub(:git_names_and_emails_since_last_green).and_return("User Two:git+ut@git.squareup.com")
         subject.should == ["usertwo@example.com"]
       end
 
       it "returns the emails of all users mentioned by name with and" do
-        GitBlame.stub(:ungreen_name_emails_from_git).and_return("User One and User Two:git+uo+ut@git.squareup.com")
+        GitBlame.stub(:git_names_and_emails_since_last_green).and_return("User One and User Two:git+uo+ut@git.squareup.com")
         subject.should == ["userone@example.com", "usertwo@example.com"]
       end
 
       it "returns the emails of all users mentioned by name with +" do
-        GitBlame.stub(:ungreen_name_emails_from_git).and_return("User One + User Two:git+uo+ut@git.squareup.com")
+        GitBlame.stub(:git_names_and_emails_since_last_green).and_return("User One + User Two:git+uo+ut@git.squareup.com")
         subject.should == ["userone@example.com", "usertwo@example.com"]
       end
 
       it "returns the emails of all users mentioned by name with 'and' and an oxford comma" do
-        GitBlame.stub(:ungreen_name_emails_from_git).and_return("User One, and User Two:git+uo+ut@git.squareup.com")
+        GitBlame.stub(:git_names_and_emails_since_last_green).and_return("User One, and User Two:git+uo+ut@git.squareup.com")
         subject.should =~ ["userone@example.com", "usertwo@example.com"]
       end
 
       it "returns the emails of all users mentioned by name with a combination of 'and' and ','" do
-        GitBlame.stub(:ungreen_name_emails_from_git).and_return("User One, User Two, and User Three:git+uo+ut+ut@git.squareup.com")
+        GitBlame.stub(:git_names_and_emails_since_last_green).and_return("User One, User Two, and User Three:git+uo+ut+ut@git.squareup.com")
         subject.should =~ ["userone@example.com", "usertwo@example.com", "userthree@example.com"]
       end
 
       it "should lookup the email based on the username" do
-        GitBlame.stub(:ungreen_name_emails_from_git).and_return("First Last:git+usero@git.squareup.com")
+        GitBlame.stub(:git_names_and_emails_since_last_green).and_return("First Last:git+usero@git.squareup.com")
         subject.should == ["userone@example.com"]
       end
 
       it "should send emails to usernames and emails" do
-        GitBlame.stub(:ungreen_name_emails_from_git).and_return("User Two:git+usero@git.squareup.com")
+        GitBlame.stub(:git_names_and_emails_since_last_green).and_return("User Two:git+usero@git.squareup.com")
         subject.should =~ ["userone@example.com", "usertwo@example.com"]
       end
     end
