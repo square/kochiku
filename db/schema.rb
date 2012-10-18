@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20121017224003) do
+ActiveRecord::Schema.define(:version => 20121018182435) do
 
   create_table "build_artifacts", :force => true do |t|
     t.integer  "build_attempt_id"
@@ -40,6 +40,7 @@ ActiveRecord::Schema.define(:version => 20121017224003) do
     t.text     "paths"
     t.datetime "created_at", :null => false
     t.datetime "updated_at", :null => false
+    t.text     "options"
   end
 
   add_index "build_parts", ["build_id"], :name => "index_build_parts_on_build_id"

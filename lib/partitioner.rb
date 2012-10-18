@@ -5,7 +5,13 @@ class Partitioner
 
   def partitions
     if File.exist?(KOCHIKU_YML)
-      YAML.load_file(KOCHIKU_YML).map { |subset| partitions_for(subset) }.flatten
+      # Handle old kochiku.yml
+      kochiku_yml = YAML.load_file(KOCHIKU_YML)
+      if kochiku_yml.is_a?(Array)
+        kochiku_yml.map { |subset| partitions_for(subset) }.flatten
+      else
+        build_partions_from(kochiku_yml)
+      end
     elsif File.exist?(BUILD_YML)
       YAML.load_file(BUILD_YML).values.select { |part| part['type'].present? }
     elsif File.exist?(POM_XML)
@@ -16,6 +22,13 @@ class Partitioner
   end
 
   private
+  def build_partions_from(kochiku_yml)
+    kochiku_yml["rvm"].map do |rvm|
+      options = {"language" => kochiku_yml["language"], "rvm" => rvm}
+      kochiku_yml["targets"].map { |subset| partitions_for(subset.merge("options" => options)) }.flatten
+    end.flatten
+  end
+
   def maven_targets(pom_xml)
     Nokogiri::XML(pom_xml).css('project modules module').map {|partition|
       {
@@ -36,7 +49,11 @@ class Partitioner
 
     files = Array(load_manifest(manifest)) | Dir[glob]
     parts = Strategies.send(strategy, files, workers).map do |files|
-      { 'type' => type, 'files' => files.compact }
+      part = { 'type' => type, 'files' => files.compact}
+      if subset['options']
+        part['options'] = subset['options']
+      end
+      part
     end
 
     parts.select { |p| p['files'].present? }
