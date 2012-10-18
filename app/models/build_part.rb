@@ -6,6 +6,7 @@ class BuildPart < ActiveRecord::Base
   validates_presence_of :kind, :paths
 
   serialize :paths, Array
+  serialize :options, Hash
 
   def create_and_enqueue_new_build_attempt!
     build_attempt = build_attempts.create!(:state => :runnable)
@@ -17,6 +18,7 @@ class BuildPart < ActiveRecord::Base
       "repo_name" => self.project.repository.repo_cache_name,
       "test_command" => self.build_instance.test_command(self.paths),
       "repo_url" => self.project.repository.url,
+      "options" => self.options,
     }
     # TODO: this is a hack, please fix the following and restore this code to it's former glory.
     # We need to do 2 things before enabling this:

@@ -28,6 +28,27 @@ describe Partitioner do
   let(:balance) { 'alphabetically' }
   let(:manifest) { nil }
 
+  context "with a rvm based kochiku.yml" do
+    let(:kochiku_yml_exists) { true }
+    let(:kochiku_yml) do
+      {
+        "rvm" => ["ree-1.8.7-2011.12"],
+        "language" => "ruby",
+        "targets" => [
+          { 'type' => 'rspec', 'glob' => 'spec/**/*_spec.rb', 'workers' => 3, 'balance' => balance, 'manifest' => manifest }
+        ]
+      }
+    end
+
+    it "parses options from kochiku yml" do
+      partitions = partitioner.partitions
+      partitions.first["options"]["language"].should == "ruby"
+      partitions.first["options"]["rvm"].should == "ree-1.8.7-2011.12"
+      partitions.first["type"].should == "rspec"
+      partitions.first["files"].should_not be_empty
+    end
+  end
+
   context "when there is no config yml" do
     let(:kochiku_yml_exists) { false }
     it "should return a single partiion" do

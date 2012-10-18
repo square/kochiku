@@ -56,6 +56,13 @@ describe Build do
       build.state.should == :runnable
     end
 
+    it "creates parts with options" do
+      build.partition([{"type" => "cucumber", "files" => ['a'], 'options' => {"rvm" => "ree", "language" => 'ruby'}}])
+      build_part = build.build_parts.first
+      build_part.reload
+      build_part.options.should == {"rvm" => "ree", "language" => 'ruby'}
+    end
+
     it "should create build attempts for each build part" do
       build.partition(parts)
       build.build_parts.all {|bp| bp.build_attempts.should have(1).item }
