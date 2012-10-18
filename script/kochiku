@@ -14,6 +14,7 @@ end
 
 if project_index = ARGV.index("--project")
   target_name = ARGV[project_index + 1]
+  ARGV.slice!(project_index, 2)
 end
 # If a ref is given as an argument, use that. Otherwise use the current commit
 commit_ish = "HEAD"
