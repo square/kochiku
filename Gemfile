@@ -23,6 +23,7 @@ gem "chunky_png"
 gem "cocaine"
 gem "awesome_print", :require => false
 gem "nokogiri"
+gem "httparty"
 
 group :assets do
   gem 'compass-rails'

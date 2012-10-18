@@ -68,4 +68,10 @@ Kochiku::Application.configure do
   Resque.redis = Redis.new(:host => "macbuild-master.sfo.squareup.com")
   Rails.application.routes.default_url_options[:host] = "macbuild-master.sfo.squareup.com"
   config.action_mailer.default_url_options = {:host => "macbuild-master.sfo.squareup.com"}
+
+  config.action_mailer.delivery_method = :smtp
+  config.action_mailer.smtp_settings = {
+    :address => "daisy.corp.squareup.com",
+    :port => 25
+  }
 end
