@@ -137,10 +137,39 @@ describe BuildsController do
 
       it "creates a build if a ref is given" do
         expect{ post @action, @params.merge(:project_id => "foobar", :build => {:ref => "asdf"}) }.to change{Build.count}.by(1)
+        Build.last.queue.should == :developer
       end
 
       it "doesn't create a build if no ref is given" do
         expect{ post @action, @params.merge(:project_id => "foobar", :build => {:ref => nil })}.to_not change{Build.count}
+      end
+    end
+
+    context "when the project is the ci project" do
+      before do
+        GitRepo.stub(:inside_copy).and_yield
+      end
+      let(:repository){ Factory.create(:repository, :url => "git@git.squareup.com:square/web.git") }
+      let(:project){ Factory.create(:project, :name => "web", :repository => repository) }
+
+      it "creates the build if a ref is given" do
+        expect{
+          post :create, @params.merge(:project_id => project.to_param, :build => {:ref => "asdf"})
+        }.to change(Build, :count).by(1)
+        build = Build.last
+        build.project.should == project
+        build.queue.should == :ci
+        build.ref.should_not == "asdf"
+      end
+
+      it "create a build if no ref is given" do
+        expect{
+          post :create, @params.merge(:project_id => project.to_param, :build => {:ref => nil})
+        }.to change(Build, :count).by(1)
+        build = Build.last
+        build.project.should == project
+        build.queue.should == :ci
+        build.ref.should_not be_blank
       end
     end
 

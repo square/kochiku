@@ -1,8 +1,8 @@
-- if !@project.main_build?
-  - content_for :header do
-    = form_for @build, :url => request_project_builds_path(@project) do |f|
+- content_for :header do
+  = form_for @build, :url => request_project_builds_path(@project) do |f|
+    - if !@project.main_build?
       =  f.text_field :ref, {:placeholder => 'SHA to build', :class => 'sha', :autocapitalize => 'off', :autocorrect => 'off', :spellcheck => 'false'}
-      =  f.submit "Build", {:class => 'build-button'}
+    =  f.submit "Build", {:class => 'build-button'}
 
 - if @project.main_build?
   %h2.subheader Build time (min)

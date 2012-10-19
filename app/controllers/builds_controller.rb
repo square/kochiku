@@ -101,6 +101,13 @@ class BuildsController < ApplicationController
     end
     auto_merge = params[:auto_merge] || false
     branch = params[:build][:branch]
-    @project.builds.find_or_initialize_by_ref(params[:build][:ref], :state => :partitioning, :queue => :developer, :auto_merge => auto_merge, :branch => branch)
+    queue = @project.main_build? ? :ci : :developer
+    ref = params[:build][:ref]
+    if queue == :ci
+      GitRepo.inside_copy(@project.repository) do
+        ref = Cocaine::CommandLine.new("git show-ref refs/heads/master").run.split(" ").first
+      end
+    end
+    @project.builds.find_or_initialize_by_ref(ref, :state => :partitioning, :queue => queue, :auto_merge => auto_merge, :branch => branch)
   end
 end
