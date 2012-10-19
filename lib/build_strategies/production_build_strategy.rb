@@ -36,7 +36,7 @@ class BuildStrategy
       else
         promotion_ref
       end
-      cherry_cmd Cocaine::CommandLine.new("git cherry", "#{target_to_check} :build_ref", :build_ref => build_ref)
+      cherry_cmd = Cocaine::CommandLine.new("git cherry", "#{target_to_check} :build_ref", :build_ref => build_ref)
       cherry_cmd.run.lines.count == 0
     end
   end
