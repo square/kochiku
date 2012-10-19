@@ -39,7 +39,7 @@ class BuildsController < ApplicationController
 
   # Used to request a developer build through the Web UI
   def request_build
-    if developer_build.save
+    if project_build.save
       flash[:message] = "Build added!"
     else
       flash[:error] = "Error adding build!"
@@ -74,7 +74,7 @@ class BuildsController < ApplicationController
     if params['payload']
       build_from_github
     elsif params['build']
-      developer_build
+      project_build
     end
   end
 
@@ -93,7 +93,7 @@ class BuildsController < ApplicationController
     end
   end
 
-  def developer_build
+  def project_build
     @project = Project.where(:name => params[:project_id]).first
     if !@project
       repository = Repository.find_or_create_by_url(params[:repo_url])
