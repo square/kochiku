@@ -6,7 +6,7 @@ describe PullRequestsController do
   describe "post /pull-request-builder" do
     it "creates the pull request project" do
       expect {
-        post :build, 'payload' => payload
+        post :build, 'payload' => pull_request_payload
         response.should be_success
       }.to change(Project, :count).by(1)
       Project.last.repository.should == repository
@@ -14,7 +14,7 @@ describe PullRequestsController do
     end
     it "creates a build for a pull request" do
       expect {
-        post :build, 'payload' => payload
+        post :build, 'payload' => pull_request_payload
         response.should be_success
       }.to change(Build, :count).by(1)
       build = Build.last
@@ -25,7 +25,7 @@ describe PullRequestsController do
     it "will enqueue a build if autobuild pull requests is enabled" do
       repository.build_pull_requests = "1"
       repository.save!
-      github_payload = payload("pull_request" => {
+      github_payload = pull_request_payload("pull_request" => {
         "head" => { "sha" => "Some-sha", "ref" => "branch-name" },
         "body" => "best pull request ever",
       })
@@ -41,7 +41,7 @@ describe PullRequestsController do
 
     it "creates a build for a pull request" do
       expect {
-        post :build, :id => project.id, 'payload' => payload
+        post :build, :id => project.id, 'payload' => pull_request_payload
         response.should be_success
       }.to change(project.builds, :count).by(1)
       build = project.builds.last
@@ -52,39 +52,39 @@ describe PullRequestsController do
 
     it "does not create a pull request if not requested" do
       expect {
-        post :build, :id => project.id, 'payload' => payload({"pull_request" => {"body" => "don't build it"}})
+        post :build, :id => project.id, 'payload' => pull_request_payload({"pull_request" => {"body" => "don't build it"}})
         response.should be_success
       }.to_not change(project.builds, :count).by(1)
     end
 
     it "ignores !buildme casing" do
       expect {
-        post :build, :id => project.id, 'payload' => payload({"pull_request" => {"body" => "!BuIlDMe"}})
+        post :build, :id => project.id, 'payload' => pull_request_payload({"pull_request" => {"body" => "!BuIlDMe"}})
         response.should be_success
       }.to change(project.builds, :count).by(1)
     end
 
     it "does not build a closed pull request" do
       expect {
-        post :build, :id => project.id, 'payload' => payload({"action" => "closed"})
+        post :build, :id => project.id, 'payload' => pull_request_payload({"action" => "closed"})
         response.should be_success
       }.to_not change(project.builds, :count).by(1)
     end
 
     it "does not blow up if action is missing" do
-      post :build, :id => project.id, 'payload' => payload({"action" => nil})
+      post :build, :id => project.id, 'payload' => pull_request_payload({"action" => nil})
       response.should be_success
     end
 
     it "does not blow up if pull_request is missing" do
       expect {
-        post :build, :id => project.id, 'payload' => payload({"pull_request" => nil})
+        post :build, :id => project.id, 'payload' => pull_request_payload({"pull_request" => nil})
         response.should be_success
       }.to_not change(project.builds, :count).by(1)
     end
   end
 
-  def payload(options = {})
+  def pull_request_payload(options = {})
     {
       "pull_request" => {
         "head" => {
