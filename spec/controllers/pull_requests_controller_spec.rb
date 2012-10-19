@@ -172,7 +172,7 @@ describe PullRequestsController do
     {
       "after" => "SOME-SHA1",
       "repository" => {
-        "ssh_url" => "git@git.squareup.com:square/web.git",
+        "url" => "https://git.squareup.com/square/web",
       },
       "ref" => "refs/heads/master",
     }.deep_merge(options).to_json

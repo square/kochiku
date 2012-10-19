@@ -35,8 +35,17 @@ class Repository < ActiveRecord::Base
     event_types
   end
 
+  def self.covert_to_ssh_url(url)
+    params = Repository.github_url_params(url)
+    "git@#{params[:host]}:#{params[:username]}/#{params[:repository]}.git"
+  end
+
   private
   def github_url_params
+    Repository.github_url_params(url)
+  end
+
+  def self.github_url_params(url)
     parser = URL_PARSERS[url.slice(0,4)]
     match = url.match(parser)
     {:host => match[1], :username => match[2], :repository => match[3]}
