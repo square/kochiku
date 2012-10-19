@@ -41,7 +41,8 @@ class GitRepo
 
     def current_master_ref(repository)
       ref = nil
-      inside_copy(repository) do
+      cached_repo_path = File.join(WORKING_DIR, repository.repo_cache_name)
+      Dir.chdir(cached_repo_path) do
         ref = Cocaine::CommandLine.new("git show-ref refs/heads/master").run.split(" ").first
       end
       ref
