@@ -121,7 +121,7 @@ describe BuildsController do
 
   describe "#request_build" do
     before do
-      @action = :create
+      @action = :request_build
       @params = {}
     end
 
@@ -154,7 +154,8 @@ describe BuildsController do
 
       it "creates the build if a ref is given" do
         expect{
-          post :create, @params.merge(:project_id => project.to_param, :build => {:ref => "asdf"})
+          post @action, @params.merge(:project_id => project.to_param, :build => {:ref => "asdf"})
+          response.should be_redirect
         }.to change(Build, :count).by(1)
         build = Build.last
         build.project.should == project
@@ -164,7 +165,8 @@ describe BuildsController do
 
       it "create a build if no ref is given" do
         expect{
-          post :create, @params.merge(:project_id => project.to_param, :build => {:ref => nil})
+          post @action, :project_id => project.to_param
+          response.should be_redirect
         }.to change(Build, :count).by(1)
         build = Build.last
         build.project.should == project
