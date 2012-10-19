@@ -20,7 +20,8 @@ class BuildPartMailer < ActionMailer::Base
     #TODO: only temporary for testing, we'll send to these emails once we're happy with the frequency and email formatting
     @emails = emails
 
-    mail(:to => ["cheister@squareup.com", "nolan@squareup.com", "ssorrell@squareup.com"],
+    mail(:to => ["cheister@squareup.com"],
+         :bcc => ["nolan@squareup.com", "ssorrell@squareup.com"],
          :subject => "[kochiku] Build part failed for #{@build_part.project.name}")
   end
 end
