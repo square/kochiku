@@ -34,53 +34,41 @@ describe PullRequestsController do
         response.should be_success
       }.to change(Build, :count).by(1)
     end
-  end
 
-  describe "post /pull-request-builder/:id" do
-    let(:project) { Factory.create(:project, :name => "web-pull_requests", :repository => repository) }
+    context "with a project" do
+      let(:project) { Factory.create(:project, :name => "web-pull_requests", :repository => repository) }
 
-    it "creates a build for a pull request" do
-      expect {
-        post :build, :id => project.id, 'payload' => pull_request_payload
+      it "does not create a pull request if not requested" do
+        expect {
+          post :build, 'payload' => pull_request_payload({"pull_request" => {"body" => "don't build it"}})
+          response.should be_success
+        }.to_not change(project.builds, :count).by(1)
+      end
+      it "ignores !buildme casing" do
+        expect {
+          post :build, 'payload' => pull_request_payload({"pull_request" => {"body" => "!BuIlDMe"}})
+          response.should be_success
+        }.to change(project.builds, :count).by(1)
+      end
+
+      it "does not build a closed pull request" do
+        expect {
+          post :build, 'payload' => pull_request_payload({"action" => "closed"})
+          response.should be_success
+        }.to_not change(project.builds, :count).by(1)
+      end
+
+      it "does not blow up if action is missing" do
+        post :build, 'payload' => pull_request_payload({"action" => nil})
         response.should be_success
-      }.to change(project.builds, :count).by(1)
-      build = project.builds.last
-      build.branch.should == "branch-name"
-      build.ref.should == "Some-sha"
-      build.queue.should == :developer
-    end
-
-    it "does not create a pull request if not requested" do
-      expect {
-        post :build, :id => project.id, 'payload' => pull_request_payload({"pull_request" => {"body" => "don't build it"}})
-        response.should be_success
-      }.to_not change(project.builds, :count).by(1)
-    end
-
-    it "ignores !buildme casing" do
-      expect {
-        post :build, :id => project.id, 'payload' => pull_request_payload({"pull_request" => {"body" => "!BuIlDMe"}})
-        response.should be_success
-      }.to change(project.builds, :count).by(1)
-    end
-
-    it "does not build a closed pull request" do
-      expect {
-        post :build, :id => project.id, 'payload' => pull_request_payload({"action" => "closed"})
-        response.should be_success
-      }.to_not change(project.builds, :count).by(1)
-    end
-
-    it "does not blow up if action is missing" do
-      post :build, :id => project.id, 'payload' => pull_request_payload({"action" => nil})
-      response.should be_success
+      end
     end
 
     it "does not blow up if pull_request is missing" do
       expect {
-        post :build, :id => project.id, 'payload' => pull_request_payload({"pull_request" => nil})
+        post :build, 'payload' => pull_request_payload({"pull_request" => nil})
         response.should be_success
-      }.to_not change(project.builds, :count).by(1)
+      }.to_not change(Build, :count)
     end
   end
 
