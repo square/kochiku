@@ -15,7 +15,7 @@ class BuildPartMailer < ActionMailer::Base
     @artifacts = build_attempt.build_artifacts.reject { |artifact| artifact.log_file.path =~ /\.xml\.gz/ }
     @git_changes = GitBlame.git_changes_since_last_green(@build_part.build_instance)
 
-    @stdout_url = "http://macbuild-master.sfo.squareup.com/public/log_files/#{@build_part.project.to_param}/build_#{@build_part.build_instance.id}/part_#{@build_part.id}/attempt_#{build_attempt.id}/stdout.log.gz"
+    @stdout_url = "http://macbuild-master.sfo.squareup.com/log_files/#{@build_part.project.to_param}/build_#{@build_part.build_instance.id}/part_#{@build_part.id}/attempt_#{build_attempt.id}/stdout.log.gz"
 
     #TODO: only temporary for testing, we'll send to these emails once we're happy with the frequency and email formatting
     @emails = emails

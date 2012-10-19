@@ -19,7 +19,9 @@ Go to <%= project_build_part_url(@build_part.build_instance.project, @build_part
 Link to <%= link_to("stdout.tar.gz", @stdout_url) %>
 
 <h1>Changes since last success</h1>
-<%= @git_changes.gsub("\n", "<br>") %>
+<% @git_changes.split("\n").each do |line| %>
+  <%= line %><br>
+<% end %>
 
 </body>
 </html>
