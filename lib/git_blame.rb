@@ -13,9 +13,16 @@ class GitBlame
     end
 
     def git_changes_since_last_green(build)
-      GitRepo.inside_repo(build.repository) do
-        Cocaine::CommandLine.new("git log --no-merges #{build.previous_successful_build.try(:ref)}...#{build.ref}").run
+      output = GitRepo.inside_repo(build.repository) do
+        Cocaine::CommandLine.new("git log --no-merges --format='::!::%H|%an <%ae>|%ad|%B::!::' #{build.previous_successful_build.try(:ref)}...#{build.ref}").run
       end
+      git_changes = []
+      output.split("::!::").each do |line|
+        commit_hash, author, commit_date, commit_message = line.chomp.split("|")
+        next if commit_hash.nil?
+        git_changes << {:hash => commit_hash, :author => author, :date => commit_date, :message => commit_message.gsub("\n", " ")}
+      end
+      git_changes
     end
 
     private

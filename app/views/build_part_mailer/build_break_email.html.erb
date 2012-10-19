@@ -19,8 +19,13 @@ Go to <%= project_build_part_url(@build_part.build_instance.project, @build_part
 Link to <%= link_to("stdout.tar.gz", @stdout_url) %>
 
 <h1>Changes since last success</h1>
-<% @git_changes.split("\n").each do |line| %>
-  <%= line %><br>
+<% @git_changes.each do |git_change| %>
+  <b>commit <%= git_change[:hash] %></b><br>
+  Author: <%= git_change[:author] %><br>
+  Date: <%=  git_change[:date] %><br>
+  <br>
+  <%= git_change[:message] %>
+  <br><br>
 <% end %>
 
 </body>

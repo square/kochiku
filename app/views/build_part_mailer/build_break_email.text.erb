@@ -14,4 +14,12 @@ Link to <%= link_to("stdout.tar.gz", @stdout_url) %>
 Changes since last success
 --------------------------------------------------------------------------------
 
-<%= @git_changes %>
+<% @git_changes.each do |git_change| %>
+  commit <%= git_change[:commit] %>
+  Author: <%= git_change[:author] %>
+  Date: <%=  git_change[:date] %>
+
+      <%= git_change[:message] %>
+
+
+<% end %>
