@@ -144,7 +144,6 @@ class Build < ActiveRecord::Base
   def branch_or_ref
     branch.blank? ? ref : branch
   end
-
   private
 
   def status_png(r, g, b)

@@ -15,10 +15,7 @@ class PullRequestsController < ApplicationController
     project = repository.projects.find_or_create_by_name(repository.repository_name)
     if payload["ref"] == "refs/heads/master" && repository.run_ci?
       sha = payload["after"]
-      last_build = project.builds.where(:queue => :ci).last
-      return if last_build && !last_build.completed?
-      build = project.builds.find_or_initialize_by_ref(sha, :state => :partitioning, :queue => :ci, :branch => 'master')
-      build.save!
+      project.builds.create_new_ci_build_for(sha)
     end
   end
 

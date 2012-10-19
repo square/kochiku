@@ -10,6 +10,11 @@ class BuildStateUpdateJob < JobBase
     build.update_state_from_parts!
     Rails.logger.info("Build #{build.id} state is now #{build.state}")
 
+    if build.project.main_build? && build.completed?
+      sha = GitRepo.current_master_ref(build.repository)
+      build.project.builds.create_new_ci_build_for(sha)
+    end
+
     if build.promotable?
       GitRepo.inside_repo(build.repository) do
         build.promote!

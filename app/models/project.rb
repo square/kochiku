@@ -1,5 +1,12 @@
 class Project < ActiveRecord::Base
-  has_many :builds, :dependent => :destroy, :inverse_of => :project
+  has_many :builds, :dependent => :destroy, :inverse_of => :project do
+    def create_new_ci_build_for(sha)
+      last_build = where(:queue => :ci).last
+      return last_build if last_build && !last_build.completed?
+      build = find_or_initialize_by_ref(sha, :state => :partitioning, :queue => :ci, :branch => 'master')
+      build.save!
+    end
+  end
   validates_uniqueness_of :name
   belongs_to :repository
 
