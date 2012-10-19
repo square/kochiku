@@ -1,9 +1,39 @@
 require 'spec_helper'
 
 describe PullRequestsController do
-  let!(:repository) { Factory.create(:repository, :url => "git@git.squareup.com:square/web.git") }
+  let!(:repository) { Factory.create(:repository, :url => "git@git.squareup.com:square/web.git", :run_ci => true) }
 
   describe "post /pull-request-builder" do
+    context "for push events" do
+      let(:project) { Factory.create(:project, :name => "web-pull_requests", :repository => repository) }
+
+      it "creates a build" do
+        expect {
+          post :build, 'payload' => push_payload
+          response.should be_success
+        }.to change(Build, :count).by(1)
+        build = Build.last
+        build.branch.should == "master"
+        build.ref.should == "SOME-SHA1"
+        build.queue.should == :ci
+      end
+
+      it "does not a build for not master" do
+        expect {
+          post :build, 'payload' => push_payload("ref" => "refs/heads/some-branch")
+          response.should be_success
+        }.to_not change(Build, :count)
+      end
+
+      it "does not a build if repository disabled ci" do
+        repository.update_attributes!(:run_ci => false)
+        expect {
+          post :build, 'payload' => push_payload
+          response.should be_success
+        }.to_not change(Build, :count)
+      end
+    end
+
     context "for pull requests" do
       it "creates the pull request project" do
         expect {
@@ -88,6 +118,16 @@ describe PullRequestsController do
         "ssh_url" => "git@git.squareup.com:square/web.git",
       },
       "action" => "synchronize",
+    }.deep_merge(options).to_json
+  end
+
+  def push_payload(options = {})
+    {
+      "after" => "SOME-SHA1",
+      "repository" => {
+        "ssh_url" => "git@git.squareup.com:square/web.git",
+      },
+      "ref" => "refs/heads/master",
     }.deep_merge(options).to_json
   end
 
