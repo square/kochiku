@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<html xmlns="http://www.w3.org/1999/html">
 <head>
   <meta content='text/html; charset=UTF-8' http-equiv='Content-Type'/>
 </head>
@@ -12,20 +12,14 @@ Emails this would have been sent to:
 <% end %>
 </ul>
 
-Build Part for <%= @build_part.project.name %> failed
-
-Go to <%= project_build_part_url(@build_part.build_instance.project, @build_part.build_instance, @build_part) %> for details
-
-Links to log files
-<ul>
-<% @artifacts.each do |artifact| %>
-  <li><%= link_to(File.basename(artifact.log_file.to_s), artifact.log_file.url) %></li>
-<% end %>
-</ul>
+Build Part for <%= @build_part.project.name %> failed<br>
+<br>
+Go to <%= project_build_part_url(@build_part.build_instance.project, @build_part.build_instance, @build_part) %> for details<br>
+<br>
+Link to <%= link_to("stdout.tar.gz", @stdout_url) %>
 
 <h1>Changes since last success</h1>
-
-<%= @git_changes %>
+<%= @git_changes.gsub("\n", "<br>") %>
 
 </body>
 </html>
