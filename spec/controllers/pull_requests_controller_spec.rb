@@ -5,7 +5,24 @@ describe PullRequestsController do
 
   describe "post /pull-request-builder" do
     context "for push events" do
-      let(:project) { Factory.create(:project, :name => "web-pull_requests", :repository => repository) }
+      let!(:project) { Factory.create(:project, :name => "web", :repository => repository) }
+
+      it "creates the default project if required" do
+        project.update_attributes!(:name => "web-something")
+        expect {
+          post :build, 'payload' => push_payload
+          response.should be_success
+        }.to change(Project, :count).by(1)
+        Project.last.repository.should == repository
+        Project.last.name.should == "web"
+      end
+
+      it "does not duplicate the default project" do
+        expect {
+          post :build, 'payload' => push_payload
+          response.should be_success
+        }.to_not change(Project, :count)
+      end
 
       it "creates a build" do
         expect {
@@ -31,6 +48,36 @@ describe PullRequestsController do
           post :build, 'payload' => push_payload
           response.should be_success
         }.to_not change(Build, :count)
+      end
+
+      it "does not build if there is an active ci build" do
+        project.builds.create!(:ref => "sha", :state => :succeeded, :queue => :ci, :branch => 'master')
+        frozen_time = 3.seconds.from_now
+        Time.stub(:now).and_return(frozen_time)
+        project.builds.create!(:ref => "sha2", :state => :partitioning, :queue => :ci, :branch => 'master')
+        expect {
+          post :build, 'payload' => push_payload
+          response.should be_success
+        }.to_not change(Build, :count)
+      end
+
+      it "builds if there is completed ci build" do
+        project.builds.create!(:ref => "sha", :state => :succeeded, :queue => :ci, :branch => 'master')
+        expect {
+          post :build, 'payload' => push_payload
+          response.should be_success
+        }.to change(Build, :count).by(1)
+      end
+
+      it "builds if there is completed ci build after a build that is still building" do
+        project.builds.create!(:ref => "sha", :state => :partitioning, :queue => :ci, :branch => 'master')
+        frozen_time = 3.seconds.from_now
+        Time.stub(:now).and_return(frozen_time)
+        project.builds.create!(:ref => "sha2", :state => :succeeded, :queue => :ci, :branch => 'master')
+        expect {
+          post :build, 'payload' => push_payload
+          response.should be_success
+        }.to change(Build, :count).by(1)
       end
     end
 
