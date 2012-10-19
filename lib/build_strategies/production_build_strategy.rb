@@ -7,7 +7,7 @@ class BuildStrategy
     # backwards by overwriting promotion_ref with build 1
     def promote_build(build_ref, repository)
       repository.promotion_refs.each do |promotion_ref|
-        unless included_in_promotion_ref?(build_ref, promotion_ref)
+        unless included_in_promotion_ref?(repository, build_ref, promotion_ref)
           if repository.use_branches_on_green
             Cocaine::CommandLine.new("git push", "origin :build_ref:refs/heads/#{promotion_ref} -f", :build_ref => build_ref).run
           else
@@ -30,8 +30,13 @@ class BuildStrategy
 
   private
 
-    def included_in_promotion_ref?(build_ref, promotion_ref)
-      cherry_cmd = Cocaine::CommandLine.new("git cherry", "origin/#{promotion_ref} :build_ref", :build_ref => build_ref)
+    def included_in_promotion_ref?(repository, build_ref, promotion_ref)
+      target_to_check = if repository.use_branches_on_green
+        "origin/#{promotion_ref}"
+      else
+        promotion_ref
+      end
+      cherry_cmd Cocaine::CommandLine.new("git cherry", "#{target_to_check} :build_ref", :build_ref => build_ref)
       cherry_cmd.run.lines.count == 0
     end
   end
