@@ -66,6 +66,10 @@ class BuildPart < ActiveRecord::Base
     end
   end
 
+  def is_for?(language)
+    options['language'].to_s.downcase == language.to_s.downcase
+  end
+
   def should_reattempt?
     build_attempts.unsuccessful.count <= 3 && kind == "cucumber" && (build_instance.auto_merge? || build_instance.queue == :ci)
   end

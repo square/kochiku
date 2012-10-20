@@ -72,4 +72,18 @@ describe BuildPart do
       it { should be_true }
     end
   end
+
+  context "#is_for?" do
+    it "is true for the same language" do
+      build_part = BuildPart.new(:options => {"language" => "ruby"})
+      build_part.is_for?(:ruby).should be_true
+      build_part.is_for?("ruby").should be_true
+      build_part.is_for?("RuBy").should be_true
+    end
+
+    it "is false for the different languages" do
+      build_part = BuildPart.new(:options => {"language" => "python"})
+      build_part.is_for?(:ruby).should be_false
+    end
+  end
 end

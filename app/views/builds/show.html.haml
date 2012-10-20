@@ -26,6 +26,8 @@
       %th.id-column Part
       %th.result-column Status
       %th Build Type
+      - if build_metadata_header(@build)
+        %th= build_metadata_header(@build)
       %th Build Host
       %th Elapsed Time
       %th Attempt #
@@ -37,6 +39,8 @@
         %td.result-column
           %span.part-status{:class => part.status}= part.status.to_s.capitalize
         %td{:class => part.kind}= part.kind.to_s.capitalize
+        - if build_metadata_header(@build)
+          %td= build_part_field_value(@build, part)
         %td= part.last_attempt ? part.last_attempt.builder : "pending"
         %td= part.elapsed_time ? duration_strftime(part.elapsed_time) : "pending"
         %td= part.build_attempts.size
