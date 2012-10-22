@@ -76,4 +76,27 @@ describe GitBlame do
       end
     end
   end
+
+  describe "#git_changes_since_last_green" do
+    subject { GitBlame.git_changes_since_last_green(build) }
+
+    before do
+      GitBlame.unstub(:git_changes_since_last_green)
+    end
+
+    it "should parse the git log message and return a hash of information" do
+      GitRepo.stub(:inside_repo).and_return("::!::817b88be7488cab5e4f9d9975222db80d8bceb3b|User One <github+uo@squareup.com>|Fri Oct 19 17:43:47 2012 -0700|this is my commit message::!::")
+      git_changes = subject
+      git_changes.first[:hash].should == "817b88be7488cab5e4f9d9975222db80d8bceb3b"
+      git_changes.first[:author].should == "User One <github+uo@squareup.com>"
+      git_changes.first[:date].should == "Fri Oct 19 17:43:47 2012 -0700"
+      git_changes.first[:message].should == "this is my commit message"
+    end
+
+    it "should strip new lines in the commit message" do
+      GitRepo.stub(:inside_repo).and_return("::!::817b88|User One|Fri Oct 19|this is my commit message\nanother line::!::")
+      git_changes = subject
+      git_changes.first[:message].should == "this is my commit message another line"
+    end
+  end
 end

@@ -16,11 +16,11 @@ Build Part for <%= @build_part.project.name %> failed<br>
 <br>
 Go to <%= project_build_part_url(@build_part.build_instance.project, @build_part.build_instance, @build_part) %> for details<br>
 <br>
-Link to <%= link_to("stdout.tar.gz", @stdout_url) %>
+Or go directly to <%= link_to("stdout.tar.gz", @stdout_url) %>
 
 <h1>Changes since last success</h1>
 <% @git_changes.each do |git_change| %>
-  <b>commit <%= git_change[:hash] %></b><br>
+  <b>commit <%= link_to(git_change[:hash], "#{@build_part.project.repository.base_html_url}/commit/#{git_change[:hash]}") %></b><br>
   Author: <%= git_change[:author] %><br>
   Date: <%=  git_change[:date] %><br>
   <br>

@@ -15,7 +15,7 @@ Changes since last success
 --------------------------------------------------------------------------------
 
 <% @git_changes.each do |git_change| %>
-  commit <%= git_change[:commit] %>
+  commit <%= git_change[:hash] %>
   Author: <%= git_change[:author] %>
   Date: <%=  git_change[:date] %>
 
