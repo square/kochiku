@@ -4,11 +4,14 @@ Emails this would have been sent to:
   <%= email %>
 <% end %>
 
-Build Part for <%= @build_part.project.name %> failed
+Project <%= @build.project.name %> failed
 
-Go to <%= project_build_part_url(@build_part.build_instance.project, @build_part.build_instance, @build_part) %> for details
+Failed build parts:
+<% @failed_build_parts.each do |failed_build_part| %>
+  Go to <%= project_build_part_url(@build.project, @build, failed_build_part) %> for details
 
-Link to <%= link_to("stdout.tar.gz", @stdout_url) %>
+  Or go directly to <%= failed_build_stdout(failed_build_part) %>
+<% end %>
 
 --------------------------------------------------------------------------------
 Changes since last success

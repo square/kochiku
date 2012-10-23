@@ -28,5 +28,9 @@ class BuildStateUpdateJob < JobBase
         Rails.logger.info("Build #{build.id} is auto_merge enabled but cannot be auto merged.")
       end
     end
+
+    if build.project.main_build? && build.previous_successful_build
+      BuildPartMailer.build_break_email(GitBlame.emails_of_build_breakers(build), build).deliver
+    end
   end
 end

@@ -12,11 +12,17 @@ Emails this would have been sent to:
 <% end %>
 </ul>
 
-Build Part for <%= @build_part.project.name %> failed<br>
-<br>
-Go to <%= project_build_part_url(@build_part.build_instance.project, @build_part.build_instance, @build_part) %> for details<br>
-<br>
-Or go directly to <%= link_to("stdout.tar.gz", @stdout_url) %>
+<h2>Project <%= @build.project.name %> failed</h2>
+Failed build parts:
+<ul>
+  <% @failed_build_parts.each do |failed_build_part| %>
+  <li>
+    <%= project_build_part_url(@build.project, @build, failed_build_part) %> for details<br>
+    <br>
+    Or go directly to <%= failed_build_stdout(failed_build_part) %>
+  </li>
+  <% end %>
+</ul>
 
 <h1>Changes since last success</h1>
 <% @git_changes.each do |git_change| %>

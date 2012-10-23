@@ -13,6 +13,7 @@ describe BuildStateUpdateJob do
     GitRepo.stub(:run!)
     GitRepo.stub(:current_master_ref).and_return(current_repo_master)
     BuildStrategy.stub(:promote_build)
+    stub_request(:post, /https:\/\/git\.squareup\.com\/api\/v3\/repos\/square\/kochiku\/statuses\//)
   end
 
   shared_examples "a non promotable state" do
@@ -22,12 +23,35 @@ describe BuildStateUpdateJob do
     end
   end
 
-
-  describe "#perform" do
-    before do
-      stub_request(:post, /https:\/\/git\.squareup\.com\/api\/v3\/repos\/square\/kochiku\/statuses\//)
+  context "build notification emails" do
+    let(:name) { repository.repository_name }
+    let(:build_attempt) { build.build_parts.first.build_attempts.create!(:state => :failed) }
+    it "should not send a failure email if the project has never had a successful build" do
+      BuildPartMailer.should_not_receive(:build_break_email)
+      build.previous_successful_build.should be_nil
+      ActionMailer::Base.deliveries.should be_empty
     end
 
+    context "for a build that has had a successful build" do
+      let(:build) { FactoryGirl.create(:build, :state => :succeeded, :project => project); FactoryGirl.create(:build, :state => :runnable, :project => project) }
+
+      it "should send a fail email when the build part fails" do
+        BuildPartMailer.should_receive(:build_break_email).and_return(OpenStruct.new(:deliver => nil))
+        BuildStateUpdateJob.perform(build.id)
+      end
+
+      context "for a build of a project not on master" do
+        let(:project) { FactoryGirl.create(:project, :branch => "other-branch")}
+
+        it "should not send a failure email" do
+          BuildPartMailer.should_not_receive(:build_break_email)
+          BuildStateUpdateJob.perform(build.id)
+        end
+      end
+    end
+  end
+
+  describe "#perform" do
     context "when incomplete but nothing has failed" do
       before do
         build.build_parts.first.build_attempts.create!(:state => :passed)

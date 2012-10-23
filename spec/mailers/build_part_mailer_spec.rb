@@ -1,7 +1,7 @@
 require "spec_helper"
 
 describe BuildPartMailer do
-  let(:build) { FactoryGirl.create(:build, :queue => :ci) }
+  let(:build) { FactoryGirl.create(:build, :queue => :developer) }
 
   describe "#time_out_email" do
     it "sends the email" do
@@ -18,10 +18,10 @@ describe BuildPartMailer do
   describe "#build_break_email" do
     it "sends the email" do
       build_part = build.build_parts.create!(:paths => ["a", "b"], :kind => "cucumber")
-      build_attempt = build_part.build_attempts.build(:state => :failed, :builder => "test-builder")
+      build_attempt = build_part.build_attempts.create!(:state => :failed, :builder => "test-builder")
       emails = ["foo@example.com"]
 
-      email = BuildPartMailer.build_break_email(emails, build_attempt)
+      email = BuildPartMailer.build_break_email(emails, build)
       email.to.should include("cheister@squareup.com")
       email.text_part.body.should include("foo@example.com")
       email.html_part.body.should include(build_part.project.name)
