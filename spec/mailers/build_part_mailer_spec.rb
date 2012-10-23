@@ -16,6 +16,10 @@ describe BuildPartMailer do
   end
 
   describe "#build_break_email" do
+    before do
+      GitBlame.stub(:git_changes_since_last_green).and_return([{:hash => "sha", :author => "Joe", :date => "some day", :message => "always be shipping it"}])
+    end
+
     it "sends the email" do
       build_part = build.build_parts.create!(:paths => ["a", "b"], :kind => "cucumber")
       build_attempt = build_part.build_attempts.create!(:state => :failed, :builder => "test-builder")

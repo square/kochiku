@@ -26,7 +26,7 @@ Failed build parts:
 
 <h1>Changes since last success</h1>
 <% @git_changes.each do |git_change| %>
-  <b>commit <%= link_to(git_change[:hash], "#{@build_part.project.repository.base_html_url}/commit/#{git_change[:hash]}") %></b><br>
+  <b>commit <%= link_to(git_change[:hash], "#{@build.project.repository.base_html_url}/commit/#{git_change[:hash]}") %></b><br>
   Author: <%= git_change[:author] %><br>
   Date: <%=  git_change[:date] %><br>
   <br>
