@@ -7,15 +7,7 @@ class GitRepo
   class << self
     def inside_copy(repository, ref = "master")
       cached_repo_path = File.join(WORKING_DIR, repository.repo_cache_name)
-
-      if !File.directory?(cached_repo_path)
-        clone_repo(repository.url, cached_repo_path)
-      end
-      Dir.chdir(cached_repo_path) do
-        # update the cached repo
-        synchronize_with_remote
-        Cocaine::CommandLine.new("git submodule update", "--init --quiet").run
-      end
+      synchronize_cache_repo(repository)
 
       Dir.mktmpdir(nil, WORKING_DIR) do |dir|
         # clone local repo (fast!)
@@ -41,6 +33,7 @@ class GitRepo
 
     def current_master_ref(repository)
       ref = nil
+      synchronize_cache_repo(repository)
       cached_repo_path = File.join(WORKING_DIR, repository.repo_cache_name)
       Dir.chdir(cached_repo_path) do
         ref = Cocaine::CommandLine.new("git show-ref refs/heads/master").run.split(" ").first
@@ -67,6 +60,19 @@ class GitRepo
     end
 
   private
+    def synchronize_cache_repo(repository)
+      cached_repo_path = File.join(WORKING_DIR, repository.repo_cache_name)
+
+      if !File.directory?(cached_repo_path)
+        clone_repo(repository.url, cached_repo_path)
+      end
+      Dir.chdir(cached_repo_path) do
+        # update the cached repo
+        synchronize_with_remote
+        Cocaine::CommandLine.new("git submodule update", "--init --quiet").run
+      end
+    end
+
     def run!(cmd)
       unless system(cmd)
         raise "non-0 exit code #{$?} returned from [#{cmd}]"
