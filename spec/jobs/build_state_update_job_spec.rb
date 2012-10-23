@@ -35,7 +35,13 @@ describe BuildStateUpdateJob do
     context "for a build that has had a successful build" do
       let(:build) { FactoryGirl.create(:build, :state => :succeeded, :project => project); FactoryGirl.create(:build, :state => :runnable, :project => project) }
 
-      it "should send a fail email when the build part fails" do
+      it "should not send the email if the build is not completed" do
+        BuildPartMailer.should_not_receive(:build_break_email)
+        BuildStateUpdateJob.perform(build.id)
+      end
+
+      it "should send a fail email when the build is finished" do
+        build.update_attribute(:state, :aborted)
         BuildPartMailer.should_receive(:build_break_email).and_return(OpenStruct.new(:deliver => nil))
         BuildStateUpdateJob.perform(build.id)
       end

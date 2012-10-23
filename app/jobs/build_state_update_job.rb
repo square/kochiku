@@ -29,7 +29,7 @@ class BuildStateUpdateJob < JobBase
       end
     end
 
-    if build.project.main_build? && build.previous_successful_build
+    if build.project.main_build? && build.completed? && build.previous_successful_build
       BuildPartMailer.build_break_email(GitBlame.emails_of_build_breakers(build), build).deliver
     end
   end
