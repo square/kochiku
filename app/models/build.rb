@@ -146,7 +146,9 @@ class Build < ActiveRecord::Base
   end
 
   def should_send_break_email?
-    project.main_build? && completed? && previous_successful_build && repository.send_build_failure_email? && !build_failure_email_sent?
+    should_send_email = project.main_build? && completed? && previous_successful_build && repository.send_build_failure_email? && !build_failure_email_sent?
+    return should_send_email && Build.update_all({:build_failure_email_sent => true}, {:id => self.id, :build_failure_email_sent => nil}) == 1 if should_send_email
+    should_send_email
   end
   private
 

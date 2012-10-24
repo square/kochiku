@@ -31,7 +31,6 @@ class BuildStateUpdateJob < JobBase
 
     if build.should_send_break_email?
       BuildPartMailer.build_break_email(GitBlame.emails_of_build_breakers(build), build).deliver
-      build.update_attribute(:build_failure_email_sent, true)
     end
   end
 end
