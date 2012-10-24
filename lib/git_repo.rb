@@ -36,8 +36,7 @@ class GitRepo
       synchronize_cache_repo(repository)
       cached_repo_path = File.join(WORKING_DIR, repository.repo_cache_name)
       Dir.chdir(cached_repo_path) do
-        Cocaine::CommandLine.new("git pull --no-tags").run
-        ref = Cocaine::CommandLine.new("git show-ref refs/heads/master").run.split(" ").first
+        ref = Cocaine::CommandLine.new("git show-ref refs/remotes/origin/master").run.split(" ").first
       end
       ref
     end
