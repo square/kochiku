@@ -144,6 +144,10 @@ class Build < ActiveRecord::Base
   def branch_or_ref
     branch.blank? ? ref : branch
   end
+
+  def should_send_break_email?
+    project.main_build? && completed? && previous_successful_build && repository.send_build_failure_email? && !build_failure_email_sent?
+  end
   private
 
   def status_png(r, g, b)

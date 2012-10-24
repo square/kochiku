@@ -40,6 +40,14 @@ describe BuildStateUpdateJob do
         BuildStateUpdateJob.perform(build.id)
       end
 
+      it "should only send the build failure email once" do
+        build.update_attribute(:state, :aborted)
+        BuildPartMailer.should_receive(:build_break_email).once.and_return(OpenStruct.new(:deliver => nil))
+        2.times {
+          BuildStateUpdateJob.perform(build.id)
+        }
+      end
+
       it "should send a fail email when the build is finished" do
         build.update_attribute(:state, :aborted)
         BuildPartMailer.should_receive(:build_break_email).and_return(OpenStruct.new(:deliver => nil))
