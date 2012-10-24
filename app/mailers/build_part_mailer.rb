@@ -18,6 +18,7 @@ class BuildPartMailer < ActionMailer::Base
 
     mail(:to => emails,
          :bcc => ["nolan@squareup.com", "ssorrell@squareup.com", "cheister@squareup.com"],
-         :subject => "[kochiku] #{@build.project.name.titleize} build failed")
+         :subject => "[kochiku] #{@build.project.name.titleize} build failed",
+         :from => "build-and-release+#{@build.project.name.parameterize}@squareup.com")
   end
 end

@@ -1,4 +1,5 @@
 Project <%= @build.project.name %> failed
+<%= project_build_url(@build.project, @build) %>
 
 Failed build parts:
 <% @failed_build_parts.each do |failed_build_part| %>
