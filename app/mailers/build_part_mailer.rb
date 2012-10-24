@@ -16,11 +16,15 @@ class BuildPartMailer < ActionMailer::Base
     @git_changes = GitBlame.git_changes_since_last_green(@build)
     @failed_build_parts = @build.build_parts.failed_or_errored
 
-    #TODO: only temporary for testing, we'll send to these emails once we're happy with the frequency and email formatting
     @emails = emails
-
-    mail(:to => ["cheister@squareup.com"],
-         :bcc => ["nolan@squareup.com", "ssorrell@squareup.com"],
-         :subject => "[kochiku] Build part failed for #{@build.project.name}")
+    #TODO: only temporary for testing, we'll send to these emails once we're happy with the frequency and email formatting
+    to = if @build.project.name == "web"
+      emails
+    else
+      []
+    end
+    mail(:to => to,
+         :bcc => ["nolan@squareup.com", "ssorrell@squareup.com", "cheister@squareup.com"],
+         :subject => "[kochiku] #{@build.project.name.titleize} build failed")
   end
 end

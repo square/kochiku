@@ -26,8 +26,11 @@ describe BuildPartMailer do
       emails = ["foo@example.com"]
 
       email = BuildPartMailer.build_break_email(emails, build)
-      email.to.should include("cheister@squareup.com")
-      email.text_part.body.should include("foo@example.com")
+
+      email.to.should be_empty
+      email.html_part.body.should include("foo@example.com")
+
+      email.bcc.should include("cheister@squareup.com")
       email.html_part.body.should include(build_part.project.name)
       email.text_part.body.should include(build_part.project.name)
       email.html_part.body.should include("http://")
