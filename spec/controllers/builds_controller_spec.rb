@@ -149,8 +149,8 @@ describe BuildsController do
       before do
         GitRepo.stub(:current_master_ref).and_return("some-sha")
       end
-      let(:repository){ Factory.create(:repository, :url => "git@git.squareup.com:square/web.git") }
-      let(:project){ Factory.create(:project, :name => "web", :repository => repository) }
+      let(:repository){ FactoryGirl.create(:repository, :url => "git@git.squareup.com:square/web.git") }
+      let(:project){ FactoryGirl.create(:project, :name => "web", :repository => repository) }
 
       it "creates the build if a ref is given" do
         expect{

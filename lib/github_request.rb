@@ -18,13 +18,14 @@ class GithubRequest
   end
 
   private
+
   def self.make_request(method, uri, args)
     body = nil
     Net::HTTP.start(uri.host, uri.port, :use_ssl => uri.scheme == 'https') do |http|
       response = http.send(method, uri.path, *args)
       body = response.body
-      Rails.logger.info("Github response: " + response.inspect)
-      Rails.logger.info("Github response body: " + body)
+      Rails.logger.info("Github response: #{response.inspect}")
+      Rails.logger.info("Github response body: #{body.inspect}")
     end
     body
   end

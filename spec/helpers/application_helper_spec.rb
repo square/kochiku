@@ -3,8 +3,8 @@ require 'spec_helper'
 describe ApplicationHelper do
   include ActionView::Helpers
   include Haml::Helpers
-  let(:project) { Factory.create(:project, :repository => repository)}
-  let(:repository) { Factory.create(:repository, :url => "git@git.squareup.com:square/web.git")}
+  let(:project) { FactoryGirl.create(:project, :repository => repository)}
+  let(:repository) { FactoryGirl.create(:repository, :url => "git@git.squareup.com:square/web.git")}
 
   before do
     @build = Build.new(:ref => "SHA1", :project => project)

@@ -2,7 +2,7 @@ require 'spec_helper'
 
 describe BuildPart do
   let(:repository) { FactoryGirl.create(:repository) }
-  let(:project) { FactoryGirl.create(:project, :repository => repository)}
+  let(:project) { FactoryGirl.create(:project, :repository => repository) }
   let(:build) { FactoryGirl.create(:build, :queue => :ci, :project => project) }
   let(:build_part) { build.build_parts.create!(:paths => ["a", "b"], :kind => "cucumber") }
 
@@ -52,9 +52,9 @@ describe BuildPart do
 
     context "with all successful attempts" do
       before {
-        2.times { Factory(:build_attempt,
-                          :build_part => build_part,
-                          :state => :passed) }
+        2.times { FactoryGirl.create(:build_attempt,
+                              :build_part => build_part,
+                              :state => :passed) }
       }
 
       it { should be_false }
@@ -62,11 +62,11 @@ describe BuildPart do
 
     context "with one successful attempt" do
       before {
-        2.times { Factory(:build_attempt,
-                          :build_part => build_part,
-                          :state => :failed) }
-        Factory(:build_attempt,
-                :state => :passed)
+        2.times { FactoryGirl.create(:build_attempt,
+                              :build_part => build_part,
+                              :state => :failed) }
+        FactoryGirl.create(:build_attempt,
+                    :state => :passed)
       }
 
       it { should be_true }
