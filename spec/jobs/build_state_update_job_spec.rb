@@ -46,6 +46,13 @@ describe BuildStateUpdateJob do
         BuildStateUpdateJob.perform(build.id)
       end
 
+      it "does not send a email if the project setting is disabled" do
+        build.update_attribute(:state, :aborted)
+        repository.update_attributes!(:send_build_failure_email => false)
+        BuildPartMailer.should_not_receive(:build_break_email)
+        BuildStateUpdateJob.perform(build.id)
+      end
+
       context "for a build of a project not on master" do
         let(:project) { FactoryGirl.create(:project, :branch => "other-branch")}
 

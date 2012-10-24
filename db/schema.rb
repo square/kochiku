@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20121018182435) do
+ActiveRecord::Schema.define(:version => 20121024005715) do
 
   create_table "build_artifacts", :force => true do |t|
     t.integer  "build_attempt_id"
@@ -73,8 +73,8 @@ ActiveRecord::Schema.define(:version => 20121018182435) do
   create_table "repositories", :force => true do |t|
     t.string   "url"
     t.string   "test_command"
-    t.datetime "created_at",                  :null => false
-    t.datetime "updated_at",                  :null => false
+    t.datetime "created_at",                                    :null => false
+    t.datetime "updated_at",                                    :null => false
     t.integer  "github_post_receive_hook_id"
     t.boolean  "run_ci"
     t.boolean  "use_branches_on_green"
@@ -83,6 +83,7 @@ ActiveRecord::Schema.define(:version => 20121018182435) do
     t.boolean  "use_spec_and_ci_queues"
     t.string   "repo_cache_dir"
     t.string   "command_flag"
+    t.boolean  "send_build_failure_email",    :default => true
   end
 
   add_index "repositories", ["url"], :name => "index_repositories_on_url"

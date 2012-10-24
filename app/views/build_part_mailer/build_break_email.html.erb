@@ -4,7 +4,7 @@
   <meta content='text/html; charset=UTF-8' http-equiv='Content-Type'/>
 </head>
 <body>
-<% if @build.project.name= "web" %>
+<% if @build.project.name != "web" %>
   Emails this would have been sent to:
   <ul>
   <% @emails.each do |email| %>
