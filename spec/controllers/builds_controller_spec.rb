@@ -147,7 +147,7 @@ describe BuildsController do
 
     context "when the project is the ci project" do
       before do
-        GitRepo.stub(:inside_copy).and_yield
+        GitRepo.stub(:current_master_ref).and_return("some-sha")
       end
       let(:repository){ Factory.create(:repository, :url => "git@git.squareup.com:square/web.git") }
       let(:project){ Factory.create(:project, :name => "web", :repository => repository) }
