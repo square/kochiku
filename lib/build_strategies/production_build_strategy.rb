@@ -1,3 +1,4 @@
+require 'open3'
 class BuildStrategy
   class << self
     # The primary function of promote_build is to push a new tag or update a branch
@@ -19,7 +20,9 @@ class BuildStrategy
 
     def run_success_script(build_ref, repository)
       GitRepo.inside_copy(repository, build_ref) do
-        Cocaine::CommandLine.new(repository.on_success_script).run
+        output, status = Open3.capture2e(repository.on_success_script)
+        output += "\nExited with status: #{status.exitstatus}"
+        return output
       end
     end
 

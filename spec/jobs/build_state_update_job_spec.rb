@@ -13,6 +13,7 @@ describe BuildStateUpdateJob do
     GitRepo.stub(:run!)
     GitRepo.stub(:current_master_ref).and_return(current_repo_master)
     BuildStrategy.stub(:promote_build)
+    BuildStrategy.stub(:run_success_script)
     stub_request(:post, /https:\/\/git\.squareup\.com\/api\/v3\/repos\/square\/kochiku\/statuses\//)
   end
 
@@ -105,10 +106,11 @@ describe BuildStateUpdateJob do
           repository.update_attribute(:on_success_script, "./this_is_a_triumph")
         end
         it "promote the build only once" do
-          BuildStrategy.should_receive(:run_success_script).once.with(build.ref, build.repository)
+          BuildStrategy.should_receive(:run_success_script).once.with(build.ref, build.repository).and_return("this is a log file\n\n")
           2.times {
             BuildStateUpdateJob.perform(build.id)
           }
+          build.reload.on_success_script_log_file.read.should == "this is a log file\n\n"
         end
       end
 

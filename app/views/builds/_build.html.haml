@@ -24,6 +24,8 @@
     - elsif build.succeeded?
       %a.info{:href => show_link_to_create_pull_request(build), :title => 'create a pull request against master'}
         Create pull request
+    - if build.on_success_script_log_file.present?
+      = link_to File.basename(build.on_success_script_log_file.to_s), build.on_success_script_log_file.url, :class => :info
     %a.info.last{:href => show_link_to_commit(build)}
       Show HEAD commit
 

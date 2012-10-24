@@ -29,6 +29,7 @@ class Build < ActiveRecord::Base
   validates_presence_of :project_id
   validates_presence_of :ref
   validates_uniqueness_of :ref, :scope => :project_id
+  mount_uploader :on_success_script_log_file, OnSuccessUploader
 
   after_create :enqueue_partitioning_job
 
@@ -116,7 +117,11 @@ class Build < ActiveRecord::Base
   def promote!
     BuildStrategy.promote_build(self.ref, repository)
     if repository.has_on_success_script? && !promoted? && Build.update_all({:promoted => true}, {:id => self.id, :promoted => nil}) == 1
-      BuildStrategy.run_success_script(self.ref, repository)
+      output = BuildStrategy.run_success_script(self.ref, repository)
+      script_log = FilelessIO.new(output)
+      script_log.original_filename = "on_success_script.log"
+      self.on_success_script_log_file = script_log
+      self.save!
     end
   end
 
