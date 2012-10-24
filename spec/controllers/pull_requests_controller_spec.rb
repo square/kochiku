@@ -1,11 +1,11 @@
 require 'spec_helper'
 
 describe PullRequestsController do
-  let!(:repository) { Factory.create(:repository, :url => "git@git.squareup.com:square/web.git", :run_ci => true) }
+  let!(:repository) { FactoryGirl.create(:repository, :url => "git@git.squareup.com:square/web.git", :run_ci => true) }
 
   describe "post /pull-request-builder" do
     context "for push events" do
-      let!(:project) { Factory.create(:project, :name => "web", :repository => repository) }
+      let!(:project) { FactoryGirl.create(:project, :name => "web", :repository => repository) }
 
       it "creates the default project if required" do
         project.update_attributes!(:name => "web-something")
@@ -114,7 +114,7 @@ describe PullRequestsController do
       end
 
       context "with a project" do
-        let(:project) { Factory.create(:project, :name => "web-pull_requests", :repository => repository) }
+        let(:project) { FactoryGirl.create(:project, :name => "web-pull_requests", :repository => repository) }
 
         it "does not create a pull request if not requested" do
           expect {

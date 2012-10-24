@@ -75,7 +75,7 @@ describe Repository do
 
   context "#run_ci=" do
     it "converts the checkbox to bool" do
-      repository = Factory.create(:repository)
+      repository = FactoryGirl.create(:repository)
       repository.run_ci="1"
       repository.save
       repository.reload
@@ -89,7 +89,7 @@ describe Repository do
 
   context "#build_pull_requests=" do
     it "converts the checkbox to bool" do
-      repository = Factory.create(:repository)
+      repository = FactoryGirl.create(:repository)
       repository.build_pull_requests="1"
       repository.save
       repository.reload
@@ -103,7 +103,7 @@ describe Repository do
 
   context "#use_branches_on_green=" do
     it "converts the checkbox to bool" do
-      repository = Factory.create(:repository)
+      repository = FactoryGirl.create(:repository)
       repository.use_branches_on_green="1"
       repository.save
       repository.reload
@@ -116,7 +116,7 @@ describe Repository do
   end
 
   it "saves build tags" do
-    repository = Factory.create(:repository)
+    repository = FactoryGirl.create(:repository)
     repository.on_green_update.should be_nil
     repository.on_green_update="1,2,3"
     repository.save

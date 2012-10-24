@@ -23,7 +23,7 @@ describe RepositoriesController do
   end
 
   describe "put /repositories/:id" do
-    let!(:repository) { Factory.create(:repository, :url => "git@git.squareup.com:square/kochiku.git", :test_command => "script/something")}
+    let!(:repository) { FactoryGirl.create(:repository, :url => "git@git.squareup.com:square/kochiku.git", :test_command => "script/something")}
     it "creates a repository" do
       expect{
         put :update, :id => repository.id, :repository => {:url => "git@git.squareup.com:square/kochiku-worker.git", :test_command => "script/something-else"}
@@ -43,7 +43,7 @@ describe RepositoriesController do
 
   describe "get /repositories/:id/edit" do
     it "responds with success" do
-      get :edit, :id => Factory.create(:repository).id
+      get :edit, :id => FactoryGirl.create(:repository).id
       response.should be_success
     end
   end

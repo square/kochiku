@@ -1,9 +1,9 @@
 require 'spec_helper'
 
 describe BuildStateUpdateJob do
-  let(:project) { Factory.create(:big_rails_project, :repository => repository, :name => name) }
-  let(:repository) { Factory.create(:repository)}
-  let(:build) { Factory.create(:build, :state => :runnable, :project => project) }
+  let(:project) { FactoryGirl.create(:big_rails_project, :repository => repository, :name => name) }
+  let(:repository) { FactoryGirl.create(:repository)}
+  let(:build) { FactoryGirl.create(:build, :state => :runnable, :project => project) }
   let(:name) { repository.repository_name + "_pull_requests" }
   let(:current_repo_master) { build.ref }
 
