@@ -29,8 +29,6 @@ class BuildStateUpdateJob < JobBase
       end
     end
 
-    if build.should_send_break_email?
-      BuildPartMailer.build_break_email(GitBlame.emails_of_build_breakers(build), build).deliver
-    end
+    build.send_build_status_email!
   end
 end

@@ -23,55 +23,6 @@ describe BuildStateUpdateJob do
     end
   end
 
-  context "build notification emails" do
-    let(:name) { repository.repository_name }
-    let(:build_attempt) { build.build_parts.first.build_attempts.create!(:state => :failed) }
-    it "should not send a failure email if the project has never had a successful build" do
-      BuildPartMailer.should_not_receive(:build_break_email)
-      build.previous_successful_build.should be_nil
-      ActionMailer::Base.deliveries.should be_empty
-    end
-
-    context "for a build that has had a successful build" do
-      let(:build) { FactoryGirl.create(:build, :state => :succeeded, :project => project); FactoryGirl.create(:build, :state => :runnable, :project => project) }
-
-      it "should not send the email if the build is not completed" do
-        BuildPartMailer.should_not_receive(:build_break_email)
-        BuildStateUpdateJob.perform(build.id)
-      end
-
-      it "should only send the build failure email once" do
-        build.update_attribute(:state, :aborted)
-        BuildPartMailer.should_receive(:build_break_email).once.and_return(OpenStruct.new(:deliver => nil))
-        2.times {
-          BuildStateUpdateJob.perform(build.id)
-        }
-      end
-
-      it "should send a fail email when the build is finished" do
-        build.update_attribute(:state, :aborted)
-        BuildPartMailer.should_receive(:build_break_email).and_return(OpenStruct.new(:deliver => nil))
-        BuildStateUpdateJob.perform(build.id)
-      end
-
-      it "does not send a email if the project setting is disabled" do
-        build.update_attribute(:state, :aborted)
-        repository.update_attributes!(:send_build_failure_email => false)
-        BuildPartMailer.should_not_receive(:build_break_email)
-        BuildStateUpdateJob.perform(build.id)
-      end
-
-      context "for a build of a project not on master" do
-        let(:project) { FactoryGirl.create(:project, :branch => "other-branch")}
-
-        it "should not send a failure email" do
-          BuildPartMailer.should_not_receive(:build_break_email)
-          BuildStateUpdateJob.perform(build.id)
-        end
-      end
-    end
-  end
-
   describe "#perform" do
     context "when incomplete but nothing has failed" do
       before do

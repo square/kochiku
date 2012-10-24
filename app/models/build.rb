@@ -145,10 +145,14 @@ class Build < ActiveRecord::Base
     branch.blank? ? ref : branch
   end
 
-  def should_send_break_email?
-    should_send_email = project.main_build? && completed? && previous_successful_build && repository.send_build_failure_email? && !build_failure_email_sent?
-    return should_send_email && Build.update_all({:build_failure_email_sent => true}, {:id => self.id, :build_failure_email_sent => nil}) == 1 if should_send_email
-    should_send_email
+  def send_build_status_email!
+    return unless project.main_build? && previous_successful_build && repository.send_build_failure_email?
+
+    if completed? && failed? && !build_failure_email_sent?
+      if Build.update_all({:build_failure_email_sent => true}, {:id => self.id, :build_failure_email_sent => nil}) == 1
+        BuildPartMailer.build_break_email(GitBlame.emails_of_build_breakers(self), self).deliver
+      end
+    end
   end
   private
 

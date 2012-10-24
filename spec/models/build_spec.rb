@@ -323,4 +323,63 @@ describe Build do
       Build.new(:branch => "some-branch", :ref => "ref").branch_or_ref.should == "some-branch"
     end
   end
+
+  context "send_build_status_email!" do
+    let(:project) { FactoryGirl.create(:big_rails_project, :repository => repository, :name => name) }
+    let(:repository) { FactoryGirl.create(:repository)}
+    let(:build) { FactoryGirl.create(:build, :state => :runnable, :project => project) }
+    let(:name) { repository.repository_name + "_pull_requests" }
+    let(:current_repo_master) { build.ref }
+    let(:name) { repository.repository_name }
+    let(:build_attempt) { build.build_parts.first.build_attempts.create!(:state => :failed) }
+
+    it "should not send a failure email if the project has never had a successful build" do
+      BuildPartMailer.should_not_receive(:build_break_email)
+      build.send_build_status_email!
+    end
+
+    context "for a build that has had a successful build" do
+      let(:build) { FactoryGirl.create(:build, :state => :succeeded, :project => project); FactoryGirl.create(:build, :state => :runnable, :project => project) }
+
+      it "should not send the email if the build is not completed" do
+        BuildPartMailer.should_not_receive(:build_break_email)
+        build.send_build_status_email!
+      end
+
+      it "should not send the email if the build passed" do
+        build.update_attribute(:state, :succeeded)
+        BuildPartMailer.should_not_receive(:build_break_email)
+        build.send_build_status_email!
+      end
+
+      it "should only send the build failure email once" do
+        build.update_attribute(:state, :failed)
+        BuildPartMailer.should_receive(:build_break_email).once.and_return(OpenStruct.new(:deliver => nil))
+        build.send_build_status_email!
+        build.send_build_status_email!
+      end
+
+      it "should send a fail email when the build is finished" do
+        build.update_attribute(:state, :failed)
+        BuildPartMailer.should_receive(:build_break_email).and_return(OpenStruct.new(:deliver => nil))
+        build.send_build_status_email!
+      end
+
+      it "does not send a email if the project setting is disabled" do
+        build.update_attribute(:state, :failed)
+        repository.update_attributes!(:send_build_failure_email => false)
+        BuildPartMailer.should_not_receive(:build_break_email)
+        build.send_build_status_email!
+      end
+
+      context "for a build of a project not on master" do
+        let(:project) { FactoryGirl.create(:project, :branch => "other-branch")}
+
+        it "should not send a failure email" do
+          BuildPartMailer.should_not_receive(:build_break_email)
+          build.send_build_status_email!
+        end
+      end
+    end
+  end
 end
