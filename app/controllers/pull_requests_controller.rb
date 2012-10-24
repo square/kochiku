@@ -12,6 +12,7 @@ class PullRequestsController < ApplicationController
   def handle_repo_push_request
     ssh_url = Repository.covert_to_ssh_url(payload['repository']['url'])
     repository = Repository.find_by_url(ssh_url)
+    return unless repository
     project = repository.projects.find_or_create_by_name(repository.repository_name)
     if payload["ref"] == "refs/heads/master" && repository.run_ci?
       sha = payload["after"]
