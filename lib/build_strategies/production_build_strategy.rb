@@ -17,6 +17,12 @@ class BuildStrategy
       end
     end
 
+    def run_success_script(build_ref, repository)
+      GitRepo.inside_copy(repository, build_ref) do
+        Cocaine::CommandLine.new(repository.on_success_script).run
+      end
+    end
+
     def merge_ref(build)
       email = 'github@squareup.com'
       begin

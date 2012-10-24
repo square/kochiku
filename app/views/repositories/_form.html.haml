@@ -23,5 +23,8 @@
   %div
     %label{:for => "use_branches_on_green"} Use Branches instead of tags:
     =  f.check_box :use_branches_on_green, {:id => "use_branches_on_green"}
+  %div
+    %label{:for => "on_success_script"} On a green CI build run:
+    =  f.text_field :on_success_script, {:id => "on_success_script"}
 
   =  f.submit "Update", {:class => 'build-button'}

@@ -96,7 +96,20 @@ describe BuildStateUpdateJob do
 
       it "should promote the build" do
         BuildStrategy.should_receive(:promote_build).with(build.ref, build.repository)
+        BuildStrategy.should_not_receive(:run_success_script)
         BuildStateUpdateJob.perform(build.id)
+      end
+
+      context "with a success script" do
+        before do
+          repository.update_attribute(:on_success_script, "./this_is_a_triumph")
+        end
+        it "promote the build only once" do
+          BuildStrategy.should_receive(:run_success_script).once.with(build.ref, build.repository)
+          2.times {
+            BuildStateUpdateJob.perform(build.id)
+          }
+        end
       end
 
       it "should automerge the build" do

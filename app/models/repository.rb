@@ -40,6 +40,10 @@ class Repository < ActiveRecord::Base
     "git@#{params[:host]}:#{params[:username]}/#{params[:repository]}.git"
   end
 
+  def has_on_success_script?
+    on_success_script.to_s.strip.present?
+  end
+
   private
   def github_url_params
     Repository.github_url_params(url)

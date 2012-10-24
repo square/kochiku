@@ -123,4 +123,17 @@ describe Repository do
     repository.reload
     repository.on_green_update.should == "1,2,3"
   end
+
+  context "has_on_success_script?" do
+    it "is false if the script is blank" do
+      Repository.new(:on_success_script => "").has_on_success_script?.should be_false
+      Repository.new(:on_success_script => nil).has_on_success_script?.should be_false
+      Repository.new(:on_success_script => "  ").has_on_success_script?.should be_false
+      Repository.new(:on_success_script => " \n ").has_on_success_script?.should be_false
+    end
+
+    it "is true if there is a script" do
+      Repository.new(:on_success_script => "hi").has_on_success_script?.should be_true
+    end
+  end
 end

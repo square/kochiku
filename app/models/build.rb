@@ -115,6 +115,9 @@ class Build < ActiveRecord::Base
 
   def promote!
     BuildStrategy.promote_build(self.ref, repository)
+    if repository.has_on_success_script? && !promoted? && Build.update_all({:promoted => true}, {:id => self.id, :promoted => nil}) == 1
+      BuildStrategy.run_success_script(self.ref, repository)
+    end
   end
 
   def completed?

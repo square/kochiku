@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20121024164929) do
+ActiveRecord::Schema.define(:version => 20121024210129) do
 
   create_table "build_artifacts", :force => true do |t|
     t.integer  "build_attempt_id"
@@ -56,6 +56,7 @@ ActiveRecord::Schema.define(:version => 20121024164929) do
     t.string   "branch"
     t.string   "target_name"
     t.boolean  "build_failure_email_sent"
+    t.boolean  "promoted"
   end
 
   add_index "builds", ["project_id"], :name => "index_builds_on_project_id"
@@ -85,6 +86,7 @@ ActiveRecord::Schema.define(:version => 20121024164929) do
     t.string   "repo_cache_dir"
     t.string   "command_flag"
     t.boolean  "send_build_failure_email",    :default => true
+    t.string   "on_success_script"
   end
 
   add_index "repositories", ["url"], :name => "index_repositories_on_url"
