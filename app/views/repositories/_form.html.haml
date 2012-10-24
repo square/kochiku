@@ -18,6 +18,9 @@
     %label{:for => "on_green_update"} On a green build tag (Comma Separated):
     =  f.text_field :on_green_update, {:id => "on_green_update"}
   %div
+    %label{:for => "send_build_failure_email"} Send email to build breakers on CI build failure:
+    =  f.check_box :send_build_failure_email, {:id => "send_build_failure_email"}
+  %div
     %label{:for => "use_branches_on_green"} Use Branches instead of tags:
     =  f.check_box :use_branches_on_green, {:id => "use_branches_on_green"}
 
