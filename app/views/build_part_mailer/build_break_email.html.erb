@@ -4,14 +4,6 @@
   <meta content='text/html; charset=UTF-8' http-equiv='Content-Type'/>
 </head>
 <body>
-<% if @build.project.name != "web" %>
-  Emails this would have been sent to:
-  <ul>
-  <% @emails.each do |email| %>
-    <li><%= email %></li>
-  <% end %>
-  </ul>
-<% end %>
 <h2>Project <%= @build.project.name %> failed</h2>
 Failed build parts:
 <ul>
