@@ -9,9 +9,9 @@ class BuildStrategy
       repository.promotion_refs.each do |promotion_ref|
         unless included_in_promotion_ref?(repository, build_ref, promotion_ref)
           if repository.use_branches_on_green
-            Cocaine::CommandLine.new("git push", "origin :build_ref:refs/heads/#{promotion_ref} -f", :build_ref => build_ref).run
+            Cocaine::CommandLine.new("git push", "origin #{build_ref}:refs/heads/#{promotion_ref} -f").run
           else
-            Cocaine::CommandLine.new("git push", "origin :build_ref:refs/tags/#{promotion_ref} -f", :build_ref => build_ref).run
+            Cocaine::CommandLine.new("git push", "origin #{build_ref}:refs/tags/#{promotion_ref} -f").run
           end
         end
       end
@@ -36,7 +36,7 @@ class BuildStrategy
       else
         promotion_ref
       end
-      cherry_cmd = Cocaine::CommandLine.new("git cherry", "#{target_to_check} :build_ref", :build_ref => build_ref)
+      cherry_cmd = Cocaine::CommandLine.new("git cherry", "#{target_to_check} #{build_ref}")
       cherry_cmd.run.lines.count == 0
     end
   end
