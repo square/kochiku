@@ -19,8 +19,8 @@ class BuildStrategy
     end
 
     def run_success_script(build_ref, repository)
-      GitRepo.inside_copy(repository, build_ref) do
-        output, status = Open3.capture2e(repository.on_success_script)
+      GitRepo.inside_copy(repository, build_ref) do |dir|
+        output, status = Open3.capture2e(repository.on_success_script, :chdir => dir)
         output += "\nExited with status: #{status.exitstatus}"
         return output
       end

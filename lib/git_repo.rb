@@ -26,7 +26,7 @@ class GitRepo
 
           run! "git submodule --quiet update"
 
-          yield
+          yield dir
         end
       end
     end
