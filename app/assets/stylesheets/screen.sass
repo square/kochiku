@@ -190,11 +190,21 @@ input.build-button, a.button
   font-size: 14px
 
 .build-errored, .build-doomed, .build-failed
-  color: #f66
+  color: #900
+.ci-errored, .ci-doomed, .ci-failed
+  background-color: #f66
 .build-partitioning, .build-runnable, .build-running
   color: #66f
+.ci-partitioning, .ci-runnable, .ci-running
+  background-color: #66f
 .build-succeeded
   color: green
+.ci-succeeded
+  background-color: #C8EEA1
+.ci-unknown
+  background-color: #EEEE71
+.build-unknown
+  color: #AA0
 
 /* Index */
 .section-wrapper
@@ -506,6 +516,26 @@ div.type
 .projects
   li.build-info
     margin: .1em 0
+
+  .ci-build-info
+    width: 150px
+    height: 150px
+    display: inline-block
+    border-radius: 10px
+    text-align: center
+    margin: 10px
+
+    .state
+      padding-top: 10px
+
+    .project-name
+      width: 100%
+      font-size: 16px
+      display: inherit
+      padding-top: 60px
+
+    .project-link
+      padding-top: 10px
 
 #repository_url, #repository_test_command, #on_green_update
   width: 400px

@@ -35,6 +35,10 @@ class Project < ActiveRecord::Base
     self.name == repository.repository_name
   end
 
+  def last_build_state
+    builds.last.try(:state) || :unknown
+  end
+
   private
 
   def execute(sql)

@@ -6,7 +6,6 @@ class ProjectsController < ApplicationController
   def ci_projects
     @repositories = Repository.all
     @projects = Project.where(:name => @repositories.map(&:repository_name))
-    render :template => "projects/index"
   end
 
   def show
