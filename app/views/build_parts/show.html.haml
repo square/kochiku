@@ -1,6 +1,8 @@
 %h2.subheader
-  =link_to @build.ref, project_build_path(@project, @build)
-  &mdash; Part #{@build_part.id}
+  = link_to(@build.project.name, project_path(@build.project))
+  \-
+  = link_to "Build #{@build.id}", project_build_path(@project, @build)
+  \- #{@build.ref} - Part #{@build_part.id}
 
 %h3 Type
 %div.type

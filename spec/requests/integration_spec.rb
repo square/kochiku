@@ -30,7 +30,7 @@ describe "viewing an in process build", :type => :request do
       click_link("#{build_part.id}")
     end
 
-    page.should have_content("#{build.ref} — Part #{build_part.id}")
+    find(".subheader").should have_content("#{build.ref} - Part #{build_part.id}")
 
     all(".build-part-info tbody tr").size.should == 1
   end
