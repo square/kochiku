@@ -22,6 +22,19 @@ describe RepositoriesController do
     end
   end
 
+  describe "get /repositories/:id/projects" do
+    let!(:repository) { FactoryGirl.create(:repository)}
+    let!(:project) { FactoryGirl.create(:project, :repository => repository)}
+    let!(:project2) { FactoryGirl.create(:project)}
+    it "shows only a repositories projects" do
+      get :projects, :id => repository.id
+      response.should be_success
+      doc = Nokogiri::HTML(response.body)
+      elements = doc.css(".projects .build-info")
+      elements.size.should == 1
+    end
+  end
+
   describe "put /repositories/:id" do
     let!(:repository) { FactoryGirl.create(:repository, :url => "git@git.squareup.com:square/kochiku.git", :test_command => "script/something")}
     it "creates a repository" do

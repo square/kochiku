@@ -1,9 +1,13 @@
 Kochiku::Application.routes.draw do
   mount Resque::Server.new, :at => '/resque'
 
-  root :to => "projects#index"
+  root :to => "projects#ci_projects"
 
-  resources :repositories
+  resources :repositories do
+    member do
+      get :projects
+    end
+  end
 
   resources :projects, :only => [:index, :new, :show] do
     get 'status-report', :action => "status_report", :on => :collection

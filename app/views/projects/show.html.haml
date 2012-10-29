@@ -18,4 +18,5 @@
     $(document).ready(Kochiku.graphBuildTimes("#{escape_javascript @project.name}"));
 
 .repositories-link
-  = link_to("Repository", edit_repository_path(@project.repository))
+  = link_to("Repository", edit_repository_path(@project.repository), :class => "info")
+  = link_to("Projects", projects_repository_path(@project.repository))

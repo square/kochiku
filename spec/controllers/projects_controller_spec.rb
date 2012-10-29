@@ -2,6 +2,21 @@ require 'spec_helper'
 require 'rexml/document'
 
 describe ProjectsController do
+  render_views
+
+  describe "#ci_projects" do
+    let(:repository) { FactoryGirl.create(:repository)}
+    let!(:ci_project) { FactoryGirl.create(:project, :name => repository.repository_name) }
+    let!(:non_ci_project) { FactoryGirl.create(:project, :name => repository.repository_name + "-pull_requests") }
+    it "only shows the ci project" do
+      get :ci_projects
+      response.should be_success
+      doc = Nokogiri::HTML(response.body)
+      elements = doc.css(".projects .build-info")
+      elements.size.should == 1
+    end
+  end
+
   describe "#show" do
     render_views
 

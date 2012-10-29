@@ -7,6 +7,11 @@ class RepositoriesController < ApplicationController
     redirect_to project_url(project)
   end
 
+  def projects
+    @projects = Project.where(:repository_id => params[:id])
+    render :template => "projects/index"
+  end
+
   def new
     @repository = Repository.new
   end
