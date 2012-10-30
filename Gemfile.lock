@@ -1,5 +1,5 @@
 GEM
-  remote: https://rubygems.org/
+  remote: http://data01.mtv.squareup.com/rubygems/
   specs:
     ZenTest (4.8.2)
     actionmailer (3.2.8)

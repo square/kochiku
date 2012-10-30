@@ -1,5 +1,5 @@
 # source 'http://mirrors.squareup.com/rubygems'
-source 'https://rubygems.org/'
+source 'http://data01.mtv.squareup.com/rubygems'
 
 gem 'rails', '3.2.8'
 gem 'rake'
