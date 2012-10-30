@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20121024212949) do
+ActiveRecord::Schema.define(:version => 20121030213442) do
 
   create_table "build_artifacts", :force => true do |t|
     t.integer  "build_attempt_id"
@@ -88,6 +88,7 @@ ActiveRecord::Schema.define(:version => 20121024212949) do
     t.string   "command_flag"
     t.boolean  "send_build_failure_email",    :default => true
     t.string   "on_success_script"
+    t.string   "queue_override"
   end
 
   add_index "repositories", ["url"], :name => "index_repositories_on_url"

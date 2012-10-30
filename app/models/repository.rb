@@ -44,6 +44,10 @@ class Repository < ActiveRecord::Base
     on_success_script.to_s.strip.present?
   end
 
+  def ci_queue_name
+    queue_override || "ci"
+  end
+
   private
   def github_url_params
     Repository.github_url_params(url)

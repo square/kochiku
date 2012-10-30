@@ -18,6 +18,15 @@ describe BuildPart do
       build_part.create_and_enqueue_new_build_attempt!
     end
 
+    it "enqueues onto a repository specific queue" do
+      repository.update_attribute(:queue_override, "ci-osx")
+      BuildAttemptJob.should_receive(:enqueue_on).once.with do |queue, arg_hash|
+        queue.should == "ci-osx"
+        true
+      end
+      build_part.create_and_enqueue_new_build_attempt!
+    end
+
     # TODO: Please fix this code and delete this spec
     it "enqueues onto a different queue then square web" do
       BuildAttemptJob.should_receive(:enqueue_on).once.with do |queue, arg_hash|
