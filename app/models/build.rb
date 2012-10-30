@@ -167,6 +167,10 @@ class Build < ActiveRecord::Base
       end
     end
   end
+
+  def is_running?
+    IN_PROGRESS_STATES.include?(self.state)
+  end
   private
 
   def status_png(r, g, b)

@@ -3,9 +3,13 @@
     %div.ci-build-info{:class => "ci-#{project.last_build_state}" }
       %div.project-name
         = link_to(project.name, project_path(project))
-      %div.state{:class => "build-#{project.last_build_state}" }
-        = project.last_build_state.to_s.capitalize
-        = "in " + distance_of_time_in_words(project.last_build_duration) if project.last_build_duration
+      - if project.builds.last.try(:is_running?)
+        %div.state{:class => "build-#{project.last_build_state}" }
+          = project.last_build_state.to_s.capitalize
+      - if project.last_completed_build
+        %div.state{:class => "build-#{project.last_completed_build.state}" }
+          = project.last_completed_build.state.to_s.capitalize
+          = "in " + distance_of_time_in_words(project.last_build_duration) if project.last_build_duration
       %div.state
         =  project.builds.last && project.builds.last.finished_at ? "Last built #{time_ago_in_words(project.builds.last.finished_at)} ago" : "Never built"
       %div.project-link
