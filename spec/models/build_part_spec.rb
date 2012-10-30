@@ -21,7 +21,7 @@ describe BuildPart do
     # TODO: Please fix this code and delete this spec
     it "enqueues onto a different queue then square web" do
       BuildAttemptJob.should_receive(:enqueue_on).once.with do |queue, arg_hash|
-        queue.should == "not-square-web-build"
+        queue.should == "ci"
         true
       end
       build_part.create_and_enqueue_new_build_attempt!

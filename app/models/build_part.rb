@@ -27,7 +27,7 @@ class BuildPart < ActiveRecord::Base
     if build_instance.repository.use_spec_and_ci_queues
       BuildAttemptJob.enqueue_on("#{build_instance.queue}-#{self.kind}", job_args)
     else
-      BuildAttemptJob.enqueue_on("not-square-web-build", job_args)
+      BuildAttemptJob.enqueue_on("ci", job_args)
     end
     build_attempt
   end
