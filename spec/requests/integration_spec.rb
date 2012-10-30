@@ -14,7 +14,7 @@ describe "viewing an in process build", :type => :request do
     visit('/')
 
     page.should have_content(project.name)
-    find(".build-info .state").should have_content("Runnable")
+    find(".ci-build-info .state").should have_content("Runnable")
 
     click_link(project.name)
     page.should have_content(build.ref)

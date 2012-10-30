@@ -12,7 +12,7 @@ describe ProjectsController do
       get :ci_projects
       response.should be_success
       doc = Nokogiri::HTML(response.body)
-      elements = doc.css(".projects .build-info")
+      elements = doc.css(".projects .ci-build-info")
       elements.size.should == 1
     end
   end
