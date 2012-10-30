@@ -11,7 +11,7 @@
           = project.last_completed_build.state.to_s.capitalize
           = "in " + distance_of_time_in_words(project.last_build_duration) if project.last_build_duration
       %div.state
-        =  project.builds.last && project.builds.last.finished_at ? "Last built #{time_ago_in_words(project.builds.last.finished_at)} ago" : "Never built"
+        =  project.last_completed_build && project.last_completed_build.finished_at ? "Last built #{time_ago_in_words(project.last_completed_build.finished_at)} ago" : "Never built"
       %div.project-link
         = link_to("Projects", projects_repository_path(project.repository))
 
