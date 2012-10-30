@@ -84,8 +84,12 @@ class Build < ActiveRecord::Base
     end
   end
 
+  def finished_at
+    build_attempts.maximum(:finished_at)
+  end
+
   def elapsed_time
-    last_finished_at = build_attempts.maximum(:finished_at)
+    last_finished_at = finished_at
     return nil if last_finished_at.blank?
     last_finished_at - created_at
   end

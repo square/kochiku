@@ -39,6 +39,10 @@ class Project < ActiveRecord::Base
     builds.last.try(:state) || :unknown
   end
 
+  def last_build_duration
+    builds.last.try(:elapsed_time) unless Build::IN_PROGRESS_STATES.include?(last_build_state)
+  end
+
   private
 
   def execute(sql)

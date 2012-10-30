@@ -1,11 +1,14 @@
 .projects
-  %div
-    - @projects.each do |project|
-      %div.ci-build-info{:class => "ci-#{project.last_build_state}" }
-        %div.project-name
-          = link_to(project.name, project_path(project))
-        %div.state{:class => "build-#{project.last_build_state}" }=  project.last_build_state.to_s.capitalize
-        %div.project-link
+  - @projects.each do |project|
+    %div.ci-build-info{:class => "ci-#{project.last_build_state}" }
+      %div.project-name
+        = link_to(project.name, project_path(project))
+      %div.state{:class => "build-#{project.last_build_state}" }
+        = project.last_build_state.to_s.capitalize
+        = "in " + distance_of_time_in_words(project.last_build_duration) if project.last_build_duration
+      %div.state
+        =  project.builds.last ? "Last built #{time_ago_in_words(project.builds.last.finished_at)} ago" : "NeverNever Never Never Never Never Never Never   built"
+      %div.project-link
         = link_to("Projects", projects_repository_path(project.repository))
 
 .repositories-link

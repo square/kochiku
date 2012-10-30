@@ -1,7 +1,7 @@
 repo_infos = [{:name => 'web'},
               {:name => 'java'},
               {:name => 'other', :last_build_state => :errored},
-              {:name => 'regulator'}]
+              {:name => 'regulator', :last_build_state => :running}]
 
 repo_infos.each do |repo_info|
   repo_name = repo_info[:name]
@@ -14,7 +14,7 @@ repo_infos.each do |repo_info|
   [:spec, :cucumber].each do |kind|
     bp = BuildPart.create!(:build_instance => build, :kind => kind, :paths => ['a'])
     build_attempt_state = build.state == :succeeded ? :passed : :errored
-    BuildAttempt.create!(:build_part => bp, :builder => :macbuild01, :state => build_attempt_state)
+    BuildAttempt.create!(:build_part => bp, :builder => :macbuild01, :state => build_attempt_state, :finished_at => rand(500).seconds.from_now)
   end
 
 end
