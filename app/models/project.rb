@@ -40,7 +40,8 @@ class Project < ActiveRecord::Base
   end
 
   def last_build_duration
-    builds.last.try(:elapsed_time) unless Build::IN_PROGRESS_STATES.include?(last_build_state)
+    last_build = builds.completed.last
+    last_build.try(:elapsed_time) unless Build::IN_PROGRESS_STATES.include?(last_build.try(:state))
   end
 
   private

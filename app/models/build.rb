@@ -33,6 +33,7 @@ class Build < ActiveRecord::Base
 
   after_create :enqueue_partitioning_job
 
+  scope :completed, {:conditions => {:state => TERMINAL_STATES}}
   scope :successful_for_project, lambda { |project_id| where(:project_id => project_id, :state => :succeeded) }
 
   def test_command(run_list)
