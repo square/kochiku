@@ -80,9 +80,7 @@ class Build < ActiveRecord::Base
       end
     previous_state = self.state
     update_attributes!(:state => state)
-    if previous_state != state
-      GithubCommitStatus.new(self).update_commit_status!
-    end
+    [previous_state, state]
   end
 
   def finished_at

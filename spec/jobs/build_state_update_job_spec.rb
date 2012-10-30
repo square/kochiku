@@ -37,6 +37,26 @@ describe BuildStateUpdateJob do
       end
     end
 
+    it "updates github when a build passes" do
+      states = []
+      stub_request(:post, "https://git.squareup.com/api/v3/repos/square/kochiku/statuses/#{build.ref}").with do |request|
+        request.headers["Authorization"].should == "token #{GithubRequest::OAUTH_TOKEN}"
+        body = JSON.parse(request.body)
+        states << body["state"]
+        true
+      end
+
+      BuildStateUpdateJob.perform(build.id)
+
+      build.build_parts.each do |part|
+        part.build_attempts.create!(:state => :passed)
+      end
+
+      BuildStateUpdateJob.perform(build.id)
+      states.should == ["pending", "success"]
+    end
+
+
     context "when all parts have passed" do
       before do
         build.build_parts.each do |part|

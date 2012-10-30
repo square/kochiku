@@ -134,21 +134,6 @@ describe Build do
       build.state.should == :succeeded
     end
 
-    it "updates github when a build passes" do
-      states = []
-      stub_request(:post, "https://git.squareup.com/api/v3/repos/square/kochiku/statuses/#{build.ref}").with do |request|
-        request.headers["Authorization"].should == "token #{GithubRequest::OAUTH_TOKEN}"
-        body = JSON.parse(request.body)
-        states << body["state"]
-        true
-      end
-      build.build_parts[0].last_attempt.finish!(:passed)
-      build.update_state_from_parts!
-      build.build_parts[1].last_attempt.finish!(:passed)
-      build.update_state_from_parts!
-      states.should == ["pending", "success"]
-    end
-
     it "should set a build state to doomed if it has a failed part but is still has more parts to process" do
       build.build_parts[0].last_attempt.finish!(:failed)
       build.update_state_from_parts!
