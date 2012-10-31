@@ -63,6 +63,16 @@ namespace :deploy do
   end
 end
 
+namespace :workers do
+  task :list, :roles => :app do
+    run "rake kochiku:workers"
+  end
+
+  namespace :ec2, :roles => :app do
+    run "rake kochiku:ec2_workers"
+  end
+end
+
 namespace :kochiku do
   task :setup, :roles => [:app, :worker] do
     run "rvm gemset create 'kochiku'"

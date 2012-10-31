@@ -1,16 +1,11 @@
+require_relative '../active_workers.rb'
+
 namespace :kochiku do
-  namespace :worker do
-    desc "Setup a development environment to run a kochiku worker. Use capistrano for remote hosts"
-    task :setup do
-      tmp_dir = Rails.root.join('tmp', 'build-partition', 'web-cache')
-      log_dir = Rails.root.join("log")
+  task :workers do
+    ActiveWorkers.all
+  end
 
-      unless File.exists?(tmp_dir)
-        FileUtils.mkdir_p tmp_dir
-        `git clone --recursive git@git.squareup.com:square/web.git #{tmp_dir}`
-      end
-
-      FileUtils.mkdir_p(log_dir)
-    end
+  task :ec2_workers  do
+    ActiveWorkers.ec2
   end
 end
