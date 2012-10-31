@@ -1,3 +1,4 @@
+- Don't build same sha twice
 - Streaming logs
 - Add wiki how to's
 - Kill abandoned jobs
