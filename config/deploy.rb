@@ -65,11 +65,11 @@ end
 
 namespace :workers do
   task :list, :roles => :app do
-    run "cd #{current_path}; rake kochiku:workers"
+    run "cd #{current_path}; rake kochiku:workers RAILS_ENV=production"
   end
 
   task :ec2, :roles => :app do
-    run "cd #{current_path}; rake kochiku:ec2_workers"
+    run "cd #{current_path}; rake kochiku:ec2_workers RAILS_ENV=production"
   end
 end
 
