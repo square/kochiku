@@ -3,12 +3,12 @@ module ActiveWorkers
     Resque.workers.map {|w|
       hostname = w.to_s.split(':').first
       hostname =~ /ec2/ ? hostname : nil
-    }.compact
+    }.compact.uniq
   end
 
   def self.all
     Resque.workers.map {|w|
       w.to_s.split(':').first
-    }
+    }.uniq
   end
 end
