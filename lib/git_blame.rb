@@ -17,7 +17,7 @@ class GitBlame
         if build.branch == "master"
           Cocaine::CommandLine.new("git log --no-merges --format='::!::%H|%an <%ae>|%ad|%B::!::' #{build.previous_successful_build.try(:ref)}...#{build.ref}").run
         else
-          Cocaine::CommandLine.new("git log --no-merges --format='::!::%H|%an <%ae>|%ad|%B::!::' origin/master..#{build.branch}").run
+          Cocaine::CommandLine.new("git log --no-merges --format='::!::%H|%an <%ae>|%ad|%B::!::' origin/master..origin/#{build.branch}").run
         end
       end
       git_changes = []
