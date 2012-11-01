@@ -6,6 +6,8 @@ class Repository < ActiveRecord::Base
   }
   has_many :projects
   validates_presence_of :url
+  validates_numericality_of :timeout, :only_integer => true
+  validates_inclusion_of :timeout, :in => 0..1440
 
   def base_html_url
     params = github_url_params
@@ -49,6 +51,7 @@ class Repository < ActiveRecord::Base
   end
 
   private
+
   def github_url_params
     Repository.github_url_params(url)
   end
@@ -58,5 +61,4 @@ class Repository < ActiveRecord::Base
     match = url.match(parser)
     {:host => match[1], :username => match[2], :repository => match[3]}
   end
-
 end

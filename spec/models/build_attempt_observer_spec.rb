@@ -2,7 +2,8 @@ require 'spec_helper'
 
 describe BuildAttemptObserver do
   describe "after_save" do
-    let(:project) { FactoryGirl.create(:project, :branch => "master")}
+    let(:repository) { FactoryGirl.create(:repository, :timeout => 20)}
+    let(:project) { FactoryGirl.create(:project, :branch => "master", :repository => repository)}
     let(:build) { FactoryGirl.create(:build, :state => :runnable, :project => project) }
     let(:build_part) { FactoryGirl.create(:build_part, :build_instance => build) }
     let(:build_attempt) { FactoryGirl.create(:build_attempt, :build_part => build_part) }
@@ -12,7 +13,7 @@ describe BuildAttemptObserver do
 
     it "sends email for a timed out build" do
       BuildPartMailer.should_receive(:time_out_email).and_return(OpenStruct.new(:deliver => nil))
-      build_attempt.assign_attributes(:state => :failed, :started_at => 41.minutes.ago)
+      build_attempt.assign_attributes(:state => :failed, :started_at => 21.minutes.ago)
       subject
     end
 

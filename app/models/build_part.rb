@@ -18,6 +18,7 @@ class BuildPart < ActiveRecord::Base
       "repo_name" => self.project.repository.repo_cache_name,
       "test_command" => self.build_instance.test_command(self.paths),
       "repo_url" => self.project.repository.url,
+      "timeout" => self.project.repository.timeout,
       "options" => self.options,
     }
     # TODO: this is a hack, please fix the following and restore this code to it's former glory.
