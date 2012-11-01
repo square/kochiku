@@ -15,6 +15,8 @@
       Create pull request
   %span.info= "Created #{time_ago_in_words @build.created_at} ago"
   %span.info= "Updated #{time_ago_in_words @build.updated_at} ago"
+  - if @build.completed?
+    %span.info= "Built in #{duration_strftime(@build.elapsed_time, "%Hh %Mm %Ss")}"
   %a.info.last{:href => show_link_to_commit(@build)}
     Show HEAD commit
   - if @build.failed?

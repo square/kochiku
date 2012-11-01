@@ -71,6 +71,9 @@ class BuildPart < ActiveRecord::Base
   end
 
   def should_reattempt?
-    build_attempts.unsuccessful.count <= 3 && kind == "cucumber" && (build_instance.auto_merge? || build_instance.queue == :ci)
+    build_attempts.unsuccessful.count < 3 &&
+        (build_instance.auto_merge? || build_instance.queue == :ci) &&
+        (kind == "cucumber" ||
+            (kind == "maven" && (paths.include?("sake/rpc") || paths.include?("clustering/zookeeper"))))
   end
 end
