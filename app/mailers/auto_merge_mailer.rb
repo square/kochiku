@@ -1,15 +1,23 @@
 class AutoMergeMailer < ActionMailer::Base
-  default :from => "kochiku-automerger@corp.squareup.com"
+  NOTIFICATIONS_EMAIL = 'kochiku-notifications@squareup.com'
 
-  def merge_successful(email, stdout_and_stderr, build)
-    @stdout_and_stderr = stdout_and_stderr
+  default :from => "build-and-release+merges@squareup.com"
+
+  def merge_successful(build, stdout_and_stderr)
     @build = build
-    mail(:to => email, :subject => "#{build.branch_or_ref} Auto Merged")
+    @stdout_and_stderr = stdout_and_stderr
+    emails = GitBlame.emails_since_last_green(@build)
+    mail(:to => emails,
+         :bcc => NOTIFICATIONS_EMAIL,
+         :subject => "[kochiku] Auto merged #{@build.branch} branch for project #{@build.project.name}")
   end
 
-  def merge_failed(email, stdout_and_stderr, build)
-    @stdout_and_stderr = stdout_and_stderr
+  def merge_failed(build, stdout_and_stderr)
     @build = build
-    mail(:to => email, :subject => "Auto Merge of #{build.branch_or_ref} Failed")
+    @stdout_and_stderr = stdout_and_stderr
+    emails = GitBlame.emails_since_last_green(@build)
+    mail(:to => emails,
+         :bcc => NOTIFICATIONS_EMAIL,
+         :subject => "[kochiku] Failed to auto merge #{@build.branch} branch for project #{@build.project.name}")
   end
 end

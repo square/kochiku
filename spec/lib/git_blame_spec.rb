@@ -4,8 +4,8 @@ describe GitBlame do
   let(:project) { FactoryGirl.create(:big_rails_project) }
   let(:build) { FactoryGirl.create(:build, :project => project) }
 
-  describe "#emails_of_build_breakers" do
-    subject { GitBlame.emails_of_build_breakers(build) }
+  describe "#emails_since_last_green" do
+    subject { GitBlame.emails_since_last_green(build) }
 
     after do
       GitBlame.instance_variable_set(:@people_lookup, nil)
@@ -77,11 +77,11 @@ describe GitBlame do
     end
   end
 
-  describe "#git_changes_since_last_green" do
-    subject { GitBlame.git_changes_since_last_green(build) }
+  describe "#changes_since_last_green" do
+    subject { GitBlame.changes_since_last_green(build) }
 
     before do
-      GitBlame.unstub(:git_changes_since_last_green)
+      GitBlame.unstub(:changes_since_last_green)
     end
 
     it "should parse the git log message and return a hash of information" do

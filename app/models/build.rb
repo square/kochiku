@@ -161,7 +161,7 @@ class Build < ActiveRecord::Base
 
     if completed? && failed? && !build_failure_email_sent?
       if Build.update_all({:build_failure_email_sent => true}, {:id => self.id, :build_failure_email_sent => nil}) == 1
-        BuildPartMailer.build_break_email(GitBlame.emails_of_build_breakers(self), self).deliver
+        BuildPartMailer.build_break_email(self).deliver
       end
     end
   end

@@ -34,7 +34,7 @@ RSpec.configure do |config|
 
     stub_request(:get, GitBlame::PEOPLE_JSON_URL).to_return(:status => 200, :body => "[]", :headers => {})
     GitBlame.stub(:git_names_and_emails_since_last_green).and_return("")
-    GitBlame.stub(:git_changes_since_last_green).and_return([])
+    GitBlame.stub(:changes_since_last_green).and_return([])
 
     ActionMailer::Base.deliveries.clear
   end

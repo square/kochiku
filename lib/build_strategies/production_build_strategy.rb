@@ -27,13 +27,12 @@ class BuildStrategy
     end
 
     def merge_ref(build)
-      email = 'github@squareup.com'
       begin
         merger = GitAutomerge.new
         log = merger.automerge(build)
-        AutoMergeMailer.merge_successful(email, log, build).deliver
+        AutoMergeMailer.merge_successful(build, log).deliver
       rescue UnableToMergeError => ex
-        AutoMergeMailer.merge_failed(email, ex.message, build).deliver
+        AutoMergeMailer.merge_failed(build, ex.message).deliver
       end
     end
 

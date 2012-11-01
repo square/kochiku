@@ -4,7 +4,7 @@ class GitBlame
   PEOPLE_JSON_URL = 'https://people.squareup.com/people.json'
 
   class << self
-    def emails_of_build_breakers(build)
+    def emails_since_last_green(build)
       git_names_and_emails = git_names_and_emails_since_last_green(build).split("\n")
       git_names_and_emails.map do |git_name_and_email|
         name, email = git_name_and_email.split(":")
@@ -12,7 +12,7 @@ class GitBlame
       end.flatten.compact.uniq
     end
 
-    def git_changes_since_last_green(build)
+    def changes_since_last_green(build)
       output = GitRepo.inside_repo(build.repository) do
         if build.branch == "master"
           Cocaine::CommandLine.new("git log --no-merges --format='::!::%H|%an <%ae>|%ad|%B::!::' #{build.previous_successful_build.try(:ref)}...#{build.ref}").run
