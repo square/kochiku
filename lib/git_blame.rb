@@ -73,7 +73,11 @@ class GitBlame
 
     def git_names_and_emails_since_last_green(build)
       GitRepo.inside_repo(build.repository) do
-        Cocaine::CommandLine.new("git log --format=%an:%ae --no-merges #{build.previous_successful_build.try(:ref)}...#{build.ref}").run
+        if build.branch == "master"
+          Cocaine::CommandLine.new("git log --format=%an:%ae --no-merges #{build.previous_successful_build.try(:ref)}...#{build.ref}").run
+        else
+          Cocaine::CommandLine.new("git log --format=%an:%ae --no-merges origin/master..origin/#{build.branch}").run
+        end
       end
     end
   end
