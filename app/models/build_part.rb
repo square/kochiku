@@ -28,7 +28,12 @@ class BuildPart < ActiveRecord::Base
     if build_instance.repository.use_spec_and_ci_queues
       BuildAttemptJob.enqueue_on("#{build_instance.queue}-#{self.kind}", job_args)
     else
-      BuildAttemptJob.enqueue_on(build_instance.repository.ci_queue_name, job_args)
+      # TODO: hopefully this is only temporary while we work to make these test less flaky
+      if (kind == "maven" && (paths.include?("sake/rpc") || paths.include?("clustering/zookeeper")))
+        BuildAttemptJob.enqueue_on("ci-osx", job_args)
+      else
+        BuildAttemptJob.enqueue_on(build_instance.repository.ci_queue_name, job_args)
+      end
     end
     build_attempt
   end
