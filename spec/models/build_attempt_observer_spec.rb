@@ -12,13 +12,13 @@ describe BuildAttemptObserver do
     subject { observer.after_save(build_attempt) }
 
     it "sends email for a timed out build" do
-      BuildPartMailer.should_receive(:time_out_email).and_return(OpenStruct.new(:deliver => nil))
+      BuildMailer.should_receive(:time_out_email).and_return(OpenStruct.new(:deliver => nil))
       build_attempt.assign_attributes(:state => :failed, :started_at => 21.minutes.ago)
       subject
     end
 
     it "does not send a timeout mail for a failed non timed out build" do
-      BuildPartMailer.should_not_receive(:time_out_email)
+      BuildMailer.should_not_receive(:time_out_email)
       build_attempt.assign_attributes(:state => :failed, :started_at => 10.minutes.ago)
       subject
     end

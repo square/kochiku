@@ -1,13 +1,13 @@
-class BuildPartMailer < ActionMailer::Base
+class BuildMailer < ActionMailer::Base
   helper :application
   NOTIFICATIONS_EMAIL = 'kochiku-notifications@squareup.com'
   KOCHIKU_EMAIL = 'kochiku@squareup.com'
 
   default :from => KOCHIKU_EMAIL
 
-  def time_out_email(build_part)
-    @build_part = build_part
-    @builder = build_part.build_attempts.last.builder
+  def time_out_email(build_attempt)
+    @build_part = build_attempt.build_part
+    @builder = build_attempt.builder
     mail(:to => NOTIFICATIONS_EMAIL, :subject => "[kochiku] Build part timed out")
   end
 
