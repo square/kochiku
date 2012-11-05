@@ -3,9 +3,7 @@ class BuildAttempt < ActiveRecord::Base
   belongs_to :build_part, :inverse_of => :build_attempts
 
   FAILED_BUILD_STATES = [:failed, :errored]
-  COMPLETED_BUILD_STATES = [:passed, :aborted] + FAILED_BUILD_STATES
-  IN_PROGRESS_BUILD_STATES = [:runnable, :running]
-  STATES = IN_PROGRESS_BUILD_STATES + COMPLETED_BUILD_STATES
+  STATES = [:runnable, :running, :passed, :aborted] + FAILED_BUILD_STATES
 
   symbolize :state, :in => STATES, :scopes => true
 
