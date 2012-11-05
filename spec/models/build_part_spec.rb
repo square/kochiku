@@ -95,4 +95,32 @@ describe BuildPart do
       build_part.is_for?(:ruby).should be_false
     end
   end
+
+  context "#last_completed_attempt" do
+    it "does not find if not in a completed state" do
+      (BuildAttempt::STATES - BuildAttempt::COMPLETED_BUILD_STATES).each do |state|
+        FactoryGirl.create(:build_attempt, :state => state)
+      end
+      BuildPart.last.last_completed_attempt.should be_nil
+    end
+    it "does find a completed" do
+      attempt = FactoryGirl.create(:build_attempt, :state => :passed)
+      BuildPart.last.last_completed_attempt.should == attempt
+    end
+  end
+
+  context "#stdout" do
+    it "finds the artifact with the stdout.log" do
+      attempt = FactoryGirl.create(:build_artifact, :log_file => File.open(FIXTURE_PATH + "stdout.log")).build_attempt
+      attempt.update_attributes(:state => :failed)
+      part = attempt.build_part
+      part.last_stdout.should_not be_nil
+    end
+    it "finds the artifact with the stdout.log.gz" do
+      attempt = FactoryGirl.create(:build_artifact, :log_file => File.open(FIXTURE_PATH + "stdout.log.gz")).build_attempt
+      attempt.update_attributes(:state => :failed)
+      part = attempt.build_part
+      part.last_stdout.should_not be_nil
+    end
+  end
 end
