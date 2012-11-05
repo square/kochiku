@@ -3,6 +3,7 @@ class BuildPart < ActiveRecord::Base
   has_many :build_attempts, :dependent => :destroy, :inverse_of => :build_part
   has_one :project, :through => :build_instance
   has_one :last_attempt, :class_name => "BuildAttempt", :order => "id DESC"
+  has_one :last_completed_attempt, :class_name => "BuildAttempt", :conditions => ['state in (?)', BuildAttempt::COMPLETED_BUILD_STATES], :order => 'id DESC'
   validates_presence_of :kind, :paths
 
   serialize :paths, Array
@@ -81,5 +82,11 @@ class BuildPart < ActiveRecord::Base
         (build_instance.auto_merge? || build_instance.queue == :ci) &&
         (kind == "cucumber" ||
             (kind == "maven" && (paths.include?("sake/rpc") || paths.include?("clustering/zookeeper"))))
+  end
+
+  def last_stdout
+    if artifacts = last_completed_attempt.try(:build_artifacts)
+      return artifacts.select{|a| a.log_file.try(:to_s) =~ /stdout\.log(\.gz)?/}.try(:first)
+    end
   end
 end
