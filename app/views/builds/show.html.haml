@@ -38,9 +38,14 @@
   %tbody
     - @build.build_parts.each do |part|
       %tr{:class => cycle("odd-row", "even-row")}
-        %td.id-column= link_to part.id, project_build_part_path(@project, @build, part)
+        %td.id-column= link_to(part.id, project_build_part_path(@project, @build, part))
         %td.result-column
-          %span.part-status{:class => part.status}= part.status.to_s.capitalize
+          %span.part-status{:class => part.status}
+            - text = part.status.to_s.capitalize
+            - if artifact = part.last_stdout
+              =link_to(text, artifact.log_file.url, :title => 'Last completed stdout.log')
+            - else
+              =text
         %td{:class => part.kind}= part.kind.to_s.capitalize
         - if build_metadata_header(@build)
           %td= build_part_field_value(@build, part)
