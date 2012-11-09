@@ -4,7 +4,7 @@ describe BuildPart do
   let(:repository) { FactoryGirl.create(:repository) }
   let(:project) { FactoryGirl.create(:project, :repository => repository) }
   let(:build) { FactoryGirl.create(:build, :queue => :ci, :project => project) }
-  let(:build_part) { build.build_parts.create!(:paths => ["a", "b"], :kind => "cucumber") }
+  let(:build_part) { FactoryGirl.create(:build_part, :paths => ["a", "b"], :kind => "spec", :build_instance => build) }
 
   describe "#create_and_enqueue_new_build_attempt!" do
     it "should create a new build attempt" do
@@ -41,7 +41,7 @@ describe BuildPart do
       build_part.update_attributes!(:options => {"rvm" => "ree"})
       # the queue name should include the queue name of the build instance and the type of the test file
       BuildAttemptJob.should_receive(:enqueue_on).once.with do |queue, arg_hash|
-        queue.should == "ci-cucumber"
+        queue.should == "ci-spec"
         arg_hash["build_attempt_id"].should_not be_blank
         arg_hash["build_ref"].should_not be_blank
         arg_hash["build_kind"].should_not be_blank
@@ -60,25 +60,59 @@ describe BuildPart do
     subject { build_part.unsuccessful? }
 
     context "with all successful attempts" do
-      before {
-        2.times { FactoryGirl.create(:build_attempt,
-                              :build_part => build_part,
-                              :state => :passed) }
-      }
+      before do
+        2.times { FactoryGirl.create(:build_attempt, :build_part => build_part, :state => :passed) }
+      end
 
       it { should be_false }
     end
 
     context "with one successful attempt" do
       before {
-        2.times { FactoryGirl.create(:build_attempt,
-                              :build_part => build_part,
-                              :state => :failed) }
-        FactoryGirl.create(:build_attempt,
-                    :state => :passed)
+        2.times { FactoryGirl.create(:build_attempt, :build_part => build_part, :state => :failed) }
+        FactoryGirl.create(:build_attempt, :build_part => build_part, :state => :passed)
       }
 
+      it { should be_false }
+    end
+
+    context "with all unsuccessful attempts" do
+      before do
+        2.times { FactoryGirl.create(:build_attempt, :build_part => build_part, :state => :failed) }
+      end
+
       it { should be_true }
+    end
+  end
+
+  describe "#status" do
+    subject { build_part.status }
+
+    context "with all successful attempts" do
+      before do
+        2.times { FactoryGirl.create(:build_attempt, :build_part => build_part, :state => :passed) }
+      end
+
+      it { should == :passed }
+    end
+
+    context "with one successful attempt" do
+      before do
+        FactoryGirl.create(:build_attempt, :build_part => build_part, :state => :failed)
+        FactoryGirl.create(:build_attempt, :build_part => build_part, :state => :passed)
+        FactoryGirl.create(:build_attempt, :build_part => build_part, :state => :failed)
+      end
+
+      it { should == :passed }
+    end
+
+    context "with no successful attempts" do
+      before do
+        FactoryGirl.create(:build_attempt, :build_part => build_part, :state => :failed)
+        FactoryGirl.create(:build_attempt, :build_part => build_part, :state => :running)
+      end
+
+      it { should == :running }
     end
   end
 

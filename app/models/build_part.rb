@@ -44,11 +44,15 @@ class BuildPart < ActiveRecord::Base
   end
 
   def status
-    last_attempt.try(:state) || "unknown"
+    if successful?
+      :passed
+    else
+      last_attempt.try(:state) || :unknown
+    end
   end
 
   def successful?
-    build_attempts.any? &:successful?
+    build_attempts.any?(&:successful?)
   end
 
   def unsuccessful?
