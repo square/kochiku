@@ -4,6 +4,7 @@
   Import this file using the following HTML or equivalent:
   <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css" />
 
+@import compass
 @import compass/reset
 @import compass/css3/border-radius
 @import _avantgarde
@@ -189,22 +190,44 @@ input.build-button, a.button
 #tiptip_content
   font-size: 14px
 
-.build-errored, .build-doomed, .build-failed
-  color: #900
+$status-color-green: #56d742
+$status-color-red: #d74242
+$status-color-blue: #42bbd7
+$status-color-gray: #b3b3b3
+
+=ci-box-shadow($color)
+  +box-shadow(0 1px 2px rgba($color, .5), inset 0 0 6px rgba(black, .3))
+
 .ci-errored, .ci-doomed, .ci-failed
-  background-color: #f66
-.build-partitioning, .build-runnable, .build-running
-  color: #66f
+  background-color: $status-color-red
+  // .build-errored, .build-doomed, .build-failed
+  color: darken($status-color-red, 30%)
+  font-weight: bold
+  +ci-box-shadow($status-color-red)
+
 .ci-partitioning, .ci-runnable, .ci-running
-  background-color: #8EE
-.build-succeeded
-  color: green
+  background-color: $status-color-blue
+  // .build-partitioning, .build-runnable, .build-running
+  color: darken($status-color-blue, 30%)
+  +ci-box-shadow($status-color-blue)
+
 .ci-succeeded
-  background-color: #C8EEA1
+  background-color: $status-color-green
+  // .build-succeeded
+  color: darken($status-color-green, 30%)
+  +ci-box-shadow($status-color-green)
+
 .ci-unknown
-  background-color: #EEEE71
-.build-unknown
-  color: #AA0
+  background-color: $status-color-gray
+  // .build-unknown
+  color: darken($status-color-gray, 30%)
+  +ci-box-shadow($status-color-gray)
+
+.ci-build-info
+  a
+    color: #fff
+    text-shadow: rgba(black, .5) 0 1px 3px
+
 
 /* Index */
 .section-wrapper
@@ -514,31 +537,41 @@ div.type
   display: inline-block
 
 .projects
+  +pie-clearfix
+
   li.build-info
     margin: .1em 0
 
   .ci-build-info
-    width: 160px
-    height: 160px
-    display: inline-block
+    position: relative
+    width: 188px
+    height: 188px
+    float: left
     border-radius: 10px
     text-align: center
-    margin: 10px
-    border: 1px solid lightgrey
-    vertical-align: top
-
-    .state
-      padding-top: 10px
+    margin: 0 10px 10px 0
+    &:nth-child(5n)
+      margin-right: 0
 
     .project-name
-      width: 100%
       font-size: 20px
       font-weight: bold
-      display: inherit
-      padding-top: 40px
-
+      a
+        display: block
+        padding: 55px 0 10px
+        letter-spacing: .05em
+    .state
+      padding-top: 6px
     .project-link
-      padding-top: 10px
+      display: none
+      position: absolute
+      bottom: 10px
+      width: 100%
+      a
+        color: #fff
+    &:hover
+      .project-link
+        display: block
 
 #repository_url, #repository_test_command, #on_green_update
   width: 400px
