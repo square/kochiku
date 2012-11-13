@@ -28,11 +28,12 @@ class BuildStrategy
 
     def merge_ref(build)
       begin
+        emails = GitBlame.emails_since_last_green(@build)
         merger = GitAutomerge.new
         log = merger.automerge(build)
-        AutoMergeMailer.merge_successful(build, log).deliver
+        AutoMergeMailer.merge_successful(build, emails, log).deliver
       rescue UnableToMergeError => ex
-        AutoMergeMailer.merge_failed(build, ex.message).deliver
+        AutoMergeMailer.merge_failed(build, emails, ex.message).deliver
       end
     end
 
