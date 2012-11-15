@@ -14,6 +14,17 @@ describe BuildMailer do
     end
   end
 
+  describe "#error_email" do
+    it "sends the email" do
+      build_attempt = FactoryGirl.build(:build_attempt, :state => :errored, :builder => "test-builder")
+
+      email = BuildMailer.error_email(build_attempt)
+      email.to.should include(BuildMailer::NOTIFICATIONS_EMAIL)
+      email.body.should include("test-builder")
+      email.body.should include("http://")
+    end
+  end
+
   describe "#build_break_email" do
     before do
       GitBlame.stub(:changes_since_last_green).and_return([{:hash => "sha", :author => "Joe", :date => "some day", :message => "always be shipping it"}])
