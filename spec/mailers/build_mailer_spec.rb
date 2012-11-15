@@ -26,24 +26,52 @@ describe BuildMailer do
   end
 
   describe "#build_break_email" do
-    before do
-      GitBlame.stub(:changes_since_last_green).and_return([{:hash => "sha", :author => "Joe", :date => "some day", :message => "always be shipping it"}])
-      GitBlame.stub(:emails_since_last_green).and_return(["foo@example.com"])
+    context "on master" do
+      let(:build) { FactoryGirl.create(:build, :queue => :developer, :branch => "master") }
+
+      before do
+        GitBlame.stub(:changes_since_last_green).and_return([{:hash => "sha", :author => "Joe", :date => "some day", :message => "always be shipping it"}])
+        GitBlame.stub(:emails_since_last_green).and_return(["foo@example.com"])
+      end
+
+      it "sends the email" do
+        build_part = build.build_parts.create!(:paths => ["a", "b"], :kind => "cucumber")
+        build_part.build_attempts.create!(:state => :failed, :builder => "test-builder")
+
+        email = BuildMailer.build_break_email(build)
+
+        email.to.should == ["foo@example.com"]
+
+        email.bcc.should include(BuildMailer::NOTIFICATIONS_EMAIL)
+        email.html_part.body.should include(build_part.project.name)
+        email.text_part.body.should include(build_part.project.name)
+        email.html_part.body.should include("http://")
+        email.text_part.body.should include("http://")
+      end
     end
 
-    it "sends the email" do
-      build_part = build.build_parts.create!(:paths => ["a", "b"], :kind => "cucumber")
-      build_attempt = build_part.build_attempts.create!(:state => :failed, :builder => "test-builder")
+    context "on a branch" do
+      let(:build) { FactoryGirl.create(:build, :queue => :developer, :branch => "branch-of-master") }
 
-      email = BuildMailer.build_break_email(build)
+      before do
+        GitBlame.stub(:changes_in_merge).and_return([{:hash => "sha", :author => "Joe", :date => "some day", :message => "always be shipping it"}])
+        GitBlame.stub(:emails_in_merge).and_return(["foo@example.com"])
+      end
 
-      email.to.should == ["foo@example.com"]
+      it "sends the email" do
+        build_part = build.build_parts.create!(:paths => ["a", "b"], :kind => "cucumber")
+        build_part.build_attempts.create!(:state => :failed, :builder => "test-builder")
 
-      email.bcc.should include(BuildMailer::NOTIFICATIONS_EMAIL)
-      email.html_part.body.should include(build_part.project.name)
-      email.text_part.body.should include(build_part.project.name)
-      email.html_part.body.should include("http://")
-      email.text_part.body.should include("http://")
+        email = BuildMailer.build_break_email(build)
+
+        email.to.should == ["foo@example.com"]
+
+        email.bcc.should include(BuildMailer::NOTIFICATIONS_EMAIL)
+        email.html_part.body.should include(build_part.project.name)
+        email.text_part.body.should include(build_part.project.name)
+        email.html_part.body.should include("http://")
+        email.text_part.body.should include("http://")
+      end
     end
   end
 end

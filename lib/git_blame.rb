@@ -5,28 +5,25 @@ class GitBlame
 
   class << self
     def emails_since_last_green(build)
-      git_names_and_emails = git_names_and_emails_since_last_green(build).split("\n")
-      git_names_and_emails.map do |git_name_and_email|
-        name, email = git_name_and_email.split(":")
-        Array(email_from_git_email(email)) | Array(email_from_git_name(name))
-      end.flatten.compact.uniq
+      lookup_git_names_and_emails(git_names_and_emails_since_last_green(build).split("\n"))
+    end
+
+    def emails_in_merge(build)
+      lookup_git_names_and_emails(git_names_and_emails_in_branch(build).split("\n"))
     end
 
     def changes_since_last_green(build)
       output = GitRepo.inside_repo(build.repository) do
-        if build.branch == "master"
-          Cocaine::CommandLine.new("git log --no-merges --format='::!::%H|%an <%ae>|%ad|%B::!::' #{build.previous_successful_build.try(:ref)}...#{build.ref}").run
-        else
-          Cocaine::CommandLine.new("git log --no-merges --format='::!::%H|%an <%ae>|%ad|%B::!::' origin/master..origin/#{build.branch}").run
-        end
+        Cocaine::CommandLine.new("git log --no-merges --format='::!::%H|%an <%ae>|%ad|%B::!::' #{build.previous_successful_build.try(:ref)}...#{build.ref}").run
       end
-      git_changes = []
-      output.split("::!::").each do |line|
-        commit_hash, author, commit_date, commit_message = line.chomp.split("|")
-        next if commit_hash.nil?
-        git_changes << {:hash => commit_hash, :author => author, :date => commit_date, :message => commit_message.gsub("\n", " ")}
+      parse_git_changes(output)
+    end
+
+    def changes_in_merge(build)
+      output = GitRepo.inside_repo(build.repository) do
+        Cocaine::CommandLine.new("git log --no-merges --format='::!::%H|%an <%ae>|%ad|%B::!::' origin/master..origin/#{build.branch}").run
       end
-      git_changes
+      parse_git_changes(output)
     end
 
     private
@@ -73,11 +70,28 @@ class GitBlame
 
     def git_names_and_emails_since_last_green(build)
       GitRepo.inside_repo(build.repository) do
-        if build.branch == "master"
-          Cocaine::CommandLine.new("git log --format=%an:%ae --no-merges #{build.previous_successful_build.try(:ref)}...#{build.ref}").run
-        else
-          Cocaine::CommandLine.new("git log --format=%an:%ae --no-merges origin/master..origin/#{build.branch}").run
-        end
+        Cocaine::CommandLine.new("git log --format=%an:%ae --no-merges #{build.previous_successful_build.try(:ref)}...#{build.ref}").run
+      end
+    end
+
+    def git_names_and_emails_in_branch(build)
+      GitRepo.inside_repo(build.repository) do
+        Cocaine::CommandLine.new("git log --format=%an:%ae --no-merges origin/master..origin/#{build.branch}").run
+      end
+    end
+
+    def lookup_git_names_and_emails(git_names_and_emails)
+      git_names_and_emails.map do |git_name_and_email|
+        name, email = git_name_and_email.split(":")
+        Array(email_from_git_email(email)) | Array(email_from_git_name(name))
+      end.flatten.compact.uniq
+    end
+
+    def parse_git_changes(output)
+      output.split("::!::").each_with_object([]) do |line, git_changes|
+        commit_hash, author, commit_date, commit_message = line.chomp.split("|")
+        next if commit_hash.nil?
+        git_changes << {:hash => commit_hash, :author => author, :date => commit_date, :message => commit_message.gsub("\n", " ")}
       end
     end
   end
