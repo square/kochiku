@@ -77,6 +77,26 @@ describe GitBlame do
     end
   end
 
+  describe "#emails_in_merge" do
+    subject { GitBlame.emails_in_merge(build) }
+
+    after do
+      GitBlame.instance_variable_set(:@people_lookup, nil)
+    end
+
+    context "with many build breakers" do
+      before do
+        GitBlame.stub(:git_names_and_emails_in_branch).and_return("User One:userone@example.com\nUser Two:usertwo@example.com")
+        GitBlame.stub(:people_from_ldap).and_return([{"First" => "User", "Last" => "One", "Email" => "userone@example.com"},
+                                                     {"First" => "User", "Last" => "Two", "Email" => "usertwo@example.com"}])
+      end
+
+      it "returns the emails of the users" do
+        subject.should == ["userone@example.com", "usertwo@example.com"]
+      end
+    end
+  end
+
   describe "#changes_since_last_green" do
     subject { GitBlame.changes_since_last_green(build) }
 
@@ -97,6 +117,23 @@ describe GitBlame do
       GitRepo.stub(:inside_repo).and_return("::!::817b88|User One|Fri Oct 19|this is my commit message\nanother line::!::")
       git_changes = subject
       git_changes.first[:message].should == "this is my commit message another line"
+    end
+  end
+
+  describe "#changes_in_merge" do
+    subject { GitBlame.changes_in_merge(build) }
+
+    before do
+      GitBlame.unstub(:changes_in_merge)
+    end
+
+    it "should parse the git log message and return a hash of information" do
+      GitRepo.stub(:inside_repo).and_return("::!::817b88be7488cab5e4f9d9975222db80d8bceb3b|User One <github+uo@squareup.com>|Fri Oct 19 17:43:47 2012 -0700|this is my commit message::!::")
+      git_changes = subject
+      git_changes.first[:hash].should == "817b88be7488cab5e4f9d9975222db80d8bceb3b"
+      git_changes.first[:author].should == "User One <github+uo@squareup.com>"
+      git_changes.first[:date].should == "Fri Oct 19 17:43:47 2012 -0700"
+      git_changes.first[:message].should == "this is my commit message"
     end
   end
 end

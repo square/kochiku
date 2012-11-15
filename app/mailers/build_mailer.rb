@@ -15,11 +15,17 @@ class BuildMailer < ActionMailer::Base
 
   def build_break_email(build)
     @build = build
-    emails = GitBlame.emails_since_last_green(@build)
-    @git_changes = GitBlame.changes_since_last_green(@build)
+    if @build.branch == "master"
+      @emails = GitBlame.emails_since_last_green(@build)
+      @git_changes = GitBlame.changes_since_last_green(@build)
+    else
+      @emails = GitBlame.emails_in_merge(@build)
+      @git_changes = GitBlame.changes_in_merge(@build)
+    end
+
     @failed_build_parts = @build.build_parts.failed_or_errored
 
-    mail :to => emails,
+    mail :to => @emails,
          :bcc => NOTIFICATIONS_EMAIL,
          :subject => "[kochiku] #{@build.project.name} build for branch #{@build.branch} failed",
          :from => "build-and-release+#{@build.project.name.parameterize}@squareup.com"
