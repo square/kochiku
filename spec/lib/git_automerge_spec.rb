@@ -22,7 +22,7 @@ describe GitAutomerge do
       before(:each) { @stubber.stub_capture2e_failure("git merge") }
 
       it "should raise an exception" do
-        expect { subject }.to raise_error(UnableToMergeError)
+        expect { subject }.to raise_error(GitAutomerge::UnableToMergeError)
       end
     end
 
@@ -30,7 +30,7 @@ describe GitAutomerge do
       before(:each) { @stubber.stub_capture2e_failure("git push") }
 
       it "should raise an exception" do
-        expect { subject }.to raise_error(UnableToMergeError)
+        expect { subject }.to raise_error(GitAutomerge::UnableToMergeError)
         @stubber.check_cmd_executed("git pull --rebase")
         @stubber.check_cmd_executed("git push origin master")
       end

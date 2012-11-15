@@ -32,7 +32,7 @@ class BuildStrategy
         merger = GitAutomerge.new
         log = merger.automerge(build)
         AutoMergeMailer.merge_successful(build, emails, log).deliver
-      rescue UnableToMergeError => ex
+      rescue GitAutomerge::UnableToMergeError => ex
         AutoMergeMailer.merge_failed(build, emails, ex.message).deliver
       end
     end

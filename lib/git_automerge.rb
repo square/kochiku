@@ -1,7 +1,8 @@
-class UnableToMergeError < StandardError; end
 require 'open3'
 
 class GitAutomerge
+  class UnableToMergeError < StandardError; end
+
   def automerge(build)
     Rails.logger.info("Trying auto_merge to master for build id: #{build.id}  branch: #{build.branch}")
 
