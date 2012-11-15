@@ -13,6 +13,14 @@ class BuildMailer < ActionMailer::Base
          :from => 'build-and-release+timeouts@squareup.com'
   end
 
+  def error_email(build_attempt)
+    @build_part = build_attempt.build_part
+    @builder = build_attempt.builder
+    mail :to => NOTIFICATIONS_EMAIL,
+         :subject => "[kochiku] Build part errored",
+         :from => 'build-and-release+errors@squareup.com'
+  end
+
   def build_break_email(build)
     @build = build
     emails = GitBlame.emails_since_last_green(@build)
