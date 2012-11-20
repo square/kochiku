@@ -18,9 +18,9 @@ class BuildStrategy
     def promote(tag_or_branch, promotion_ref, ref_to_promote)
       case tag_or_branch
       when :tag
-        command = "git push", "origin #{build_ref}:refs/tags/#{promotion_ref} -f"
+        command = "git push", "origin #{ref_to_promote}:refs/tags/#{promotion_ref} -f"
       when :branch
-        command = "git push", "origin #{build_ref}:refs/heads/#{promotion_ref} -f"
+        command = "git push", "origin #{ref_to_promote}:refs/heads/#{promotion_ref} -f"
       end
     end
 
