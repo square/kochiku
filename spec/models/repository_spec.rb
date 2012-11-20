@@ -117,7 +117,6 @@ describe Repository do
 
   it "saves build tags" do
     repository = FactoryGirl.create(:repository)
-    repository.on_green_update.should be_nil
     repository.on_green_update="1,2,3"
     repository.save
     repository.reload
