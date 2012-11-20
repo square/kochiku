@@ -31,4 +31,21 @@ describe BuildStrategy do
       end
     end
   end
+
+  describe "#promote_build" do
+    subject { described_class.promote_build(build.ref, project.repository) }
+
+    context "when pushing to a ref that doesn't exist" do
+      before(:each) {
+        mock_git_command = mock()
+        mock_git_command.should_receive(:run).and_return ""
+        Cocaine::CommandLine.stub(:new).with("git show-ref", anything, anything).and_return mock_git_command
+      }
+
+      it "fails gracefully if the ref is undefined" do
+        described_class.should_receive(:promote).with(:tag, project.repository.promotion_refs.first, build.ref)
+        subject
+      end
+    end
+  end
 end

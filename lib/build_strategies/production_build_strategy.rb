@@ -9,21 +9,21 @@ class BuildStrategy
     def promote_build(build_ref, repository)
       repository.promotion_refs.each do |promotion_ref|
         unless included_in_promotion_ref?(repository, build_ref, promotion_ref)
-          if repository.use_branches_on_green
-            command = "git push", "origin #{build_ref}:refs/heads/#{promotion_ref} -f"
-            @output = Cocaine::CommandLine.new(command).run
-          else
-            command = "git push", "origin #{build_ref}:refs/tags/#{promotion_ref} -f"
-            @output = Cocaine::CommandLine.new(command).run
-          end
+          ref_type = repository.use_branches_on_green ? :branch : :tag
+          promote(ref_type, promotion_ref, build_ref)
         end
       end
-    rescue Cocaine::ExitStatusError => e
-      # Cocaine doesn't log command line output in its exceptions, so we store it off manually
-      # What's more, Exception#message= doesn't exist, so we can't stuff the output in there
-      Rails.logger.error [e.message, @output, *e.backtrace].join("\n")
-      raise
     end
+
+    def promote(tag_or_branch, promotion_ref, ref_to_promote)
+      case tag_or_branch
+      when :tag
+        command = "git push", "origin #{build_ref}:refs/tags/#{promotion_ref} -f"
+      when :branch
+        command = "git push", "origin #{build_ref}:refs/heads/#{promotion_ref} -f"
+      end
+    end
+
 
     def run_success_script(build_ref, repository)
       GitRepo.inside_copy(repository, build_ref) do |dir|
@@ -47,6 +47,8 @@ class BuildStrategy
   private
 
     def included_in_promotion_ref?(repository, build_ref, promotion_ref)
+      return unless ref_exists?(promotion_ref)
+
       target_to_check = if repository.use_branches_on_green
         "origin/#{promotion_ref}"
       else
@@ -54,6 +56,11 @@ class BuildStrategy
       end
       cherry_cmd = Cocaine::CommandLine.new("git cherry", "#{target_to_check} #{build_ref}")
       cherry_cmd.run.lines.count == 0
+    end
+
+    def ref_exists?(promotion_ref)
+      show_ref = Cocaine::CommandLine.new("git show-ref", promotion_ref, :expected_outcodes => [0,1])
+      show_ref.run.present?
     end
   end
 end

@@ -36,5 +36,6 @@ FactoryGirl.define do
   factory :repository do
     url "git@git.squareup.com:square/kochiku.git"
     test_command "script/ci worker"
+    on_green_update 'last-green-build'
   end
 end
