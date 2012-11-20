@@ -11,17 +11,17 @@ class BuildStrategy
         unless included_in_promotion_ref?(repository, build_ref, promotion_ref)
           if repository.use_branches_on_green
             command = "git push", "origin #{build_ref}:refs/heads/#{promotion_ref} -f"
-            output  = Cocaine::CommandLine.new(command).run
+            @output = Cocaine::CommandLine.new(command).run
           else
             command = "git push", "origin #{build_ref}:refs/tags/#{promotion_ref} -f"
-            output  = Cocaine::CommandLine.new(command).run
+            @output = Cocaine::CommandLine.new(command).run
           end
         end
       end
     rescue Cocaine::ExitStatusError => e
       # Cocaine doesn't log command line output in its exceptions, so we store it off manually
       # What's more, Exception#message= doesn't exist, so we can't stuff the output in there
-      Rails.logger.error [e.message, output, *e.backtrace].join("\n")
+      Rails.logger.error [e.message, @output, *e.backtrace].join("\n")
       raise
     end
 
