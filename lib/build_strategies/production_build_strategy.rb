@@ -21,7 +21,7 @@ class BuildStrategy
     rescue Cocaine::ExitStatusError => e
       # Cocaine doesn't log command line output in its exceptions, so we store it off manually
       # What's more, Exception#message= doesn't exist, so we can't stuff the output in there
-      Rails.logger.error [command, e.message, output, *e.backtrace].join("\n")
+      Rails.logger.error [e.message, output, *e.backtrace].join("\n")
       raise
     end
 
