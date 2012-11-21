@@ -48,4 +48,18 @@ describe BuildStrategy do
       end
     end
   end
+
+  describe "#promote" do
+    subject {
+      described_class.promote(:branch, 'last-green', 'abc123',)
+    }
+
+    it "should promote a sha" do
+      mock_git_command = mock()
+      mock_git_command.should_receive(:run).and_return ""
+      Cocaine::CommandLine.stub(:new).with(["git push", "origin abc123:refs/heads/last-green -f"]).and_return mock_git_command
+
+      subject
+    end
+  end
 end

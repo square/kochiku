@@ -19,8 +19,10 @@ class BuildStrategy
       case tag_or_branch
       when :tag
         command = "git push", "origin #{ref_to_promote}:refs/tags/#{promotion_ref} -f"
+        Cocaine::CommandLine.new(command).run
       when :branch
         command = "git push", "origin #{ref_to_promote}:refs/heads/#{promotion_ref} -f"
+        Cocaine::CommandLine.new(command).run
       end
     end
 
