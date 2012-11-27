@@ -12,6 +12,6 @@ set -ex
 
 gem install bundler
 bundle
-rake db:drop db:create db:migrate
-rake db:test:prepare
+bundle exec rake db:drop db:create db:migrate
+bundle exec rake db:test:prepare
 bundle exec rspec
