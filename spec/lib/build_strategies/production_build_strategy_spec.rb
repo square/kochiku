@@ -18,6 +18,7 @@ describe BuildStrategy do
         merger = GitAutomerge.new
         GitAutomerge.should_receive(:new).and_return(merger)
         merger.should_receive(:automerge).with(build)
+        GitBlame.should_receive(:emails_since_last_green).with(duck_type(:repository))
 
         BuildStrategy.merge_ref(build).should_not be_nil
       end
