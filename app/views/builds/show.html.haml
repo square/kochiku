@@ -59,7 +59,8 @@
         - else
           %td
 
-:javascript
-  $(document).ready(function() {
-    $("#build-summary").tablesorter();
-  });
+= content_for :javascript do
+  :javascript
+    $(document).ready(function() {
+      $("#build-summary").tablesorter();
+    });

@@ -14,8 +14,9 @@
   = render @builds
 
 - if @project.main_build?
-  :javascript
-    $(document).ready(Kochiku.graphBuildTimes("#{escape_javascript @project.name}"));
+  = content_for :javascript do
+    :javascript
+      $(document).ready(Kochiku.graphBuildTimes("#{escape_javascript @project.name}"));
 
 .repositories-link
   = link_to("Repository", edit_repository_path(@project.repository), :class => "info")

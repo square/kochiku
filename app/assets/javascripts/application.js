@@ -1,3 +1,11 @@
+//= require jquery
+//= require jquery_ujs
+//= require jquery.tipTip
+//= require jquery.tablesorter
+//= require jquery.flot
+
+//= require_self
+
 Kochiku = {};
 
 Kochiku.graphBuildTimes = function(projectName) {
