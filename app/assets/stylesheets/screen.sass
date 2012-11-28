@@ -293,7 +293,6 @@ h3
     .build-info
       float: left
       .ref
-        +text-shadow
         font-size: 175%
         font-family: $font-code
         line-height: 40px
@@ -315,8 +314,8 @@ h3
       font-weight: bold
       text-align: right
 
-$part-margin: 1px
-$color-passed: hsl(81, 90%, 70%)
+$part-margin: 2px
+$color-passed: hsl(90, 90%, 70%)
 $color-runnable: hsl(58, 90%, 70%)
 $color-running: hsl(216, 90%, 70%)
 $color-failed: hsl(0, 90%, 70%)
@@ -329,7 +328,8 @@ $color-aborted: hsl(0, 0%, 70%)
   .part
     overflow: hidden
     float: left
-    border: 1px solid rgba(0, 0, 0, 0.5)
+    border: 1px solid rgba(0, 0, 0, 0.1)
+    border-radius: 3px
     margin: $part-margin
     box-shadow: 0 1px 1px rgba(0, 0, 0, 0.3)
   .part.runnable
@@ -352,8 +352,9 @@ $color-aborted: hsl(0, 0%, 70%)
     width: 115px
     height: 25px
     color: #333
+    .kind, .attempts
+      display: inline-block
     .kind
-      float: left
       font-size: 175%
       font-weight: bold
       line-height: 27px
@@ -514,10 +515,13 @@ div.type
     +box-shadow(0 1px 2px rgba(black, .5), inset 0 0 3px rgba(black, .3))
     &:nth-child(5n)
       margin-right: 0
-
+    a
+      color: rgba(white, 0.95)
+      text-shadow: rgba(black, .2) 0 -1px 0
     .project-name
-      font-size: 20px
-      font-weight: bold
+      font-family: "agb", $font-base
+      font-size: 30px
+      font-weight: 300
       a
         display: block
         padding: 55px 0 10px
@@ -529,29 +533,22 @@ div.type
       position: absolute
       bottom: 10px
       width: 100%
-      a
-        color: #fff
     &:hover
       .project-link
         display: block
 
 .ci-errored, .ci-doomed, .ci-failed
-  background-color: darken($color-failed, 10%)
+  background-color: desaturate(darken($color-failed, 10%), 20%)
   font-weight: bold
 
 .ci-partitioning, .ci-runnable, .ci-running
-  background-color: darken($color-running, 10%)
+  background-color: desaturate(darken($color-running, 10%), 20%)
 
 .ci-succeeded
-  background-color: darken($color-passed, 10%)
+  background-color: desaturate(darken($color-passed, 20%), 20%)
 
 .ci-unknown
-  background-color: darken($color-aborted, 10%)
-
-.ci-build-info
-  a
-    color: #fff
-    text-shadow: rgba(black, .3) 0 -1px 0
+  background-color: desaturate(darken($color-aborted, 10%), 20%)
 
 #repository_url, #repository_test_command, #on_green_update
   width: 400px
