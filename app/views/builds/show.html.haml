@@ -28,19 +28,19 @@
 %table.build-summary#build-summary
   %thead
     %tr
-      %th.id-column Part
+      %th.id-column.right Part
       %th.result-column Status
       %th Build Type
       - if build_metadata_header(@build)
         %th= build_metadata_header(@build)
-      %th Build Host
-      %th Elapsed Time
-      %th Attempt #
+      %th.right Build Host
+      %th.right Elapsed Time
+      %th.right Attempt #
       %th Actions
   %tbody
     - @build.build_parts.each do |part|
       %tr{:class => cycle("odd-row", "even-row")}
-        %td.id-column= link_to(part.id, project_build_part_path(@project, @build, part))
+        %td.id-column.right= link_to(part.id, project_build_part_path(@project, @build, part))
         %td.result-column
           %span.part-status{:class => part.status}
             - text = part.status.to_s.capitalize
@@ -51,9 +51,9 @@
         %td{:class => part.kind}= part.kind.to_s.capitalize
         - if build_metadata_header(@build)
           %td= build_part_field_value(@build, part)
-        %td= part.last_attempt ? part.last_attempt.builder : "pending"
-        %td= part.elapsed_time ? duration_strftime(part.elapsed_time) : "pending"
-        %td= part.build_attempts.size
+        %td.right= part.last_attempt ? part.last_attempt.builder : "pending"
+        %td.right= part.elapsed_time ? duration_strftime(part.elapsed_time) : "pending"
+        %td.right= part.build_attempts.size
         - if part.unsuccessful?
           %td= link_to("Rebuild", rebuild_project_build_part_path(@project, @build, part), :method => :post)
         - else

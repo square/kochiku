@@ -169,7 +169,7 @@ $primary-active-button-focus-shadow: $button-inset-border, $button-inset-inner, 
 
 .primary-button
   color: white
-  text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.2)
+  text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.8)
   background: #2e8cf0
   -webkit-border-radius: 7px // hack for Safari adjusting border-radius based upon "inset spread distance" value in box-shadow.
   -webkit-box-shadow: $primary-button-shadow
@@ -276,26 +276,16 @@ $logo-padding: 45px
 
 #nav
   line-height: 30px
-  width: 960px
+  width: 1000px
   margin: 15px auto
   padding-bottom: 30px
-  a
-    float: right
-    background: #3B98F2
-    font-weight: bold
-    color: white
-    text-decoration: none
-    margin-right: 0
-    display: inline-block
-    padding: 0px 10px
-    -webkit-border-radius: 6px
-    -moz-border-radius: 6px
-    border-radius: 6px 6px
 
 h2.subheader
   color: $color-title + #222
   font-size: 175%
   padding: 0 0 25px
+  form
+    display: inline-block
 
 h3
   color: $color-title + #222
@@ -303,12 +293,11 @@ h3
   padding: 0 0 10px
 
 .info
-  padding-right: 10px
-.info:after
-  padding-left: 10px
-  content: "|"
+  padding-right: 8px
+  margin-right: 8px
+  border-right: solid 1px rgba(0, 0, 0, 0.3)
 .info.last:after
-  content: ""
+  border-right: none
 
 #plot
   margin: 5px 5px 25px 5px
@@ -467,34 +456,33 @@ input.ref
   font-size: 150%
 input.build-button
   font-size: 120%
-  padding: 3px 25px 5px
+  padding: 5px 25px
   border: none
 
 table
-  width: 80%
+  width: 100%
   tr.even-row
-    background-color: #e4edfa
+    background-color: rgba(0, 0, 0, 0.05)
+  tbody tr:hover
+    background-color: #e4edfa !important
   th
     font-weight: bold
-    border-bottom: 1px solid rgba(0, 0, 0, 0.4)
-    text-align: right
+    border-bottom: 1px solid rgba(0, 0, 0, 0.1)
     padding: 0 15px 5px
     cursor: pointer
   td
-    text-align: right
     padding: 5px 15px
     .part-status, .attempt-status
-      float: right
       &::before
         content: "\00A0"
-        border: 1px solid #666
-        border-radius: 8px
+        border: 1px solid rgba(0, 0, 0, 0.4)
+        border-radius: 3px
         display: block
-        float: right
+        float: left
         width: 10px
         height: 10px
-        margin: 0 0 0 5px
-        box-shadow: 0 1px 1px rgba(0, 0, 0, 0.3)
+        margin: 0 5px 0 0
+        box-shadow: 0 1px 1px rgba(0, 0, 0, 0.1)
       &.runnable::before
         background-color: $color-runnable
       &.running::before
@@ -507,6 +495,8 @@ table
         background-color: $color-passed
       &.aborted::before
         background-color: $color-aborted
+  th.right, td.right
+    text-align: right
 
 
 /* Build show */
@@ -516,11 +506,11 @@ table
   font-size: 110%
   margin-bottom: 10px
   .id-column
-    text-align: left
     width: 50px
   .result-column
-    text-align: right
     width: 80px
+  th.result-column
+    padding-left: 32px
 
 /* Build parts show*/
 ol#build-paths
