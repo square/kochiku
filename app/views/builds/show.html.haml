@@ -4,6 +4,8 @@
   - if @build.auto_merge_enabled?
     = image_tag 'auto-merge.png', title: 'Auto merge enabled'
     = button_to "Abort Auto Merge", abort_auto_merge_project_build_path(@build.project, @build), :method => :post, :form_class => "abort-auto-merge"
+  - if Build::IN_PROGRESS_STATES.include?(@build.state)
+    = button_to "Abort Build", abort_project_build_path(@build.project, @build), :method => "put", :class => "abort-build"
 
 .build-info.build-info-subheader
   %span.info
@@ -56,9 +58,6 @@
           %td= link_to("Rebuild", rebuild_project_build_part_path(@project, @build, part), :method => :post)
         - else
           %td
-
-- if Build::IN_PROGRESS_STATES.include?(@build.state)
-  = button_to "Abort Build", abort_project_build_path(@build.project, @build), :method => "put", :class => "abort-build"
 
 :javascript
   $(document).ready(function() {
