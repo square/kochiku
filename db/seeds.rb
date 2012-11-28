@@ -9,25 +9,27 @@ repo_infos = [{:name => 'web'},
 /
 
 def create_builds_for(project, repo_info)
-  build = Build.create!(:project => project,
-                        :ref => SecureRandom.hex,
-                        :state => :runnable,
-                        :queue => "ci")
+  3.times do
+    build = Build.create!(:project => project,
+                          :ref => SecureRandom.hex,
+                          :state => :runnable,
+                          :queue => "ci")
 
-  [:spec, :cucumber].each do |kind|
-    10.times do
-      bp = BuildPart.create!(:build_instance => build,
-                             :kind => kind,
-                             :paths => ['a'])
-      build_attempt_state = repo_info[:build_attempt_state] || (BuildAttempt::STATES + [:passed] * 5).sample
-      BuildAttempt.create!(:build_part => bp, :builder => @builders.sample,
-                           :state => build_attempt_state,
-                           :started_at => Time.now,
-                           :finished_at => BuildAttempt::IN_PROGRESS_BUILD_STATES.include?(build_attempt_state) ? nil : rand(500).seconds.from_now)
+    [:spec, :cucumber].each do |kind|
+      10.times do
+        bp = BuildPart.create!(:build_instance => build,
+                               :kind => kind,
+                               :paths => ['a'])
+        build_attempt_state = repo_info[:build_attempt_state] || (BuildAttempt::STATES + [:passed] * 5).sample
+        BuildAttempt.create!(:build_part => bp, :builder => @builders.sample,
+                             :state => build_attempt_state,
+                             :started_at => Time.now,
+                             :finished_at => BuildAttempt::IN_PROGRESS_BUILD_STATES.include?(build_attempt_state) ? nil : rand(500).seconds.from_now)
+      end
     end
-  end
 
-  build.update_state_from_parts!
+    build.update_state_from_parts!
+  end
 end
 
 repo_infos.each do |repo_info|
