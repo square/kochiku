@@ -366,12 +366,12 @@ h3
       text-align: right
 
 $part-margin: 1px
-$color-passed: #D5FA8E
-$color-runnable: #FAF79D
-$color-running: #84A6D9
-$color-failed: #E9953B
-$color-errored: #FFD428
-$color-aborted: #CCCCCC
+$color-passed: hsl(81, 90%, 70%)
+$color-runnable: hsl(58, 90%, 70%)
+$color-running: hsl(216, 90%, 70%)
+$color-failed: hsl(30, 90%, 70%)
+$color-errored: hsl(48, 90%, 70%)
+$color-aborted: hsl(0, 0%, 70%)
 
 .parts
   +envelope
@@ -423,12 +423,16 @@ $color-aborted: #CCCCCC
         float: right
         margin: 13px 0 0 3px
         box-shadow: 0 1px 1px rgba(0, 0, 0, 0.3)
-    .result.runnable::before, .result.running::before
-      background-color: #66f
-    .result.failed::before, .result.errored::before
-      background-color: #f66
+    .result.runnable::before
+      background-color: $color-runnable
+    .result.running::before
+      background-color: $color-running
+    .result.failed::before
+      background-color: $color-failed
+    .result.errored::before
+      background-color: $color-errored
     .result.passed::before
-      background-color: #6f6
+      background-color: $color-passed
 
 .attempts
   .attempt
@@ -491,14 +495,18 @@ table
         height: 10px
         margin: 0 0 0 5px
         box-shadow: 0 1px 1px rgba(0, 0, 0, 0.3)
-      &.runnable::before, &.running::before
-        background-color: #66f
-      &.failed::before, &.errored::before
-        background-color: #f00
+      &.runnable::before
+        background-color: $color-runnable
+      &.running::before
+        background-color: $color-running
+      &.failed::before
+        background-color: $color-failed
+      &.errored::before
+        background-color: $color-errored
       &.passed::before
-        background-color: #6f6
+        background-color: $color-passed
       &.aborted::before
-        background-color: #CCC
+        background-color: $color-aborted
 
 
 /* Build show */
