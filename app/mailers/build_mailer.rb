@@ -23,7 +23,7 @@ class BuildMailer < ActionMailer::Base
 
   def build_break_email(build)
     @build = build
-    if @build.branch == "master"
+    if @build.project.main_build?
       @emails = GitBlame.emails_since_last_green(@build)
       @git_changes = GitBlame.changes_since_last_green(@build)
     else
