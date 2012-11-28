@@ -432,6 +432,12 @@ table
     border-bottom: 1px solid rgba(0, 0, 0, 0.1)
     padding: 0 15px 5px
     cursor: pointer
+    &.headerSortDown::after
+      content: " ▲"
+      font-size: 8px
+    &.headerSortUp::after
+      content: " ▼"
+      font-size: 8px
   td
     padding: 5px 15px
     .part-status, .attempt-status
