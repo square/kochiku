@@ -18,7 +18,7 @@
   %span.info= "Created #{time_ago_in_words @build.created_at} ago"
   %span.info= "Updated #{time_ago_in_words @build.updated_at} ago"
   - if @build.completed?
-    %span.info= "Built in #{duration_strftime(@build.elapsed_time, "%Hh %Mm %Ss").sub(/^00h 0?/, "")}"
+    %span.info= "Built in #{duration_strftime(@build.elapsed_time, "%Hh %Mm %Ss")}"
   %a.info.last{:href => show_link_to_commit(@build)}
     Show HEAD commit
   - if @build.failed?
@@ -52,7 +52,7 @@
         - if build_metadata_header(@build)
           %td= build_part_field_value(@build, part)
         %td.right= part.last_attempt ? part.last_attempt.builder : "pending"
-        %td.right= part.elapsed_time ? duration_strftime(part.elapsed_time).sub(/^00:0?/, "") : "pending"
+        %td.right= part.elapsed_time ? duration_strftime(part.elapsed_time) : "pending"
         %td.right= part.build_attempts.size
         - if part.unsuccessful?
           %td= link_to("Rebuild", rebuild_project_build_part_path(@project, @build, part), :method => :post)
