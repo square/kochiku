@@ -18,8 +18,7 @@
         %a{:href => root_path, :class => "logo", :title => "Home"}
           %h1
             <span class="title-first">Kochi</span><span class="title-second">ku</span>
-            %span.translation
-              こうちく
+            %span.translation こうちく
         %div.header-right
           = yield :header
     #content.section-wrapper
@@ -33,7 +32,7 @@
         = yield
 
     #nav
-      = link_to "Resque Admin", "/resque", :class => "button"
+      = link_to "Resque Admin", "/resque"
 
   :javascript
     $(document).ready(function() {
