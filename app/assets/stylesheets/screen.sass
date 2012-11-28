@@ -190,45 +190,6 @@ input.build-button, a.button
 #tiptip_content
   font-size: 14px
 
-$status-color-green: #56d742
-$status-color-red: #d74242
-$status-color-blue: #42bbd7
-$status-color-gray: #b3b3b3
-
-=ci-box-shadow($color)
-  +box-shadow(0 1px 2px rgba($color, .5), inset 0 0 6px rgba(black, .3))
-
-.ci-errored, .ci-doomed, .ci-failed
-  background-color: $status-color-red
-  // .build-errored, .build-doomed, .build-failed
-  color: darken($status-color-red, 30%)
-  font-weight: bold
-  +ci-box-shadow($status-color-red)
-
-.ci-partitioning, .ci-runnable, .ci-running
-  background-color: $status-color-blue
-  // .build-partitioning, .build-runnable, .build-running
-  color: darken($status-color-blue, 30%)
-  +ci-box-shadow($status-color-blue)
-
-.ci-succeeded
-  background-color: $status-color-green
-  // .build-succeeded
-  color: darken($status-color-green, 30%)
-  +ci-box-shadow($status-color-green)
-
-.ci-unknown
-  background-color: $status-color-gray
-  // .build-unknown
-  color: darken($status-color-gray, 30%)
-  +ci-box-shadow($status-color-gray)
-
-.ci-build-info
-  a
-    color: #fff
-    text-shadow: rgba(black, .5) 0 1px 3px
-
-
 /* Index */
 .section-wrapper
   overflow: hidden
@@ -358,7 +319,7 @@ $part-margin: 1px
 $color-passed: hsl(81, 90%, 70%)
 $color-runnable: hsl(58, 90%, 70%)
 $color-running: hsl(216, 90%, 70%)
-$color-failed: hsl(30, 90%, 70%)
+$color-failed: hsl(0, 90%, 70%)
 $color-errored: hsl(48, 90%, 70%)
 $color-aborted: hsl(0, 0%, 70%)
 
@@ -548,6 +509,9 @@ div.type
     border-radius: 10px
     text-align: center
     margin: 0 10px 10px 0
+    color: rgba(black, 0.8)
+    text-shadow: rgba(white, .1) 0 1px 0
+    +box-shadow(0 1px 2px rgba(black, .5), inset 0 0 3px rgba(black, .3))
     &:nth-child(5n)
       margin-right: 0
 
@@ -570,6 +534,24 @@ div.type
     &:hover
       .project-link
         display: block
+
+.ci-errored, .ci-doomed, .ci-failed
+  background-color: darken($color-failed, 10%)
+  font-weight: bold
+
+.ci-partitioning, .ci-runnable, .ci-running
+  background-color: darken($color-running, 10%)
+
+.ci-succeeded
+  background-color: darken($color-passed, 10%)
+
+.ci-unknown
+  background-color: darken($color-aborted, 10%)
+
+.ci-build-info
+  a
+    color: #fff
+    text-shadow: rgba(black, .3) 0 -1px 0
 
 #repository_url, #repository_test_command, #on_green_update
   width: 400px
