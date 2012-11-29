@@ -58,13 +58,15 @@
         %td.right= part.last_attempt ? part.last_attempt.builder : "pending"
         %td.right= part.elapsed_time ? duration_strftime(part.elapsed_time) : "pending"
         %td.right= part.build_attempts.size
-        - if part.unsuccessful?
-          %td= link_to("Rebuild", rebuild_project_build_part_path(@project, @build, part), :method => :post)
-        - else
-          %td
+        %td
+          - if part.unsuccessful?
+            = link_to("Rebuild", rebuild_project_build_part_path(@project, @build, part), :method => :post)
 
 = content_for :javascript do
   :javascript
     $(document).ready(function() {
       $("#build-summary").tablesorter({ sortList: [ [1, 0] ] });
     });
+  - if @build.is_running?
+    :javascript
+      setTimeout(function() { window.location.reload() }, 10000);
