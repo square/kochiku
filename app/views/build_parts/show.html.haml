@@ -46,7 +46,11 @@
   - @build_part.paths.each do |path|
     %li=path
 
-- if @build_part.is_running?
-  = content_for :javascript do
+= content_for :javascript do
+  :javascript
+    $(document).ready(function() {
+      $(".build-part-info").tablesorter({ sortList: [ [0, 0] ] });
+    });
+  - if @build_part.is_running?
     :javascript
       Kochiku.delayedRefresh();
