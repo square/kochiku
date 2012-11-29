@@ -26,8 +26,10 @@ describe BuildMailer do
   end
 
   describe "#build_break_email" do
-    context "on master" do
-      let(:build) { FactoryGirl.create(:build, :queue => :developer, :branch => "master") }
+    context "on master as the main build for the project" do
+      let(:repository) { FactoryGirl.create(:repository) }
+      let(:project) { FactoryGirl.create(:project, :name => repository.repository_name)}
+      let(:build) { FactoryGirl.create(:build, :queue => :developer, :project => project, :branch => "master") }
 
       before do
         GitBlame.stub(:changes_since_last_green).and_return([{:hash => "sha", :author => "Joe", :date => "some day", :message => "always be shipping it"}])
@@ -35,6 +37,8 @@ describe BuildMailer do
       end
 
       it "sends the email" do
+        build.project.should be_main_build
+
         build_part = build.build_parts.create!(:paths => ["a", "b"], :kind => "cucumber")
         build_part.build_attempts.create!(:state => :failed, :builder => "test-builder")
 
