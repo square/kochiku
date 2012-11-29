@@ -42,3 +42,8 @@
 %ol#build-paths
   - @build_part.paths.each do |path|
     %li=path
+
+- if @build_part.is_running?
+  = content_for :javascript do
+    :javascript
+      setTimeout(function() { window.location.reload() }, 10000);

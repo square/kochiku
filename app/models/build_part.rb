@@ -62,6 +62,10 @@ class BuildPart < ActiveRecord::Base
     !successful?
   end
 
+  def is_running?
+    !finished_at
+  end
+
   def to_color
     case status
     when :passed

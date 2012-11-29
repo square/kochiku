@@ -130,6 +130,17 @@ describe BuildPart do
     end
   end
 
+  describe "#is_running?" do
+    subject { build_part.is_running? }
+    context "when not finished" do
+      it { should be_true }
+    end
+    context "when finished" do
+      before { FactoryGirl.create(:build_attempt, :build_part => build_part, :state => :passed, :finished_at => Time.now) }
+      it { should be_false }
+    end
+  end
+
   context "#last_completed_attempt" do
     it "does not find if not in a completed state" do
       (BuildAttempt::STATES - BuildAttempt::COMPLETED_BUILD_STATES).each do |state|
