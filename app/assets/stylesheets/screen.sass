@@ -430,8 +430,6 @@ input.build-button
 
 table
   width: 100%
-  margin-left: -15px
-  margin-right: -15px
   tr:nth-child(even)
     background-color: rgba(0, 0, 0, 0.05)
   tbody tr:hover
@@ -472,6 +470,8 @@ table
         background-color: $color-passed
       &.aborted::before
         background-color: $color-aborted
+  th:first-child, td:first-child
+    padding-left: 0
   th.right, td.right
     text-align: right
 
