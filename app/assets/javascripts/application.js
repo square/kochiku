@@ -8,6 +8,15 @@
 
 Kochiku = {};
 
+Kochiku.delayedRefresh = function() {
+  setTimeout(function() {
+    if ($('input#refresh').is(':checked'))
+      window.location.reload();
+    else
+      Kochiku.delayedRefresh();
+  }, 10000);
+};
+
 Kochiku.graphBuildTimes = function(projectName) {
   var url = '/projects/' + projectName + '/build-time-history.json';
 

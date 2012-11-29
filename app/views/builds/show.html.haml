@@ -10,6 +10,9 @@
     = button_to "Abort Auto Merge", abort_auto_merge_project_build_path(@build.project, @build), :method => :post, :form_class => "abort-auto-merge"
   - if Build::IN_PROGRESS_STATES.include?(@build.state)
     = button_to "Abort Build", abort_project_build_path(@build.project, @build), :method => "put", :class => "abort-build"
+  %label
+    = check_box_tag :refresh, true, true
+    Auto Refresh
 
 .build-info.build-info-subheader
   %span.info
@@ -69,4 +72,4 @@
     });
   - if @build.is_running?
     :javascript
-      setTimeout(function() { window.location.reload() }, 10000);
+      Kochiku.delayedRefresh();
