@@ -48,9 +48,7 @@
 
 = content_for :javascript do
   :javascript
-    $(document).ready(function() {
-      $(".build-part-info").tablesorter({ sortList: [ [0, 0] ] });
-    });
+    $(".build-part-info").tablesorter({ sortList: [ [0, 0] ] });
   - if @build_part.is_running?
     :javascript
       Kochiku.delayedRefresh();
