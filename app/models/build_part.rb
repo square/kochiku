@@ -62,6 +62,17 @@ class BuildPart < ActiveRecord::Base
     !successful?
   end
 
+  def to_color
+    case status
+    when :passed
+      :green
+    when :failed, :errored, :aborted
+      :red
+    else
+      :blue
+    end
+  end
+
   def started_at
     last_attempt.try(:started_at)
   end

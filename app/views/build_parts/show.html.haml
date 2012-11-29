@@ -1,3 +1,7 @@
+= content_for :title, "#{@build_part.id}/#{@build.ref}"
+= content_for :favicon do
+  = favicon_link_tag image_path("#{@build_part.to_color}.png"), :type => 'image/png'
+
 %h2.subheader
   = link_to(@build.project.name, project_path(@build.project))
   \-
