@@ -10,7 +10,7 @@
     /[if IE]
       = stylesheet_link_tag 'ie.css', :media => 'screen, projection'
     = csrf_meta_tag
-    - if favicon = yield(:favicon)
+    - if (favicon = yield(:favicon)).present?
       = favicon
     - else
       = favicon_link_tag
