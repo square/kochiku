@@ -73,6 +73,9 @@ a
 strong
   font-weight: bold
 
+code
+  font-family: $font-code
+
 .structure
   display: table-cell
   display: inline-block
@@ -427,6 +430,8 @@ input.build-button
 
 table
   width: 100%
+  margin-left: -15px
+  margin-right: -15px
   tr:nth-child(even)
     background-color: rgba(0, 0, 0, 0.05)
   tbody tr:hover
@@ -484,11 +489,13 @@ table
     padding-left: 32px
 
 /* Build parts show*/
+table.build-part-info
+  margin-bottom: 20px
+
 ol#build-paths
   margin-bottom: 20px
   list-style: square inside none
-div.type
-  margin-bottom: 20px
+  line-height: 125%
 
 .abort-build
   font-size: 130%

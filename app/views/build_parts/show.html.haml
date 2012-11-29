@@ -2,26 +2,16 @@
   = link_to(@build.project.name, project_path(@build.project))
   \-
   = link_to "Build #{@build.id}", project_build_path(@project, @build)
-  \- #{@build.ref} - Part #{@build_part.id}
+  \- <code>#{@build.ref}</code> - Part #{@build_part.id}
 
-%h3 Type
-%div.type
-  =@build_part.kind.capitalize
-
-%h3 Paths
-%ol#build-paths
-  - @build_part.paths.each do |path|
-    %li=path
-
-%h3 Attempts
 %table.build-part-info
   %thead
     %tr
       %th Attempt #
       %th Status
       %th Started At
-      %th Elapsed Time
-      %th Builder
+      %th.right Elapsed Time
+      %th.right Builder
       %th Build Artifacts
       %th Actions
   %tbody
@@ -31,8 +21,8 @@
         %td.result-column
           %span.attempt-status{:class => attempt.state}= attempt.state.to_s.capitalize
         %td= attempt.started_at
-        %td= duration_strftime(attempt.elapsed_time)
-        %td= attempt.builder
+        %td.right= duration_strftime(attempt.elapsed_time)
+        %td.right= attempt.builder
         %td
           -# ci_reporter in square-web generates a bunch of xml files that we
           -# do not want to show in the web interface.
@@ -44,3 +34,7 @@
             = link_to("Rebuild", rebuild_project_build_part_path(@project, @build, @build_part), :method => :post)
           - if attempt.running?
             = link_to("Abandon", finish_build_attempt_path(attempt, :state => :errored), :method => :post)
+
+%ol#build-paths
+  - @build_part.paths.each do |path|
+    %li=path
