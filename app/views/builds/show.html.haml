@@ -1,9 +1,15 @@
+= content_for :title, @build.ref
+= content_for :favicon do
+  = favicon_link_tag image_path("#{@build.to_color}.png"), :type => 'image/png'
+
 %h2.subheader
   = link_to(@build.project.name, project_path(@build.project))
   \- Build #{@build.id} - #{@build.ref}
   - if @build.auto_merge_enabled?
     = image_tag 'auto-merge.png', title: 'Auto merge enabled'
     = button_to "Abort Auto Merge", abort_auto_merge_project_build_path(@build.project, @build), :method => :post, :form_class => "abort-auto-merge"
+  - if Build::IN_PROGRESS_STATES.include?(@build.state)
+    = button_to "Abort Build", abort_project_build_path(@build.project, @build), :method => "put", :class => "abort-build"
 
 .build-info.build-info-subheader
   %span.info
@@ -26,19 +32,19 @@
 %table.build-summary#build-summary
   %thead
     %tr
-      %th.id-column Part
+      %th.id-column.right Part
       %th.result-column Status
       %th Build Type
       - if build_metadata_header(@build)
         %th= build_metadata_header(@build)
-      %th Build Host
-      %th Elapsed Time
-      %th Attempt #
+      %th.right Build Host
+      %th.right Elapsed Time
+      %th.right Attempt #
       %th Actions
   %tbody
     - @build.build_parts.each do |part|
-      %tr{:class => cycle("odd-row", "even-row")}
-        %td.id-column= link_to(part.id, project_build_part_path(@project, @build, part))
+      %tr
+        %td.id-column.right= link_to(part.id, project_build_part_path(@project, @build, part))
         %td.result-column
           %span.part-status{:class => part.status}
             - text = part.status.to_s.capitalize
@@ -49,18 +55,18 @@
         %td{:class => part.kind}= part.kind.to_s.capitalize
         - if build_metadata_header(@build)
           %td= build_part_field_value(@build, part)
-        %td= part.last_attempt ? part.last_attempt.builder : "pending"
-        %td= part.elapsed_time ? duration_strftime(part.elapsed_time) : "pending"
-        %td= part.build_attempts.size
-        - if part.unsuccessful?
-          %td= link_to("Rebuild", rebuild_project_build_part_path(@project, @build, part), :method => :post)
-        - else
-          %td
+        %td.right= part.last_attempt ? part.last_attempt.builder : "pending"
+        %td.right= part.elapsed_time ? duration_strftime(part.elapsed_time) : "pending"
+        %td.right= part.build_attempts.size
+        %td
+          - if part.unsuccessful?
+            = link_to("Rebuild", rebuild_project_build_part_path(@project, @build, part), :method => :post)
 
-- if Build::IN_PROGRESS_STATES.include?(@build.state)
-  = button_to "Abort Build", abort_project_build_path(@build.project, @build), :method => "put", :class => "abort-build"
-
-:javascript
-  $(document).ready(function() {
-    $("#build-summary").tablesorter();
-  });
+= content_for :javascript do
+  :javascript
+    $(document).ready(function() {
+      $("#build-summary").tablesorter({ sortList: [ [1, 0] ] });
+    });
+  - if @build.is_running?
+    :javascript
+      setTimeout(function() { window.location.reload() }, 10000);

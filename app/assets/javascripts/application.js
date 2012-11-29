@@ -1,3 +1,11 @@
+//= require jquery
+//= require jquery_ujs
+//= require jquery.tipTip
+//= require jquery.tablesorter
+//= require jquery.flot
+
+//= require_self
+
 Kochiku = {};
 
 Kochiku.graphBuildTimes = function(projectName) {
@@ -32,3 +40,16 @@ Kochiku.graphBuildTimes = function(projectName) {
     });
   });
 };
+
+(function() {
+  var statuses = [
+    'Errored', 'Aborted', 'Failed', 'Runnable', 'Running', 'Passed'
+  ];
+
+  $.tablesorter.addParser({
+    id:     'state',
+    type:   'numeric',
+    is:     function(s) { return statuses.indexOf(s) !== -1 },
+    format: function(s) { return statuses.indexOf(s.replace(/^\s+|\s+$/g, '')); }
+  });
+})();

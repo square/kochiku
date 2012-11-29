@@ -3,23 +3,24 @@
   %head
     %title
       Kochiku
+      = yield(:title)
     = stylesheet_link_tag 'tipTip.css', :media => 'screen'
     = stylesheet_link_tag 'screen.css', :media => 'screen, projection'
     = stylesheet_link_tag 'print.css', :media => 'print'
     /[if IE]
       = stylesheet_link_tag 'ie.css', :media => 'screen, projection'
-    -#= javascript_include_tag "https://ajax.googleapis.com/ajax/libs/jquery/1.6.1/jquery.js"
-    = javascript_include_tag 'jquery-1.5.2.min', "rails", "application", 'jquery.tipTip', "jquery.tablesorter.min.js", 'jquery.flot.min.js'
     = csrf_meta_tag
-    = favicon_link_tag
+    - if favicon = yield(:favicon)
+      = favicon
+    - else
+      = favicon_link_tag
   %body
     #header.section-wrapper
       .section
         %a{:href => root_path, :class => "logo", :title => "Home"}
           %h1
             <span class="title-first">Kochi</span><span class="title-second">ku</span>
-            %span.translation
-              こうちく
+            %span.translation こうちく
         %div.header-right
           = yield :header
     #content.section-wrapper
@@ -32,10 +33,11 @@
             = flash[:message]
         = yield
 
-    #nav
-      = link_to "Resque Admin", "/resque", :class => "button"
+    #nav= link_to "Resque Admin", "/resque"
 
+  = javascript_include_tag 'application'
   :javascript
     $(document).ready(function() {
       $('.part').tipTip({maxWidth: "auto", edgeOffset: 10, fadeIn: 100, fadeOut: 100});
     });
+  = yield :javascript

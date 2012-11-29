@@ -2,13 +2,14 @@
   -# build_part.build_instance.project is important to prevent n+1 queries here. Using the :through does a bunch of SQL.
   %a.part-wrapper{:href => project_build_part_path(build_part.build_instance.project, build_part.build_instance, build_part)}
     .kind
-      - if build_part.kind == "spec"
+      - case build_part.kind
+      - when "spec"
         Specs
-      - elsif build_part.kind == "cucumber"
+      - when "cucumber"
         Cukes
-      - elsif build_part.kind == "jasmine"
+      - when "jasmine"
         Jasmine
-      - elsif build_part.kind == "maven"
+      - when "maven"
         Maven
     - if build_part.build_attempts.any?
       .attempts

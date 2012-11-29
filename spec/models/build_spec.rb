@@ -194,9 +194,9 @@ describe Build do
     let(:png)       { build.to_png }
     let(:png_color) { png.get_pixel(png.width/2, png.height/2) }
 
-    let(:red)   { 4284901119 }
-    let(:green) { 1728014079 }
-    let(:blue)  { 1718026239 }
+    let(:red)   { 4151209727 }
+    let(:green) { 3019337471 }
+    let(:blue)  { 1856370687 }
 
     context 'with succeeded state' do
       let(:state) { :succeeded }

@@ -26,7 +26,7 @@
       %th Actions
   %tbody
     - @build_part.build_attempts.each_with_index do |attempt, index|
-      %tr{:class => cycle("odd-row", "even-row")}
+      %tr
         %td= index + 1
         %td.result-column
           %span.attempt-status{:class => attempt.state}= attempt.state.to_s.capitalize
