@@ -50,17 +50,21 @@ $color-link: #2D81C5
   border-radius: $radius
 
 /* Styles */
-$default-background: #b4b5b7 image-url("body-noise.png") center left fixed
 html
   font-family: $font-base
-  background: $default-background
-  background: image-url("body-noise-shadow.png") repeat-y center top fixed, $default-background
-
-h1, h2, h3, h4, h5, h6
-  font-family: "agb", $font-base
+  background: #b4b5b7 image-url("body-noise.png") center left
 
 body
   font-size: 12px
+
+#page
+  background-color: white
+  width: 1140px
+  margin: 0 auto
+  box-shadow: 0 0 10px rgba(black, 0.8)
+
+h1, h2, h3, h4, h5, h6
+  font-family: "agb", $font-base
 
 a
   color: $color-link
@@ -557,6 +561,3 @@ div.type
 
 #repository_url, #repository_test_command, #on_green_update
   width: 400px
-
-.build-summary
-  width: 100%

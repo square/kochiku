@@ -15,25 +15,26 @@
     - else
       = favicon_link_tag
   %body
-    #header.section-wrapper
-      .section
-        %a{:href => root_path, :class => "logo", :title => "Home"}
-          %h1
-            <span class="title-first">Kochi</span><span class="title-second">ku</span>
-            %span.translation こうちく
-        %div.header-right
-          = yield :header
-    #content.section-wrapper
-      .section
-        - if flash[:error].present?
-          .flash.error
-            = flash[:error]
-        - if flash[:message].present?
-          .flash.message
-            = flash[:message]
-        = yield
+    #page
+      #header.section-wrapper
+        .section
+          %a{:href => root_path, :class => "logo", :title => "Home"}
+            %h1
+              <span class="title-first">Kochi</span><span class="title-second">ku</span>
+              %span.translation こうちく
+          %div.header-right
+            = yield :header
+      #content.section-wrapper
+        .section
+          - if flash[:error].present?
+            .flash.error
+              = flash[:error]
+          - if flash[:message].present?
+            .flash.message
+              = flash[:message]
+          = yield
 
-    #nav= link_to "Resque Admin", "/resque"
+      #nav= link_to "Resque Admin", "/resque"
 
   = javascript_include_tag 'application'
   :javascript
