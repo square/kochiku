@@ -43,7 +43,7 @@ Kochiku.graphBuildTimes = function(projectName) {
 
 (function() {
   var statuses = [
-    'Errored', 'Aborted', 'Failed', 'Runnable', 'Running', 'Passed'
+    'Errored', 'Aborted', 'Failed', 'Running', 'Runnable', 'Passed'
   ];
 
   $.tablesorter.addParser({
