@@ -30,7 +30,9 @@ class BuildPart < ActiveRecord::Base
       BuildAttemptJob.enqueue_on("#{build_instance.queue}-#{self.kind}", job_args)
     else
       # TODO: hopefully this is only temporary while we work to make these test less flaky
-      if (kind == "maven" && (paths.include?("sake/rpc") || paths.include?("clustering/zookeeper")))
+      if (kind == "maven" && (paths.include?("sake/rpc") ||
+                              paths.include?("clustering/zookeeper") ||
+                              paths.include?("bletchley")))
         BuildAttemptJob.enqueue_on("ci-osx", job_args)
       else
         BuildAttemptJob.enqueue_on(build_instance.repository.ci_queue_name, job_args)
@@ -85,7 +87,9 @@ class BuildPart < ActiveRecord::Base
     build_attempts.unsuccessful.count < 3 &&
         (build_instance.auto_merge? || build_instance.queue == :ci) &&
         (kind == "cucumber" ||
-            (kind == "maven" && (paths.include?("sake/rpc") || paths.include?("clustering/zookeeper") || paths.include?("tracon"))))
+            (kind == "maven" && (paths.include?("sake/rpc") ||
+                                 paths.include?("clustering/zookeeper") ||
+                                 paths.include?("tracon"))))
   end
 
   def last_stdout
