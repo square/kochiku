@@ -10,6 +10,13 @@ $color-base: #52585D
 $color-title: #52585D
 $color-link: #2D81C5
 
+$color-passed: hsl(90, 90%, 70%)
+$color-runnable: hsl(216, 40%, 90%)
+$color-running: hsl(216, 90%, 70%)
+$color-failed: hsl(0, 90%, 70%)
+$color-errored: hsl(48, 90%, 70%)
+$color-aborted: hsl(0, 0%, 70%)
+
 /* Mixins */
 =has-layout
   display: block
@@ -321,12 +328,6 @@ h3
       text-align: right
 
 $part-margin: 2px
-$color-passed: hsl(90, 90%, 70%)
-$color-runnable: hsl(216, 40%, 90%)
-$color-running: hsl(216, 90%, 70%)
-$color-failed: hsl(0, 90%, 70%)
-$color-errored: hsl(48, 90%, 70%)
-$color-aborted: hsl(0, 0%, 70%)
 
 .parts
   +envelope
@@ -364,32 +365,6 @@ $color-aborted: hsl(0, 0%, 70%)
       font-size: 175%
       font-weight: bold
       line-height: 27px
-    .result
-      float: right
-      text-transform: uppercase
-      color: #444
-      line-height: 40px
-      font-size: 90%
-      &::before
-        content: "\00A0"
-        display: block
-        border: 1px solid #666
-        border-radius: 8px
-        width: 10px
-        height: 10px
-        float: right
-        margin: 13px 0 0 3px
-        box-shadow: 0 1px 1px rgba(0, 0, 0, 0.3)
-    .result.runnable::before
-      background-color: $color-runnable
-    .result.running::before
-      background-color: $color-running
-    .result.failed::before
-      background-color: $color-failed
-    .result.errored::before
-      background-color: $color-errored
-    .result.passed::before
-      background-color: $color-passed
 
 .attempts
   .attempt
@@ -449,26 +424,35 @@ table
     .part-status, .attempt-status
       &::before
         content: "\00A0"
-        border: 1px solid rgba(0, 0, 0, 0.4)
+        border: 1px solid rgba(black, 0.4)
         border-radius: 3px
         display: block
         float: left
         width: 10px
         height: 10px
-        margin: 0 5px 0 0
-        box-shadow: 0 1px 1px rgba(0, 0, 0, 0.1)
+        text-align: center
+        margin-right: 5px
+        box-shadow: 0 1px 1px rgba(black, 0.1)
+        font-size: 10px
+        font-family: verdana, sans-serif
+        font-weight: bold
+        color: rgba(black, 0.4)
       &.runnable::before
         background-color: $color-runnable
       &.running::before
         background-color: $color-running
+      &.failed::before, &.errored::before, &.aborted::before
+        content: "!"
       &.failed::before
         background-color: $color-failed
       &.errored::before
         background-color: $color-errored
-      &.passed::before
-        background-color: $color-passed
       &.aborted::before
         background-color: $color-aborted
+      &.passed::before
+        background-color: $color-passed
+  .result-column
+    width: 80px
   th:first-child, td:first-child
     padding-left: 0
   th.right, td.right
@@ -482,8 +466,6 @@ table
   margin-bottom: 10px
   .id-column
     width: 50px
-  .result-column
-    width: 80px
   th.result-column
     padding-left: 32px
 
