@@ -8,7 +8,7 @@
   = link_to "Build #{@build.id}", project_build_path(@project, @build)
   \- <code>#{@build.ref}</code> - Part #{@build_part.id}
   %label
-    = check_box_tag :refresh, true, true
+    = check_box_tag :refresh, true, @build_part.is_running?
     Auto Refresh
 
 %table.build-part-info

@@ -11,7 +11,7 @@
   - if Build::IN_PROGRESS_STATES.include?(@build.state)
     = button_to "Abort Build", abort_project_build_path(@build.project, @build), :method => "put", :class => "abort-build"
   %label
-    = check_box_tag :refresh, true, true
+    = check_box_tag :refresh, true, @build.is_running?
     Auto Refresh
 
 .build-info.build-info-subheader
