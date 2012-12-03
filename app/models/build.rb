@@ -2,20 +2,29 @@ class Build < ActiveRecord::Base
   belongs_to :project, :inverse_of => :builds
   has_one :repository, :through => :project
   has_many :build_parts, :dependent => :destroy, :inverse_of => :build_instance do
-    def last_attempt_in_state(*state)
-      joins(:build_attempts).joins("LEFT JOIN build_attempts AS r ON build_attempts.build_part_id = r.build_part_id AND build_attempts.id < r.id").where("build_attempts.state" => state, "r.build_part_id" => nil)
+    def not_passed_and_last_attempt_in_state(*state)
+      joins(:build_attempts).joins(<<-EOSQL).where("build_attempts.state" => state, "passed_attempt.id" => nil, "newer_attempt.id" => nil)
+        LEFT JOIN build_attempts
+          AS passed_attempt
+          ON build_attempts.build_part_id = passed_attempt.build_part_id
+            AND passed_attempt.state = 'passed'
+        LEFT JOIN build_attempts
+          AS newer_attempt
+          ON build_attempts.build_part_id = newer_attempt.build_part_id
+            AND newer_attempt.id > build_attempts.id
+      EOSQL
     end
     def passed
-      last_attempt_in_state(:passed)
+      joins(:build_attempts).where("build_attempts.state" => :passed).group("build_parts.id")
     end
     def failed
-      last_attempt_in_state(:failed)
+      not_passed_and_last_attempt_in_state(:failed)
     end
     def failed_or_errored
-      last_attempt_in_state(:failed, :errored)
+      not_passed_and_last_attempt_in_state(:failed, :errored)
     end
     def errored
-      last_attempt_in_state(:errored)
+      not_passed_and_last_attempt_in_state(:errored)
     end
   end
   has_many :build_attempts, :through => :build_parts
