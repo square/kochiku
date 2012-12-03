@@ -19,7 +19,7 @@ def create_builds_for(project, repo_info)
       10.times do
         bp = BuildPart.create!(:build_instance => build,
                                :kind => kind,
-                               :paths => ['a'])
+                               :paths => ['a', 'b', 'c', 'd'])
         build_attempt_state = repo_info[:build_attempt_state] || (BuildAttempt::STATES + [:passed] * 5).sample
         BuildAttempt.create!(:build_part => bp, :builder => @builders.sample,
                              :state => build_attempt_state,

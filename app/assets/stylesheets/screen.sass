@@ -1,9 +1,3 @@
-/*
-  Welcome to Compass.
-  In this file you should write your main styles. (or centralize your imports)
-  Import this file using the following HTML or equivalent:
-  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css" />
-
 @import compass
 @import compass/reset
 @import compass/css3/border-radius
@@ -15,6 +9,13 @@ $font-code: Inconsolata, Menlo, Monaco, monospace
 $color-base: #52585D
 $color-title: #52585D
 $color-link: #2D81C5
+
+$color-passed: hsl(90, 90%, 70%)
+$color-runnable: hsl(216, 40%, 90%)
+$color-running: hsl(216, 90%, 70%)
+$color-failed: hsl(0, 90%, 70%)
+$color-errored: hsl(48, 90%, 70%)
+$color-aborted: hsl(0, 0%, 70%)
 
 /* Mixins */
 =has-layout
@@ -50,17 +51,24 @@ $color-link: #2D81C5
   border-radius: $radius
 
 /* Styles */
-$default-background: #b4b5b7 image-url("body-noise.png") center left fixed
 html
   font-family: $font-base
-  background: $default-background
-  background: image-url("body-noise-shadow.png") repeat-y center top fixed, $default-background
-
-h1, h2, h3, h4, h5, h6
-  font-family: "agb", $font-base
+  background: #b4b5b7 image-url("body-noise.png") 0 0 repeat
+  height: 100%
 
 body
   font-size: 12px
+  height: 100%
+
+#page
+  background-color: white
+  width: 1140px
+  margin: 0 auto
+  box-shadow: 0 0 10px rgba(black, 0.8)
+  min-height: 100%
+
+h1, h2, h3, h4, h5, h6
+  font-family: "agb", $font-base
 
 a
   color: $color-link
@@ -68,6 +76,9 @@ a
 
 strong
   font-weight: bold
+
+code
+  font-family: $font-code
 
 .structure
   display: table-cell
@@ -247,6 +258,11 @@ h2.subheader
   padding: 0 0 25px
   form
     display: inline-block
+  label
+    font-size: 12px
+    font-family: $font-base
+    float: right
+    padding-top: 5px
 
 h3
   color: $color-title + #222
@@ -315,12 +331,6 @@ h3
       text-align: right
 
 $part-margin: 2px
-$color-passed: hsl(90, 90%, 70%)
-$color-runnable: hsl(58, 90%, 70%)
-$color-running: hsl(216, 90%, 70%)
-$color-failed: hsl(0, 90%, 70%)
-$color-errored: hsl(48, 90%, 70%)
-$color-aborted: hsl(0, 0%, 70%)
 
 .parts
   +envelope
@@ -358,32 +368,6 @@ $color-aborted: hsl(0, 0%, 70%)
       font-size: 175%
       font-weight: bold
       line-height: 27px
-    .result
-      float: right
-      text-transform: uppercase
-      color: #444
-      line-height: 40px
-      font-size: 90%
-      &::before
-        content: "\00A0"
-        display: block
-        border: 1px solid #666
-        border-radius: 8px
-        width: 10px
-        height: 10px
-        float: right
-        margin: 13px 0 0 3px
-        box-shadow: 0 1px 1px rgba(0, 0, 0, 0.3)
-    .result.runnable::before
-      background-color: $color-runnable
-    .result.running::before
-      background-color: $color-running
-    .result.failed::before
-      background-color: $color-failed
-    .result.errored::before
-      background-color: $color-errored
-    .result.passed::before
-      background-color: $color-passed
 
 .attempts
   .attempt
@@ -443,26 +427,37 @@ table
     .part-status, .attempt-status
       &::before
         content: "\00A0"
-        border: 1px solid rgba(0, 0, 0, 0.4)
+        border: 1px solid rgba(black, 0.4)
         border-radius: 3px
         display: block
         float: left
         width: 10px
         height: 10px
-        margin: 0 5px 0 0
-        box-shadow: 0 1px 1px rgba(0, 0, 0, 0.1)
+        text-align: center
+        margin-right: 5px
+        box-shadow: 0 1px 1px rgba(black, 0.1)
+        font-size: 10px
+        font-family: verdana, sans-serif
+        font-weight: bold
+        color: rgba(black, 0.4)
       &.runnable::before
         background-color: $color-runnable
       &.running::before
         background-color: $color-running
+      &.failed::before, &.errored::before, &.aborted::before
+        content: "!"
       &.failed::before
         background-color: $color-failed
       &.errored::before
         background-color: $color-errored
-      &.passed::before
-        background-color: $color-passed
       &.aborted::before
         background-color: $color-aborted
+      &.passed::before
+        background-color: $color-passed
+  .result-column
+    width: 80px
+  th:first-child, td:first-child
+    padding-left: 0
   th.right, td.right
     text-align: right
 
@@ -471,21 +466,20 @@ table
 .build-info-subheader
   margin: -15px 0 25px
 .build-summary
-  font-size: 110%
   margin-bottom: 10px
   .id-column
     width: 50px
-  .result-column
-    width: 80px
   th.result-column
     padding-left: 32px
 
 /* Build parts show*/
+table.build-part-info
+  margin-bottom: 20px
+
 ol#build-paths
   margin-bottom: 20px
   list-style: square inside none
-div.type
-  margin-bottom: 20px
+  line-height: 150%
 
 .abort-build
   font-size: 130%
@@ -526,7 +520,7 @@ div.type
       text-shadow: rgba(black, .2) 0 -1px 0
     .project-name
       font-family: "agb", $font-base
-      font-size: 30px
+      font-size: 26px
       font-weight: 300
       a
         display: block
@@ -558,6 +552,3 @@ div.type
 
 #repository_url, #repository_test_command, #on_green_update
   width: 400px
-
-.build-summary
-  width: 100%

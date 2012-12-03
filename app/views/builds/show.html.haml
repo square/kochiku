@@ -4,12 +4,15 @@
 
 %h2.subheader
   = link_to(@build.project.name, project_path(@build.project))
-  \- Build #{@build.id} - #{@build.ref}
+  \- Build #{@build.id} - <code>#{@build.ref}</code>
   - if @build.auto_merge_enabled?
     = image_tag 'auto-merge.png', title: 'Auto merge enabled'
     = button_to "Abort Auto Merge", abort_auto_merge_project_build_path(@build.project, @build), :method => :post, :form_class => "abort-auto-merge"
   - if Build::IN_PROGRESS_STATES.include?(@build.state)
     = button_to "Abort Build", abort_project_build_path(@build.project, @build), :method => "put", :class => "abort-build"
+  %label
+    = check_box_tag :refresh, true, @build.is_running?
+    Auto Refresh
 
 .build-info.build-info-subheader
   %span.info
@@ -24,9 +27,9 @@
   - if @build.completed?
     %span.info= "Built in #{duration_strftime(@build.elapsed_time, "%Hh %Mm %Ss")}"
   %a.info.last{:href => show_link_to_commit(@build)}
-    Show HEAD commit
+    Show on GitHub
   - if @build.failed?
-    = button_to "Rebuild All", rebuild_failed_parts_project_build_path(@project, @build), :method => :post, :form_class => "rebuild-parts"
+    = button_to "Rebuild Failed", rebuild_failed_parts_project_build_path(@project, @build), :method => :post, :form_class => "rebuild-parts"
 
 
 %table.build-summary#build-summary
@@ -37,7 +40,7 @@
       %th Build Type
       - if build_metadata_header(@build)
         %th= build_metadata_header(@build)
-      %th.right Build Host
+      %th.right Worker
       %th.right Elapsed Time
       %th.right Attempt #
       %th Actions
@@ -64,9 +67,5 @@
 
 = content_for :javascript do
   :javascript
-    $(document).ready(function() {
-      $("#build-summary").tablesorter({ sortList: [ [1, 0] ] });
-    });
-  - if @build.is_running?
-    :javascript
-      setTimeout(function() { window.location.reload() }, 10000);
+    $("#build-summary").tablesorter({ sortList: [ [1, 0] ] });
+    Kochiku.delayedRefresh();
