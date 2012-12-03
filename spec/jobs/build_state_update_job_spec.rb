@@ -83,9 +83,18 @@ describe BuildStateUpdateJob do
               build.ref.should == "new-sha"
             end
 
+            # TODO: this shouldn't be under the "when all parts have passed" context
             it "does not kick off a new build unless finished" do
-              build.build_parts.first.create_and_enqueue_new_build_attempt!
+              build.build_parts.first.build_attempts.last.update_attribute(:state, :running)
               expect { subject }.to_not change(project.builds, :count)
+            end
+
+            it "kicks off a new build if attempts are running on a part that passed" do
+              build.build_parts.first.create_and_enqueue_new_build_attempt!
+              expect { subject }.to change(project.builds, :count).by(1)
+              build = project.builds.last
+              build.queue.should == :ci
+              build.ref.should == "new-sha"
             end
 
             it "does not kick off a new build if one is already running" do
@@ -157,7 +166,7 @@ describe BuildStateUpdateJob do
 
     context "when all parts have run and some have failed" do
       before do
-        build.build_parts.each do |part|
+        (build.build_parts - [build.build_parts.first]).each do |part|
           part.build_attempts.create!(:state => :passed)
         end
         build.build_parts.first.build_attempts.create!(:state => :failed)
