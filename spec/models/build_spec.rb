@@ -150,6 +150,24 @@ describe Build do
       build.state.should == :failed
     end
 
+    it "should set build_state to running when a failed attempt is retried" do
+      build.build_parts[0].last_attempt.finish!(:passed)
+      build.build_parts[1].last_attempt.finish!(:failed)
+      build.build_parts[1].build_attempts.create!(:state => :running)
+      build.update_state_from_parts!
+
+      build.state.should == :running
+    end
+
+    it "should set build_state to doomed when an attempt is retried but other attempts are failed" do
+      build.build_parts[0].last_attempt.finish!(:failed)
+      build.build_parts[1].last_attempt.finish!(:failed)
+      build.build_parts[1].build_attempts.create!(:state => :running)
+      build.update_state_from_parts!
+
+      build.state.should == :doomed
+    end
+
     it "should ignore the old build_attempts" do
       build.build_parts[0].last_attempt.finish!(:passed)
       build.build_parts[1].last_attempt.finish!(:errored)
