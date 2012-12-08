@@ -7,10 +7,8 @@
         Specs
       - when "cucumber"
         Cukes
-      - when "jasmine"
-        Jasmine
-      - when "maven"
-        Maven
+      - else
+        = build_part.kind.capitalize
     - if build_part.build_attempts.any?
       .attempts
         = render build_part.last_attempt
