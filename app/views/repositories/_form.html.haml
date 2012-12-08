@@ -9,25 +9,32 @@
     %label{:for => "command_flag"} Command Flag:
     = f.text_field :command_flag, {:placeholder => '', :autocapitalize => 'off', :autocorrect => 'off', :spellcheck => 'false'}
   %div
+    %label{:for => "timeout"} Build part timeout:
+    = f.text_field :timeout, {:id => "timeout"}
+    minutes
+  %div
     %label{:for => "build_pull_requests"} Auto-build pull requests:
     = f.check_box :build_pull_requests, {:id => "build_pull_requests"}
   %div
-    %label{:for => "run_ci"} Run Continuous Integration for repository:
+    %label{:for => "run_ci"} Run continuous integration:
     = f.check_box :run_ci, {:id => "run_ci"}
-  %div
-    %label{:for => "on_green_update"} On a green build tag (Comma Separated):
-    = f.text_field :on_green_update, {:id => "on_green_update"}
-  %div
-    %label{:for => "send_build_failure_email"} Send email to build breakers on CI build failure:
-    = f.check_box :send_build_failure_email, {:id => "send_build_failure_email"}
-  %div
-    %label{:for => "use_branches_on_green"} Use Branches instead of tags:
-    = f.check_box :use_branches_on_green, {:id => "use_branches_on_green"}
-  %div
-    %label{:for => "on_success_script"} On a green CI build run:
-    = f.text_field :on_success_script, {:id => "on_success_script"}
-  %div
-    %label{:for => "timeout"} Build Part timeout in minutes:
-    = f.text_field :timeout, {:id => "timeout"}
+
+  %fieldset
+    %legend On a passed build
+    %div
+      %label{:for => "on_green_update"} Tag:
+      = f.text_field :on_green_update, {:id => "on_green_update", :placeholder => "Comma separated list"}
+    %div
+      %label{:for => "use_branches_on_green"} Use branches instead of tags:
+      = f.check_box :use_branches_on_green, {:id => "use_branches_on_green"}
+    %div
+      %label{:for => "on_success_script"} Run:
+      = f.text_field :on_success_script, {:id => "on_success_script"}
+
+  %fieldset
+    %legend On a failed build
+    %div
+      %label{:for => "send_build_failure_email"} Send email to build breakers:
+      = f.check_box :send_build_failure_email, {:id => "send_build_failure_email"}
 
   = f.submit "Update", {:class => 'build-button'}
