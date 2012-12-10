@@ -1,7 +1,7 @@
 # coding: utf-8
 require "spec_helper"
 
-describe "viewing an in process build", :type => :request do
+feature "viewing an in process build" do
   let(:repository) { FactoryGirl.create(:repository) }
   let(:project) { FactoryGirl.create(:project, :name => repository.repository_name) }
   let(:build) { FactoryGirl.create(:build, :project => project) }
@@ -14,7 +14,7 @@ describe "viewing an in process build", :type => :request do
     visit('/')
 
     page.should have_content(project.name)
-    find(".ci-build-info .state").should have_content("Runnable")
+    first(".ci-build-info .state").should have_content("Runnable")
 
     click_link(project.name)
     page.should have_content(build.ref)
@@ -46,7 +46,7 @@ describe "viewing an in process build", :type => :request do
   end
 end
 
-describe "a failed build", :type => :request do
+feature "a failed build" do
   before :each do
     @build_attempt = FactoryGirl.create(:build_attempt, :state => :failed)
     @build_part = @build_attempt.build_part
@@ -63,7 +63,7 @@ describe "a failed build", :type => :request do
 end
 
 
-describe "requesting a developer build", :type => :request do
+feature "requesting a developer build" do
   before :each do
     repository = FactoryGirl.create(:repository, :url => "git@git.squareup.com:square/kochiku.git")
     @project = FactoryGirl.create(:project, :name => "kochiku-developer", :repository => repository)
