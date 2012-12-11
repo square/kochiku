@@ -1,6 +1,6 @@
 = form_for @repository, :url => @url do |f|
   %div
-    %label{:for => "url"} Repository Url:
+    %label{:for => "url"} Repository URL:
     = f.text_field :url, {:placeholder => '', :autocapitalize => 'off', :autocorrect => 'off', :spellcheck => 'false'}
   %div
     %label{:for => "test_command"} Test Command:
@@ -13,17 +13,17 @@
     = f.text_field :timeout, {:id => "timeout"}
     minutes
   %div
-    %label{:for => "build_pull_requests"} Auto-build pull requests:
+    %label{:for => "build_pull_requests"} Build pull requests:
     = f.check_box :build_pull_requests, {:id => "build_pull_requests"}
   %div
-    %label{:for => "run_ci"} Run continuous integration:
+    %label{:for => "run_ci"} Build on push:
     = f.check_box :run_ci, {:id => "run_ci"}
 
   %fieldset
-    %legend On a passed build
+    %legend On a green build
     %div
-      %label{:for => "on_green_update"} Tag:
-      = f.text_field :on_green_update, {:id => "on_green_update", :placeholder => "Comma separated list"}
+      %label{:for => "on_green_update"} Tag commit with:
+      = f.text_field :on_green_update, {:id => "on_green_update", :placeholder => "Comma separated list of tags"}
     %div
       %label{:for => "use_branches_on_green"} Use branches instead of tags:
       = f.check_box :use_branches_on_green, {:id => "use_branches_on_green"}
@@ -32,7 +32,7 @@
       = f.text_field :on_success_script, {:id => "on_success_script"}
 
   %fieldset
-    %legend On a failed build
+    %legend On a red build
     %div
       %label{:for => "send_build_failure_email"} Send email to build breakers:
       = f.check_box :send_build_failure_email, {:id => "send_build_failure_email"}
