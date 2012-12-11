@@ -51,7 +51,7 @@ Getting Started
     rails server
 
     # run a partition worker
-    QUEUE=partition rake resque:work
+    QUEUE=high,partition rake resque:work
 
 Make sure to also clone the [kochiku-worker] repository if you need to run
 build jobs.
