@@ -13,7 +13,7 @@ set :scm, :git
 set :scm_command, 'git'
 
 set :user, "square"
-set :deploy_to, "$HOME/kochiku"
+set :deploy_to, "/Users/#{user}/kochiku"
 set :deploy_via, :remote_cache
 set :keep_releases, 5
 set :use_sudo, false
