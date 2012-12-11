@@ -26,10 +26,11 @@
   %span.info= "Updated #{time_ago_in_words @build.updated_at} ago"
   - if @build.completed?
     %span.info= "Built in #{duration_strftime(@build.elapsed_time, "%Hh %Mm %Ss")}"
-  %a.info.last{:href => show_link_to_commit(@build)}
+  %a.info{:href => show_link_to_commit(@build)}
     Show on GitHub
   - if @build.failed?
-    = button_to "Rebuild failed parts", rebuild_failed_parts_project_build_path(@project, @build), :method => :post, :form_class => "rebuild-parts"
+    %span.info
+      = button_to "Rebuild failed parts", rebuild_failed_parts_project_build_path(@project, @build), :method => :post, :form_class => "rebuild-parts"
 
 
 %table.build-summary#build-summary
