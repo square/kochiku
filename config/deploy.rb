@@ -15,16 +15,17 @@ set :scm_command, 'git'
 set :user, "square"
 set :deploy_to, "/Users/#{user}/kochiku"
 set :deploy_via, :remote_cache
-set :keep_releases, 5
+set :keep_releases, 10
 set :use_sudo, false
 
 server "macbuild-master.sfo.squareup.com", :app, :web, :db, :worker, :primary => true
 
 set :rails_env, "production"
 
-after "deploy:setup", "kochiku:setup"
+after "deploy:setup",          "kochiku:setup"
 after "deploy:create_symlink", "kochiku:symlinks"
-after "deploy:update_code", "deploy:migrate"
+after "deploy:update_code",    "deploy:migrate"
+after "deploy:restart",        "deploy:cleanup"
 
 namespace :deploy do
   task :start, :roles => :app do
