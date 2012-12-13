@@ -1,4 +1,5 @@
 require 'cocaine'
+require 'git_repo'
 
 class GitBlame
   PEOPLE_JSON_URL = 'https://people.squareup.com/people.json'

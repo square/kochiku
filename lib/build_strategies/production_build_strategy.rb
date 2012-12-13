@@ -1,4 +1,7 @@
 require 'open3'
+require 'git_blame'
+require 'git_automerge'
+
 class BuildStrategy
   class << self
     # The primary function of promote_build is to push a new tag or update a branch

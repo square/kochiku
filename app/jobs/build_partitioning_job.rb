@@ -1,3 +1,6 @@
+require 'job_base'
+require 'git_repo'
+
 class BuildPartitioningJob < JobBase
   extend Resque::Plugins::Retry
   @queue = :partition

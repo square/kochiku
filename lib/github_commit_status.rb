@@ -1,3 +1,5 @@
+require 'github_request'
+
 class GithubCommitStatus
   def initialize(build)
     @uri = URI("#{build.repository.base_api_url}/statuses/#{build.ref}")

@@ -1,3 +1,5 @@
+require 'github_request'
+
 class GithubPostReceiveHook
   SUBSCRIBE_NAME = "web"
   def initialize(repository)
