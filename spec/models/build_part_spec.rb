@@ -154,18 +154,36 @@ describe BuildPart do
     end
   end
 
-  context "#stdout" do
-    it "finds the artifact with the stdout.log" do
-      attempt = FactoryGirl.create(:build_artifact, :log_file => File.open(FIXTURE_PATH + "stdout.log")).build_attempt
-      attempt.update_attributes(:state => :failed)
-      part = attempt.build_part
-      part.last_stdout.should_not be_nil
+  describe "#last_stdout" do
+    let(:artifact) { FactoryGirl.create(:build_artifact, :log_file => File.open(FIXTURE_PATH + file)) }
+    let(:attempt) { artifact.build_attempt }
+    let(:part) { attempt.build_part }
+
+    subject { part.last_stdout }
+
+    context "stdout.log" do
+      let(:file) { "stdout.log" }
+      it { should == artifact }
     end
-    it "finds the artifact with the stdout.log.gz" do
-      attempt = FactoryGirl.create(:build_artifact, :log_file => File.open(FIXTURE_PATH + "stdout.log.gz")).build_attempt
-      attempt.update_attributes(:state => :failed)
-      part = attempt.build_part
-      part.last_stdout.should_not be_nil
+
+    context "stdout.log.gz" do
+      let(:file) { "stdout.log.gz" }
+      it { should == artifact }
+    end
+  end
+
+  describe "#last_junit" do
+    let(:artifact) { FactoryGirl.create(:build_artifact, :log_file => File.open(FIXTURE_PATH + "rspec.xml.log.gz")) }
+    let(:part) { artifact.build_attempt.build_part }
+
+    subject { part.last_junit }
+
+    it { should == artifact }
+
+    describe "#last_junit_failures" do
+      subject { part.last_junit_failures }
+
+      it { should have(1).testcase }
     end
   end
 end

@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite tests="3" failures="1" errors="0" time="0.074398" timestamp="2012-12-14T15:22:36-08:00">
+  <properties/>
+  <testcase classname="/Users/visnu/Development/funnel-cake/spec/models/event_spec.rb" name="Event should serialize metadata as json" time="0.073261"/>
+  <testcase classname="/Users/visnu/Development/funnel-cake/spec/models/event_spec.rb" name="Event fails horribly" time="0.000861">
+    <failure message="omg" type="RuntimeError">
+      <![CDATA[omg
+./spec/models/event_spec.rb:11:in `block (2 levels) in <top (required)>']]>
+    </failure>
+  </testcase>
+  <testcase classname="/Users/visnu/Development/funnel-cake/spec/models/event_spec.rb" name="Event has a pending test" time="0.000016">
+    <skipped/>
+  </testcase>
+</testsuite>

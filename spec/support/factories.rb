@@ -29,7 +29,7 @@ FactoryGirl.define do
   end
 
   factory :build_artifact do
-    build_attempt
+    association :build_attempt, :state => :failed
     log_file File.open(FIXTURE_PATH + "build_artifact.log")
   end
 

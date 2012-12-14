@@ -110,7 +110,22 @@ class BuildPart < ActiveRecord::Base
 
   def last_stdout
     if artifacts = last_completed_attempt.try(:build_artifacts)
-      return artifacts.select{|a| a.log_file.try(:to_s) =~ /stdout\.log(\.gz)?/}.try(:first)
+      artifacts.stdout.first
+    end
+  end
+
+  def last_junit
+    if artifacts = last_completed_attempt.try(:build_artifacts)
+      artifacts.junit.first
+    end
+  end
+
+  def last_junit_failures
+    if junit_artifact = last_junit
+      Zlib::GzipReader.open junit_artifact.log_file.path do |gz|
+        xml = Nokogiri::XML.parse(gz)
+        xml.xpath('//testcase[failure]')
+      end
     end
   end
 end
