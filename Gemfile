@@ -34,7 +34,7 @@ end
 gem 'jquery-rails'
 
 group :development do
-  gem 'debugger', :require => false
+  #gem 'debugger', :require => false
   gem 'capistrano', :require => false
   gem 'rvm-capistrano', :require => false
 end
