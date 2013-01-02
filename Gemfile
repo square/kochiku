@@ -34,10 +34,7 @@ end
 gem 'jquery-rails'
 
 group :development do
-  # ruby-debug19 for 1.9.3 is still considered unstable. Reenable this once
-  # linecache19-0.5.13 and ruby-debug-base19-0.11.26 have been released
-  #gem 'ruby-debug19', :require => 'ruby-debug', :platforms => :mri_19
-
+  #gem 'debugger', :require => false
   gem 'capistrano', :require => false
   gem 'rvm-capistrano', :require => false
 end

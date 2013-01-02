@@ -1,6 +1,7 @@
 class JobBase
   def initialize
-    # Ensure the log is flushed, even if this job exits quickly or never exceeds the log buffer.
+    # Ensure the log is flushed, even if this job exits quickly or never
+    # exceeds the log buffer.
     Rails.logger.auto_flushing = true
   end
 

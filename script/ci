@@ -10,8 +10,7 @@ echo
 # set -ex: make script verbose and exit on first failed command
 set -ex
 
-gem install bundler
-bundle
-bundle exec rake db:drop db:create db:migrate
-bundle exec rake db:test:prepare
+gem install bundler --conservative
+bundle check || bundle
+bundle exec rake db:create db:schema:load RAILS_ENV=test
 bundle exec rspec

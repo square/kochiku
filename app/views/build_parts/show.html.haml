@@ -48,5 +48,6 @@
 
 = content_for :javascript do
   :javascript
-    $(".build-part-info").tablesorter({ sortList: [ [0, 0] ] });
+    if ($('.build-part-info tbody tr').length > 0)
+      $('.build-part-info').tablesorter({ sortList: [ [0, 0] ] });
     Kochiku.delayedRefresh();

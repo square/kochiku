@@ -1,16 +1,17 @@
+Kochiku
+=======
+
 Kochiku is "Build" in Japanese (according to google translate).
 
-# Currently
+Kochiku consists of two pieces. There is a master process and a number of slave
+workers. The slave workers check out a copy of your project into a directory
+and run a subset of the tests inside of it. They then report status, any build
+artifacts (logs, etc) and statistical information back to the master server.
 
-Kochiku consists of two pieces. There is a master process and a number of slave workers. The slave workers check out a copy of your project into a directory and run a subset of the tests inside of it. They then report status, any build artifacts (logs, etc) and statistical information back to the master server.
 
-### Models
- - Build: a sha to build
- - Build parts: A build has many of these, each one corresponds to the atomic unit of your tests
- - Build attempts: Each build part can have many build attempts. This records state so we can retry parts.
- - Build artifacts: Each attempt has artifacts (only log files right now) that are associated with that run.
+Master
+------
 
-## Master
 Responsibilities:
 
  - Is alerted about git changes
@@ -18,8 +19,18 @@ Responsibilities:
  - divides build into parts
  - puts the parts on a resque queue
 
+### Models
+ - Build: a sha to build
+ - Build parts: A build has many of these, each one corresponds to the atomic unit of your tests
+ - Build attempts: Each build part can have many build attempts. This records state so we can retry parts.
+ - Build artifacts: Each attempt has artifacts (only log files right now) that are associated with that run.
 
-## Worker
+
+Worker
+------
+
+The worker is in [its own GitHub repository][kochiku-worker].
+
 ### BuildPartitioningJob
 Fills the queue with build part jobs. Enqueued by the master.
 
@@ -30,8 +41,19 @@ Runs the tests for a particular part of the build. Updates status.
 Promotes a tag if the build is successful. Enqueued by BuildAttemptObserver.
 
 
-## Getting Started
+Getting Started
+---------------
 
+    # create database
     rake db:setup
-    rake kochiku:worker:setup
-    rake
+
+    # start server
+    rails server
+
+    # run a partition worker
+    QUEUE=high,partition rake resque:work
+
+Make sure to also clone the [kochiku-worker] repository if you need to run
+build jobs.
+
+[kochiku-worker]: https://git.squareup.com/square/kochiku-worker
