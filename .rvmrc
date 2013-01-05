@@ -1,1 +1,1 @@
-rvm use --create ruby-1.9.3@kochiku
+rvm use 1.9.3-p327@kochiku --create
