@@ -2,6 +2,7 @@ require 'cocaine'
 require 'fileutils'
 
 class GitRepo
+  class RefNotFoundError < StandardError; end
   WORKING_DIR = Rails.root.join('tmp', 'build-partition')
 
   class << self
@@ -14,6 +15,8 @@ class GitRepo
         run! "git clone #{cached_repo_path} #{dir}"
 
         Dir.chdir(dir) do
+          raise RefNotFoundError unless system("git rev-parse --quiet --verify #{ref}")
+
           run! "git checkout --quiet #{ref}"
 
           run! "git submodule --quiet init"
@@ -59,7 +62,8 @@ class GitRepo
       FileUtils.mkdir_p(WORKING_DIR)
     end
 
-  private
+    private
+
     def synchronize_cache_repo(repository)
       cached_repo_path = File.join(WORKING_DIR, repository.repo_cache_name)
 
