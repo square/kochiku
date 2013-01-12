@@ -1,5 +1,9 @@
 class BuildPartitioningJob < JobBase
+  extend Resque::Plugins::Retry
   @queue = :partition
+
+  @retry_limit = 3
+  @retry_exceptions = {GitRepo::RefNotFoundError => [30, 60, 120]}
 
   def initialize(build_id)
     @build = Build.find(build_id)

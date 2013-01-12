@@ -4,7 +4,7 @@ describe BuildPartitioningJob do
 
   describe "#perform" do
     subject { BuildPartitioningJob.perform(id) }
-    let(:id)    { build.id }
+    let(:id) { build.id }
     let(:build) { FactoryGirl.create(:build, :state => :runnable) }
 
     context "with a job runs successfully" do
@@ -46,6 +46,11 @@ describe BuildPartitioningJob do
         expect { subject }.to raise_error(NameError)
         build.reload.state.should == :errored
       end
+    end
+
+    it "should have an on_failure_retry hook that will re-enqueue the job if it it gets a git ref not found error" do
+      Resque.should_receive(:enqueue_in).with(30, BuildPartitioningJob, id)
+      BuildPartitioningJob.on_failure_retry(GitRepo::RefNotFoundError.new, id)
     end
   end
 end
