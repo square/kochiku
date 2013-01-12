@@ -47,16 +47,18 @@ namespace :deploy do
     run "touch #{current_release}/tmp/restart.txt"
   end
 
-  desc "Restart the build workers"
+  desc "Restart the resque workers"
   task :restart_workers, :roles => :worker do
     # the trailing semicolons are required because this is passed to the shell as a single string
     run <<-CMD
       resque1_pid=$(cat #{shared_path}/pids/resque1.pid);
       resque2_pid=$(cat #{shared_path}/pids/resque2.pid);
+      resque_scheduler_pid=$(cat #{shared_path}/pids/resque-scheduler.pid);
       kill -QUIT $resque1_pid;
       kill -QUIT $resque2_pid;
+      kill -QUIT $resque_scheduler_pid;
 
-      while ps x | egrep -q "^($resque1_pid|$resque2_pid)"; do
+      while ps x | egrep -q "^($resque1_pid|$resque2_pid|$resque_scheduler_pid)"; do
         echo "Waiting for Resque workers to stop on $HOSTNAME...";
         sleep 5;
       done;
