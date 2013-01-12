@@ -1,5 +1,6 @@
 require 'resque-retry'
 require 'resque/failure/redis'
+require 'resque-retry/server'
 
 Resque.redis.namespace = "resque:kochiku"
 
