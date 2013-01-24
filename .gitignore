@@ -5,3 +5,5 @@ log/*.log
 tmp/
 public/uploads
 public/log_files
+vendor/ruby
+bin
