@@ -4,7 +4,7 @@
 @import _avantgarde
 
 /* Variables */
-$font-base: Helvetica, Arial, sans-serif
+$font-base: Helvetica Neue, Helvetica, Arial, sans-serif
 $font-code: Inconsolata, Menlo, Monaco, monospace
 $color-base: #52585D
 $color-title: #52585D
@@ -70,7 +70,7 @@ body, input
   min-height: 100%
 
 h1, h2, h3, h4, h5, h6
-  font-family: "agb", $font-base
+  font-weight: 300
 
 a
   color: $color-link
@@ -141,6 +141,7 @@ $logo-padding: 45px
   a.logo
     float: left
     h1
+      font-family: "agb", $font-base
       background: image-url("logo.png") no-repeat left center
       padding-left: $logo-padding
       font-size: 28px
@@ -209,7 +210,6 @@ form label
   padding: 2px
   background-color: #B8BEC3
   font-size: 130%
-  font-family: "agb"
   opacity: 0.80
 
 .build-state
@@ -435,7 +435,6 @@ ol#build-paths
       color: rgba(white, 0.95)
       text-shadow: rgba(black, .2) 0 -1px 0
     .project-name
-      font-family: "agb", $font-base
       font-size: 26px
       font-weight: 300
       a
