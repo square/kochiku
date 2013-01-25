@@ -10,7 +10,7 @@ def send_to_graphite(graphite_host, metrics)
   begin
     socket = TCPSocket.new(graphite_host, 2003)
     metrics.each do |metric|
-      # puts "sending #{metric} to #{graphite_host}"
+      # puts "#{Time.now.to_s}: sending #{metric} to #{graphite_host}"
       socket.puts(metric)
     end
   ensure
