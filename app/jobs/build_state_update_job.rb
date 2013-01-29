@@ -1,5 +1,6 @@
 require 'job_base'
 require 'git_repo'
+require 'github_commit_status'
 
 class BuildStateUpdateJob < JobBase
   @queue = :high
