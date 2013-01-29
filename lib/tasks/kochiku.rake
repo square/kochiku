@@ -1,4 +1,4 @@
-require_relative '../active_workers.rb'
+require_relative '../active_workers'
 
 namespace :kochiku do
   task :workers => :environment do

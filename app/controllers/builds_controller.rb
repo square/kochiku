@@ -1,3 +1,5 @@
+require 'git_repo'
+
 class BuildsController < ApplicationController
   before_filter :load_project, :only => [:show, :abort, :build_status, :abort_auto_merge, :rebuild_failed_parts]
   skip_before_filter :verify_authenticity_token, :only => [:create]
