@@ -66,7 +66,7 @@ class GitBlame
     end
 
     def people_from_ldap
-      @people_from_ldap ||= JSON.parse(HTTParty.get(PEOPLE_JSON_URL))
+      @people_from_ldap ||= JSON.parse(HTTParty.get(PEOPLE_JSON_URL).body)
     end
 
     def git_names_and_emails_since_last_green(build)
