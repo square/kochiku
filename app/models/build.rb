@@ -1,4 +1,5 @@
 require 'on_success_uploader'
+require 'fileless_io'
 
 class Build < ActiveRecord::Base
   belongs_to :project, :inverse_of => :builds
