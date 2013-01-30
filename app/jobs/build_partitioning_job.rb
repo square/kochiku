@@ -1,6 +1,7 @@
 require 'job_base'
 require 'git_repo'
 require 'github_commit_status'
+require 'partitioner'
 
 class BuildPartitioningJob < JobBase
   extend Resque::Plugins::Retry
