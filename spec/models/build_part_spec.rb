@@ -38,7 +38,7 @@ describe BuildPart do
 
     it "should enqueue the build attempt for building" do
       repository.update_attributes!(:use_spec_and_ci_queues => true)
-      build_part.update_attributes!(:options => {"rvm" => "ree"})
+      build_part.update_attributes!(:options => {"ruby" => "ree"})
       # the queue name should include the queue name of the build instance and the type of the test file
       BuildAttemptJob.should_receive(:enqueue_on).once.with do |queue, arg_hash|
         queue.should == "ci-spec"
@@ -49,7 +49,7 @@ describe BuildPart do
         arg_hash["repo_name"].should_not be_blank
         arg_hash["test_command"].should_not be_blank
         arg_hash["repo_url"].should_not be_blank
-        arg_hash["options"].should == {"rvm" => "ree"}
+        arg_hash["options"].should == {"ruby" => "ree"}
         true
       end
       build_part.create_and_enqueue_new_build_attempt!
