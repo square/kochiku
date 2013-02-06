@@ -1,0 +1,6 @@
+ruby:
+ - 1.9.3-p327
+targets:
+  - type: spec
+    glob: /dev/null
+    workers: 1
