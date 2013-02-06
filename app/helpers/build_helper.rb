@@ -11,7 +11,7 @@ module BuildHelper
 
   def build_part_field_value(build, build_part)
     if is_a_ruby_build?(build)
-      build_part.options["rvm"]
+      build_part.options["ruby"]
     elsif is_a_build_with_one_part?(build)
       build_part.paths.first
     end

@@ -57,10 +57,10 @@ describe Build do
     end
 
     it "creates parts with options" do
-      build.partition([{"type" => "cucumber", "files" => ['a'], 'options' => {"rvm" => "ree", "language" => 'ruby'}}])
+      build.partition([{"type" => "cucumber", "files" => ['a'], 'options' => {"ruby" => "ree", "language" => 'ruby'}}])
       build_part = build.build_parts.first
       build_part.reload
-      build_part.options.should == {"rvm" => "ree", "language" => 'ruby'}
+      build_part.options.should == {"ruby" => "ree", "language" => 'ruby'}
     end
 
     it "should create build attempts for each build part" do

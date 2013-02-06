@@ -28,11 +28,11 @@ describe Partitioner do
   let(:balance) { 'alphabetically' }
   let(:manifest) { nil }
 
-  context "with a rvm based kochiku.yml" do
+  context "with a ruby-based kochiku.yml" do
     let(:kochiku_yml_exists) { true }
     let(:kochiku_yml) do
       {
-        "rvm" => ["ree-1.8.7-2011.12"],
+        "ruby" => ["ree-1.8.7-2011.12"],
         "language" => "ruby",
         "targets" => [
           { 'type' => 'rspec', 'glob' => 'spec/**/*_spec.rb', 'workers' => 3, 'balance' => balance, 'manifest' => manifest }
@@ -43,9 +43,25 @@ describe Partitioner do
     it "parses options from kochiku yml" do
       partitions = partitioner.partitions
       partitions.first["options"]["language"].should == "ruby"
-      partitions.first["options"]["rvm"].should == "ree-1.8.7-2011.12"
+      partitions.first["options"]["ruby"].should == "ree-1.8.7-2011.12"
       partitions.first["type"].should == "rspec"
       partitions.first["files"].should_not be_empty
+    end
+
+    describe "using the deprecated rvm option" do
+      let(:kochiku_yml) do
+        {
+          "ruby" => ["ree-1.8.7-2011.12"],
+          "language" => "ruby",
+          "targets" => [
+            { 'type' => 'rspec', 'glob' => 'spec/**/*_spec.rb', 'workers' => 3, 'balance' => balance, 'manifest' => manifest }
+          ]
+        }
+      end
+
+      it "parses the rvm option as ruby" do
+        partitioner.partitions.first["options"]["ruby"].should == "ree-1.8.7-2011.12"
+      end
     end
   end
 
