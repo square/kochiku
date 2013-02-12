@@ -9,11 +9,11 @@ describe BuildArtifact do
     ba.should be_valid
   end
 
-  describe "junit scope" do
+  describe "junit_log scope" do
     let!(:artifact)       { FactoryGirl.create :build_artifact }
     let!(:junit_artifact) { FactoryGirl.create :build_artifact, :log_file => File.open(FIXTURE_PATH + 'rspec.xml.log.gz') }
 
-    subject { BuildArtifact.junit }
+    subject { BuildArtifact.junit_log }
 
     it "should return artifacts that match rspec.xml.log" do
       should_not include(artifact)

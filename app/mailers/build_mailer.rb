@@ -18,7 +18,7 @@ class BuildMailer < ActionMailer::Base
     @builder = build_attempt.builder
     @error_text = error_text
     mail :to => NOTIFICATIONS_EMAIL,
-         :subject => "[kochiku] Build part errored",
+         :subject => "[kochiku] Build part errored on #{@builder}",
          :from => 'build-and-release+errors@squareup.com'
   end
 
