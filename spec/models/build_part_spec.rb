@@ -154,12 +154,12 @@ describe BuildPart do
     end
   end
 
-  describe "#last_stdout" do
+  describe "#last_stdout_artifact" do
     let(:artifact) { FactoryGirl.create(:build_artifact, :log_file => File.open(FIXTURE_PATH + file)) }
     let(:attempt) { artifact.build_attempt }
     let(:part) { attempt.build_part }
 
-    subject { part.last_stdout }
+    subject { part.last_stdout_artifact }
 
     context "stdout.log" do
       let(:file) { "stdout.log" }
@@ -172,11 +172,11 @@ describe BuildPart do
     end
   end
 
-  describe "#last_junit" do
+  describe "#last_junit_artifact" do
     let(:artifact) { FactoryGirl.create(:build_artifact, :log_file => File.open(FIXTURE_PATH + "rspec.xml.log.gz")) }
     let(:part) { artifact.build_attempt.build_part }
 
-    subject { part.last_junit }
+    subject { part.last_junit_artifact }
 
     it { should == artifact }
 

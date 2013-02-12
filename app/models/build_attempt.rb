@@ -48,4 +48,10 @@ class BuildAttempt < ActiveRecord::Base
   def should_reattempt?
     unsuccessful? && build_part.should_reattempt?
   end
+
+  def first_line_of_error_txt
+    if error_artifact = build_artifacts.error_txt.first
+      File.open(error_artifact.log_file.path).first
+    end
+  end
 end

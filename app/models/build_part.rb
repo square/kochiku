@@ -108,21 +108,21 @@ class BuildPart < ActiveRecord::Base
                                  paths.include?("tracon"))))
   end
 
-  def last_stdout
+  def last_stdout_artifact
     if artifacts = last_completed_attempt.try(:build_artifacts)
-      artifacts.stdout.first
+      artifacts.stdout_log.first
     end
   end
 
-  def last_junit
+  def last_junit_artifact
     if artifacts = last_completed_attempt.try(:build_artifacts)
-      artifacts.junit.first
+      artifacts.junit_log.first
     end
   end
 
   def last_junit_failures
-    if junit_artifact = last_junit
-      Zlib::GzipReader.open junit_artifact.log_file.path do |gz|
+    if junit_artifact = last_junit_artifact
+      Zlib::GzipReader.open(junit_artifact.log_file.path) do |gz|
         xml = Nokogiri::XML.parse(gz)
         xml.xpath('//testcase[failure]')
       end
