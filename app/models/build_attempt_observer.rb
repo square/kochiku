@@ -7,7 +7,7 @@ class BuildAttemptObserver < ActiveRecord::Observer
         BuildMailer.time_out_email(record).deliver
       end
     elsif record.state == :errored
-      BuildMailer.error_email(record, record.first_line_of_error_txt).deliver
+      BuildMailer.error_email(record, record.error_txt).deliver
     end
     BuildStateUpdateJob.enqueue(record.build_part.build_id)
   end
