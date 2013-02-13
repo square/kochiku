@@ -19,10 +19,15 @@ describe BuildMailer do
       build_attempt = FactoryGirl.build(:build_attempt, :state => :errored, :builder => "test-builder")
 
       email = BuildMailer.error_email(build_attempt, "error text")
+
       email.to.should include(BuildMailer::NOTIFICATIONS_EMAIL)
-      email.body.should include("test-builder")
-      email.body.should include("http://")
-      email.body.should include("error text")
+
+      email.html_part.body.should include("test-builder")
+      email.text_part.body.should include("test-builder")
+      email.html_part.body.should include("http://")
+      email.text_part.body.should include("http://")
+      email.html_part.body.should include("error text")
+      email.text_part.body.should include("error text")
     end
   end
 
