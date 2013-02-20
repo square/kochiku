@@ -1,4 +1,3 @@
-# source 'http://mirrors.squareup.com/rubygems'
 source 'http://data01.mtv.squareup.com/rubygems'
 
 gem 'rails', '3.2.12'
@@ -18,7 +17,6 @@ gem 'compass'
 gem "resque"
 gem "resque-retry"
 gem "json"                                   # used by resque
-gem "system_timer", :platforms => :mri_18    # used by redis gem
 
 gem "chunky_png"
 gem "cocaine"
