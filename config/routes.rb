@@ -1,3 +1,5 @@
+require 'resque/server'
+
 Kochiku::Application.routes.draw do
   mount Resque::Server.new, :at => '/resque'
 
