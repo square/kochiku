@@ -4,6 +4,10 @@ gem 'rails', '3.2.12'
 gem 'rake'
 gem 'passenger', :group => :production
 
+gem 'squash_ruby', :require => 'squash/ruby'
+gem 'squash_rails', :require => 'squash/rails'
+gem 'guard_dog', :git => 'git@git.squareup.com:square/guard_dog.git'
+
 gem 'carrierwave'
 gem 'mysql2'
 gem "symbolize", :require => "symbolize/active_record"
