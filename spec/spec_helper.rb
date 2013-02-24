@@ -6,6 +6,7 @@ require 'webmock/rspec'
 require 'nokogiri'
 require 'factory_girl'
 require 'capybara/rspec'
+require 'git_blame'
 
 FIXTURE_PATH = Rails.root.join('spec', 'fixtures')
 
