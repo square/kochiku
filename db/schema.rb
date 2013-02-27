@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20121101220831) do
+ActiveRecord::Schema.define(:version => 20130226232844) do
 
   create_table "build_artifacts", :force => true do |t|
     t.integer  "build_attempt_id"
@@ -61,6 +61,7 @@ ActiveRecord::Schema.define(:version => 20121101220831) do
   end
 
   add_index "builds", ["project_id"], :name => "index_builds_on_project_id"
+  add_index "builds", ["ref"], :name => "index_builds_on_ref"
 
   create_table "projects", :force => true do |t|
     t.string   "name"

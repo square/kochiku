@@ -121,6 +121,35 @@ describe PullRequestsController do
           }.to change(Build, :count).by(1)
         end
 
+        context "when the pull request sha has already been built" do
+          before do
+            repository.build_pull_requests = "1"
+            repository.save!
+            @github_payload = pull_request_payload("pull_request" => {
+              "head" => {"sha" => "de8251ff97ee194a289832576287d6f8ad74e3d0", "ref" => "branch-name"},
+              "body" => "best pull request ever",
+            })
+          end
+
+          it "has no effect" do
+            project = FactoryGirl.create(:project, :repository => repository)
+            build = FactoryGirl.create(:build, :project => project, :ref => "de8251ff97ee194a289832576287d6f8ad74e3d0")
+            expect {
+              post :build, 'payload' => @github_payload
+              response.should be_success
+            }.to_not change(Build, :count)
+          end
+
+          it "rebuilds if the sha is on a different repo" do
+            project = FactoryGirl.create(:project)
+            build = FactoryGirl.create(:build, :project => project, :ref => "de8251ff97ee194a289832576287d6f8ad74e3d0")
+            expect {
+              post :build, 'payload' => @github_payload
+              response.should be_success
+            }.to change(Build, :count)
+          end
+        end
+
         context "with a project" do
           let(:project) { FactoryGirl.create(:project, :name => "web-pull_requests", :repository => repository) }
 

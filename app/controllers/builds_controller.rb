@@ -91,7 +91,7 @@ class BuildsController < ApplicationController
     requested_branch = payload['ref'].split('/').last
 
     if @project.branch == requested_branch
-      @project.builds.build(:state => :partitioning, :ref => payload['after'], :queue => :ci)
+      @project.builds.find_existing_build_or_initialize(payload['after'], :state => :partitioning, :queue => :ci)
     end
   end
 
@@ -109,6 +109,6 @@ class BuildsController < ApplicationController
       ref = GitRepo.current_master_ref(@project.repository)
       branch = "master"
     end
-    @project.builds.find_or_initialize_by_ref(ref, :state => :partitioning, :queue => queue, :auto_merge => auto_merge, :branch => branch)
+    @project.builds.find_existing_build_or_initialize(ref, :state => :partitioning, :queue => queue, :auto_merge => auto_merge, :branch => branch)
   end
 end
