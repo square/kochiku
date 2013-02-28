@@ -3,7 +3,7 @@ Squash::Ruby.configure :api_key  => 'b29ba2c2-3af6-40dc-a961-5edbf4fa41ed',
 
 
 module Squash::Ruby
-  GUARD_DOG_CONFIG = YAML.load_file(Rails.root.join('config', 'environments', 'production', 'guard_dog.yml'))
+  GUARD_DOG_CONFIG = YAML.load_file(Rails.root.join('config', 'environments', 'production', 'guard_dog.yml')).symbolize_keys
 
   def self.http_transmit(url, headers, body)
     client = GuardDog::SslClient.new(GUARD_DOG_CONFIG.merge(:uri => url))
