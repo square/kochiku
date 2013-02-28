@@ -6,7 +6,7 @@ module Squash::Ruby
   GUARD_DOG_CONFIG = YAML.load_file(Rails.root.join('config', 'environments', 'production', 'guard_dog.yml'))
 
   def self.http_transmit(url, headers, body)
-    client = GuardDog::SslClient.new(GUARD_DOG_CONFIG)
+    client = GuardDog::SslClient.new(GUARD_DOG_CONFIG.merge(:uri => url))
     client.post URI.parse(url).path, body, headers.merge('Content-Type' => 'application/json')
   end
 end
