@@ -3,6 +3,7 @@ set :rvm_type, :user
 set :rvm_ruby_string, 'ruby-1.9.3-p327@kochiku'
 
 require 'bundler/capistrano' # adds bundle:install step to deploy pipeline
+require 'squash/rails/capistrano'
 
 default_run_options[:env] = {'PATH' => '/usr/local/bin:$PATH'}
 
@@ -87,6 +88,7 @@ namespace :kochiku do
   task :symlinks, :roles => [:app, :worker] do
     run "ln -nfFs #{shared_path}/build-partition #{current_path}/tmp/build-partition"
     run "ln -nfFs #{shared_path}/log_files #{current_path}/public/log_files"
+    run "ln -nfFs #{shared_path}/secrets #{current_path}/config/secrets"
   end
 
   task :cleanup_zombies, :roles => [:worker] do

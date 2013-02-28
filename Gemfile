@@ -3,7 +3,10 @@ source 'http://data01.mtv.squareup.com/rubygems'
 gem 'rails', '3.2.12'
 gem 'rake'
 gem 'passenger', :group => :production
-gem 'square-hoptoad_notifier', :require => "hoptoad_notifier"
+
+gem 'squash_ruby', :require => 'squash/ruby'
+gem 'squash_rails', :require => 'squash/rails'
+gem 'guard_dog', :git => 'git@git.squareup.com:square/guard_dog.git'
 
 gem 'carrierwave'
 gem 'mysql2'
