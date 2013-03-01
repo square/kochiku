@@ -11,35 +11,38 @@ class BuildPart < ActiveRecord::Base
 
   def create_and_enqueue_new_build_attempt!
     build_attempt = build_attempts.create!(:state => :runnable)
-    job_args = {
-      "build_attempt_id" => build_attempt.id,
-      "build_kind" => self.kind,
-      "build_ref" => build_instance.ref,
-      "test_files" => self.paths,
-      "repo_name" => self.project.repository.repo_cache_name,
-      "test_command" => self.build_instance.test_command(self.paths),
-      "repo_url" => self.project.repository.url,
-      "timeout" => self.project.repository.timeout.minutes,
-      "options" => self.options,
-    }
     # TODO: this is a hack, please fix the following and restore this code to it's former glory.
     # We need to do 2 things before enabling this:
     # 1) update the ssh key on ec2 builders
     # 2) get more space on the ec2 builders
     if build_instance.repository.use_spec_and_ci_queues
-      BuildAttemptJob.enqueue_on("#{build_instance.queue}-#{self.kind}", job_args)
+      BuildAttemptJob.enqueue_on("#{build_instance.queue}-#{self.kind}", job_args(build_attempt))
     else
       # TODO: hopefully this is only temporary while we work to make these test less flaky
       if (kind == "maven" && (paths.include?("sake/rpc") ||
                               paths.include?("clustering/zookeeper") ||
                               paths.include?("bletchley") ||
                               paths.include?("searle")))
-        BuildAttemptJob.enqueue_on("ci-osx", job_args)
+        BuildAttemptJob.enqueue_on("ci-osx", job_args(build_attempt))
       else
-        BuildAttemptJob.enqueue_on(build_instance.repository.ci_queue_name, job_args)
+        BuildAttemptJob.enqueue_on(build_instance.repository.ci_queue_name, job_args(build_attempt))
       end
     end
     build_attempt
+  end
+
+  def job_args(build_attempt)
+    {
+        "build_attempt_id" => build_attempt.id,
+        "build_kind" => self.kind,
+        "build_ref" => self.build_instance.ref,
+        "test_files" => self.paths,
+        "repo_name" => self.project.repository.repo_cache_name,
+        "test_command" => self.build_instance.test_command(self.paths),
+        "repo_url" => self.project.repository.url,
+        "timeout" => self.project.repository.timeout.minutes,
+        "options" => self.options,
+    }
   end
 
   def rebuild!
