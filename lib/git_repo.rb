@@ -88,7 +88,7 @@ class GitRepo
     end
 
     def synchronize_with_remote(name = 'origin')
-      Cocaine::CommandLine.new("git fetch", "#{name} --quiet").run
+      Cocaine::CommandLine.new("git fetch", "#{name} --quiet --prune").run
     rescue Cocaine::ExitStatusError
       # likely caused by another 'git fetch' that is currently in progress. Wait a few seconds and try again
       tries = (tries || 0) + 1
