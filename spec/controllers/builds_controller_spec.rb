@@ -10,7 +10,7 @@ describe BuildsController do
 
     context "via github" do
       before do
-        @project = FactoryGirl.create(:big_rails_project)
+        @project = FactoryGirl.create(:big_rails_project, :repository => repo)
         @payload = JSON.load(FIXTURE_PATH.join("sample_github_webhook_payload.json").read)
       end
 
@@ -66,6 +66,28 @@ describe BuildsController do
         expect {
           post @action, @params.merge(:project_id => project_param, :build => build_info)
         }.to change { Project.exists?(:name => project_param) }.from(false).to(true)
+      end
+
+      context "when the pushed branch has already been built" do
+        it "has no effect" do
+          project = FactoryGirl.create(:project, :repository => repo)
+          build = FactoryGirl.create(:build, :project => project, :ref => "30b111147d9a245468c6650f54de5c16584bc154")
+          expect {
+            post @action, @params.merge(:project_id => project_param, :build => build_info)
+            response.should be_success
+          }.to_not change(Build, :count)
+          response.headers["Location"].should == project_build_url(project, build)
+        end
+
+        it "rebuilds if the sha is on a different repo" do
+          project = FactoryGirl.create(:project)
+          build = FactoryGirl.create(:build, :project => project, :ref => "30b111147d9a245468c6650f54de5c16584bc154")
+          expect {
+            post @action, @params.merge(:project_id => project_param, :build => build_info)
+            response.should be_success
+          }.to change(Build, :count)
+          response.headers["Location"].should_not == project_build_url(project, build)
+        end
       end
 
       it "should create a repo if one does not exist" do

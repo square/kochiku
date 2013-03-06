@@ -26,7 +26,7 @@ class PullRequestsController < ApplicationController
     if active_pull_request? && (build_requested_for_pull_request? || repository.build_pull_requests)
       sha = payload["pull_request"]["head"]["sha"]
       branch = payload["pull_request"]["head"]["ref"]
-      build = project.builds.find_or_initialize_by_ref(sha, :state => :partitioning, :queue => :developer, :branch => branch)
+      build = project.builds.find_existing_build_or_initialize(sha, :state => :partitioning, :queue => :developer, :branch => branch)
       build.save!
     end
   end

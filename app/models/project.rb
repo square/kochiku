@@ -6,6 +6,12 @@ class Project < ActiveRecord::Base
       build = find_or_initialize_by_ref(sha, :state => :partitioning, :queue => :ci, :branch => 'master')
       build.save!
     end
+
+    def find_existing_build_or_initialize(ref, options)
+      # Always create another build for CI purposes - it would be nice to not do this but we need to link builds to achieve this.
+      existing_build = Build.first(:joins => :project, :conditions => ["projects.repository_id = ? AND builds.ref = ?", proxy_association.owner.repository_id, ref], :readonly => false) unless options[:queue] == :ci
+      existing_build || build(options.merge(:ref => ref))
+    end
   end
   validates_uniqueness_of :name
   belongs_to :repository
