@@ -105,10 +105,7 @@ class BuildPart < ActiveRecord::Base
   def should_reattempt?
     build_attempts.unsuccessful.count < 3 &&
         (build_instance.auto_merge? || build_instance.queue == :ci) &&
-        (kind == "cucumber" ||
-            (kind == "maven" && (paths.include?("sake/rpc") ||
-                                 paths.include?("clustering/zookeeper") ||
-                                 paths.include?("tracon"))))
+        (kind == "cucumber" || kind == "maven" )
   end
 
   def last_stdout_artifact
