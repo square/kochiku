@@ -1,6 +1,7 @@
 require 'nokogiri'
 require 'set'
 
+# TODO: remove this comment later
 class MavenPartitioner
   POM_XML = 'pom.xml'
 
