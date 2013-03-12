@@ -1,12 +1,13 @@
 require 'spec_helper'
 
 describe Partitioner do
+  let(:build) { FactoryGirl.create(:build) }
   let(:partitioner) { Partitioner.new }
 
   before do
     YAML.stub(:load_file).with(Partitioner::BUILD_YML).and_return(build_yml)
     YAML.stub(:load_file).with(Partitioner::KOCHIKU_YML).and_return(kochiku_yml)
-    File.stub(:exist?).with(Partitioner::POM_XML).and_return(pom_xml_exists)
+    File.stub(:exist?).with(MavenPartitioner::POM_XML).and_return(pom_xml_exists)
     File.stub(:exist?).with(Partitioner::KOCHIKU_YML).and_return(kochiku_yml_exists)
     File.stub(:exist?).with(Partitioner::BUILD_YML).and_return(build_yml_exists)
   end
@@ -41,7 +42,7 @@ describe Partitioner do
     end
 
     it "parses options from kochiku yml" do
-      partitions = partitioner.partitions
+      partitions = partitioner.partitions(build)
       partitions.first["options"]["language"].should == "ruby"
       partitions.first["options"]["ruby"].should == "ree-1.8.7-2011.12"
       partitions.first["type"].should == "rspec"
@@ -60,17 +61,19 @@ describe Partitioner do
       end
 
       it "parses the rvm option as ruby" do
-        partitioner.partitions.first["options"]["ruby"].should == "ree-1.8.7-2011.12"
+        partitioner.partitions(build).first["options"]["ruby"].should == "ree-1.8.7-2011.12"
       end
     end
   end
 
   context "when there is no config yml" do
     let(:kochiku_yml_exists) { false }
+    let(:build_yml_exists) { false }
+
     it "should return a single partiion" do
-      File.stub(:exist?).with(Partitioner::KOCHIKU_YML).and_return(false)
-      File.stub(:exist?).with(Partitioner::BUILD_YML).and_return(false)
-      partitions = partitioner.partitions
+      #File.stub(:exist?).with(Partitioner::KOCHIKU_YML).and_return(false)
+      #File.stub(:exist?).with(Partitioner::BUILD_YML).and_return(false)
+      partitions = partitioner.partitions(build)
       partitions.size.should == 1
       partitions.first["type"].should == "spec"
       partitions.first["files"].should_not be_empty
@@ -78,26 +81,7 @@ describe Partitioner do
   end
 
   describe '#partitions' do
-    subject { partitioner.partitions }
-
-    context 'when there is a pom.xml' do
-      let(:kochiku_yml_exists) { false }
-      let(:build_yml_exists) { false }
-      let(:pom_xml_exists) { true }
-      before do
-        sample_pom = File.read(Rails.root.join("spec/fixtures/sample_pom.xml"))
-        File.stub(:read).with(Partitioner::POM_XML).and_return(sample_pom)
-      end
-
-      it "should return a list of targets" do
-        partitions = subject
-        partitions.size.should == 170
-        partitions.each do |partition|
-          partition.should have_key("type")
-          partition["files"].should_not be_empty
-        end
-      end
-    end
+    subject { partitioner.partitions(build) }
 
     context 'when there is not a kochiku.yml' do
       let(:kochiku_yml_exists) { false }

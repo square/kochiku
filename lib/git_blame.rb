@@ -27,6 +27,13 @@ class GitBlame
       parse_git_changes(output)
     end
 
+    def files_changed_since_last_green(build)
+      output = GitRepo.inside_repo(build.repository) do
+        Cocaine::CommandLine.new("git log --no-merges --format='::!::%H::!::' --name-only #{build.previous_successful_build.try(:ref)}...#{build.ref}").run
+      end
+      parse_git_files_changes(output)
+    end
+
     private
 
     def email_from_git_email(email)
@@ -93,6 +100,13 @@ class GitBlame
         commit_hash, author, commit_date, commit_message = line.chomp.split("|")
         next if commit_hash.nil?
         git_changes << {:hash => commit_hash, :author => author, :date => commit_date, :message => commit_message.gsub("\n", " ")}
+      end
+    end
+
+    def parse_git_files_changes(output)
+      output.split.each_with_object([]) do |line, file_changes|
+        next if line.empty? || line.start_with?("::!::")
+        file_changes << line
       end
     end
   end

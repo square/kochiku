@@ -1,9 +1,10 @@
-class Partitioner
-  BUILD_YML   = 'config/ci/build.yml'
-  KOCHIKU_YML = 'config/ci/kochiku.yml'
-  POM_XML = 'pom.xml'
+require 'maven_partitioner'
 
-  def partitions
+class Partitioner
+  BUILD_YML = 'config/ci/build.yml'
+  KOCHIKU_YML = 'config/ci/kochiku.yml'
+
+  def partitions(build)
     if File.exist?(KOCHIKU_YML)
       # Handle old kochiku.yml
       kochiku_yml = YAML.load_file(KOCHIKU_YML)
@@ -14,14 +15,19 @@ class Partitioner
       end
     elsif File.exist?(BUILD_YML)
       YAML.load_file(BUILD_YML).values.select { |part| part['type'].present? }
-    elsif File.exist?(POM_XML)
-      maven_targets(File.read(POM_XML))
+    elsif File.exist?(MavenPartitioner::POM_XML)
+      if build.project.main_build?
+        MavenPartitioner.new.incremental_partitions(build)
+      else
+        MavenPartitioner.new.partitions
+      end
     else
       [{"type" => "spec", "files" => ['no-manifest']}]
     end
   end
 
   private
+
   def build_partions_from(kochiku_yml)
     $stderr.puts "DEPRECATED: Your kochiku.yml file contains 'rvm' when it should be 'ruby'. Please update your config." if kochiku_yml.include?("rvm")
     (kochiku_yml["ruby"] || kochiku_yml["rvm"]).map do |rvm|
@@ -30,19 +36,10 @@ class Partitioner
     end.flatten
   end
 
-  def maven_targets(pom_xml)
-    Nokogiri::XML(pom_xml).css('project modules module').map {|partition|
-      {
-        'type' => 'maven',
-        'files' => [partition.text]
-      }
-    }
-  end
-
   def partitions_for(subset)
-    glob     = subset.fetch('glob', '/dev/null')
-    type     = subset.fetch('type', 'test')
-    workers  = subset.fetch('workers', 1)
+    glob = subset.fetch('glob', '/dev/null')
+    type = subset.fetch('type', 'test')
+    workers = subset.fetch('workers', 1)
     manifest = subset['manifest']
 
     strategy = subset.fetch('balance', 'alphabetically')
@@ -50,7 +47,7 @@ class Partitioner
 
     files = Array(load_manifest(manifest)) | Dir[glob]
     parts = Strategies.send(strategy, files, workers).map do |files|
-      part = { 'type' => type, 'files' => files.compact}
+      part = {'type' => type, 'files' => files.compact}
       if subset['options']
         part['options'] = subset['options']
       end
@@ -89,10 +86,10 @@ class Partitioner
       def size_greedy_partitioning(files, workers)
         files = files.sort_by { |path| 0 - File.size(path) }
         numbers = (0...workers).to_a
-        results = numbers.map{ [] }
-        sizes   = numbers.map{  0 }
+        results = numbers.map { [] }
+        sizes = numbers.map { 0 }
         files.each do |file|
-          dest = numbers.sort_by{|n| sizes[n]}.first
+          dest = numbers.sort_by { |n| sizes[n] }.first
           sizes[dest] += File.size(file)
           results[dest] << file
         end
@@ -100,7 +97,7 @@ class Partitioner
       end
 
       def size_average_partitioning(files, workers)
-        threshold = files.sum{|file| File.size(file)} / workers
+        threshold = files.sum { |file| File.size(file) } / workers
         results = []
         this_bucket = []
         this_bucket_size = 0
