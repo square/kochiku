@@ -9,11 +9,15 @@ describe MavenPartitioner do
     it "should return the set of modules to build for a given set of file changes" do
       GitBlame.stub(:files_changed_since_last_green).with(build).and_return(["module-one/src/main/java/com/squareup/foo.java",
                                                                              "module-two/src/main/java/com/squareup/bar.java"])
+      File.stub(:exists?).and_return(false)
+      File.stub(:exists?).with("module-one/pom.xml").and_return(true)
+      File.stub(:exists?).with("module-two/pom.xml").and_return(true)
 
       subject.stub(:depends_on_map).and_return({
           "module-one" => ["module-three", "module-four"].to_set,
           "module-two" => ["module-three"].to_set
       })
+      subject.should_not_receive(:partitions)
 
       partitions = subject.incremental_partitions(build)
       partitions.size.should == 2
@@ -23,6 +27,20 @@ describe MavenPartitioner do
         partitions[0]["files"][0].should == "module-four"
         partitions[1]["files"][0].should == "module-three"
       end
+    end
+
+    it "should build everything if one of the files does not map to a module" do
+      GitBlame.stub(:files_changed_since_last_green).with(build).and_return(["toplevel/foo.xml"])
+
+      subject.stub(:depends_on_map).and_return({
+          "module-one" => ["module-three", "module-four"].to_set,
+          "module-two" => ["module-three"].to_set
+      })
+
+      subject.should_receive(:partitions).and_return([{"type" => "maven", "files" => "ALL"}])
+
+      partitions = subject.incremental_partitions(build)
+      partitions.first["files"].should == "ALL"
     end
   end
 
@@ -126,17 +144,40 @@ POM
   end
 
   describe "#file_to_module" do
+    before do
+      File.stub(:exists?).and_return(false)
+    end
+
     it "should return the module for a src main path" do
+      File.stub(:exists?).with("beemo/pom.xml").and_return(true)
       subject.file_to_module("beemo/src/main/java/com/squareup/beemo/BeemoApp.java").should == "beemo"
+    end
+
+    it "should return the module in a subdirectory" do
+      File.stub(:exists?).with("gateways/cafis/pom.xml").and_return(true)
       subject.file_to_module("gateways/cafis/src/main/java/com/squareup/gateways/cafis/data/DataField_9_6_1.java").should == "gateways/cafis"
     end
 
-    it "should return the module for a resource path" do
-      subject.file_to_module("beemo/src/main/resources/beemo-common.yaml").should == "beemo"
+    it "should return the module for a src test path even if there is pom in the parent directory" do
+      File.stub(:exists?).with("integration/hibernate/pom.xml").and_return(true)
+      File.stub(:exists?).with("integration/hibernate/tests/pom.xml").and_return(true)
+      subject.file_to_module("integration/hibernate/tests/src/test/java/com/squareup/integration/hibernate/ConfigurationExtTest.java").should == "integration/hibernate/tests"
     end
 
-    it "should return the module for a src test path" do
-      subject.file_to_module("integration/hibernate/tests/src/test/java/com/squareup/integration/hibernate/ConfigurationExtTest.java").should == "integration/hibernate/tests"
+    it "should return a module for a pom change" do
+      File.stub(:exists?).with("common/pom.xml").and_return(true)
+      subject.file_to_module("common/pom.xml").should == "common"
+    end
+
+    it "should work for a toplevel change" do
+      subject.file_to_module("pom.xml").should be_nil
+      subject.file_to_module("Gemfile.lock").should be_nil
+      subject.file_to_module("non_maven_dependencies/README").should be_nil
+    end
+
+    it "should return nil for changes in parents directory" do
+      File.stub(:exists?).with("parents/base/pom.xml").and_return(true)
+      subject.file_to_module("parents/base/pom.xml").should be_nil
     end
   end
 end

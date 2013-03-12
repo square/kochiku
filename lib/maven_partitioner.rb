@@ -17,7 +17,10 @@ class MavenPartitioner
     modules_to_build = Set.new
 
     GitBlame.files_changed_since_last_green(build).each do |changed_file|
-      modules_to_build.merge(depends_on_map[file_to_module(changed_file)])
+      module_to_build = file_to_module(changed_file)
+      return partitions if module_to_build.nil?
+
+      modules_to_build.merge(depends_on_map[module_to_build])
     end
 
     modules_to_build.map do |module_name|
@@ -94,6 +97,13 @@ class MavenPartitioner
   end
 
   def file_to_module(file_path)
-    file_path.split("/src").first
+    return nil if file_path.start_with?("parents/")
+    dir_path = file_path
+    while (dir_path = File.dirname(dir_path)) != "."
+      if File.exists?("#{dir_path}/pom.xml")
+        return dir_path
+      end
+    end
+    nil
   end
 end
