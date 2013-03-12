@@ -83,25 +83,6 @@ describe Partitioner do
   describe '#partitions' do
     subject { partitioner.partitions(build) }
 
-    context 'when there is a pom.xml' do
-      let(:kochiku_yml_exists) { false }
-      let(:build_yml_exists) { false }
-      let(:pom_xml_exists) { true }
-      before do
-        sample_pom = File.read(Rails.root.join("spec/fixtures/sample_pom.xml"))
-        File.stub(:read).with(MavenPartitioner::POM_XML).and_return(sample_pom)
-      end
-
-      it "should return a list of targets" do
-        partitions = subject
-        partitions.size.should == 170
-        partitions.each do |partition|
-          partition.should have_key("type")
-          partition["files"].should_not be_empty
-        end
-      end
-    end
-
     context 'when there is not a kochiku.yml' do
       let(:kochiku_yml_exists) { false }
       it { should == [{'type' => 'rspec', 'files' => '<FILES>'}] }

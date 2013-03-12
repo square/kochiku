@@ -1,7 +1,6 @@
 require 'nokogiri'
 require 'set'
 
-# TODO: remove this comment later
 class MavenPartitioner
   POM_XML = 'pom.xml'
 
@@ -49,7 +48,7 @@ class MavenPartitioner
 
     group_artifact_map = {}
 
-    top_level_pom = Nokogiri::XML(POM_XML)
+    top_level_pom = Nokogiri::XML(File.read(POM_XML))
 
     top_level_pom.css('project>modules>module').each do |mvn_module|
       module_pom = Nokogiri::XML(File.read("#{mvn_module.text}/pom.xml"))
