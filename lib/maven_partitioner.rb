@@ -37,8 +37,10 @@ class MavenPartitioner
     module_depends_on_map = {}
     module_dependency_map.each do |mvn_module, dep_set|
       module_depends_on_map[mvn_module] ||= Set.new
+      module_depends_on_map[mvn_module].add(mvn_module)
       dep_set.each do |dep|
         module_depends_on_map[dep] ||= Set.new
+        module_depends_on_map[dep].add(dep)
         module_depends_on_map[dep].add(mvn_module)
       end
     end

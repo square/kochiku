@@ -54,12 +54,16 @@ describe MavenPartitioner do
 
       depends_on_map = subject.depends_on_map
 
-      depends_on_map["module_one"].should == ["module_two"].to_set
-      depends_on_map["module_two"].should be_empty
-      depends_on_map["module_three"].should be_empty
-      depends_on_map["a"].should == ["module_one"].to_set
+      depends_on_map["module_one"].should include("module_one")
+      depends_on_map["module_one"].should include("module_two")
+      depends_on_map["module_two"].should == ["module_two"].to_set
+      depends_on_map["module_three"].should == ["module_three"].to_set
+      depends_on_map["a"].should include("a")
+      depends_on_map["a"].should include("module_one")
+      depends_on_map["b"].should include("b")
       depends_on_map["b"].should include("module_one")
       depends_on_map["b"].should include("module_two")
+      depends_on_map["c"].should include("c")
       depends_on_map["c"].should include("module_one")
       depends_on_map["c"].should include("module_two")
     end
