@@ -47,25 +47,19 @@ describe MavenPartitioner do
   describe "#depends_on_map" do
     it "should convert a dependency map to a depends on map" do
       subject.stub(:module_dependency_map).and_return({
-          "module_one" => ["a", "b", "c"].to_set,
-          "module_two" => ["b", "c", "module_one"].to_set,
-          "module_three" => Set.new
+          "module-one" => ["a", "b", "c"].to_set,
+          "module-two" => ["b", "c", "module-one"].to_set,
+          "module-three" => Set.new
       })
 
       depends_on_map = subject.depends_on_map
 
-      depends_on_map["module_one"].should include("module_one")
-      depends_on_map["module_one"].should include("module_two")
-      depends_on_map["module_two"].should == ["module_two"].to_set
-      depends_on_map["module_three"].should == ["module_three"].to_set
-      depends_on_map["a"].should include("a")
-      depends_on_map["a"].should include("module_one")
-      depends_on_map["b"].should include("b")
-      depends_on_map["b"].should include("module_one")
-      depends_on_map["b"].should include("module_two")
-      depends_on_map["c"].should include("c")
-      depends_on_map["c"].should include("module_one")
-      depends_on_map["c"].should include("module_two")
+      depends_on_map["module-one"].should == ["module-one", "module-two"].to_set
+      depends_on_map["module-two"].should == ["module-two"].to_set
+      depends_on_map["module-three"].should == ["module-three"].to_set
+      depends_on_map["a"].should == ["a", "module-one"].to_set
+      depends_on_map["b"].should == ["b", "module-one", "module-two"].to_set
+      depends_on_map["c"].should == ["c", "module-one", "module-two"].to_set
     end
   end
 
@@ -138,12 +132,30 @@ POM
 
       dependency_map = subject.module_dependency_map
 
-      dependency_map["module-one"].size.should == 2
-      dependency_map["module-one"].should include("module-two")
-      dependency_map["module-one"].should include("module-three")
+      dependency_map["module-one"].should == ["module-one", "module-two", "module-three"].to_set
+      dependency_map["module-two"].should == ["module-two", "module-three"].to_set
+      dependency_map["module-three"].should == ["module-three"].to_set
+    end
+  end
 
-      dependency_map["module-two"].should == ["module-three"].to_set
-      dependency_map["module-three"].should be_empty
+  describe "#transitive_dependencies" do
+    it "should return the module in a set as a base case" do
+      subject.transitive_dependencies("module-one", {"module-one" => Set.new}).should == ["module-one"].to_set
+    end
+
+    it "should work for the recursive case" do
+      dependency_map = {
+          "module-one" => ["a", "b", "c"].to_set,
+          "a" => ["d"].to_set,
+          "b" => ["d", "e"].to_set,
+          "c" => Set.new,
+          "d" => ["e"].to_set,
+          "e" => Set.new,
+          "f" => Set.new
+      }
+
+      transitive_map = subject.transitive_dependencies("module-one", dependency_map)
+      transitive_map.should == ["module-one", "a", "b", "c", "d", "e"].to_set
     end
   end
 

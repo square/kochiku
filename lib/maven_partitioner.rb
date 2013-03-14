@@ -80,22 +80,26 @@ class MavenPartitioner
       end
     end
 
-    module_dependency_map.each do |mvn_module, dep_set|
-      trans_closure_set = dep_set.dup
-      size = 0
+    transitive_dependency_map = {}
 
-      while size != trans_closure_set.length do
-        working_set = trans_closure_set.dup
-        working_set.each do |dep|
-          trans_closure_set.merge(module_dependency_map[dep])
-        end
-        size = working_set.length
-      end
-
-      module_dependency_map[mvn_module] = trans_closure_set
+    module_dependency_map.keys.each do |mvn_module|
+      transitive_dependency_map[mvn_module] = transitive_dependencies(mvn_module, module_dependency_map)
     end
 
-    @module_dependency_map = module_dependency_map
+    @module_dependency_map = transitive_dependency_map
+  end
+
+  def transitive_dependencies(mvn_module, dependency_map)
+    result_set = Set.new
+    to_process = [mvn_module]
+
+    while dep_module = to_process.shift
+      deps = dependency_map[dep_module].to_a
+      to_process += (deps - result_set.to_a)
+      result_set << dep_module
+    end
+
+    result_set
   end
 
   def file_to_module(file_path)
