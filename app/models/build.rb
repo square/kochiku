@@ -121,6 +121,10 @@ class Build < ActiveRecord::Base
     succeeded? && auto_merge_enabled?
   end
 
+  def auto_merge_togglable?
+    queue == :developer && !succeeded?
+  end
+
   def auto_merge_enabled?
     queue == :developer && self.auto_merge
   end
