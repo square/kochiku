@@ -1,7 +1,7 @@
 require 'git_repo'
 
 class BuildsController < ApplicationController
-  before_filter :load_project, :only => [:show, :abort, :build_status, :abort_auto_merge, :rebuild_failed_parts]
+  before_filter :load_project, :only => [:show, :abort, :build_status, :toggle_auto_merge, :rebuild_failed_parts]
   skip_before_filter :verify_authenticity_token, :only => [:create]
 
   def show
@@ -55,9 +55,9 @@ class BuildsController < ApplicationController
     redirect_to project_build_path(@project, @build)
   end
 
-  def abort_auto_merge
+  def toggle_auto_merge
     @build = @project.builds.find(params[:id])
-    @build.update_attributes!(:auto_merge => false)
+    @build.update_attributes!(:auto_merge => params[:auto_merge])
     redirect_to project_build_path(@project, @build)
   end
 

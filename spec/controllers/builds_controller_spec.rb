@@ -227,15 +227,52 @@ describe BuildsController do
     end
   end
 
-  describe "#abort_auto_merge" do
+  describe "#toggle_auto_merge" do
     before do
       @build = FactoryGirl.create(:build, :auto_merge => true)
     end
 
     it "aborts the auto_merge" do
-      post :abort_auto_merge, :id => @build.id, :project_id => @build.project.name
+      post :toggle_auto_merge, :id => @build.id, :project_id => @build.project.name, :auto_merge => false
       response.should redirect_to(project_build_path(@build.project, @build))
       @build.reload.auto_merge.should be_false
+    end
+
+    it "enables the auto_merge" do
+      @build.update_attributes(:auto_merge => false)
+      post :toggle_auto_merge, :id => @build.id, :project_id => @build.project.name, :auto_merge => true
+      response.should redirect_to(project_build_path(@build.project, @build))
+      @build.reload.auto_merge.should be_true
+    end
+  end
+
+  describe "#show" do
+    render_views
+    let(:project) { FactoryGirl.create(:project) }
+    let(:build) { FactoryGirl.create(:build, :project => project, :queue => queue) }
+    let(:queue) { :developer }
+    before do
+      @action = :show
+      @params = {:id => build.id, :project_id => project.name}
+    end
+
+    it "renders the enable auto merge button" do
+      get @action, @params
+      doc = Nokogiri::HTML(response.body)
+      elements = doc.css("form.toggle-auto-merge input[type=submit]")
+      elements.size.should == 1
+      elements.first['value'].should include("Enable")
+    end
+
+    context "for ci builds" do
+      let(:queue) { :ci }
+
+      it "does not render the enable auto merge button" do
+        get @action, @params
+        doc = Nokogiri::HTML(response.body)
+        elements = doc.css("form.toggle-auto-merge")
+        elements.size.should == 0
+      end
     end
   end
 
