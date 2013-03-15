@@ -9,6 +9,10 @@ class GitBlame
       lookup_git_names_and_emails(git_names_and_emails_since_last_green(build).split("\n"))
     end
 
+    def emails_since_master(build)
+      lookup_git_names_and_emails(commiters_between_refs(build.repository, "master", build.ref).split("\n"))
+    end
+
     def emails_in_merge(build)
       lookup_git_names_and_emails(git_names_and_emails_in_branch(build).split("\n"))
     end
@@ -77,8 +81,12 @@ class GitBlame
     end
 
     def git_names_and_emails_since_last_green(build)
-      GitRepo.inside_repo(build.repository) do
-        Cocaine::CommandLine.new("git log --format=%an:%ae --no-merges #{build.previous_successful_build.try(:ref)}...#{build.ref}").run
+      commiters_between_refs(build.repository, build.previous_successful_build.try(:ref), build.ref)
+    end
+
+    def commiters_between_refs(repository, start_commit, end_commit)
+      GitRepo.inside_repo(repository) do
+        Cocaine::CommandLine.new("git log --format=%an:%ae --no-merges #{start_commit}...#{end_commit}").run
       end
     end
 

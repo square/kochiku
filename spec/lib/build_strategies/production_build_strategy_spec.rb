@@ -14,12 +14,14 @@ describe BuildStrategy do
 
   describe "#merge_ref" do
     context "when auto_merge is enabled" do
+      before do
+        GitBlame.should_receive(:emails_since_master).with(build)
+      end
+
       it "should merge to master" do
         merger = GitAutomerge.new
         GitAutomerge.should_receive(:new).and_return(merger)
         merger.should_receive(:automerge).with(build)
-        GitBlame.should_receive(:emails_since_last_green).with(duck_type(:repository))
-
         BuildStrategy.merge_ref(build).should_not be_nil
       end
 
