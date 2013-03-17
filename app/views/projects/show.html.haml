@@ -1,8 +1,11 @@
 - content_for :header do
+  %ul.links
+    %li= link_to("Repository", edit_repository_path(@project.repository), :class => "info")
+    %li= link_to("Projects", projects_repository_path(@project.repository))
   = form_for @build, :url => request_project_builds_path(@project) do |f|
     - if !@project.main_build?
-      =  f.text_field :ref, {:placeholder => 'SHA to build', :class => 'sha', :autocapitalize => 'off', :autocorrect => 'off', :spellcheck => 'false'}
-    =  f.submit "Build", {:class => 'build-button'}
+      = f.text_field :ref, {:placeholder => 'SHA to build', :class => 'sha', :autocapitalize => 'off', :autocorrect => 'off', :spellcheck => 'false'}
+    = f.submit "Build", {:class => 'build-button'}
 
 - if @project.main_build?
   %h2.subheader Build time (min)
@@ -17,7 +20,3 @@
   = content_for :javascript do
     :javascript
       $(document).ready(Kochiku.graphBuildTimes("#{escape_javascript @project.name}"));
-
-.repositories-link
-  = link_to("Repository", edit_repository_path(@project.repository), :class => "info")
-  = link_to("Projects", projects_repository_path(@project.repository))

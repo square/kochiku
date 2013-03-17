@@ -1,3 +1,7 @@
+- content_for :header do
+  %ul.links
+    %li= link_to("Repositories", repositories_path)
+
 .projects
   %ul
     - @projects.each do |project|
@@ -5,7 +9,3 @@
         = link_to(project.name, project_path(project))
         \-
         %span.state{:class => 'build-' + project.builds.last.try(:state).to_s}=  project.builds.last.try(:state).to_s.capitalize
-
-
-.repositories-link
-  = link_to("Repositories", repositories_path)
