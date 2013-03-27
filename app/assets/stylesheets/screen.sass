@@ -1,7 +1,11 @@
 @import compass
 @import compass/reset
 @import compass/css3/border-radius
-@import _avantgarde
+
+/* SQ Market font */
+@font-face
+  font-family: 'SQ Market'
+  src: url('/fonts/SQMarket-Regular.otf') format('opentype')
 
 /* Variables */
 $font-base: Helvetica Neue, Helvetica, Arial, sans-serif
@@ -51,11 +55,7 @@ $color-aborted: hsl(0, 0%, 70%)
   border-radius: $radius
 
 /* Styles */
-html
-  background: #b4b5b7 image-url("body-noise.png") 0 0 repeat
-  height: 100%
-
-body
+html, body
   height: 100%
 
 body, input
@@ -63,10 +63,8 @@ body, input
   font-size: 12px
 
 #page
-  background-color: white
-  width: 1140px
+  width: 1020px
   margin: 0 auto
-  box-shadow: 0 0 10px rgba(black, 0.8)
   min-height: 100%
 
 h1, h2, h3, h4, h5, h6
@@ -116,11 +114,12 @@ input[type=submit], button, .button
 /* Index */
 .section-wrapper
   overflow: hidden
-  background: image-url("section-bottom.png") no-repeat bottom center
-  background: image-url("section-top.png") no-repeat top center, image-url("section-bottom.png") no-repeat bottom center
+  border-bottom: solid 1px #e2e2e2
+  //background: image-url("section-bottom.png") no-repeat bottom center
+  //background: image-url("section-top.png") no-repeat top center, image-url("section-bottom.png") no-repeat bottom center
 .section
   +envelope
-  margin: 15px auto
+  margin: 1em auto 0.25em
   width: 1000px
 
 .flash
@@ -136,28 +135,18 @@ input[type=submit], button, .button
     background-color: #ff9999
 
 
-$logo-padding: 45px
 #header
   a.logo
     float: left
     h1
-      font-family: "agb", $font-base
-      background: image-url("logo.png") no-repeat left center
-      padding-left: $logo-padding
+      font-family: "SQ Market", $font-base
       font-size: 28px
-      line-height: 39px
-      position: relative
-      overflow: visible
-      .title-first
+      height: 37px
+      color: $color-title + #666
+      b
         color: $color-title
-      .title-second
-        color: $color-title + #666
       .translation
-        color: $color-title
         font-size: 14px
-        position: absolute
-        right: -60px
-        bottom: -10px
   ul.links
     display: inline-block
     li
@@ -168,9 +157,8 @@ $logo-padding: 45px
     display: inline-block
 
 #nav
-  line-height: 30px
   width: 1000px
-  margin: 15px auto
+  margin: 1em auto
   padding-bottom: 30px
 
 h2.subheader
@@ -316,9 +304,8 @@ $part-margin: 2px
 /* New build in header */
 .header-right
   float: right
-  height: 34px
-  margin-top: 4px
-  line-height: 39px
+  line-height: 32px
+  margin-top: 5px
   input.ref
     margin: 0
     width: 200px
