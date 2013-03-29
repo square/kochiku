@@ -42,6 +42,22 @@ describe MavenPartitioner do
       partitions = subject.incremental_partitions(build)
       partitions.first["files"].should == "ALL"
     end
+
+    it "should not fail if a file is reference in a top level module that is not in the top level pom" do
+      GitBlame.stub(:files_changed_since_last_green).with(build).and_return(["new-module/src/main/java/com/squareup/foo.java"])
+
+      File.stub(:exists?).and_return(false)
+      File.stub(:exists?).with("new-module/pom.xml").and_return(true)
+
+      subject.stub(:depends_on_map).and_return({
+          "module-one" => ["module-three", "module-four"].to_set,
+          "module-two" => ["module-three"].to_set
+      })
+      subject.should_not_receive(:partitions)
+
+      partitions = subject.incremental_partitions(build)
+      partitions.should be_empty
+    end
   end
 
   describe "#depends_on_map" do

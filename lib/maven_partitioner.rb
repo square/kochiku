@@ -20,7 +20,7 @@ class MavenPartitioner
       module_to_build = file_to_module(changed_file)
       return partitions if module_to_build.nil?
 
-      modules_to_build.merge(depends_on_map[module_to_build])
+      modules_to_build.merge(depends_on_map[module_to_build] || Set.new)
     end
 
     modules_to_build.map do |module_name|
