@@ -25,7 +25,9 @@
     %tr
       %td.whisker
         - @builds[0..-2].each do |build|
-          %span.part-status{:class => build.build_parts[i].try(:status)}
+          - attempts = build.build_parts[i].build_attempts.try(:count) || 0
+          = link_to project_build_part_path(@project, build, build.build_parts[i]) do
+            %span.part-status{:class => [build.build_parts[i].try(:status), "attempt-#{attempts}"], :title => build.ref}
       %td.result-column
         %span.part-status{:class => part.status}
           - text = part.status.to_s.capitalize
