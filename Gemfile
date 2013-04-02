@@ -38,7 +38,9 @@ gem 'jquery-rails'
 group :development do
   #gem 'debugger', :require => false
   gem 'capistrano', :require => false
+  gem 'quiet_assets'
   gem 'rvm-capistrano', :require => false
+  gem 'thin'
 end
 
 group :test, :development do
