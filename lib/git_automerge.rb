@@ -12,12 +12,10 @@ class GitAutomerge
     commit_message = "Automerge branch #{build.branch} for kochiku build id: #{build.id} ref: #{build.ref}"
     merge_log, status = Open3.capture2e(merge_env, "git merge --no-ff -m '#{commit_message}' #{build.ref}")
     abort_merge_and_raise("git merge --abort",
-      "Was unable to merge your branch:\n\n#{merge_log}") if status.exitstatus != 0
+      "Was unable to merge your branch:\n\n#{merge_log}") unless status.success?
 
     push_log, status = Open3.capture2e("git push origin master")
-    if status.exitstatus != 0
-      rebase_log, second_push_log = recover_failed_push
-    end
+    rebase_log, second_push_log = recover_failed_push unless status.success?
 
     [checkout_log, merge_log, push_log, rebase_log, second_push_log].join("\n")
   end
@@ -32,15 +30,15 @@ class GitAutomerge
   end
 
   def recover_failed_push
-    rebase_log, rebase_status = Open3.capture2e("git pull --rebase")
+    rebase_log, status = Open3.capture2e("git pull --rebase")
     # Someone else pushed and we are conflicted, abort rebase and remove merges
     abort_merge_and_raise("git rebase --abort; git reset --hard origin/master",
-                          "Was unable to merge your branch:\n\n#{rebase_log}") if rebase_status.exitstatus != 0
+                          "Was unable to merge your branch:\n\n#{rebase_log}") unless status.success?
 
     # Try to push once more if it fails remove merges
     second_push_log, status = Open3.capture2e("git push origin master")
     abort_merge_and_raise("git reset --hard origin/master",
-                          "Was unable to push your branch:\n\n#{second_push_log}") if status.exitstatus != 0
+                          "Was unable to push your branch:\n\n#{second_push_log}") unless status.success?
 
     [rebase_log, second_push_log]
   end
