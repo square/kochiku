@@ -7,16 +7,42 @@
       = f.text_field :ref, {:placeholder => 'SHA to build', :class => 'sha', :autocapitalize => 'off', :autocorrect => 'off', :spellcheck => 'false'}
     = f.submit "Build", {:class => 'build-button'}
 
-- if @project.main_build?
-  %h2.subheader Build time (min)
-  #plot
+%h2.subheader= @project.name
 
-%h2.subheader Builds
-
-.builds
-  = render @builds
-
-- if @project.main_build?
-  = content_for :javascript do
-    :javascript
-      $(document).ready(Kochiku.graphBuildTimes("#{escape_javascript @project.name}"));
+- build = @builds.last
+%table
+  %thead
+    %tr
+      %th Status
+      %th Last
+      - if build_metadata_header(build)
+        %th= build_metadata_header(build)
+      %th Build Type
+      %th.right ETA
+      %th.right Avg
+      %th Actions
+  - build.build_parts.each_with_index do |part, i|
+    %tr
+      %td.whisker
+        - @builds[0..-2].each do |build|
+          %span.part-status{:class => build.build_parts[i].try(:status)}
+      %td.result-column
+        %span.part-status{:class => part.status}
+          - text = part.status.to_s.capitalize
+          - if artifact = part.last_stdout_artifact
+            =link_to(text, artifact.log_file.url, :title => 'Last completed stdout.log')
+          - else
+            =text
+      - if build_metadata_header(build)
+        %td= build_part_field_value(build, part)
+      %td{:class => part.kind}= part.kind.to_s.capitalize
+      - average = average_time(@builds, i)
+      %td.right
+        - last_time = @builds.last.build_parts[i].try(:elapsed_time)
+        - eta = last_time && average - last_time
+        - if eta
+          = duration_strftime([eta, 0].max)
+        - else
+          Pending
+      %td.right= duration_strftime(average)
+      %td

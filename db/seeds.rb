@@ -21,7 +21,7 @@ def create_build_part(build, kind, paths, build_attempt_state)
 end
 
 def create_builds_for(project, repo_info)
-  3.times do
+  10.times do
     build = Build.create!(:project => project,
                           :ref => SecureRandom.hex,
                           :state => :runnable,

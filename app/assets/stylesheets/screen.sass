@@ -368,6 +368,14 @@ table
         background-color: $color-aborted
       &.passed::before
         background-color: $color-passed
+    &.whisker
+      width: 100px
+      padding-right: 0
+      .part-status::before
+        content: ""
+        width: 1px
+        margin-right: 2px
+        border-color: rgba(black, 0.2)
   .result-column
     width: 80px
   th:first-child, td:first-child

@@ -42,9 +42,9 @@
     %tr
       %th.id-column.right Part
       %th.result-column Status
-      %th Build Type
       - if build_metadata_header(@build)
         %th= build_metadata_header(@build)
+      %th Build Type
       %th.right Worker
       %th.right Elapsed Time
       %th.right Attempt #
@@ -60,9 +60,9 @@
               =link_to(text, artifact.log_file.url, :title => 'Last completed stdout.log')
             - else
               =text
-        %td{:class => part.kind}= part.kind.to_s.capitalize
         - if build_metadata_header(@build)
           %td= build_part_field_value(@build, part)
+        %td{:class => part.kind}= part.kind.to_s.capitalize
         %td.right= part.last_attempt ? part.last_attempt.builder : "pending"
         %td.right= part.elapsed_time ? duration_strftime(part.elapsed_time) : "pending"
         %td.right= part.build_attempts.size
