@@ -40,6 +40,12 @@
   = javascript_include_tag 'application'
   :javascript
     $(document).ready(function() {
-      $('.part').tipTip({maxWidth: "auto", edgeOffset: 10, fadeIn: 100, fadeOut: 100});
+      $('.part,.part-status').tipTip({
+        delay: 100,
+        maxWidth: "auto",
+        edgeOffset: 10,
+        fadeIn: 100,
+        fadeOut: 100
+      });
     });
   = yield :javascript

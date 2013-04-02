@@ -369,34 +369,32 @@ table
       &.passed::before
         background-color: $color-passed
     &.whisker
-      width: 100px
+      width: 60px
       padding-right: 0
       .part-status::before
         content: ""
         width: 1px
-        height: 20px
+        height: 10px
         margin-right: 2px
         border-color: rgba(black, 0.2)
       .part-status.attempt-1::before
         height: 1px
       .part-status.attempt-2::before
-        height: 4px
+        height: 3px
       .part-status.attempt-3::before
-        height: 7px
+        height: 5px
       .part-status.attempt-4::before
-        height: 10px
+        height: 7px
       .part-status.attempt-5::before
-        height: 13px
-      .part-status.attempt-6::before
-        height: 16px
-      .part-status.attempt-7::before
-        height: 19px
+        height: 9px
   .result-column
     width: 80px
   th:first-child, td:first-child
     padding-left: 0
   th.right, td.right
     text-align: right
+  th.small, td.small
+    width: 30px
 
 
 /* Build show */
