@@ -40,7 +40,7 @@ class BuildStrategy
 
     def merge_ref(build)
       begin
-        emails = GitBlame.emails_since_master(build)
+        emails = GitBlame.emails_in_merge(build)
         merger = GitAutomerge.new
         log = merger.automerge(build)
         AutoMergeMailer.merge_successful(build, emails, log).deliver
