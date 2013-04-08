@@ -30,8 +30,20 @@ module ApplicationHelper
     end
   end
 
+  def link_to_commit(build)
+    link_to build.ref[0,7], show_link_to_commit(build)
+  end
+
+  def link_to_branch(build)
+    link_to build.branch, show_link_to_branch(build)
+  end
+
   def show_link_to_commit(build)
     "#{build.repository.base_html_url}/commit/#{build.ref}"
+  end
+
+  def show_link_to_branch(build)
+    "#{build.repository.base_html_url}/tree/#{build.branch}"
   end
 
   def show_link_to_compare(build, first_commit_hash, second_commit_hash)

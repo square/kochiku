@@ -13,6 +13,7 @@ class CommandStubber
   def create_stubbed_process_status(exitstatus=0)
     obj = Object.new
     obj.stub(:exitstatus).and_return(exitstatus)
+    obj.stub(:success?).and_return(exitstatus == 0)
     obj
   end
 

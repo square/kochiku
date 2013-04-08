@@ -1,4 +1,5 @@
 class AutoMergeMailer < ActionMailer::Base
+  helper :application
   NOTIFICATIONS_EMAIL = 'kochiku-notifications@squareup.com'
 
   default :from => "build-and-release+merges@squareup.com"

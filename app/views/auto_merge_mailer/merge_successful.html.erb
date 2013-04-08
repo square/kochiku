@@ -1,8 +1,10 @@
 <p>
-  Kochiku build automatically merged build: <%= [@build.project.name, @build.id, @build.branch].join(", ") %>.
+  Kochiku automatically merged build:
+  <%= @build.project.name %>, <%= @build.id %>, <%= link_to_branch @build %>.
 </p>
+
 <p>
-  The ref for the merge is <%= @build.ref %>
+  The ref for the merge is <%= link_to_commit @build %>.
 </p>
 
 stdout &amp; stderr:
