@@ -28,6 +28,9 @@
       %label{:for => "use_branches_on_green"} Use branches instead of tags:
       = f.check_box :use_branches_on_green, {:id => "use_branches_on_green"}
     %div
+      %label{:for => "on_success_note"} Add git note:
+      = f.text_field :on_success_note, {:id => "on_success_note", :placeholder => "ex. (ci=green)"}
+    %div
       %label{:for => "on_success_script"} Run:
       = f.text_field :on_success_script, {:id => "on_success_script"}
 

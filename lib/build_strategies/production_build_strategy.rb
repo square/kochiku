@@ -29,6 +29,11 @@ class BuildStrategy
       end
     end
 
+    def add_note(build_ref, namespace, note)
+      Cocaine::CommandLine.new("git fetch -f origin refs/notes/*:refs/notes/*").run
+      Cocaine::CommandLine.new("git notes --ref=#{namespace} add -f -m '#{note}' #{build_ref}").run
+      Cocaine::CommandLine.new("git push -f origin refs/notes/#{namespace}").run
+    end
 
     def run_success_script(build_ref, repository)
       GitRepo.inside_copy(repository, build_ref) do |dir|
