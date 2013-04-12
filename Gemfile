@@ -42,8 +42,6 @@ group :development do
 end
 
 group :test, :development do
-  gem 'autotest-rails', :require => false
-  gem 'autotest-fsevent', :require => false
   gem 'rspec-rails'
   gem 'factory_girl_rails'
   gem "launchy"
