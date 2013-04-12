@@ -46,6 +46,10 @@ class Repository < ActiveRecord::Base
     on_success_script.to_s.strip.present?
   end
 
+  def has_on_success_note?
+    on_success_note.to_s.strip.present?
+  end
+
   def ci_queue_name
     queue_override || "ci"
   end

@@ -22,6 +22,12 @@ class BuildStateUpdateJob < JobBase
         build.project.builds.create_new_ci_build_for(sha)
       end
 
+      if build.succeeded? && build.repository.has_on_success_note?
+        GitRepo.inside_repo(build.repository) do
+          build.add_note!
+        end
+      end
+
       if build.promotable?
         GitRepo.inside_repo(build.repository) do
           build.promote!

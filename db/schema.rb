@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20130226232844) do
+ActiveRecord::Schema.define(:version => 20130409144945) do
 
   create_table "build_artifacts", :force => true do |t|
     t.integer  "build_attempt_id"
@@ -89,6 +89,7 @@ ActiveRecord::Schema.define(:version => 20130226232844) do
     t.string   "command_flag"
     t.boolean  "send_build_failure_email",    :default => true
     t.string   "on_success_script"
+    t.string   "on_success_note"
     t.string   "queue_override"
     t.integer  "timeout",                     :default => 40
   end
