@@ -9,12 +9,18 @@
 
 %h2.subheader= @project.name
 
+- if @project.main_build?
+  #plot
+  = content_for :javascript do
+    :javascript
+      $(document).ready(Kochiku.graphBuildTimes("#{escape_javascript @project.name}"));
+
 - build = @builds.last
 %table
   %thead
     %tr
-      %th Status
-      %th Last
+      %th Previous
+      %th Current
       - if build_metadata_header(build)
         %th= build_metadata_header(build)
       %th Build Type
@@ -28,10 +34,11 @@
       %td.whisker
         - total_attempts = 0
         - @builds[0..-2].each do |build|
-          - attempts = build.build_parts[i].build_attempts.try(:size) || 0
+          - attempts = build.build_parts[i].try(:build_attempts).try(:size) || 0
           - total_attempts += attempts
-          = link_to project_build_part_path(@project, build, build.build_parts[i]) do
-            %span.part-status{:class => [build.build_parts[i].try(:status), "attempt-#{attempts}"], :title => "#{build.ref} (#{attempts} Attempts)"}
+          - if build.build_parts[i]
+            = link_to project_build_part_path(@project, build, build.build_parts[i]) do
+              %span.part-status{:class => [build.build_parts[i].try(:status), "attempt-#{attempts}"], :title => "#{build.ref} (#{attempts} Attempts)"}
       %td.result-column
         %span.part-status{:class => part.status}
           = link_to part.status.to_s.capitalize, project_build_part_path(@project, build, part)

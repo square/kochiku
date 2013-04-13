@@ -3,6 +3,8 @@
 //= require jquery.tipTip
 //= require jquery.tablesorter
 //= require jquery.flot
+//= require jquery.flot.categories
+//= require jquery.flot.errorbars
 
 //= require_self
 
@@ -18,33 +20,53 @@ Kochiku.delayedRefresh = function() {
 };
 
 Kochiku.graphBuildTimes = function(projectName) {
-  var url = '/projects/' + projectName + '/build-time-history.json';
+  var url = '/projects/' + projectName + '/build-time-history.json'
+    , colors = {
+      cucumber: 'hsl(87,63%,47%)',
+      spec: 'hsl(187, 63%,47%)',
+      jasmine: 'hsl(27, 63%,47%)',
+
+      maven: 'hsl(207,63%,47%)',
+
+      unit: 'hsl(187, 63%,47%)',
+      integration: 'hsl(87,63%,47%)',
+      acceptance: 'hsl(207,63%,47%)'
+    };
 
   $.getJSON(url, function(data) {
-    var min = data.min;
-    var max = data.max + 10; // bump up the max so the graph doesn't get
-                             // *really* wide at the right edge.
+    var series = [];
+    for (var label in data)
+      series.push({
+        label: label,
+        data: data[label],
+        color: colors[label]
+      });
 
-    $.plot($('#plot'), [
-      {color: '#00802D', data: data.cucumber},
-      {color: '#2D80C5', data: data.spec},
-      {color: '#F8DE7E', data: data.jasmine},
-      {color: '#00802D', data: data.maven}
-    ], {
-      lines: {
+    $.plot($('#plot'), series, {
+      grid: {
+        borderWidth: 1
+      },
+      legend: {
         show: true,
-        fill: true
+        position: 'nw',
+        noColumns: series.length
       },
       xaxis: {
-        // logarithmically scale the x axis to increase resolution for more
-        // recent builds
-        transform: function (value) {
-          return Math.log(max - min) - Math.log(max - value);
-        }
+        show: false,
+        mode: 'categories'
       },
-      yaxis: {
-        min: 0,
-        max: 50
+      points: {
+        show: true,
+        lineWidth: 2,
+        radius: 3,
+        shadowSize: 0,
+        errorbars: 'y',
+        yerr: {
+          show: true,
+          asymmetric: true,
+          lineWidth: 1,
+          lowerCap: '-'
+        }
       }
     });
   });
