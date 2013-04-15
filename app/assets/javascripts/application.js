@@ -34,7 +34,8 @@ Kochiku.graphBuildTimes = function(projectName) {
     };
 
   $.getJSON(url, function(data) {
-    var series = [];
+    var plot = $('#plot')
+      , series = [];
     for (var label in data)
       series.push({
         label: label,
@@ -42,15 +43,7 @@ Kochiku.graphBuildTimes = function(projectName) {
         color: colors[label]
       });
 
-    $.plot($('#plot'), series, {
-      grid: {
-        borderWidth: 1
-      },
-      legend: {
-        show: true,
-        position: 'nw',
-        noColumns: series.length
-      },
+    $.plot(plot, series, {
       xaxis: {
         show: false,
         mode: 'categories'
@@ -67,8 +60,23 @@ Kochiku.graphBuildTimes = function(projectName) {
           lineWidth: 1,
           lowerCap: '-'
         }
+      },
+      grid: {
+        borderWidth: 1,
+        margin: {
+          left: 20
+        }
+      },
+      legend: {
+        show: true,
+        position: 'nw',
+        noColumns: series.length
       }
     });
+
+    $('<div class="axis-label y">')
+      .text('Minutes (Min to Max)')
+      .appendTo(plot);
   });
 };
 
