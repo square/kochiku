@@ -89,9 +89,9 @@ ActiveRecord::Schema.define(:version => 20130409144945) do
     t.string   "command_flag"
     t.boolean  "send_build_failure_email",    :default => true
     t.string   "on_success_script"
-    t.string   "on_success_note"
     t.string   "queue_override"
     t.integer  "timeout",                     :default => 40
+    t.string   "on_success_note"
   end
 
   add_index "repositories", ["url"], :name => "index_repositories_on_url"
