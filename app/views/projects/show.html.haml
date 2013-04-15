@@ -20,7 +20,7 @@
   %thead
     %tr
       %th Previous
-      %th Current
+      %th= link_to build.ref[0, 5], [@project, build]
       - if build_metadata_header(build)
         %th= build_metadata_header(build)
       %th Build Type
@@ -38,7 +38,7 @@
           - total_attempts += attempts
           - if build.build_parts[i]
             = link_to project_build_part_path(@project, build, build.build_parts[i]) do
-              %span.part-status{:class => [build.build_parts[i].try(:status), "attempt-#{attempts}"], :title => "#{build.ref} (#{attempts} Attempts)"}
+              %span.part-status{:class => [build.build_parts[i].try(:status), "attempt-#{attempts}"], :title => pluralize(attempts, 'attempt')}
       %td.result-column
         %span.part-status{:class => part.status}
           = link_to part.status.to_s.capitalize, project_build_part_path(@project, build, part)

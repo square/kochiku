@@ -3,8 +3,8 @@
 //= require jquery.tipTip
 //= require jquery.tablesorter
 //= require jquery.flot
-//= require jquery.flot.categories
 //= require jquery.flot.errorbars
+//= require jquery.flot.categories
 
 //= require_self
 
@@ -39,13 +39,12 @@ Kochiku.graphBuildTimes = function(projectName) {
     for (var label in data)
       series.push({
         label: label,
-        data: data[label],
+        data: data[label].slice(-28),
         color: colors[label]
       });
 
     $.plot(plot, series, {
       xaxis: {
-        show: false,
         mode: 'categories'
       },
       points: {
