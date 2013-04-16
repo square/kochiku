@@ -1,4 +1,5 @@
-source 'http://data01.mtv.squareup.com/rubygems'
+source 'https://rubygems.org'
+#source 'http://data01.mtv.squareup.com/rubygems'
 
 gem 'rails', '3.2.13'
 gem 'passenger', '3.0.18', :group => :production

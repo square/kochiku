@@ -5,7 +5,7 @@ GIT
     guard_dog (0.0.3)
 
 GEM
-  remote: http://data01.mtv.squareup.com/rubygems/
+  remote: https://rubygems.org/
   specs:
     actionmailer (3.2.13)
       actionpack (= 3.2.13)
