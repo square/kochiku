@@ -1,8 +1,7 @@
 source 'http://data01.mtv.squareup.com/rubygems'
 
-gem 'rails', '3.2.12'
-gem 'rake'
-gem 'passenger', :group => :production
+gem 'rails', '3.2.13'
+gem 'passenger', '3.0.18', :group => :production
 
 gem 'squash_ruby', :require => 'squash/ruby'
 gem 'squash_rails', :require => 'squash/rails'
@@ -10,9 +9,8 @@ gem 'guard_dog', :git => 'git@git.squareup.com:square/guard_dog.git'
 
 gem 'carrierwave'
 gem 'mysql2'
-gem "symbolize", :require => "symbolize/active_record"
+gem "symbolize"
 
-gem 'haml'
 gem 'haml-rails'
 gem 'sass'
 gem 'compass'
@@ -28,12 +26,18 @@ gem "nokogiri"
 gem "httparty"
 
 group :assets do
-  gem 'compass-rails'
-  gem 'sass-rails',   '~> 3.2.3'
   gem 'coffee-rails', '~> 3.2.1'
+  gem 'compass-rails'
+  gem 'jquery-rails'
+  gem 'sass-rails',   '~> 3.2.3'
   gem 'uglifier', '>= 1.0.3'
 end
-gem 'jquery-rails'
+
+group :test, :development do
+  gem 'rspec-rails'
+  gem 'factory_girl_rails'
+  gem "launchy"
+end
 
 group :development do
   #gem 'debugger', :require => false
@@ -41,12 +45,6 @@ group :development do
   gem 'quiet_assets'
   gem 'rvm-capistrano', :require => false
   gem 'thin'
-end
-
-group :test, :development do
-  gem 'rspec-rails'
-  gem 'factory_girl_rails'
-  gem "launchy"
 end
 
 group :test do
