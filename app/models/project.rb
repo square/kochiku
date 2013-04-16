@@ -62,7 +62,8 @@ class Project < ActiveRecord::Base
              SUBSTR(builds.ref, 1, 5),
              FLOOR(ROUND(MAX(UNIX_TIMESTAMP(build_attempts.finished_at) - UNIX_TIMESTAMP(build_attempts.started_at)) / 60)),
              FLOOR(ROUND(MAX(UNIX_TIMESTAMP(build_attempts.finished_at) - UNIX_TIMESTAMP(build_attempts.started_at)) / 60)) - FLOOR(ROUND(MIN(UNIX_TIMESTAMP(build_attempts.finished_at) - UNIX_TIMESTAMP(build_attempts.started_at)) / 60)),
-             0
+             0,
+             builds.id
         FROM builds
         JOIN build_parts ON build_parts.build_id = builds.id
         JOIN build_attempts ON build_attempts.build_part_id = build_parts.id

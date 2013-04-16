@@ -20,7 +20,8 @@
     %thead
       %tr
         %th Previous
-        %th= link_to build.ref[0, 5], [@project, build]
+        %th
+          %code= link_to build.ref[0, 5], [@project, build]
         - if build_metadata_header(build)
           %th= build_metadata_header(build)
         %th Build Type

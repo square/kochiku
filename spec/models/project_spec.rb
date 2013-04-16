@@ -64,7 +64,8 @@ describe Project do
               'spec' => [[
                            build.ref[0, 5],
                            (build_attempt.elapsed_time / 60).round,
-                           0, 0
+                           0, 0,
+                           build.id
                          ]]}
           end
         end

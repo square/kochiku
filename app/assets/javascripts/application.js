@@ -36,12 +36,13 @@ Kochiku.graphBuildTimes = function(projectName) {
   $.getJSON(url, function(data) {
     var plot = $('#plot')
       , series = [];
-    for (var label in data)
+    for (var label in data) {
       series.push({
         label: label,
-        data: data[label].slice(-28),
+        data: data[label].slice(-26),
         color: colors[label]
       });
+    }
 
     $.plot(plot, series, {
       xaxis: {
@@ -62,6 +63,7 @@ Kochiku.graphBuildTimes = function(projectName) {
       },
       grid: {
         borderWidth: 1,
+        clickable: true,
         margin: {
           left: 20
         }
@@ -71,6 +73,11 @@ Kochiku.graphBuildTimes = function(projectName) {
         position: 'nw',
         noColumns: series.length
       }
+    });
+
+    plot.on('plotclick', function(e, pos, item) {
+      var build = series[0].data[Math.round(pos.x)];
+      window.location = location + '/builds/' + build[4];
     });
 
     $('<div class="axis-label y">')
