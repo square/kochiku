@@ -15,40 +15,40 @@
     :javascript
       $(document).ready(Kochiku.graphBuildTimes("#{escape_javascript @project.name}"));
 
-- build = @builds.last
-%table
-  %thead
-    %tr
-      %th Previous
-      %th= link_to build.ref[0, 5], [@project, build]
-      - if build_metadata_header(build)
-        %th= build_metadata_header(build)
-      %th Build Type
-      %th.right Elapsed Time
-      %th.right Avg Time
-      %th.right.small Attempt #
-      %th.right.small Avg Attempts
-      %th Actions
-  - build.build_parts.each_with_index do |part, i|
-    %tr
-      %td.whisker
-        - total_attempts = 0
-        - @builds[0..-2].each do |build|
-          - attempts = build.build_parts[i].try(:build_attempts).try(:size) || 0
-          - total_attempts += attempts
-          - if build.build_parts[i]
-            = link_to project_build_part_path(@project, build, build.build_parts[i]) do
-              %span.part-status{:class => [build.build_parts[i].try(:status), "attempt-#{attempts}"], :title => pluralize(attempts, 'attempt')}
-      %td.result-column
-        %span.part-status{:class => part.status}
-          = link_to part.status.to_s.capitalize, project_build_part_path(@project, build, part)
-      - if build_metadata_header(build)
-        %td= build_part_field_value(build, part)
-      %td{:class => part.kind}= part.kind.to_s.capitalize
-      %td.right= part.elapsed_time ? duration_strftime(part.elapsed_time) : "pending"
-      %td.right= duration_strftime(average_time(@builds, i))
-      %td.right= part.build_attempts.size
-      %td.right= (total_attempts.to_f / (@builds.length-1)).round 0
-      %td
-        - if part.unsuccessful?
-          = link_to("Rebuild", rebuild_project_build_part_path(@project, build, part), :method => :post)
+- if build = @builds.last
+  %table
+    %thead
+      %tr
+        %th Previous
+        %th= link_to build.ref[0, 5], [@project, build]
+        - if build_metadata_header(build)
+          %th= build_metadata_header(build)
+        %th Build Type
+        %th.right Elapsed Time
+        %th.right Avg Time
+        %th.right.small Attempt #
+        %th.right.small Avg Attempts
+        %th Actions
+    - build.build_parts.each_with_index do |part, i|
+      %tr
+        %td.whisker
+          - total_attempts = 0
+          - @builds[0..-2].each do |build|
+            - attempts = build.build_parts[i].try(:build_attempts).try(:size) || 0
+            - total_attempts += attempts
+            - if build.build_parts[i]
+              = link_to project_build_part_path(@project, build, build.build_parts[i]) do
+                %span.part-status{:class => [build.build_parts[i].try(:status), "attempt-#{attempts}"], :title => pluralize(attempts, 'attempt')}
+        %td.result-column
+          %span.part-status{:class => part.status}
+            = link_to part.status.to_s.capitalize, project_build_part_path(@project, build, part)
+        - if build_metadata_header(build)
+          %td= build_part_field_value(build, part)
+        %td{:class => part.kind}= part.kind.to_s.capitalize
+        %td.right= part.elapsed_time ? duration_strftime(part.elapsed_time) : "pending"
+        %td.right= duration_strftime(average_time(@builds, i))
+        %td.right= part.build_attempts.size
+        %td.right= (total_attempts.to_f / (@builds.length-1)).round 0 if @builds.length > 1
+        %td
+          - if part.unsuccessful?
+            = link_to("Rebuild", rebuild_project_build_part_path(@project, build, part), :method => :post)

@@ -21,7 +21,7 @@ class Project < ActiveRecord::Base
   def build_time_history(fuzzy_limit=1000)
     result = Hash.new { |hash, key| hash[key] = [] }
 
-    id_cutoff = builds.maximum(:id) - fuzzy_limit
+    id_cutoff = builds.maximum(:id).to_i - fuzzy_limit
 
     execute(build_time_history_sql(id_cutoff)).each do |value|
       result[value.shift] << value
@@ -60,8 +60,8 @@ class Project < ActiveRecord::Base
     return <<-SQL
       SELECT build_parts.kind,
              SUBSTR(builds.ref, 1, 5),
-             ROUND(MAX(UNIX_TIMESTAMP(build_attempts.finished_at) - UNIX_TIMESTAMP(build_attempts.started_at)) / 60),
-             ROUND(MAX(UNIX_TIMESTAMP(build_attempts.finished_at) - UNIX_TIMESTAMP(build_attempts.started_at)) / 60) - ROUND(MIN(UNIX_TIMESTAMP(build_attempts.finished_at) - UNIX_TIMESTAMP(build_attempts.started_at)) / 60),
+             FLOOR(ROUND(MAX(UNIX_TIMESTAMP(build_attempts.finished_at) - UNIX_TIMESTAMP(build_attempts.started_at)) / 60)),
+             FLOOR(ROUND(MAX(UNIX_TIMESTAMP(build_attempts.finished_at) - UNIX_TIMESTAMP(build_attempts.started_at)) / 60)) - FLOOR(ROUND(MIN(UNIX_TIMESTAMP(build_attempts.finished_at) - UNIX_TIMESTAMP(build_attempts.started_at)) / 60)),
              0
         FROM builds
         JOIN build_parts ON build_parts.build_id = builds.id

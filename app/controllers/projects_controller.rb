@@ -20,7 +20,7 @@ class ProjectsController < ApplicationController
 
     respond_to do |format|
       format.html
-      format.rss
+      format.rss { @builds = @builds.reverse } # latest first
     end
   end
 

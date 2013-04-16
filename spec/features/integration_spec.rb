@@ -17,9 +17,8 @@ feature "viewing an in process build" do
     first(".ci-build-info .state").should have_content("Runnable")
 
     click_link(project.name)
-    page.should have_content(build.ref)
-    click_link(build.ref)
-
+    page.should have_content(build.ref[0, 5])
+    click_link(build.ref[0, 5])
 
     page.should have_content("Runnable on Ci")
 
@@ -73,7 +72,7 @@ feature "requesting a developer build" do
     visit(project_path(@project))
     fill_in("build_ref", :with => "DEADBEEF")
     click_button('Build')
-    page.should have_content("DEADBEEF")
+    page.should have_content("DEADB")
     find(".flash.message").should have_content("Build added!")
   end
 
