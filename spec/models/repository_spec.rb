@@ -135,4 +135,16 @@ describe Repository do
       Repository.new(:on_success_script => "hi").has_on_success_script?.should be_true
     end
   end
+
+  describe "#ci_queue_name" do
+    it "returns queue override if present" do
+      Repository.new(:queue_override => 'special').ci_queue_name.should == 'special'
+    end
+
+    it "returns ci if queue override is blank" do
+      Repository.new(:queue_override => nil).ci_queue_name.should == 'ci'
+      Repository.new(:queue_override => '').ci_queue_name.should == 'ci'
+      Repository.new(:queue_override => '  ').ci_queue_name.should == 'ci'
+    end
+  end
 end

@@ -51,7 +51,7 @@ class Repository < ActiveRecord::Base
   end
 
   def ci_queue_name
-    queue_override || "ci"
+    queue_override.presence || "ci"
   end
 
   private
