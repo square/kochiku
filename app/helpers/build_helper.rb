@@ -25,12 +25,13 @@ module BuildHelper
     !build.build_parts.empty? && build.build_parts.all? {|build_part| build_part.paths.size == 1 }
   end
 
-  def average_time(builds, part_index)
-    builds = builds.reject(&:is_running?)
-
-    total = builds.inject(0) do |sum, build|
-      sum + (build.build_parts[part_index].try(:elapsed_time) || 0)
+  def average_time(build_parts)
+    build_parts = build_parts.reject { |build, build_part| build.is_running? }
+    p build_parts.values.map(&:elapsed_time)
+    # build_parts is a hash of build => build_part
+    total = build_parts.inject(0) do |sum, (build, build_part)|
+      sum + (build_part.elapsed_time || 0)
     end
-    total.to_f / builds.length
+    total.to_f / build_parts.length
   end
 end

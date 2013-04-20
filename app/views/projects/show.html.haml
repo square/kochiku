@@ -1,11 +1,11 @@
 - content_for :header do
   %ul.links
-    %li= link_to("Repository", edit_repository_path(@project.repository), :class => "info")
+    %li= link_to("Repository", edit_repository_path(@project.repository), class: "info")
     %li= link_to("Projects", projects_repository_path(@project.repository))
-  = form_for @build, :url => request_project_builds_path(@project) do |f|
+  = form_for @build, url: request_project_builds_path(@project) do |f|
     - if !@project.main_build?
-      = f.text_field :ref, {:placeholder => 'SHA to build', :class => 'sha', :autocapitalize => 'off', :autocorrect => 'off', :spellcheck => 'false'}
-    = f.submit "Build", {:class => 'build-button'}
+      = f.text_field :ref, {placeholder: 'SHA to build', class: 'sha', autocapitalize: 'off', autocorrect: 'off', spellcheck: 'false'}
+    = f.submit "Build", {class: 'build-button'}
 
 %h2.subheader= @project.name
 
@@ -30,26 +30,31 @@
         %th.right.small Attempt #
         %th.right.small Avg Attempts
         %th Actions
-    - build.build_parts.each_with_index do |part, i|
+    - @build_parts.each do |paths, build_parts_by_build|
+      - part = build_parts_by_build.values.first
+      - build_part = build_parts_by_build[build]
       %tr
         %td.whisker
           - total_attempts = 0
-          - @builds[0..-2].each do |build|
-            - attempts = build.build_parts[i].try(:build_attempts).try(:size) || 0
-            - total_attempts += attempts
-            - if build.build_parts[i]
-              = link_to project_build_part_path(@project, build, build.build_parts[i]) do
-                %span.part-status{:class => [build.build_parts[i].try(:status), "attempt-#{attempts}"], :title => pluralize(attempts, 'attempt')}
+          - @builds[0..-2].each do |previous_build|
+            - if previous_part = build_parts_by_build[previous_build]
+              - attempts = previous_part.build_attempts.size
+              - total_attempts += attempts
+              = link_to "/projects/#{@project.to_param}/builds/#{previous_build.to_param}/parts/#{previous_part.to_param}" do
+                %span.part-status{class: [previous_part.status, "attempt-#{attempts}"], title: pluralize(attempts, 'attempt')}
+            - else
+              %span.part-status.attempt-0
         %td.result-column
-          %span.part-status{:class => part.status}
-            = link_to part.status.to_s.capitalize, project_build_part_path(@project, build, part)
+          - if build_part
+            %span.part-status{class: build_part.status}
+              = link_to build_part.status.to_s.capitalize, "/projects/#{@project.to_param}/builds/#{build.to_param}/parts/#{build_part.to_param}"
         - if build_metadata_header(build)
           %td= build_part_field_value(build, part)
-        %td{:class => part.kind}= part.kind.to_s.capitalize
-        %td.right= part.elapsed_time ? duration_strftime(part.elapsed_time) : "pending"
-        %td.right= duration_strftime(average_time(@builds, i))
-        %td.right= part.build_attempts.size
+        %td= part.kind.to_s.capitalize
+        %td.right= build_part.elapsed_time ? duration_strftime(build_part.elapsed_time) : "pending" if build_part
+        %td.right= duration_strftime(average_time(build_parts_by_build))
+        %td.right= build_part.build_attempts.size if build_part
         %td.right= (total_attempts.to_f / (@builds.length-1)).round 0 if @builds.length > 1
         %td
-          - if part.unsuccessful?
-            = link_to("Rebuild", rebuild_project_build_part_path(@project, build, part), :method => :post)
+          - if build_part && build_part.unsuccessful?
+            = link_to "Rebuild", "/projects/#{@project.to_param}/builds/#{build.to_param}/parts/#{build_part.to_param}", method: :post

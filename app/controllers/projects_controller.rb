@@ -13,6 +13,14 @@ class ProjectsController < ApplicationController
     @build = @project.builds.build(:queue => "developer")
     @builds = @project.builds.order('id desc').limit(12).includes(:build_parts => [:last_attempt, :last_completed_attempt, :build_attempts]).reverse
 
+    @build_parts = ActiveSupport::OrderedHash.new
+    @builds.each do |build|
+      build.build_parts.each do |build_part|
+        paths = build_part.paths.first
+        (@build_parts[paths] ||= Hash.new)[build] = build_part
+      end
+    end
+
     if params[:format] == 'rss'
       # remove recent builds that are pending or in progress (cimonitor expects this)
       @builds = @builds.drop_while {|build| [:partitioning, :runnable, :running].include?(build.state) }
