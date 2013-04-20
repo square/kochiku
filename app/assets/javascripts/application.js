@@ -37,9 +37,12 @@ Kochiku.graphBuildTimes = function(projectName) {
     var plot = $('#plot')
       , series = [];
     for (var label in data) {
+      var points = data[label].slice(-26);
+      for (var i = 0; i < points.length; i++)
+        points[i][0] = '<a href="' + location + '/builds/' + points[i][4] + '">' + points[i][0] + '</a>';
       series.push({
         label: label,
-        data: data[label].slice(-26),
+        data: points,
         color: colors[label]
       });
     }
@@ -73,11 +76,6 @@ Kochiku.graphBuildTimes = function(projectName) {
         position: 'nw',
         noColumns: series.length
       }
-    });
-
-    plot.on('plotclick', function(e, pos, item) {
-      var build = series[0].data[Math.round(pos.x)];
-      window.location = location + '/builds/' + build[4];
     });
 
     $('<div class="axis-label y">')
