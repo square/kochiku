@@ -67,7 +67,7 @@
           = builder ? builder.sub('.squareup.com', '') : "pending"
         %td.right= part.elapsed_time ? duration_strftime(part.elapsed_time) : "pending"
         %td.right= part.build_attempts.size
-        %td
+        %td.right
           - if part.unsuccessful?
             = link_to("Rebuild", rebuild_project_build_part_path(@project, @build, part), :method => :post)
 

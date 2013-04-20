@@ -73,4 +73,4 @@
             %span{ title: 'Average' } / #{average}
         %td.right
           - if build_part && build_part.unsuccessful?
-            = link_to "Rebuild", "/projects/#{@project.to_param}/builds/#{@current_build.to_param}/parts/#{build_part.to_param}", method: :post
+            = link_to "Rebuild", "/projects/#{@project.to_param}/builds/#{@current_build.to_param}/parts/#{build_part.to_param}/rebuild", method: :post
