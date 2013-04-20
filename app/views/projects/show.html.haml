@@ -14,22 +14,32 @@
   = content_for :javascript do
     :javascript
       $(document).ready(Kochiku.graphBuildTimes("#{escape_javascript @project.name}"));
+      $(function() {
+        var whisker = $('th.whisker');
+        $('table')
+          .on('mouseenter', '.whisker .part-status', function() {
+            whisker.text($(this).data('ref'));
+          })
+          .on('mouseleave', '.whisker', function() {
+            whisker.text('Previous');
+          });
+      });
 
 - if build = @builds.last
   %table
     %thead
       %tr
-        %th Previous
-        %th
+        %th.whisker Previous
+        %th.status
           %code= link_to build.ref[0, 5], [@project, build]
         - if build_metadata_header(build)
-          %th= build_metadata_header(build)
-        %th Build Type
-        %th.right Elapsed Time
-        %th.right Avg Time
-        %th.right.small Attempt #
-        %th.right.small Avg Attempts
-        %th Actions
+          %th.metadata= build_metadata_header(build)
+        %th.type Build Type
+        %th.right.time Elapsed
+        %th.right.time Avg Time
+        %th.right.count Attempt #
+        %th.right.count Attempt Avg
+        %th.right Actions
     - @build_parts.each do |paths, build_parts_by_build|
       - part = build_parts_by_build.values.first
       - build_part = build_parts_by_build[build]
@@ -41,7 +51,7 @@
               - attempts = previous_part.build_attempts.size
               - total_attempts += attempts
               = link_to "/projects/#{@project.to_param}/builds/#{previous_build.to_param}/parts/#{previous_part.to_param}" do
-                %span.part-status{class: [previous_part.status, "attempt-#{attempts}"], title: pluralize(attempts, 'attempt')}
+                %span.part-status{class: [previous_part.status, "attempt-#{attempts}"], title: pluralize(attempts, 'attempt'), data: { ref: previous_build.ref[0, 5] }}
             - else
               %span.part-status.attempt-0
         %td.result-column
@@ -55,6 +65,6 @@
         %td.right= duration_strftime(average_time(build_parts_by_build))
         %td.right= build_part.build_attempts.size if build_part
         %td.right= (total_attempts.to_f / (@builds.length-1)).round 0 if @builds.length > 1
-        %td
+        %td.right
           - if build_part && build_part.unsuccessful?
             = link_to "Rebuild", "/projects/#{@project.to_param}/builds/#{build.to_param}/parts/#{build_part.to_param}", method: :post

@@ -333,6 +333,7 @@ input.build-button
   font-size: 120%
 
 table
+  table-layout: fixed
   width: 100%
   tr:nth-child(even)
     background-color: rgba(0, 0, 0, 0.05)
@@ -341,7 +342,7 @@ table
   th
     font-weight: bold
     border-bottom: 1px solid rgba(0, 0, 0, 0.1)
-    padding: 0 15px 5px
+    padding: 0 10px 5px
     cursor: pointer
     &.headerSortDown::after
       content: " ▲"
@@ -351,8 +352,20 @@ table
       font-size: 8px
     code
       font-size: 15px
+    &.whisker
+      width: 45px
+    &.status
+      width: 70px
+    &.metadata
+      width: 30%
+    &.type
+      width: 90px
+    &.time
+      width: 80px
+    &.count
+      width: 40px
   td
-    padding: 5px 15px
+    padding: 5px 10px
     .part-status, .attempt-status
       &::before
         content: "\00A0"
@@ -384,7 +397,6 @@ table
       &.passed::before
         background-color: $color-passed
     &.whisker
-      width: 60px
       padding-right: 0
       .part-status::before
         content: ""
@@ -410,8 +422,6 @@ table
     padding-left: 0
   th.right, td.right
     text-align: right
-  th.small, td.small
-    width: 30px
 
 
 /* Build show */
