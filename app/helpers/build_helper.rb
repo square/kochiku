@@ -32,9 +32,8 @@ module BuildHelper
   end
 
   def average_time(build_parts)
-    build_parts = build_parts.reject { |build, build_part| build.is_running? }
-    p build_parts.values.map(&:elapsed_time)
     # build_parts is a hash of build => build_part
+    build_parts = build_parts.reject { |build, build_part| build.is_running? }
     total = build_parts.inject(0) do |sum, (build, build_part)|
       sum + (build_part.elapsed_time || 0)
     end
