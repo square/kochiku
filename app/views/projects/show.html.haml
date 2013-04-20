@@ -1,3 +1,7 @@
+= content_for :title, @project.name
+= content_for :favicon do
+  = favicon_link_tag image_path("#{@current_build.to_color}.png"), type: 'image/png'
+
 - content_for :header do
   %ul.links
     %li= link_to("Repository", edit_repository_path(@project.repository), class: "info")
@@ -25,24 +29,23 @@
           });
       });
 
-- if build = @builds.last
+- if @current_build
   %table
     %thead
       %tr
         %th.whisker Previous
         %th.status
-          %code= link_to build.ref[0, 5], [@project, build]
-        - if build_metadata_header(build)
-          %th.metadata= build_metadata_header(build)
-        %th.type Build Type
+          %code= link_to @current_build.ref[0, 5], [@project, @current_build]
+        - build_metadata_headers(@current_build).each do |header|
+          %th{ class: header.downcase.gsub(/\W+/, '-') }= header
+        %th.type Type
         %th.right.time Elapsed
         %th.right.time Avg Time
-        %th.right.count Attempt #
-        %th.right.count Attempt Avg
-        %th.right Actions
+        %th.right.count Attempt
+        %th.right.actions Actions
     - @build_parts.each do |paths, build_parts_by_build|
       - part = build_parts_by_build.values.first
-      - build_part = build_parts_by_build[build]
+      - build_part = build_parts_by_build[@current_build]
       %tr
         %td.whisker
           - total_attempts = 0
@@ -57,14 +60,17 @@
         %td.result-column
           - if build_part
             %span.part-status{class: build_part.status}
-              = link_to build_part.status.to_s.capitalize, "/projects/#{@project.to_param}/builds/#{build.to_param}/parts/#{build_part.to_param}"
-        - if build_metadata_header(build)
-          %td= build_part_field_value(build, part)
+              = link_to build_part.status.to_s.capitalize, "/projects/#{@project.to_param}/builds/#{@current_build.to_param}/parts/#{build_part.to_param}"
+        - build_metadata_values(@current_build, part).each do |value|
+          %td= value
         %td= part.kind.to_s.capitalize
         %td.right= build_part.elapsed_time ? duration_strftime(build_part.elapsed_time) : "pending" if build_part
         %td.right= duration_strftime(average_time(build_parts_by_build))
-        %td.right= build_part.build_attempts.size if build_part
-        %td.right= (total_attempts.to_f / (@builds.length-1)).round 0 if @builds.length > 1
+        %td.right
+          = build_part.build_attempts.size if build_part
+          - average = (total_attempts.to_f / (@builds.length-1)).round 0 if @builds.length > 1
+          - if average > 1
+            %span{ title: 'Average' } / #{average}
         %td.right
           - if build_part && build_part.unsuccessful?
-            = link_to "Rebuild", "/projects/#{@project.to_param}/builds/#{build.to_param}/parts/#{build_part.to_param}", method: :post
+            = link_to "Rebuild", "/projects/#{@project.to_param}/builds/#{@current_build.to_param}/parts/#{build_part.to_param}", method: :post

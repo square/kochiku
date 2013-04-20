@@ -344,6 +344,7 @@ table
     border-bottom: 1px solid rgba(0, 0, 0, 0.1)
     padding: 0 10px 5px
     cursor: pointer
+    white-space: nowrap
     &.headerSortDown::after
       content: " ▲"
       font-size: 8px
@@ -352,20 +353,29 @@ table
       font-size: 8px
     code
       font-size: 15px
+    &.id
+      width: 50px
     &.whisker
       width: 45px
     &.status
       width: 70px
-    &.metadata
-      width: 30%
+    &.ruby-version
+      width: 100px
     &.type
-      width: 90px
+      width: 65px
+    &.worker
+      width: 100px
     &.time
       width: 80px
     &.count
-      width: 40px
+      width: 50px
+    &.actions
+      width: 70px
   td
     padding: 5px 10px
+    overflow: hidden
+    text-overflow: ellipsis
+    white-space: nowrap
     .part-status, .attempt-status
       &::before
         content: "\00A0"

@@ -12,6 +12,7 @@ class ProjectsController < ApplicationController
     @project = Project.find_by_name!(params[:id])
     @build = @project.builds.build(:queue => "developer")
     @builds = @project.builds.order('id desc').limit(12).includes(:build_parts => [:last_attempt, :last_completed_attempt, :build_attempts]).reverse
+    @current_build = @builds.last
 
     @build_parts = ActiveSupport::OrderedHash.new
     @builds.each do |build|
