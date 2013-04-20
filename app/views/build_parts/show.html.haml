@@ -25,11 +25,11 @@
     - @build_part.build_attempts.each_with_index do |attempt, index|
       %tr
         %td.right= index + 1
-        %td.result-column
+        %td
           %span.attempt-status{:class => attempt.state}= attempt.state.to_s.capitalize
         %td= attempt.started_at
         %td.right= duration_strftime(attempt.elapsed_time)
-        %td.right= attempt.builder.sub('.squareup.com', '')
+        %td.right= attempt.builder ? attempt.builder.sub('.squareup.com', '') : "pending"
         %td
           -# ci_reporter in square-web generates a bunch of xml files that we
           -# do not want to show in the web interface.

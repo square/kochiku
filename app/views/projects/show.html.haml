@@ -1,6 +1,7 @@
 = content_for :title, @project.name
 = content_for :favicon do
-  = favicon_link_tag image_path("#{@current_build.to_color}.png"), type: 'image/png'
+  - if @current_build
+    = favicon_link_tag image_path("#{@current_build.to_color}.png"), type: 'image/png'
 
 - content_for :header do
   %ul.links
@@ -57,7 +58,7 @@
                 %span.part-status{class: [previous_part.status, "attempt-#{attempts}"], title: pluralize(attempts, 'attempt'), data: { ref: previous_build.ref[0, 5] }}
             - else
               %span.part-status.attempt-0
-        %td.result-column
+        %td
           - if build_part
             %span.part-status{class: build_part.status}
               = link_to build_part.status.to_s.capitalize, "/projects/#{@project.to_param}/builds/#{@current_build.to_param}/parts/#{build_part.to_param}"
@@ -69,7 +70,7 @@
         %td.right
           = build_part.build_attempts.size if build_part
           - average = (total_attempts.to_f / (@builds.length-1)).round 0 if @builds.length > 1
-          - if average > 1
+          - if average && average > 1
             %span{ title: 'Average' } / #{average}
         %td.right
           - if build_part && build_part.unsuccessful?

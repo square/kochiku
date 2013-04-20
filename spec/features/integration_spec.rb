@@ -23,9 +23,9 @@ feature "viewing an in process build" do
     page.should have_content("Runnable on Ci")
 
     within("table.build-summary") do
-      find("td.id-column").should have_content(build_part.id)
-      find("td.result-column").should have_content("Runnable")
-      find("td.test").should have_content("Test")
+      find("td:nth-child(1)").should have_content(build_part.id)
+      find("td:nth-child(2)").should have_content("Runnable")
+      find("td:nth-child(4)").should have_content("Test")
       click_link("#{build_part.id}")
     end
 
