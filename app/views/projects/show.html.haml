@@ -14,21 +14,20 @@
 
 %h2.subheader= @project.name
 
-- if @project.main_build?
-  #plot
-  = content_for :javascript do
-    :javascript
-      $(document).ready(Kochiku.graphBuildTimes("#{escape_javascript @project.name}"));
-      $(function() {
-        var whisker = $('th.whisker');
-        $('table')
-          .on('mouseenter', '.whisker .part-status', function() {
-            whisker.text($(this).data('ref'));
-          })
-          .on('mouseleave', '.whisker', function() {
-            whisker.text('Previous');
-          });
-      });
+#plot
+= content_for :javascript do
+  :javascript
+    $(document).ready(Kochiku.graphBuildTimes("#{escape_javascript @project.name}"));
+    $(function() {
+      var whisker = $('th.whisker');
+      $('table')
+        .on('mouseenter', '.whisker .part-status', function() {
+          whisker.text($(this).data('ref'));
+        })
+        .on('mouseleave', '.whisker', function() {
+          whisker.text('Previous');
+        });
+    });
 
 - if @current_build
   %table
