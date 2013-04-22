@@ -11,23 +11,24 @@ describe BuildHelper do
     let!(:build_part) { FactoryGirl.create(:build_part, :build_instance => build, :options => options) }
     let(:options) { {"language" => "ruby", "ruby" => "1.9.3-p194"} }
     it "returns the ruby version info" do
-      build_metadata_header(build).should == "Ruby Version"
-      build_part_field_value(build, build_part).should == "1.9.3-p194"
+      build_metadata_headers(build).should include("Ruby Version")
+      build_metadata_values(build, build_part).should include("1.9.3-p194")
     end
   end
 
   context "with a build only having one target" do
     let!(:build_part) { FactoryGirl.create(:build_part, :build_instance => build, :paths => ['a']) }
     it "returns the info" do
-      build_metadata_header(build).should == "Target"
-      build_part_field_value(build, build_part).should == "a"
+      build_metadata_headers(build).should == ["Target"]
+      build_metadata_values(build, build_part).should include("a")
     end
   end
 
-  context "with a build having no metadata" do
+  context "with a build with paths" do
     let!(:build_part) { FactoryGirl.create(:build_part, :build_instance => build, :paths => ['a', 'b']) }
     it "returns the info" do
-      build_metadata_header(build).should == nil
+      build_metadata_headers(build).should include("Paths")
+      build_metadata_values(build, build_part).should include("2 <span class=\"paths\">(a, b)</span>")
     end
   end
 end

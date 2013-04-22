@@ -7,8 +7,7 @@
       Kochiku
       = yield(:title)
     = stylesheet_link_tag 'tipTip.css', :media => 'screen'
-    = stylesheet_link_tag 'screen.css', :media => 'screen, projection'
-    = stylesheet_link_tag 'print.css', :media => 'print'
+    = stylesheet_link_tag 'screen.css', :media => 'all'
     /[if IE]
       = stylesheet_link_tag 'ie.css', :media => 'screen, projection'
     = csrf_meta_tag
@@ -22,7 +21,7 @@
         .section
           %a{:href => root_path, :class => "logo", :title => "Home"}
             %h1
-              <span class="title-first">Kochi</span><span class="title-second">ku</span>
+              %b Kochiku
               %span.translation こうちく
           %div.header-right
             = yield :header
@@ -41,6 +40,12 @@
   = javascript_include_tag 'application'
   :javascript
     $(document).ready(function() {
-      $('.part').tipTip({maxWidth: "auto", edgeOffset: 10, fadeIn: 100, fadeOut: 100});
+      $('.part').tipTip({
+        delay: 100,
+        maxWidth: "auto",
+        edgeOffset: 10,
+        fadeIn: 100,
+        fadeOut: 100
+      });
     });
   = yield :javascript

@@ -11,7 +11,16 @@ class ProjectsController < ApplicationController
   def show
     @project = Project.find_by_name!(params[:id])
     @build = @project.builds.build(:queue => "developer")
-    @builds = @project.builds.order('id desc').limit(10).includes(:build_parts => [:last_attempt, :build_attempts])
+    @builds = @project.builds.order('id desc').limit(12).includes(:build_parts => [:last_attempt, :last_completed_attempt, :build_attempts]).reverse
+    @current_build = @builds.last
+
+    @build_parts = ActiveSupport::OrderedHash.new
+    @builds.each do |build|
+      build.build_parts.each do |build_part|
+        paths = build_part.paths.first
+        (@build_parts[paths] ||= Hash.new)[build] = build_part
+      end
+    end
 
     if params[:format] == 'rss'
       # remove recent builds that are pending or in progress (cimonitor expects this)
@@ -20,7 +29,7 @@ class ProjectsController < ApplicationController
 
     respond_to do |format|
       format.html
-      format.rss
+      format.rss { @builds = @builds.reverse } # latest first
     end
   end
 

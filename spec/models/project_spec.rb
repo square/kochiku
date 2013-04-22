@@ -37,7 +37,7 @@ describe Project do
     let(:project) { FactoryGirl.create(:project) }
 
     context 'when the project has never been built' do
-      it { should == {'min' => 0, 'max' => 0} }
+      it { should == {} }
     end
 
     context 'when the project has one build' do
@@ -61,12 +61,11 @@ describe Project do
 
           it 'shows a simple series' do
             should == {
-              'min' => build.id,
-              'max' => build.id,
               'spec' => [[
-                           build.id,
+                           build.ref[0, 5],
                            (build_attempt.elapsed_time / 60).round,
-                           (build_attempt.elapsed_time / 60).round
+                           0, 0,
+                           build.id
                          ]]}
           end
         end

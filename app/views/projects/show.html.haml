@@ -1,22 +1,76 @@
+= content_for :title, @project.name
+= content_for :favicon do
+  - if @current_build
+    = favicon_link_tag image_path("#{@current_build.to_color}.png"), type: 'image/png'
+
 - content_for :header do
   %ul.links
-    %li= link_to("Repository", edit_repository_path(@project.repository), :class => "info")
+    %li= link_to("Repository", edit_repository_path(@project.repository), class: "info")
     %li= link_to("Projects", projects_repository_path(@project.repository))
-  = form_for @build, :url => request_project_builds_path(@project) do |f|
+  = form_for @build, url: request_project_builds_path(@project) do |f|
     - if !@project.main_build?
-      = f.text_field :ref, {:placeholder => 'SHA to build', :class => 'sha', :autocapitalize => 'off', :autocorrect => 'off', :spellcheck => 'false'}
-    = f.submit "Build", {:class => 'build-button'}
+      = f.text_field :ref, {placeholder: 'SHA to build', class: 'sha', autocapitalize: 'off', autocorrect: 'off', spellcheck: 'false'}
+    = f.submit "Build", {class: 'build-button'}
 
-- if @project.main_build?
-  %h2.subheader Build time (min)
-  #plot
+%h2.subheader= @project.name
 
-%h2.subheader Builds
+#plot
+= content_for :javascript do
+  :javascript
+    $(document).ready(Kochiku.graphBuildTimes("#{escape_javascript @project.name}"));
+    $(function() {
+      var whisker = $('th.whisker');
+      $('table')
+        .on('mouseenter', '.whisker .part-status', function() {
+          whisker.text($(this).data('ref'));
+        })
+        .on('mouseleave', '.whisker', function() {
+          whisker.text('Previous');
+        });
+    });
 
-.builds
-  = render @builds
-
-- if @project.main_build?
-  = content_for :javascript do
-    :javascript
-      $(document).ready(Kochiku.graphBuildTimes("#{escape_javascript @project.name}"));
+- if @current_build
+  %table
+    %thead
+      %tr
+        %th.whisker Previous
+        %th.status
+          %code= link_to @current_build.ref[0, 5], [@project, @current_build]
+        - build_metadata_headers(@current_build).each do |header|
+          %th{ class: header.downcase.gsub(/\W+/, '-') }= header
+        %th.type Type
+        %th.right.time Elapsed
+        %th.right.time Avg Time
+        %th.right.count Attempt
+        %th.right.actions Actions
+    - @build_parts.each do |paths, build_parts_by_build|
+      - part = build_parts_by_build.values.first
+      - build_part = build_parts_by_build[@current_build]
+      %tr
+        %td.whisker
+          - total_attempts = 0
+          - @builds[0..-2].each do |previous_build|
+            - if previous_part = build_parts_by_build[previous_build]
+              - attempts = previous_part.build_attempts.size
+              - total_attempts += attempts
+              = link_to "/projects/#{@project.to_param}/builds/#{previous_build.to_param}/parts/#{previous_part.to_param}" do
+                %span.part-status{class: [previous_part.status, "attempt-#{attempts}"], title: pluralize(attempts, 'attempt'), data: { ref: previous_build.ref[0, 5] }}
+            - else
+              %span.part-status.attempt-0
+        %td
+          - if build_part
+            %span.part-status{class: build_part.status}
+              = link_to build_part.status.to_s.capitalize, "/projects/#{@project.to_param}/builds/#{@current_build.to_param}/parts/#{build_part.to_param}"
+        - build_metadata_values(@current_build, part).each do |value|
+          %td= value
+        %td= part.kind.to_s.capitalize
+        %td.right= build_part.elapsed_time ? duration_strftime(build_part.elapsed_time) : "pending" if build_part
+        %td.right= duration_strftime(average_time(build_parts_by_build))
+        %td.right
+          = build_part.build_attempts.size if build_part
+          - average = (total_attempts.to_f / (@builds.length-1)).round 0 if @builds.length > 1
+          - if average && average > 1
+            %span{ title: 'Average' } / #{average}
+        %td.right
+          - if build_part && build_part.unsuccessful?
+            = link_to "Rebuild", "/projects/#{@project.to_param}/builds/#{@current_build.to_param}/parts/#{build_part.to_param}/rebuild", method: :post

@@ -14,22 +14,22 @@
 %table.build-part-info
   %thead
     %tr
-      %th Attempt #
-      %th Status
+      %th.right.count Attempt
+      %th.status Status
       %th Started At
-      %th.right Elapsed Time
-      %th.right Worker
+      %th.right.time Elapsed Time
+      %th.right.worker Worker
       %th Build Artifacts
-      %th Actions
+      %th.right.actions Actions
   %tbody
     - @build_part.build_attempts.each_with_index do |attempt, index|
       %tr
-        %td= index + 1
-        %td.result-column
+        %td.right= index + 1
+        %td
           %span.attempt-status{:class => attempt.state}= attempt.state.to_s.capitalize
         %td= attempt.started_at
         %td.right= duration_strftime(attempt.elapsed_time)
-        %td.right= attempt.builder
+        %td.right= attempt.builder ? attempt.builder.sub('.squareup.com', '') : "pending"
         %td
           -# ci_reporter in square-web generates a bunch of xml files that we
           -# do not want to show in the web interface.

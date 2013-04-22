@@ -36,37 +36,38 @@
     %span.info
       = button_to "Rebuild failed parts", rebuild_failed_parts_project_build_path(@project, @build), :method => :post, :form_class => "rebuild-parts"
 
-
 %table.build-summary#build-summary
   %thead
     %tr
-      %th.id-column.right Part
-      %th.result-column Status
-      %th Build Type
-      - if build_metadata_header(@build)
-        %th= build_metadata_header(@build)
-      %th.right Worker
-      %th.right Elapsed Time
-      %th.right Attempt #
-      %th Actions
+      %th.right.id Part
+      %th.status Status
+      - build_metadata_headers(@build).each do |header|
+        %th{ class: header.downcase.gsub(/\W+/, '-') }= header
+      %th.type Type
+      %th.right.worker Worker
+      %th.right.time Elapsed Time
+      %th.right.count Attempt
+      %th.right.actions Actions
   %tbody
     - @build.build_parts.each do |part|
       %tr
-        %td.id-column.right= link_to(part.id, project_build_part_path(@project, @build, part))
-        %td.result-column
+        %td.right= link_to(part.id, project_build_part_path(@project, @build, part))
+        %td
           %span.part-status{:class => part.status}
             - text = part.status.to_s.capitalize
             - if artifact = part.last_stdout_artifact
               =link_to(text, artifact.log_file.url, :title => 'Last completed stdout.log')
             - else
               =text
-        %td{:class => part.kind}= part.kind.to_s.capitalize
-        - if build_metadata_header(@build)
-          %td= build_part_field_value(@build, part)
-        %td.right= part.last_attempt ? part.last_attempt.builder : "pending"
+        - build_metadata_values(@build, part).each do |value|
+          %td= value
+        %td= part.kind.to_s.capitalize
+        %td.right
+          - builder = part.last_attempt.try(:builder)
+          = builder ? builder.sub('.squareup.com', '') : "pending"
         %td.right= part.elapsed_time ? duration_strftime(part.elapsed_time) : "pending"
         %td.right= part.build_attempts.size
-        %td
+        %td.right
           - if part.unsuccessful?
             = link_to("Rebuild", rebuild_project_build_part_path(@project, @build, part), :method => :post)
 
