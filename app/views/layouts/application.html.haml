@@ -8,8 +8,6 @@
       = yield(:title)
     = stylesheet_link_tag 'tipTip.css', :media => 'screen'
     = stylesheet_link_tag 'screen.css', :media => 'all'
-    /[if IE]
-      = stylesheet_link_tag 'ie.css', :media => 'screen, projection'
     = csrf_meta_tag
     - if (favicon = yield(:favicon)).present?
       = favicon
