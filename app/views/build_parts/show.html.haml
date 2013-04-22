@@ -6,7 +6,7 @@
   = link_to(@build.project.name, project_path(@build.project))
   \-
   = link_to project_build_path(@project, @build) do
-    %code{ title: @build.ref }= @build.ref[0, 5]
+    %code{ title: @build.ref }= @build.ref[0, 7]
   \- Part #{@build_part.id}
 
   .actions

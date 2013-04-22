@@ -5,7 +5,7 @@
 %h2.subheader
   = link_to(@build.project.name, project_path(@build.project))
   \-
-  %code{ title: @build.ref }= @build.ref[0, 5]
+  %code{ title: @build.ref }= @build.ref[0, 7]
   %a.info{:href => show_link_to_commit(@build)}
     Show on GitHub
 
