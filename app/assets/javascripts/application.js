@@ -37,7 +37,7 @@ Kochiku.graphBuildTimes = function(projectName) {
     var plot = $('#plot')
       , series = [];
     for (var label in data) {
-      var points = data[label].slice(-26);
+      var points = data[label].slice(-24);
       for (var i = 0; i < points.length; i++)
         points[i][0] = '<a href="' + location + '/builds/' + points[i][4] + '">' + points[i][0] + '</a>';
       series.push({
