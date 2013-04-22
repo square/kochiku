@@ -1,3 +1,6 @@
+require 'build'
+require 'build_attempt'
+
 class RenameErrorStateToErrored < ActiveRecord::Migration
   def self.up
     BuildAttempt.update_all({:state => 'errored'}, {:state => 'error'})
