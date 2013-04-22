@@ -254,6 +254,7 @@ DEPENDENCIES
   passenger (= 3.0.18)
   quiet_assets
   rails (= 3.2.13)
+  rake
   resque
   resque-retry
   rspec-rails
