@@ -43,7 +43,7 @@
         %th.right.time Avg Time
         %th.right.count Attempt
         %th.right.actions Actions
-    - @build_parts.each do |paths, build_parts_by_build|
+    - @build_parts.each do |key, build_parts_by_build|
       - part = build_parts_by_build.values.first
       - build_part = build_parts_by_build[@current_build]
       %tr

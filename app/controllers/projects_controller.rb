@@ -15,10 +15,10 @@ class ProjectsController < ApplicationController
     @current_build = @builds.last
 
     @build_parts = ActiveSupport::OrderedHash.new
-    @builds.each do |build|
+    @builds.reverse.each do |build|
       build.build_parts.each do |build_part|
-        paths = build_part.paths.first
-        (@build_parts[paths] ||= Hash.new)[build] = build_part
+        key = [build_part.paths.first, build_part.kind, build_part.options['ruby']]
+        (@build_parts[key] ||= Hash.new)[build] = build_part
       end
     end
 
