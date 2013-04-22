@@ -4,7 +4,7 @@
 
 %h2.subheader
   = link_to(@build.project.name, project_path(@build.project))
-  \- Build #{@build.id} - <code>#{@build.ref}</code>
+  \- Build #{@build.id} - <code title="#{@build.ref}">#{@build.ref[0,5]}</code>
   - if @build.auto_merge_enabled?
     = image_tag 'auto-merge.png', title: 'Auto merge enabled'
     = button_to "Abort Auto Merge", toggle_auto_merge_project_build_path(@build.project, @build, :auto_merge => false), :method => :post, :form_class => "toggle-auto-merge"
