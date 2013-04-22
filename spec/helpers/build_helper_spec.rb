@@ -28,7 +28,8 @@ describe BuildHelper do
     let!(:build_part) { FactoryGirl.create(:build_part, :build_instance => build, :paths => ['a', 'b']) }
     it "returns the info" do
       build_metadata_headers(build).should include("Paths")
-      build_metadata_values(build, build_part).should include("2 (a, b)")
+      build_metadata_values(build, build_part).should include("2")
+      build_metadata_values(build, build_part).should include("(a, b)")
     end
   end
 end
