@@ -5,11 +5,14 @@
 %h2.subheader
   = link_to(@build.project.name, project_path(@build.project))
   \-
-  = link_to "Build #{@build.id}", project_build_path(@project, @build)
-  \- <code>#{@build.ref}</code> - Part #{@build_part.id}
-  %label
-    = check_box_tag :refresh, true, @build_part.is_running?
-    Auto Refresh
+  = link_to project_build_path(@project, @build) do
+    %code{ title: @build.ref }= @build.ref[0, 5]
+  \- Part #{@build_part.id}
+
+  .actions
+    %label
+      = check_box_tag :refresh, true, @build_part.is_running?
+      Refresh
 
 %table.build-part-info
   %thead
