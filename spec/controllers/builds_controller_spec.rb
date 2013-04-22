@@ -246,7 +246,7 @@ describe BuildsController do
     end
   end
 
-  describe "#show" do
+  describe "auto merge" do
     render_views
     let(:project) { FactoryGirl.create(:project) }
     let(:build) { FactoryGirl.create(:build, :project => project, :queue => queue) }
@@ -256,22 +256,34 @@ describe BuildsController do
       @params = {:id => build.id, :project_id => project.name}
     end
 
-    it "renders the enable auto merge button" do
+    it "renders the enable auto merge checkbox" do
       get @action, @params
       doc = Nokogiri::HTML(response.body)
-      elements = doc.css("form.toggle-auto-merge input[type=submit]")
+      elements = doc.css("input[name=auto_merge]")
       elements.size.should == 1
-      elements.first['value'].should include("Enable")
+      elements.first['checked'].should be_blank
+    end
+
+    context "for auto merge enabled builds" do
+      let(:build) { FactoryGirl.create(:build, :project => project, :queue => queue, :auto_merge => true) }
+      it "renders the enable auto merge checkbox" do
+        get @action, @params
+        doc = Nokogiri::HTML(response.body)
+        elements = doc.css("input[name=auto_merge]")
+        elements.size.should == 1
+        elements.first['checked'].should be_present
+      end
     end
 
     context "for ci builds" do
       let(:queue) { :ci }
 
-      it "does not render the enable auto merge button" do
+      it "renders the auto merge checkbox disabled" do
         get @action, @params
         doc = Nokogiri::HTML(response.body)
-        elements = doc.css("form.toggle-auto-merge")
-        elements.size.should == 0
+        elements = doc.css("input[name=auto_merge]")
+        elements.size.should == 1
+        elements.first['disabled'].should be_present
       end
     end
   end

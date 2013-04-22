@@ -20,7 +20,7 @@ feature "viewing an in process build" do
     page.should have_content(build.ref[0, 5])
     click_link(build.ref[0, 5])
 
-    page.should have_content("Runnable on Ci")
+    page.should have_content("Runnable on ci queue")
 
     within("table.build-summary") do
       find("td:nth-child(1)").should have_content(build_part.id)
@@ -29,7 +29,7 @@ feature "viewing an in process build" do
       click_link("#{build_part.id}")
     end
 
-    find(".subheader").should have_content("#{build.ref} - Part #{build_part.id}")
+    find(".subheader").should have_content("#{build.ref[0, 7]} - Part #{build_part.id}")
 
     all(".build-part-info tbody tr").size.should == 1
   end
