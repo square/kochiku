@@ -4,8 +4,9 @@
     %meta{ :charset => 'utf-8' }
     %meta{ :name => 'google', :value => 'notranslate' }
     %title
+      - if (title = yield(:title)).present?
+        #{title} &ndash;
       Kochiku
-      = yield(:title)
     = stylesheet_link_tag 'tipTip.css', :media => 'screen'
     = stylesheet_link_tag 'screen.css', :media => 'all'
     = csrf_meta_tag

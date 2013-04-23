@@ -1,4 +1,7 @@
-= content_for :title, @build.ref
+= content_for :title do
+  = @build.ref[0, 7]
+  &ndash;
+  = @build.project.name
 = content_for :favicon do
   = favicon_link_tag image_path("#{@build.to_color}.png"), :type => 'image/png'
 
