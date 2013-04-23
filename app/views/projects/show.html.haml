@@ -33,9 +33,10 @@
   %table
     %thead
       %tr
-        %th.whisker Previous
+        %th.right.whisker Previous
         %th.status
-          %code= link_to @current_build.ref[0, 5], [@project, @current_build]
+          %code.build-status{ class: @current_build.state }
+            = link_to @current_build.ref[0, 5], [@project, @current_build]
         - build_metadata_headers(@current_build).each do |header|
           %th{ class: header.downcase.gsub(/\W+/, '-') }= header
         %th.type Type
@@ -47,7 +48,7 @@
       - part = build_parts_by_build.values.first
       - build_part = build_parts_by_build[@current_build]
       %tr
-        %td.whisker
+        %td.right.whisker
           - total_attempts = 0
           - @builds[0..-2].each do |previous_build|
             - if previous_part = build_parts_by_build[previous_build]

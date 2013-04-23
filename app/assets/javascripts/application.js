@@ -39,7 +39,10 @@ Kochiku.graphBuildTimes = function(projectName) {
     for (var label in data) {
       var points = data[label].slice(-24);
       for (var i = 0; i < points.length; i++)
-        points[i][0] = '<a href="' + location + '/builds/' + points[i][4] + '">' + points[i][0] + '</a>';
+        points[i][0] = $('<a>')
+          .attr('href', location + '/builds/' + points[i][4])
+          .attr('class', 'build-status ' + points[i][5])
+          .text(points[i][0])[0].outerHTML;
       series.push({
         label: label,
         data: points,
@@ -67,6 +70,7 @@ Kochiku.graphBuildTimes = function(projectName) {
       grid: {
         borderWidth: 1,
         clickable: true,
+        labelMargin: 10,
         margin: {
           left: 20
         }

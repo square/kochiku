@@ -69,7 +69,8 @@ class Project < ActiveRecord::Base
              IFNULL(FLOOR(ROUND(MAX(UNIX_TIMESTAMP(build_attempts.finished_at) - UNIX_TIMESTAMP(build_attempts.started_at)) / 60)), 0) AS max,
              IFNULL(FLOOR(ROUND(MAX(UNIX_TIMESTAMP(build_attempts.finished_at) - UNIX_TIMESTAMP(build_attempts.started_at)) / 60)) - FLOOR(ROUND(MIN(UNIX_TIMESTAMP(build_attempts.finished_at) - UNIX_TIMESTAMP(build_attempts.started_at)) / 60)), 0) AS min_diff,
              0 AS max_diff,
-             builds.id
+             builds.id,
+             builds.state
         FROM builds
    LEFT JOIN build_parts ON build_parts.build_id = builds.id
    LEFT JOIN build_attempts ON build_attempts.build_part_id = build_parts.id
@@ -82,7 +83,7 @@ class Project < ActiveRecord::Base
              ORDER BY id DESC
                 LIMIT 1
              ))
-    GROUP BY builds.id, build_parts.kind
+    GROUP BY builds.id, build_parts.kind, builds.state
     SQL
   end
 end

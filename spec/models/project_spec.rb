@@ -54,7 +54,8 @@ describe Project do
               'spec' => [[
                            build.ref[0, 5],
                            0, 0, 0,
-                           build.id
+                           build.id,
+                           'succeeded'
                          ]]}
           end
         end
@@ -73,7 +74,8 @@ describe Project do
               'spec' => [[
                            build.ref[0, 5],
                            0, 0, 0,
-                           build.id
+                           build.id,
+                           'succeeded'
                          ]]}
           end
         end
@@ -89,13 +91,14 @@ describe Project do
             )
           end
 
-          it 'shows a simple series' do
+          it 'shows error bars, ref, and build status' do
             should == {
               'spec' => [[
                            build.ref[0, 5],
                            (build_attempt.elapsed_time / 60).round,
                            0, 0,
-                           build.id
+                           build.id,
+                           'succeeded'
                          ]]}
           end
         end

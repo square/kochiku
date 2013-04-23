@@ -29,7 +29,7 @@ feature "viewing an in process build" do
       click_link("#{build_part.id}")
     end
 
-    find(".subheader").should have_content("#{build.ref[0, 7]} - Part #{build_part.id}")
+    find(".subheader").should have_content("#{build.ref[0, 7]} – Part #{build_part.id}")
 
     all(".build-part-info tbody tr").size.should == 1
   end
