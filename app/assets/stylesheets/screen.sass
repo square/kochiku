@@ -208,6 +208,14 @@ form label
     font-family: $font-code
     font-size: 12px
     color: $color-link
+    .build-status:before
+      content: ''
+      width: 2px
+      height: 2px
+      border: 1px solid rgba(black, 0.2)
+      margin-right: 2px
+      border-radius: 1px
+      vertical-align: middle
   .axis-label
     position: absolute
     color: #666
@@ -319,6 +327,38 @@ $part-margin: 2px
   li
     margin: 5px 0
 
+.build-status, .part-status, .attempt-status
+  &:before
+    content: "\00A0"
+    border: 1px solid rgba(black, 0.4)
+    border-radius: 3px
+    display: inline-block
+    width: 10px
+    height: 10px
+    text-align: center
+    margin-right: 2px
+    box-shadow: 0 1px 1px rgba(black, 0.1)
+    font-size: 10px
+    font-family: verdana, sans-serif
+    font-weight: bold
+    color: rgba(black, 0.4)
+  &.runnable:before, &.partitioning:before
+    background-color: $color-runnable
+  &.running:before
+    background-color: $color-running
+  &.failed:before, &.errored:before, &.aborted:before, &.doomed:before
+    content: "!"
+  &.failed:before, &.doomed:before
+    background-color: $color-failed
+  &.errored:before
+    background-color: $color-errored
+  &.aborted:before
+    background-color: $color-aborted
+  &.passed:before, &.succeeded:before
+    background-color: $color-passed
+
+h2 .build-status:before
+  vertical-align: middle
 
 /* New build in header */
 .header-right
@@ -348,13 +388,13 @@ table
   th
     font-weight: bold
     border-bottom: 1px solid rgba(0, 0, 0, 0.1)
-    padding: 0 10px 5px
+    padding: 0 5px 5px
     cursor: pointer
     white-space: nowrap
-    &.headerSortDown::after
+    &.headerSortDown:after
       content: " ▲"
       font-size: 8px
-    &.headerSortUp::after
+    &.headerSortUp:after
       content: " ▼"
       font-size: 8px
     code
@@ -378,64 +418,32 @@ table
     &.actions
       width: 70px
   td
-    padding: 5px 10px
+    padding: 5px
     overflow: hidden
     text-overflow: ellipsis
     white-space: nowrap
-    .part-status, .attempt-status
-      &::before
-        content: "\00A0"
-        border: 1px solid rgba(black, 0.4)
-        border-radius: 3px
-        display: block
-        float: left
-        width: 10px
-        height: 10px
-        text-align: center
-        margin-right: 5px
-        box-shadow: 0 1px 1px rgba(black, 0.1)
-        font-size: 10px
-        font-family: verdana, sans-serif
-        font-weight: bold
-        color: rgba(black, 0.4)
-      &.runnable::before
-        background-color: $color-runnable
-      &.running::before
-        background-color: $color-running
-      &.failed::before, &.errored::before, &.aborted::before
-        content: "!"
-      &.failed::before
-        background-color: $color-failed
-      &.errored::before
-        background-color: $color-errored
-      &.aborted::before
-        background-color: $color-aborted
-      &.passed::before
-        background-color: $color-passed
     &.whisker
-      padding-right: 0
-      .part-status::before
+      padding-right: 2px
+      .part-status:before
         content: ""
         width: 1px
         height: 10px
-        margin-right: 2px
+        margin-right: -1px
         border-color: rgba(black, 0.2)
-      .part-status.attempt-0::before
+      .part-status.attempt-0:before
         height: 1px
         border-color: transparent
         -webkit-box-shadow: none
-      .part-status.attempt-1::before
+      .part-status.attempt-1:before
         height: 1px
-      .part-status.attempt-2::before
+      .part-status.attempt-2:before
         height: 3px
-      .part-status.attempt-3::before
+      .part-status.attempt-3:before
         height: 5px
-      .part-status.attempt-4::before
+      .part-status.attempt-4:before
         height: 7px
-      .part-status.attempt-5::before
+      .part-status.attempt-5:before
         height: 9px
-  th:first-child, td:first-child
-    padding-left: 0
   th.right, td.right
     text-align: right
   td .paths
