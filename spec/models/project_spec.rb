@@ -48,6 +48,38 @@ describe Project do
           FactoryGirl.create(:build_part, :build_instance => build, :kind => 'spec')
         }
 
+        context 'when the part has zero attempts' do
+          it 'still includes the build' do
+            should == {
+              'spec' => [[
+                           build.ref[0, 5],
+                           0, 0, 0,
+                           build.id,
+                           'succeeded'
+                         ]]}
+          end
+        end
+
+        context 'when the part has an unstarted attempt' do
+          let!(:build_attempt) do
+            FactoryGirl.create(
+              :build_attempt,
+              :build_part => build_part,
+              :state => :runnable
+            )
+          end
+
+          it 'still includes the build' do
+            should == {
+              'spec' => [[
+                           build.ref[0, 5],
+                           0, 0, 0,
+                           build.id,
+                           'succeeded'
+                         ]]}
+          end
+        end
+
         context 'when the part has one attempt' do
           let!(:build_attempt) do
             FactoryGirl.create(
