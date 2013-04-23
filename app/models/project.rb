@@ -26,9 +26,7 @@ class Project < ActiveRecord::Base
     execute(build_time_history_sql(id_cutoff)).each do |value|
       if key = value.shift
         result[key] << value
-      else
-        # unfortunate, but flot dislikes missing data
-        value[1] = value[2] = 0
+      else # unfortunate, but flot dislikes missing data
         result.keys.each do |key|
           result[key] << value
         end
@@ -66,11 +64,11 @@ class Project < ActiveRecord::Base
 
   def build_time_history_sql(min_build_id)
     return <<-SQL
-      SELECT build_parts.kind,
-             SUBSTR(builds.ref, 1, 5),
-             FLOOR(ROUND(MAX(UNIX_TIMESTAMP(build_attempts.finished_at) - UNIX_TIMESTAMP(build_attempts.started_at)) / 60)),
-             FLOOR(ROUND(MAX(UNIX_TIMESTAMP(build_attempts.finished_at) - UNIX_TIMESTAMP(build_attempts.started_at)) / 60)) - FLOOR(ROUND(MIN(UNIX_TIMESTAMP(build_attempts.finished_at) - UNIX_TIMESTAMP(build_attempts.started_at)) / 60)),
-             0,
+      SELECT build_parts.kind AS kind,
+             SUBSTR(builds.ref, 1, 5) AS ref,
+             IFNULL(FLOOR(ROUND(MAX(UNIX_TIMESTAMP(build_attempts.finished_at) - UNIX_TIMESTAMP(build_attempts.started_at)) / 60)), 0) AS max,
+             IFNULL(FLOOR(ROUND(MAX(UNIX_TIMESTAMP(build_attempts.finished_at) - UNIX_TIMESTAMP(build_attempts.started_at)) / 60)) - FLOOR(ROUND(MIN(UNIX_TIMESTAMP(build_attempts.finished_at) - UNIX_TIMESTAMP(build_attempts.started_at)) / 60)), 0) AS min_diff,
+             0 AS max_diff,
              builds.id
         FROM builds
    LEFT JOIN build_parts ON build_parts.build_id = builds.id
