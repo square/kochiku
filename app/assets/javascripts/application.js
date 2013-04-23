@@ -70,6 +70,7 @@ Kochiku.graphBuildTimes = function(projectName) {
       grid: {
         borderWidth: 1,
         clickable: true,
+        labelMargin: 10,
         margin: {
           left: 20
         }

@@ -208,14 +208,14 @@ form label
     font-family: $font-code
     font-size: 12px
     color: $color-link
+    .build-status
+      position: relative
     .build-status:before
-      content: ''
-      width: 2px
-      height: 2px
-      border: 1px solid rgba(black, 0.2)
-      margin-right: 2px
-      border-radius: 1px
-      vertical-align: middle
+      position: absolute
+      left: 50%
+      top: -15px
+      margin: 0
+      margin-left: -6px
   .axis-label
     position: absolute
     color: #666
