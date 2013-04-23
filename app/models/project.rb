@@ -24,7 +24,15 @@ class Project < ActiveRecord::Base
     id_cutoff = builds.maximum(:id).to_i - fuzzy_limit
 
     execute(build_time_history_sql(id_cutoff)).each do |value|
-      result[value.shift] << value
+      if key = value.shift
+        result[key] << value
+      else
+        # unfortunate, but flot dislikes missing data
+        value[1] = value[2] = 0
+        result.keys.each do |key|
+          result[key] << value
+        end
+      end
     end
 
     result
@@ -65,19 +73,17 @@ class Project < ActiveRecord::Base
              0,
              builds.id
         FROM builds
-        JOIN build_parts ON build_parts.build_id = builds.id
-        JOIN build_attempts ON build_attempts.build_part_id = build_parts.id
+   LEFT JOIN build_parts ON build_parts.build_id = builds.id
+   LEFT JOIN build_attempts ON build_attempts.build_part_id = build_parts.id
        WHERE builds.project_id = #{id}
          AND builds.id >= #{min_build_id}
-         AND builds.state IN ('succeeded', 'failed')
-         AND build_attempts.id = (
+         AND (build_attempts.id IS NULL OR build_attempts.id = (
                SELECT id
                  FROM build_attempts
                 WHERE build_part_id = build_parts.id
-                  AND state IN ('passed', 'failed')
              ORDER BY id DESC
                 LIMIT 1
-             )
+             ))
     GROUP BY builds.id, build_parts.kind
     SQL
   end
