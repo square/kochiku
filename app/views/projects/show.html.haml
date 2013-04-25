@@ -30,7 +30,7 @@
     });
 
 - if @current_build
-  %table
+  %table.build-parts
     %thead
       %tr
         %th.right.whisker Previous
@@ -75,3 +75,8 @@
         %td.right
           - if build_part && build_part.unsuccessful?
             = link_to "Rebuild", "/projects/#{@project.to_param}/builds/#{@current_build.to_param}/parts/#{build_part.to_param}/rebuild", method: :post
+
+= content_for :javascript do
+  :javascript
+    if ($('table.build-parts tbody tr').length > 0)
+      $('table.build-parts').tablesorter();
