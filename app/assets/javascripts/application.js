@@ -22,15 +22,15 @@ Kochiku.delayedRefresh = function() {
 Kochiku.graphBuildTimes = function(projectName) {
   var url = '/projects/' + projectName + '/build-time-history.json'
     , colors = {
-      cucumber: 'hsl(87,63%,47%)',
-      spec: 'hsl(187, 63%,47%)',
-      jasmine: 'hsl(27, 63%,47%)',
+      cucumber:     'hsl(87,  63%, 47%)',
+      spec:         'hsl(187, 63%, 47%)',
+      jasmine:      'hsl(27,  63%, 47%)',
 
-      maven: 'hsl(207,63%,47%)',
+      maven:        'hsl(207, 63%, 47%)',
 
-      unit: 'hsl(187, 63%,47%)',
-      integration: 'hsl(87,63%,47%)',
-      acceptance: 'hsl(207,63%,47%)'
+      unit:         'hsl(187, 63%, 47%)',
+      integration:  'hsl(87,  63%, 47%)',
+      acceptance:   'hsl(207, 63%, 47%)'
     };
 
   $.getJSON(url, function(data) {
@@ -52,11 +52,15 @@ Kochiku.graphBuildTimes = function(projectName) {
 
     $.plot(plot, series, {
       xaxis: {
-        mode: 'categories'
+        mode: 'categories',
+        color: 'transparent'
+      },
+      yaxis: {
+        color: '#f3f3f3'
       },
       points: {
         show: true,
-        lineWidth: 2,
+        lineWidth: 1.5,
         radius: 3,
         shadowSize: 0,
         errorbars: 'y',
@@ -68,7 +72,7 @@ Kochiku.graphBuildTimes = function(projectName) {
         }
       },
       grid: {
-        borderWidth: 1,
+        borderWidth: 0,
         clickable: true,
         labelMargin: 10,
         margin: {
