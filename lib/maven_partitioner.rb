@@ -16,11 +16,20 @@ class MavenPartitioner
   def incremental_partitions(build)
     modules_to_build = Set.new
 
-    GitBlame.files_changed_since_last_green(build).each do |changed_file|
-      module_to_build = file_to_module(changed_file)
-      return partitions if module_to_build.nil?
+    if build.project.main_build?
+      GitBlame.files_changed_since_last_green(build).each do |changed_file|
+        module_to_build = file_to_module(changed_file)
+        return partitions if module_to_build.nil?
 
-      modules_to_build.merge(depends_on_map[module_to_build] || Set.new)
+        modules_to_build.merge(depends_on_map[module_to_build] || Set.new)
+      end
+    else
+      GitBlame.files_changed_in_branch(build).each do |changed_file|
+        module_to_build = file_to_module(changed_file)
+        return partitions if module_to_build.nil?
+
+        modules_to_build.merge(depends_on_map[module_to_build] || Set.new)
+      end
     end
 
     modules_to_build.map do |module_name|

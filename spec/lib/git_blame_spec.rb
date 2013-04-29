@@ -152,4 +152,20 @@ describe GitBlame do
       git_file_changes.should include("path/two/file.java")
     end
   end
+
+  describe "#files_changed_in_branch" do
+    subject { GitBlame.files_changed_in_branch(build) }
+
+    before do
+      GitBlame.unstub(:files_changed_in_branch)
+    end
+
+    it "should parse the git log and return change file paths" do
+      GitRepo.stub(:inside_repo).and_return("::!::817b88be7488cab5e4f9d9975222db80d8bceb3b::!::\n\npath/one/file.java\npath/two/file.java")
+      git_file_changes = subject
+      git_file_changes.size.should == 2
+      git_file_changes.should include("path/one/file.java")
+      git_file_changes.should include("path/two/file.java")
+    end
+  end
 end
