@@ -38,6 +38,13 @@ class GitBlame
       parse_git_files_changes(output)
     end
 
+    def files_changed_in_branch(build)
+      output = GitRepo.inside_repo(build.repository) do
+        Cocaine::CommandLine.new("git log --no-merges --format='::!::%H::!::' --name-only origin/master..origin/#{build.branch}").run
+      end
+      parse_git_files_changes(output)
+    end
+
     private
 
     def email_from_git_email(email)

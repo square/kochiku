@@ -4,59 +4,128 @@ describe MavenPartitioner do
   subject { MavenPartitioner.new }
 
   describe "#incremental_partitions" do
-    let(:build) { FactoryGirl.create(:build) }
+    context "on master as the main build for the project" do
+      let(:repository) { FactoryGirl.create(:repository) }
+      let(:project) { FactoryGirl.create(:project, :name => repository.repository_name) }
+      let(:build) { FactoryGirl.create(:build, :queue => :developer, :project => project, :branch => "master") }
 
-    it "should return the set of modules to build for a given set of file changes" do
-      GitBlame.stub(:files_changed_since_last_green).with(build).and_return(["module-one/src/main/java/com/squareup/foo.java",
-                                                                             "module-two/src/main/java/com/squareup/bar.java"])
-      File.stub(:exists?).and_return(false)
-      File.stub(:exists?).with("module-one/pom.xml").and_return(true)
-      File.stub(:exists?).with("module-two/pom.xml").and_return(true)
+      it "should be the main build" do
+        build.project.should be_main_build
+      end
 
-      subject.stub(:depends_on_map).and_return({
-          "module-one" => ["module-three", "module-four"].to_set,
-          "module-two" => ["module-three"].to_set
-      })
-      subject.should_not_receive(:partitions)
+      it "should return the set of modules to build for a given set of file changes" do
+        GitBlame.stub(:files_changed_since_last_green).with(build).and_return(["module-one/src/main/java/com/squareup/foo.java",
+                                                                               "module-two/src/main/java/com/squareup/bar.java"])
+        File.stub(:exists?).and_return(false)
+        File.stub(:exists?).with("module-one/pom.xml").and_return(true)
+        File.stub(:exists?).with("module-two/pom.xml").and_return(true)
 
-      partitions = subject.incremental_partitions(build)
-      partitions.size.should == 2
-      if partitions[0]["files"][0] == "module-three"
-        partitions[1]["files"][0].should == "module-four"
-      else
-        partitions[0]["files"][0].should == "module-four"
-        partitions[1]["files"][0].should == "module-three"
+        subject.stub(:depends_on_map).and_return({
+                                                     "module-one" => ["module-three", "module-four"].to_set,
+                                                     "module-two" => ["module-three"].to_set
+                                                 })
+        subject.should_not_receive(:partitions)
+
+        partitions = subject.incremental_partitions(build)
+        partitions.size.should == 2
+        if partitions[0]["files"][0] == "module-three"
+          partitions[1]["files"][0].should == "module-four"
+        else
+          partitions[0]["files"][0].should == "module-four"
+          partitions[1]["files"][0].should == "module-three"
+        end
+      end
+
+      it "should build everything if one of the files does not map to a module" do
+        GitBlame.stub(:files_changed_since_last_green).with(build).and_return(["toplevel/foo.xml"])
+
+        subject.stub(:depends_on_map).and_return({
+                                                     "module-one" => ["module-three", "module-four"].to_set,
+                                                     "module-two" => ["module-three"].to_set
+                                                 })
+
+        subject.should_receive(:partitions).and_return([{"type" => "maven", "files" => "ALL"}])
+
+        partitions = subject.incremental_partitions(build)
+        partitions.first["files"].should == "ALL"
+      end
+
+      it "should not fail if a file is reference in a top level module that is not in the top level pom" do
+        GitBlame.stub(:files_changed_since_last_green).with(build).and_return(["new-module/src/main/java/com/squareup/foo.java"])
+
+        File.stub(:exists?).and_return(false)
+        File.stub(:exists?).with("new-module/pom.xml").and_return(true)
+
+        subject.stub(:depends_on_map).and_return({
+                                                     "module-one" => ["module-three", "module-four"].to_set,
+                                                     "module-two" => ["module-three"].to_set
+                                                 })
+        subject.should_not_receive(:partitions)
+
+        partitions = subject.incremental_partitions(build)
+        partitions.should be_empty
       end
     end
 
-    it "should build everything if one of the files does not map to a module" do
-      GitBlame.stub(:files_changed_since_last_green).with(build).and_return(["toplevel/foo.xml"])
+    context "on a branch" do
+      let(:build) { FactoryGirl.create(:build, :queue => :developer, :branch => "branch-of-master") }
 
-      subject.stub(:depends_on_map).and_return({
-          "module-one" => ["module-three", "module-four"].to_set,
-          "module-two" => ["module-three"].to_set
-      })
+      it "should not be the main build" do
+        build.project.should_not be_main_build
+      end
 
-      subject.should_receive(:partitions).and_return([{"type" => "maven", "files" => "ALL"}])
+      it "should return the set of modules to build for a given set of file changes" do
+        GitBlame.stub(:files_changed_in_branch).with(build).and_return(["module-one/src/main/java/com/squareup/foo.java",
+                                                                        "module-two/src/main/java/com/squareup/bar.java"])
+        File.stub(:exists?).and_return(false)
+        File.stub(:exists?).with("module-one/pom.xml").and_return(true)
+        File.stub(:exists?).with("module-two/pom.xml").and_return(true)
 
-      partitions = subject.incremental_partitions(build)
-      partitions.first["files"].should == "ALL"
-    end
+        subject.stub(:depends_on_map).and_return({
+                                                     "module-one" => ["module-three", "module-four"].to_set,
+                                                     "module-two" => ["module-three"].to_set
+                                                 })
+        subject.should_not_receive(:partitions)
 
-    it "should not fail if a file is reference in a top level module that is not in the top level pom" do
-      GitBlame.stub(:files_changed_since_last_green).with(build).and_return(["new-module/src/main/java/com/squareup/foo.java"])
+        partitions = subject.incremental_partitions(build)
+        partitions.size.should == 2
+        if partitions[0]["files"][0] == "module-three"
+          partitions[1]["files"][0].should == "module-four"
+        else
+          partitions[0]["files"][0].should == "module-four"
+          partitions[1]["files"][0].should == "module-three"
+        end
+      end
 
-      File.stub(:exists?).and_return(false)
-      File.stub(:exists?).with("new-module/pom.xml").and_return(true)
+      it "should build everything if one of the files does not map to a module" do
+        GitBlame.stub(:files_changed_in_branch).with(build).and_return(["toplevel/foo.xml"])
 
-      subject.stub(:depends_on_map).and_return({
-          "module-one" => ["module-three", "module-four"].to_set,
-          "module-two" => ["module-three"].to_set
-      })
-      subject.should_not_receive(:partitions)
+        subject.stub(:depends_on_map).and_return({
+                                                     "module-one" => ["module-three", "module-four"].to_set,
+                                                     "module-two" => ["module-three"].to_set
+                                                 })
 
-      partitions = subject.incremental_partitions(build)
-      partitions.should be_empty
+        subject.should_receive(:partitions).and_return([{"type" => "maven", "files" => "ALL"}])
+
+        partitions = subject.incremental_partitions(build)
+        partitions.first["files"].should == "ALL"
+      end
+
+      it "should not fail if a file is reference in a top level module that is not in the top level pom" do
+        GitBlame.stub(:files_changed_in_branch).with(build).and_return(["new-module/src/main/java/com/squareup/foo.java"])
+
+        File.stub(:exists?).and_return(false)
+        File.stub(:exists?).with("new-module/pom.xml").and_return(true)
+
+        subject.stub(:depends_on_map).and_return({
+                                                     "module-one" => ["module-three", "module-four"].to_set,
+                                                     "module-two" => ["module-three"].to_set
+                                                 })
+        subject.should_not_receive(:partitions)
+
+        partitions = subject.incremental_partitions(build)
+        partitions.should be_empty
+      end
     end
   end
 
