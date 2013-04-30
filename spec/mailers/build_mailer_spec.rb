@@ -64,8 +64,8 @@ describe BuildMailer do
       let(:build) { FactoryGirl.create(:build, :queue => :developer, :branch => "branch-of-master") }
 
       before do
-        GitBlame.stub(:changes_in_merge).and_return([{:hash => "sha", :author => "Joe", :date => "some day", :message => "always be shipping it"}])
-        GitBlame.stub(:emails_in_merge).and_return(["foo@example.com"])
+        GitBlame.stub(:changes_in_branch).and_return([{:hash => "sha", :author => "Joe", :date => "some day", :message => "always be shipping it"}])
+        GitBlame.stub(:emails_in_branch).and_return(["foo@example.com"])
       end
 
       it "sends the email" do

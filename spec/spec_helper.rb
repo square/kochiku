@@ -37,7 +37,7 @@ RSpec.configure do |config|
     GitBlame.stub(:git_names_and_emails_since_last_green).and_return("")
     GitBlame.stub(:git_names_and_emails_in_branch).and_return("")
     GitBlame.stub(:changes_since_last_green).and_return([])
-    GitBlame.stub(:changes_in_merge).and_return([])
+    GitBlame.stub(:changes_in_branch).and_return([])
     GitBlame.stub(:files_changed_since_last_green).and_return([])
     GitBlame.stub(:files_changed_in_branch).and_return([])
 

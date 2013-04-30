@@ -77,8 +77,8 @@ describe GitBlame do
     end
   end
 
-  describe "#emails_in_merge" do
-    subject { GitBlame.emails_in_merge(build) }
+  describe "#emails_in_branch" do
+    subject { GitBlame.emails_in_branch(build) }
 
     after do
       GitBlame.instance_variable_set(:@people_lookup, nil)
@@ -120,11 +120,11 @@ describe GitBlame do
     end
   end
 
-  describe "#changes_in_merge" do
-    subject { GitBlame.changes_in_merge(build) }
+  describe "#changes_in_branch" do
+    subject { GitBlame.changes_in_branch(build) }
 
     before do
-      GitBlame.unstub(:changes_in_merge)
+      GitBlame.unstub(:changes_in_branch)
     end
 
     it "should parse the git log message and return a hash of information" do

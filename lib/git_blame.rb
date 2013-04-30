@@ -9,7 +9,7 @@ class GitBlame
       lookup_git_names_and_emails(git_names_and_emails_since_last_green(build).split("\n"))
     end
 
-    def emails_in_merge(build)
+    def emails_in_branch(build)
       lookup_git_names_and_emails(git_names_and_emails_in_branch(build).split("\n"))
     end
 
@@ -20,7 +20,7 @@ class GitBlame
       parse_git_changes(output)
     end
 
-    def changes_in_merge(build)
+    def changes_in_branch(build)
       output = GitRepo.inside_repo(build.repository) do
         Cocaine::CommandLine.new("git log --no-merges --format='::!::%H|%an <%ae>|%ad|%B::!::' origin/master..origin/#{build.branch}").run
       end
