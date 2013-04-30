@@ -40,6 +40,7 @@ class BuildPart < ActiveRecord::Base
         "repo_name" => self.project.repository.repo_cache_name,
         "test_command" => self.build_instance.test_command(self.paths),
         "repo_url" => self.project.repository.url,
+        "remote_name" => "origin",
         "timeout" => self.project.repository.timeout.minutes,
         "options" => self.options,
     }
