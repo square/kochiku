@@ -17,11 +17,11 @@ class MavenPartitioner
     modules_to_build = Set.new
 
     files_changed_method = build.project.main_build? ? :files_changed_since_last_green : :files_changed_in_branch
-    GitBlame.send(files_changed_method, build).each do |changed_file|
-      module_to_build = file_to_module(changed_file)
-      return partitions if module_to_build.nil?
+    GitBlame.send(files_changed_method, build).each do |file_and_emails|
+      module_affected_by_file = file_to_module(file_and_emails[:file])
+      return partitions if module_affected_by_file.nil?
 
-      modules_to_build.merge(depends_on_map[module_to_build] || Set.new)
+      modules_to_build.merge(depends_on_map[module_affected_by_file] || Set.new)
     end
 
     modules_to_build.map do |module_name|
@@ -30,6 +30,26 @@ class MavenPartitioner
           'files' => [module_name]
       }
     end
+  end
+
+  def emails_for_commits_causing_failures(build)
+    return [] if build.build_parts.failed_or_errored.empty?
+
+    failed_modules = build.build_parts.failed_or_errored.inject(Set.new) do |failed_set, build_part|
+      failed_set.add(file_to_module(build_part.paths.first))
+    end
+
+    emails = []
+    GitBlame.files_changed_since_last_green(build, :fetch_emails => true).each do |file_and_emails|
+      module_affected_by_file = file_to_module(file_and_emails[:file])
+
+      if module_affected_by_file.nil? ||
+          ((set = depends_on_map[module_affected_by_file]) && !set.intersection(failed_modules).empty?)
+        emails << file_and_emails[:emails]
+      end
+    end
+
+    emails.flatten.compact.uniq
   end
 
   def depends_on_map

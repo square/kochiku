@@ -14,51 +14,49 @@ describe MavenPartitioner do
       end
 
       it "should return the set of modules to build for a given set of file changes" do
-        GitBlame.stub(:files_changed_since_last_green).with(build).and_return(["module-one/src/main/java/com/squareup/foo.java",
-                                                                               "module-two/src/main/java/com/squareup/bar.java"])
+        GitBlame.stub(:files_changed_since_last_green).with(build).and_return([{:file => "module-one/src/main/java/com/squareup/foo.java", :emails => []},
+                                                                               {:file => "module-two/src/main/java/com/squareup/bar.java", :emails => []}])
         File.stub(:exists?).and_return(false)
         File.stub(:exists?).with("module-one/pom.xml").and_return(true)
         File.stub(:exists?).with("module-two/pom.xml").and_return(true)
 
         subject.stub(:depends_on_map).and_return({
-                                                   "module-one" => ["module-three", "module-four"].to_set,
-                                                   "module-two" => ["module-three"].to_set
+                                                   "module-one" => ["module-one", "module-three", "module-four"].to_set,
+                                                   "module-two" => ["module-two", "module-three"].to_set
                                                  })
         subject.should_not_receive(:partitions)
 
         partitions = subject.incremental_partitions(build)
-        partitions.size.should == 2
-        if partitions[0]["files"][0] == "module-three"
-          partitions[1]["files"][0].should == "module-four"
-        else
-          partitions[0]["files"][0].should == "module-four"
-          partitions[1]["files"][0].should == "module-three"
-        end
+        partitions.size.should == 4
+        partitions.should include({"type" => "maven", "files" => ["module-one"]})
+        partitions.should include({"type" => "maven", "files" => ["module-two"]})
+        partitions.should include({"type" => "maven", "files" => ["module-three"]})
+        partitions.should include({"type" => "maven", "files" => ["module-four"]})
       end
 
       it "should build everything if one of the files does not map to a module" do
-        GitBlame.stub(:files_changed_since_last_green).with(build).and_return(["toplevel/foo.xml"])
+        GitBlame.stub(:files_changed_since_last_green).with(build).and_return([{:file => "toplevel/foo.xml", :emails => []}])
 
         subject.stub(:depends_on_map).and_return({
-                                                   "module-one" => ["module-three", "module-four"].to_set,
-                                                   "module-two" => ["module-three"].to_set
+                                                  "module-one" => ["module-one", "module-three", "module-four"].to_set,
+                                                  "module-two" => ["module-two", "module-three"].to_set
                                                  })
 
         subject.should_receive(:partitions).and_return([{"type" => "maven", "files" => "ALL"}])
 
         partitions = subject.incremental_partitions(build)
-        partitions.first["files"].should == "ALL"
+        partitions.should == [{"type" => "maven", "files" => "ALL"}]
       end
 
       it "should not fail if a file is reference in a top level module that is not in the top level pom" do
-        GitBlame.stub(:files_changed_since_last_green).with(build).and_return(["new-module/src/main/java/com/squareup/foo.java"])
+        GitBlame.stub(:files_changed_since_last_green).with(build).and_return([{:file => "new-module/src/main/java/com/squareup/foo.java", :emails => []}])
 
         File.stub(:exists?).and_return(false)
         File.stub(:exists?).with("new-module/pom.xml").and_return(true)
 
         subject.stub(:depends_on_map).and_return({
-                                                   "module-one" => ["module-three", "module-four"].to_set,
-                                                   "module-two" => ["module-three"].to_set
+                                                  "module-one" => ["module-one", "module-three", "module-four"].to_set,
+                                                  "module-two" => ["module-two", "module-three"].to_set
                                                  })
         subject.should_not_receive(:partitions)
 
@@ -75,8 +73,8 @@ describe MavenPartitioner do
       end
 
       it "should return the set of modules to build for a given set of file changes" do
-        GitBlame.stub(:files_changed_in_branch).with(build).and_return(["module-one/src/main/java/com/squareup/foo.java",
-                                                                        "module-two/src/main/java/com/squareup/bar.java"])
+        GitBlame.stub(:files_changed_in_branch).with(build).and_return([{:file => "module-one/src/main/java/com/squareup/foo.java", :emails => []},
+                                                                        {:file => "module-two/src/main/java/com/squareup/bar.java", :emails => []}])
         File.stub(:exists?).and_return(false)
         File.stub(:exists?).with("module-one/pom.xml").and_return(true)
         File.stub(:exists?).with("module-two/pom.xml").and_return(true)
@@ -89,16 +87,12 @@ describe MavenPartitioner do
 
         partitions = subject.incremental_partitions(build)
         partitions.size.should == 2
-        if partitions[0]["files"][0] == "module-three"
-          partitions[1]["files"][0].should == "module-four"
-        else
-          partitions[0]["files"][0].should == "module-four"
-          partitions[1]["files"][0].should == "module-three"
-        end
+        partitions.should include({"type" => "maven", "files" => ["module-three"]})
+        partitions.should include({"type" => "maven", "files" => ["module-four"]})
       end
 
       it "should build everything if one of the files does not map to a module" do
-        GitBlame.stub(:files_changed_in_branch).with(build).and_return(["toplevel/foo.xml"])
+        GitBlame.stub(:files_changed_in_branch).with(build).and_return([{:file => "toplevel/foo.xml", :emails => []}])
 
         subject.stub(:depends_on_map).and_return({
                                                    "module-one" => ["module-three", "module-four"].to_set,
@@ -108,11 +102,11 @@ describe MavenPartitioner do
         subject.should_receive(:partitions).and_return([{"type" => "maven", "files" => "ALL"}])
 
         partitions = subject.incremental_partitions(build)
-        partitions.first["files"].should == "ALL"
+        partitions.should == [{"type" => "maven", "files" => "ALL"}]
       end
 
       it "should not fail if a file is reference in a top level module that is not in the top level pom" do
-        GitBlame.stub(:files_changed_in_branch).with(build).and_return(["new-module/src/main/java/com/squareup/foo.java"])
+        GitBlame.stub(:files_changed_in_branch).with(build).and_return([{:file => "new-module/src/main/java/com/squareup/foo.java", :emails => []}])
 
         File.stub(:exists?).and_return(false)
         File.stub(:exists?).with("new-module/pom.xml").and_return(true)
@@ -126,6 +120,44 @@ describe MavenPartitioner do
         partitions = subject.incremental_partitions(build)
         partitions.should be_empty
       end
+    end
+  end
+
+  describe "#emails_for_commits_causing_failures" do
+    let(:repository) { FactoryGirl.create(:repository) }
+    let(:project) { FactoryGirl.create(:project, :name => repository.repository_name) }
+    let(:build) { FactoryGirl.create(:build, :queue => :developer, :project => project, :branch => "master") }
+
+    it "should return nothing if there are no failed parts" do
+      build.build_parts.failed_or_errored.should be_empty
+      emails = subject.emails_for_commits_causing_failures(build)
+      emails.should be_empty
+    end
+
+    it "should return the emails for the modules that are failing" do
+      build_part = FactoryGirl.create(:build_part, :paths => ["module-four/src/test/java/com/squareup/BarTest.java"], :build_instance => build)
+      FactoryGirl.create(:build_attempt, :state => :failed, :build_part => build_part)
+      build.build_parts.failed_or_errored.should == [build_part]
+
+      GitBlame.stub(:files_changed_since_last_green).with(build, :fetch_emails => true).and_return([{:file => "module-one/src/main/java/com/squareup/Foo.java", :emails => ["userone@example.com"]},
+                                                                             {:file => "module-two/src/main/java/com/squareup/Bar.java", :emails => ["usertwo@example.com"]},
+                                                                             {:file => "module-four/src/main/java/com/squareup/Baz.java", :emails => ["userfour@example.com"]}])
+      File.stub(:exists?).and_return(false)
+      File.stub(:exists?).with("module-one/pom.xml").and_return(true)
+      File.stub(:exists?).with("module-two/pom.xml").and_return(true)
+      File.stub(:exists?).with("module-four/pom.xml").and_return(true)
+
+      subject.stub(:depends_on_map).and_return({
+                                                   "module-one" => ["module-one", "module-three", "module-four"].to_set,
+                                                   "module-two" => ["module-two", "module-three"].to_set,
+                                                   "module-four" => ["module-four"].to_set
+                                               })
+      subject.should_not_receive(:partitions)
+
+      emails = subject.emails_for_commits_causing_failures(build)
+      emails.size.should == 2
+      emails.should include("userone@example.com")
+      emails.should include("userfour@example.com")
     end
   end
 
