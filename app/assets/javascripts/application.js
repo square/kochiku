@@ -5,8 +5,18 @@
 //= require jquery.flot
 //= require jquery.flot.errorbars
 //= require jquery.flot.categories
+//= require moment
 
 //= require_self
+
+moment.lang('en', {
+  calendar: {
+    sameDay: 'h:mma',
+    lastDay: 'ddd ha',
+    lastWeek: 'ddd',
+    sameElse: 'M/D'
+  }
+});
 
 Kochiku = {};
 
@@ -37,12 +47,16 @@ Kochiku.graphBuildTimes = function(projectName) {
     var plot = $('#plot')
       , series = [];
     for (var label in data) {
-      var points = data[label].slice(-24);
+      var points = data[label].slice(-20);
       for (var i = 0; i < points.length; i++)
-        points[i][0] = $('<a>')
-          .attr('href', location + '/builds/' + points[i][4])
-          .attr('class', 'build-status ' + points[i][5])
-          .text(points[i][0])[0].outerHTML;
+        points[i][0] = $('<div>').append(
+          $('<a>')
+            .attr('href', location + '/builds/' + points[i][4])
+            .attr('class', 'build-status ' + points[i][5])
+            .text(points[i][0])
+        ).append(
+          $('<time>').text(moment(points[i][6]).calendar().replace(/m$/,''))
+        ).html();
       series.push({
         label: label,
         data: points,
