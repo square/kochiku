@@ -2,7 +2,7 @@ source 'https://rubygems.org'
 #source 'http://data01.mtv.squareup.com/rubygems'
 
 gem 'rails', '3.2.13'
-gem 'passenger', '3.0.18', :group => :production
+gem 'passenger', '4.0.1', :group => :production
 
 gem 'squash_ruby', :require => 'squash/ruby'
 gem 'squash_rails', :require => 'squash/rails'
