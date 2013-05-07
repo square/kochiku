@@ -55,7 +55,8 @@ describe Project do
                            build.ref[0, 5],
                            0, 0, 0,
                            build.id,
-                           'succeeded'
+                           'succeeded',
+                           build.created_at.to_s
                          ]]}
           end
         end
@@ -75,7 +76,8 @@ describe Project do
                            build.ref[0, 5],
                            0, 0, 0,
                            build.id,
-                           'succeeded'
+                           'succeeded',
+                           build.created_at.to_s
                          ]]}
           end
         end
@@ -98,7 +100,8 @@ describe Project do
                            (build_attempt.elapsed_time / 60).round,
                            0, 0,
                            build.id,
-                           'succeeded'
+                           'succeeded',
+                           build.created_at.to_s
                          ]]}
           end
         end
