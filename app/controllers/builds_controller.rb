@@ -41,10 +41,11 @@ class BuildsController < ApplicationController
 
   # Used to request a developer build through the Web UI
   def request_build
-    if project_build.save
+    build = project_build
+    if build.save
       flash[:message] = "Build added!"
     else
-      flash[:error] = "Error adding build!"
+      flash[:error] = "Error adding build! #{build.errors.full_messages.to_sentence}"
     end
     redirect_to project_path(params[:project_id])
   end

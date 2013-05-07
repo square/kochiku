@@ -164,6 +164,16 @@ describe BuildsController do
 
       it "doesn't create a build if no ref is given" do
         expect{ post @action, @params.merge(:project_id => "foobar", :build => {:ref => nil })}.to_not change{Build.count}
+        flash[:error].should start_with("Error adding build!")
+      end
+
+      it "doesn't create a build if the ref already exists" do
+        project = FactoryGirl.create(:project, :name => repo.repository_name)
+        build = FactoryGirl.create(:build, :state => :succeeded, :project => project, :branch => "master", :ref => "deadbeef12345")
+        GitRepo.stub(:current_master_ref).and_return(build.ref)
+
+        expect{ post @action, @params.merge(:project_id => project.to_param, :build => {:ref => build.ref })}.to_not change{Build.count}
+        flash[:error].should start_with("Error adding build!")
       end
     end
 
@@ -208,7 +218,6 @@ describe BuildsController do
         expect{ post :create, @params.merge(:project_id => project.to_param, :build => {:ref => nil}) }.to_not change{Build.count}
       end
     end
-
   end
 
   describe "#abort" do
