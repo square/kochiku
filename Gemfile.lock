@@ -72,7 +72,7 @@ GEM
     compass-rails (1.0.3)
       compass (>= 0.12.2, < 0.14)
     crack (0.3.2)
-    daemon_controller (1.1.2)
+    daemon_controller (1.1.4)
     daemons (1.1.9)
     diff-lcs (1.2.3)
     erubis (2.7.0)
@@ -84,7 +84,6 @@ GEM
     factory_girl_rails (4.2.1)
       factory_girl (~> 4.2.0)
       railties (>= 3.0.0)
-    fastthread (1.0.7)
     fssm (0.2.10)
     haml (4.0.2)
       tilt
@@ -123,9 +122,8 @@ GEM
     net-ssh-gateway (1.2.0)
       net-ssh (>= 2.6.5)
     nokogiri (1.5.9)
-    passenger (3.0.18)
-      daemon_controller (>= 1.0.0)
-      fastthread (>= 1.0.1)
+    passenger (4.0.1)
+      daemon_controller (>= 1.1.0)
       rack
       rake (>= 0.8.1)
     polyglot (0.3.3)
@@ -251,7 +249,7 @@ DEPENDENCIES
   launchy
   mysql2
   nokogiri
-  passenger (= 3.0.18)
+  passenger (= 4.0.1)
   quiet_assets
   rails (= 3.2.13)
   resque
