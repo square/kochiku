@@ -1,54 +1,58 @@
 source 'https://rubygems.org'
-#source 'http://data01.mtv.squareup.com/rubygems'
+
+def square_gem(org, name, opts = {})
+  gem name, opts.merge(git: "git@git.squareup.com:#{org}/#{name}.git")
+end
 
 gem 'rails', '3.2.13'
-gem 'passenger', '4.0.1', :group => :production
+gem 'passenger', '4.0.1', group: :production
 
-gem 'squash_ruby', :require => 'squash/ruby'
-gem 'squash_rails', :require => 'squash/rails'
-gem 'guard_dog', :git => 'git@git.squareup.com:square/guard_dog.git'
+gem 'squash_ruby', require: 'squash/ruby'
+gem 'squash_rails', require: 'squash/rails'
+
+# TODO: this should use square_root, not guard_dog
+square_gem 'square', 'guard_dog'
 
 gem 'carrierwave'
 gem 'mysql2'
-gem "symbolize"
+gem 'symbolize'
 
 gem 'haml-rails'
 gem 'sass'
 gem 'compass'
 
-gem "resque"
-gem "resque-retry"
-gem "json"                                   # used by resque
+gem 'resque'
+gem 'resque-retry'
+gem 'json' # used by resque
 
-gem "chunky_png"
-gem "cocaine"
-gem "awesome_print", :require => false
-gem "nokogiri"
-gem "httparty"
+gem 'chunky_png'
+gem 'cocaine'
+gem 'awesome_print', require: false
+gem 'nokogiri'
+gem 'httparty'
 
 group :assets do
-  gem 'coffee-rails', '~> 3.2.1'
   gem 'compass-rails'
   gem 'jquery-rails'
-  gem 'sass-rails',   '~> 3.2.3'
-  gem 'uglifier', '>= 1.0.3'
+  gem 'sass-rails'
+  gem 'uglifier'
 end
 
 group :test, :development do
+  gem 'pry-rails'
   gem 'rspec-rails'
   gem 'factory_girl_rails'
-  gem "launchy"
+  gem 'launchy'
 end
 
 group :development do
-  #gem 'debugger', :require => false
-  gem 'capistrano', :require => false
+  gem 'capistrano', require: false
   gem 'quiet_assets'
-  gem 'rvm-capistrano', :require => false
+  gem 'rvm-capistrano', require: false
   gem 'thin'
 end
 
 group :test do
-  gem "webmock", :require => false
-  gem "capybara"
+  gem 'webmock', require: false
+  gem 'capybara'
 end
