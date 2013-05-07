@@ -1,9 +1,8 @@
 # Ruby #
 
-# If you have not run kochiku on the machine you'll need to setup the gemset and rake wrapper for kochiku
+# If you have not run kochiku on the machine you'll need to setup the rake wrapper for kochiku
 
-    rvm use --create ruby-1.9.3-p327@kochiku
-    rvm wrapper ruby-1.9.3-p327@kochiku kochiku rake
+    rvm wrapper ruby-1.9.3-p327 kochiku rake
 
 
 # Nginx #
@@ -13,21 +12,21 @@
 # Download the nginx version to be installed
 
     cd /Users/square
-    curl http://nginx.org/download/nginx-1.2.4.tar.gz | tar xvz
+    curl http://nginx.org/download/nginx-1.5.0.tar.gz | tar xvz
 
-# Install the passenger gem into the 1.9.3@kochiku gemset
+# Install the passenger gem
 
     $ cd ~/kochiku/current
-    $ gem install passenger -v 3.0.18
+    $ gem install passenger -v 4.0.1
     $ which passenger-install-nginx-module
-    # => /Users/square/.rvm/gems/ruby-1.9.3-p327@kochiku/bin/passenger-install-nginx-module
+    # => /Users/square/.rvm/gems/ruby-1.9.3-p327/bin/passenger-install-nginx-module
 
 Run the passenger nginx install
 
     rvmsudo passenger-install-nginx-module
 
 Select the advanced install (number 2)
-Provide the path the nginx source (/Users/square/nginx-1.2.4)
+Provide the path the nginx source (/Users/square/nginx-1.5.0)
 Use the default install dir (/opt/nginx)
 Ensure that nginx is configured with the following additional options:
 
