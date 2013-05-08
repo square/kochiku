@@ -4,6 +4,25 @@
 
     rvm wrapper ruby-2.0.0-p0 kochiku rake
 
+# If you are upgrading the ruby version you should should first install it and populate the bundle
+
+    rvm install <new-version>
+    cd ~/kochiku/current
+    rvm use <new-version>
+    bundle
+
+# Then recreate the kochiku_rake rvm wrapper and restart the resque workers one at a time
+
+    rm ~/.rvm/bin/kochiku_rake
+    rvm wrapper <new-version> kochiku rake
+
+    launchctl unload ~/Library/LaunchAgents/com.squareup.kochiku-worker-1.plist
+    launchctl load ~/Library/LaunchAgents/com.squareup.kochiku-worker-1.plist
+    #<repeat for all workers>
+
+# and make sure they restart correctly.  Then follow the steps to install the passenger gem for the new ruby version below
+
+
 
 # Nginx #
 
