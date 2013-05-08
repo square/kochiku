@@ -2,7 +2,7 @@
 
 # If you have not run kochiku on the machine you'll need to setup the rake wrapper for kochiku
 
-    rvm wrapper ruby-1.9.3-p327 kochiku rake
+    rvm wrapper ruby-2.0.0-p0 kochiku rake
 
 
 # Nginx #
@@ -19,7 +19,7 @@
     $ cd ~/kochiku/current
     $ gem install passenger -v 4.0.1
     $ which passenger-install-nginx-module
-    # => /Users/square/.rvm/gems/ruby-1.9.3-p327/bin/passenger-install-nginx-module
+    # => /Users/square/.rvm/gems/ruby-2.0.0-p0/bin/passenger-install-nginx-module
 
 Run the passenger nginx install
 
