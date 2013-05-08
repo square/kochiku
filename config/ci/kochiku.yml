@@ -2,5 +2,5 @@ ruby:
  - 2.0.0-p0
 targets:
   - type: spec
-    glob: /dev/null
+    glob: spec/**/*_spec.rb
     workers: 1
