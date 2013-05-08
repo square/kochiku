@@ -47,16 +47,20 @@ Kochiku.graphBuildTimes = function(projectName) {
     var plot = $('#plot')
       , series = [];
     for (var label in data) {
-      var points = data[label].slice(-20);
-      for (var i = 0; i < points.length; i++)
-        points[i][0] = $('<div>').append(
-          $('<a>')
-            .attr('href', location + '/builds/' + points[i][4])
-            .attr('class', 'build-status ' + points[i][5])
-            .text(points[i][0])
-        ).append(
-          $('<time>').text(moment(points[i][6]).calendar().replace(/m$/,''))
-        ).html();
+      var points = data[label].slice(-20)
+        , lastTime = null;
+      for (var i = 0; i < points.length; i++) {
+        var ref = $('<a>')
+              .attr('href', location + '/builds/' + points[i][4])
+              .attr('class', 'build-status ' + points[i][5])
+              .text(points[i][0]).wrap('<div>')
+          , time = moment(points[i][6]).calendar().replace(/m$/,'');
+        if (time != lastTime) {
+          ref.after($('<time>').text(time));
+          lastTime = time;
+        }
+        points[i][0] = ref.parent().html();
+      }
       series.push({
         label: label,
         data: points,
