@@ -49,7 +49,7 @@ describe BuildPartitioningJob do
     end
 
     it "should have an on_failure_retry hook that will re-enqueue the job if it it gets a git ref not found error" do
-      Resque.should_receive(:enqueue_in).with(30, BuildPartitioningJob, id)
+      Resque.should_receive(:enqueue_in).with(60, BuildPartitioningJob, id)
       BuildPartitioningJob.on_failure_retry(GitRepo::RefNotFoundError.new, id)
     end
   end
