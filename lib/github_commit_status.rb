@@ -18,6 +18,7 @@ class GithubCommitStatus
   end
 
   private
+
   def mark_as(state, description)
     GithubRequest.post(@uri, {:state => state, :target_url => @build_url, :description => description})
   end

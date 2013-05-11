@@ -25,9 +25,14 @@ class BuildStateUpdateJob < JobBase
     if build.project.main_build? && build_part.successful?
       if promotion_ref = build.deployable_branch(build_part.paths.first)
         GithubRequest.post(
-          URI("#{build.repository.base_api_url}/git/refs"),
-          :ref => 'refs/heads/%s' % promotion_ref,
-          :sha => build.ref
+            URI("#{build.repository.base_api_url}/git/refs"),
+            :ref => "refs/heads/#{promotion_ref}",
+            :sha => build.ref
+        )
+        GithubRequest.post(
+            URI("#{build.repository.base_api_url}/git/refs"),
+            :ref => "refs/heads/ci-#{promotion_ref}-master/latest",
+            :sha => build.ref
         )
       end
     end
