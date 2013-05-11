@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20130409144945) do
+ActiveRecord::Schema.define(:version => 20130511012855) do
 
   create_table "build_artifacts", :force => true do |t|
     t.integer  "build_attempt_id"
@@ -58,6 +58,7 @@ ActiveRecord::Schema.define(:version => 20130409144945) do
     t.boolean  "build_failure_email_sent"
     t.boolean  "promoted"
     t.string   "on_success_script_log_file"
+    t.text     "deployable_map"
   end
 
   add_index "builds", ["project_id"], :name => "index_builds_on_project_id"

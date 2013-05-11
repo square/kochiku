@@ -22,15 +22,11 @@ class BuildStateUpdateJob < JobBase
     # projects each individual part corresponds to a distinct promotable project. We want
     # to promote this even if another part fails since there are a lot of projects and
     # one is usually broken!
-    #if build.project.main_build? && build_part.successful? && build.maven?
-    #  GitRepo.inside_repo(build.repository) do
-    #    promotion_ref = MavenPartitioner.deployable_modules_map[build_part.paths.first]
-    #
-    #    if promotion_ref
-    #      BuildStrategy.promote(:branch, promotion_ref, build.ref)
-    #    end
-    #  end
-    #end
+    if build.project.main_build? && build_part.successful?
+      if promotion_ref = build.deployable_branch(build_part.paths.first)
+        BuildStrategy.promote(:branch, promotion_ref, build.ref)
+      end
+    end
 
     previous_state, new_state = build.update_state_from_parts!
     Rails.logger.info("Build #{build.id} state is now #{build.state}")

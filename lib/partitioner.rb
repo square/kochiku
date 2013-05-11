@@ -16,7 +16,9 @@ class Partitioner
     elsif File.exist?(BUILD_YML)
       YAML.load_file(BUILD_YML).values.select { |part| part['type'].present? }
     elsif File.exist?(MavenPartitioner::POM_XML)
-      MavenPartitioner.new.incremental_partitions(build)
+      partioner = MavenPartitioner.new
+      build.update_attributes!(:deployable_map => partioner.deployable_modules_map)
+      partioner.incremental_partitions(build)
     else
       [{"type" => "spec", "files" => ['no-manifest']}]
     end

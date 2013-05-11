@@ -37,6 +37,8 @@ class Build < ActiveRecord::Base
   STATES = IN_PROGRESS_STATES + TERMINAL_STATES
   symbolize :state, :in => STATES
   symbolize :queue
+  serialize :deployable_map, Hash
+
   validates_presence_of :queue
   validates_presence_of :project_id
   validates_presence_of :ref
@@ -52,6 +54,10 @@ class Build < ActiveRecord::Base
     command = repository.test_command
     command += " #{repository.command_flag}" unless run_list.include?(target_name)
     command
+  end
+
+  def deployable_branch(module_name)
+    (deployable_map || {})[module_name]
   end
 
   def previous_successful_build
