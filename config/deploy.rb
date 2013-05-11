@@ -54,12 +54,16 @@ namespace :deploy do
     run <<-CMD
       resque1_pid=$(cat #{shared_path}/pids/resque1.pid);
       resque2_pid=$(cat #{shared_path}/pids/resque2.pid);
+      resque3_pid=$(cat #{shared_path}/pids/resque3.pid);
+      resque4_pid=$(cat #{shared_path}/pids/resque4.pid);
       resque_scheduler_pid=$(cat #{shared_path}/pids/resque-scheduler.pid);
       kill -QUIT $resque1_pid;
       kill -QUIT $resque2_pid;
+      kill -QUIT $resque3_pid;
+      kill -QUIT $resque4_pid;
       kill -QUIT $resque_scheduler_pid;
 
-      while ps x | egrep -q "^($resque1_pid|$resque2_pid|$resque_scheduler_pid)"; do
+      while ps x | egrep -q "^($resque1_pid|$resque2_pid|$resque3_pid|$resque4_pid|$resque_scheduler_pid)"; do
         echo "Waiting for Resque workers to stop on $HOSTNAME...";
         sleep 5;
       done;
