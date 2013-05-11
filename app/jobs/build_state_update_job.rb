@@ -5,12 +5,19 @@ require 'github_commit_status'
 class BuildStateUpdateJob < JobBase
   @queue = :high
 
-  def initialize(build_id)
-    @build_id = build_id
+  def initialize(build_part_id)
+    @build_part_id = build_part_id
+  end
+
+  def build
+    @build ||= build_part.build_instance
+  end
+
+  def build_part
+    @build_part ||= BuildPart.find(@build_part_id)
   end
 
   def perform
-    build = Build.find(@build_id)
     previous_state, new_state = build.update_state_from_parts!
     Rails.logger.info("Build #{build.id} state is now #{build.state}")
 

@@ -9,6 +9,6 @@ class BuildAttemptObserver < ActiveRecord::Observer
     elsif record.state == :errored
       BuildMailer.error_email(record, record.error_txt).deliver
     end
-    BuildStateUpdateJob.enqueue(record.build_part.build_id)
+    BuildStateUpdateJob.enqueue(record.build_part.id)
   end
 end
