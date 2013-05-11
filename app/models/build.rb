@@ -129,6 +129,10 @@ class Build < ActiveRecord::Base
     queue == :developer && self.auto_merge
   end
 
+  def maven?
+    project.name == 'java'
+  end
+
   def auto_merge!
     BuildStrategy.merge_ref(self)
   end
