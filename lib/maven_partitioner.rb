@@ -113,4 +113,23 @@ class MavenPartitioner
     end
     nil
   end
+
+  def deployable_modules_map
+    deployable_modules_map = {}
+
+    top_level_pom = Nokogiri::XML(File.read(POM_XML))
+
+    top_level_pom.css('project>modules>module').each do |mvn_module|
+      module_pom = Nokogiri::XML(File.read("#{mvn_module.text}/pom.xml"))
+      deployable_branch = module_pom.css('project>properties>deployableBranch').first
+
+      if deployable_branch
+        deployable_modules_map[mvn_module.text] = "deployable-#{deployable_branch.text}"
+      end
+    end
+
+    deployable_modules_map
+  end
+
+  def self.deployable_modules_map; new.deployable_modules_map; end
 end
