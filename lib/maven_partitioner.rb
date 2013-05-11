@@ -124,7 +124,7 @@ class MavenPartitioner
       deployable_branch = module_pom.css('project>properties>deployableBranch').first
 
       if deployable_branch
-        deployable_modules_map[mvn_module.text] = "deployable-#{deployable_branch.text}"
+        deployable_modules_map[mvn_module.text] = deployable_branch.text
       end
     end
 

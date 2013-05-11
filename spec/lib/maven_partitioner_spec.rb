@@ -241,8 +241,8 @@ describe MavenPartitioner do
         File.stub(:read).with("module-three/pom.xml").and_return(module_three_pom)
 
         subject.deployable_modules_map.should == {
-          "module-one"=>"deployable-one-branch",
-          "module-two"=>"deployable-two-branch"
+          "module-one"=>"one-branch",
+          "module-two"=>"two-branch"
         }
       end
     end
