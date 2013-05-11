@@ -137,20 +137,8 @@ class Build < ActiveRecord::Base
     BuildStrategy.merge_ref(self)
   end
 
-  def promotion_refs
-    extra = if File.exist?(MavenPartitioner::POM_XML)
-      map = MavenPartitioner.deployable_modules_map
-      build_parts.map do |build_part|
-        map[build_part.paths.first]
-      end.compact
-    else
-      []
-    end
-    repository.promotion_refs + extra
-  end
-
   def promote!
-    BuildStrategy.promote_build(self)
+    BuildStrategy.promote_build(self.ref, repository)
     if repository.has_on_success_script? && !promoted? && Build.update_all({:promoted => true}, {:id => self.id, :promoted => nil}) == 1
       output = BuildStrategy.run_success_script(self.ref, repository)
       script_log = FilelessIO.new(output)

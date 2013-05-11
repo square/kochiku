@@ -21,8 +21,8 @@ describe MavenPartitioner do
         File.stub(:exists?).with("module-two/pom.xml").and_return(true)
 
         subject.stub(:depends_on_map).and_return({
-                                                   "module-one" => ["module-three", "module-four"].to_set,
-                                                   "module-two" => ["module-three"].to_set
+                                                     "module-one" => ["module-three", "module-four"].to_set,
+                                                     "module-two" => ["module-three"].to_set
                                                  })
         subject.should_not_receive(:partitions)
 
@@ -40,8 +40,8 @@ describe MavenPartitioner do
         GitBlame.stub(:files_changed_since_last_green).with(build).and_return(["toplevel/foo.xml"])
 
         subject.stub(:depends_on_map).and_return({
-                                                   "module-one" => ["module-three", "module-four"].to_set,
-                                                   "module-two" => ["module-three"].to_set
+                                                     "module-one" => ["module-three", "module-four"].to_set,
+                                                     "module-two" => ["module-three"].to_set
                                                  })
 
         subject.should_receive(:partitions).and_return([{"type" => "maven", "files" => "ALL"}])
@@ -57,8 +57,8 @@ describe MavenPartitioner do
         File.stub(:exists?).with("new-module/pom.xml").and_return(true)
 
         subject.stub(:depends_on_map).and_return({
-                                                   "module-one" => ["module-three", "module-four"].to_set,
-                                                   "module-two" => ["module-three"].to_set
+                                                     "module-one" => ["module-three", "module-four"].to_set,
+                                                     "module-two" => ["module-three"].to_set
                                                  })
         subject.should_not_receive(:partitions)
 
@@ -82,8 +82,8 @@ describe MavenPartitioner do
         File.stub(:exists?).with("module-two/pom.xml").and_return(true)
 
         subject.stub(:depends_on_map).and_return({
-                                                   "module-one" => ["module-three", "module-four"].to_set,
-                                                   "module-two" => ["module-three"].to_set
+                                                     "module-one" => ["module-three", "module-four"].to_set,
+                                                     "module-two" => ["module-three"].to_set
                                                  })
         subject.should_not_receive(:partitions)
 
@@ -101,8 +101,8 @@ describe MavenPartitioner do
         GitBlame.stub(:files_changed_in_branch).with(build).and_return(["toplevel/foo.xml"])
 
         subject.stub(:depends_on_map).and_return({
-                                                   "module-one" => ["module-three", "module-four"].to_set,
-                                                   "module-two" => ["module-three"].to_set
+                                                     "module-one" => ["module-three", "module-four"].to_set,
+                                                     "module-two" => ["module-three"].to_set
                                                  })
 
         subject.should_receive(:partitions).and_return([{"type" => "maven", "files" => "ALL"}])
@@ -118,8 +118,8 @@ describe MavenPartitioner do
         File.stub(:exists?).with("new-module/pom.xml").and_return(true)
 
         subject.stub(:depends_on_map).and_return({
-                                                   "module-one" => ["module-three", "module-four"].to_set,
-                                                   "module-two" => ["module-three"].to_set
+                                                     "module-one" => ["module-three", "module-four"].to_set,
+                                                     "module-two" => ["module-three"].to_set
                                                  })
         subject.should_not_receive(:partitions)
 
@@ -132,10 +132,10 @@ describe MavenPartitioner do
   describe "#depends_on_map" do
     it "should convert a dependency map to a depends on map" do
       subject.stub(:module_dependency_map).and_return({
-                                                        "module-one" => ["a", "b", "c"].to_set,
-                                                        "module-two" => ["b", "c", "module-one"].to_set,
-                                                        "module-three" => Set.new
-                                                      })
+          "module-one" => ["a", "b", "c"].to_set,
+          "module-two" => ["b", "c", "module-one"].to_set,
+          "module-three" => Set.new
+      })
 
       depends_on_map = subject.depends_on_map
 
@@ -148,8 +148,7 @@ describe MavenPartitioner do
     end
   end
 
-  context "with actual files" do
-
+  describe "#module_dependency_map" do
     let(:top_level_pom) { <<-POM
 <project>
   <modules>
@@ -158,15 +157,11 @@ describe MavenPartitioner do
     <module>module-three</module>
   </modules>
 </project>
-    POM
+POM
     }
 
     let(:module_one_pom) { <<-POM
 <project>
-  <properties>
-    <deployableBranch>one-branch</deployableBranch>
-  </properties>
-
   <groupId>com.squareup</groupId>
   <artifactId>module-core</artifactId>
 
@@ -181,15 +176,11 @@ describe MavenPartitioner do
     </dependency>
   </dependencies>
 </project>
-    POM
+POM
     }
 
     let(:module_two_pom) { <<-POM
 <project>
-  <properties>
-    <deployableBranch>two-branch</deployableBranch>
-  </properties>
-
   <groupId>com.squareup</groupId>
   <artifactId>module-extras</artifactId>
 
@@ -200,7 +191,7 @@ describe MavenPartitioner do
     </dependency>
   </dependencies>
 </project>
-    POM
+POM
     }
 
     let(:module_three_pom) { <<-POM
@@ -215,36 +206,20 @@ describe MavenPartitioner do
     </dependency>
   </dependencies>
 </project>
-    POM
+POM
     }
 
-    describe "#module_dependency_map" do
-      it "it should get the transitive dependencies from a pom" do
-        File.stub(:read).with(MavenPartitioner::POM_XML).and_return(top_level_pom)
-        File.stub(:read).with("module-one/pom.xml").and_return(module_one_pom)
-        File.stub(:read).with("module-two/pom.xml").and_return(module_two_pom)
-        File.stub(:read).with("module-three/pom.xml").and_return(module_three_pom)
+    it "it should get the transitive dependencies from a pom" do
+      File.stub(:read).with(MavenPartitioner::POM_XML).and_return(top_level_pom)
+      File.stub(:read).with("module-one/pom.xml").and_return(module_one_pom)
+      File.stub(:read).with("module-two/pom.xml").and_return(module_two_pom)
+      File.stub(:read).with("module-three/pom.xml").and_return(module_three_pom)
 
-        dependency_map = subject.module_dependency_map
+      dependency_map = subject.module_dependency_map
 
-        dependency_map["module-one"].should == ["module-one", "module-two", "module-three"].to_set
-        dependency_map["module-two"].should == ["module-two", "module-three"].to_set
-        dependency_map["module-three"].should == ["module-three"].to_set
-      end
-    end
-
-    describe "#deployable_modules_map" do
-      it "it should get the deployable branches from the poms" do
-        File.stub(:read).with(MavenPartitioner::POM_XML).and_return(top_level_pom)
-        File.stub(:read).with("module-one/pom.xml").and_return(module_one_pom)
-        File.stub(:read).with("module-two/pom.xml").and_return(module_two_pom)
-        File.stub(:read).with("module-three/pom.xml").and_return(module_three_pom)
-
-        subject.deployable_modules_map.should == {
-          "module-one"=>"deployable-one-branch",
-          "module-two"=>"deployable-two-branch"
-        }
-      end
+      dependency_map["module-one"].should == ["module-one", "module-two", "module-three"].to_set
+      dependency_map["module-two"].should == ["module-two", "module-three"].to_set
+      dependency_map["module-three"].should == ["module-three"].to_set
     end
   end
 
@@ -255,13 +230,13 @@ describe MavenPartitioner do
 
     it "should work for the recursive case" do
       dependency_map = {
-        "module-one" => ["a", "b", "c"].to_set,
-        "a" => ["d"].to_set,
-        "b" => ["d", "e"].to_set,
-        "c" => Set.new,
-        "d" => ["e"].to_set,
-        "e" => Set.new,
-        "f" => Set.new
+          "module-one" => ["a", "b", "c"].to_set,
+          "a" => ["d"].to_set,
+          "b" => ["d", "e"].to_set,
+          "c" => Set.new,
+          "d" => ["e"].to_set,
+          "e" => Set.new,
+          "f" => Set.new
       }
 
       transitive_map = subject.transitive_dependencies("module-one", dependency_map)

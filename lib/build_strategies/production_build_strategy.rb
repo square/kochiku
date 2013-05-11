@@ -9,11 +9,11 @@ class BuildStrategy
     # A feature of promote build is that it will not cause the promotion ref to move
     # backwards. For instance, if build 1 finishes after build 2, we don't cause the promotion ref to move
     # backwards by overwriting promotion_ref with build 1
-    def promote_build(build)
-      build.promotion_refs.each do |promotion_ref|
-        unless included_in_promotion_ref?(build.repository, build.ref, promotion_ref)
-          ref_type = build.repository.use_branches_on_green ? :branch : :tag
-          promote(ref_type, promotion_ref, build.ref)
+    def promote_build(build_ref, repository)
+      repository.promotion_refs.each do |promotion_ref|
+        unless included_in_promotion_ref?(repository, build_ref, promotion_ref)
+          ref_type = repository.use_branches_on_green ? :branch : :tag
+          promote(ref_type, promotion_ref, build_ref)
         end
       end
     end
