@@ -394,4 +394,27 @@ describe Build do
       end
     end
   end
+
+  describe "#promotion_refs" do
+    before do
+      FactoryGirl.create(:build_part, :build_instance => build, :paths => ["module-one"])
+    end
+
+    it "should return ref for the respository" do
+      build.promotion_refs.should == build.repository.promotion_refs
+    end
+
+    context "with pom file" do
+      before do
+        File.stub(:exist?).with(MavenPartitioner::POM_XML).and_return(true)
+        MavenPartitioner.should_receive(:deployable_modules_map).and_return({
+          "module-one" => 'deployable-one'
+        })
+      end
+
+      it "should return refs for repo and maven deployable branches as well" do
+        build.promotion_refs.should == build.repository.promotion_refs + ["deployable-one"]
+      end
+    end
+  end
 end

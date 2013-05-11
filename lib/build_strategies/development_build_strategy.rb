@@ -1,6 +1,6 @@
 class BuildStrategy
   class << self
-    def promote_build(build_ref, repository)
+    def promote_build(build)
     end
     def merge_ref(ref)
     end

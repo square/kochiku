@@ -125,7 +125,7 @@ describe BuildStateUpdateJob do
       end
 
       it "should promote the build" do
-        BuildStrategy.should_receive(:promote_build).with(build.ref, build.repository)
+        BuildStrategy.should_receive(:promote_build).with(build)
         BuildStrategy.should_not_receive(:run_success_script)
         BuildStateUpdateJob.perform(build.id)
       end

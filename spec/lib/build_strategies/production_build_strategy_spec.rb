@@ -36,7 +36,7 @@ describe BuildStrategy do
   end
 
   describe "#promote_build" do
-    subject { described_class.promote_build(build.ref, project.repository) }
+    subject { described_class.promote_build(build) }
 
     context "when pushing to a ref that doesn't exist" do
       before(:each) {
