@@ -9,12 +9,6 @@ class BuildAttemptObserver < ActiveRecord::Observer
     elsif record.state == :errored
       BuildMailer.error_email(record, record.error_txt).deliver
     end
-
-    build = record.build_part.build_instance
-    previous_state, new_state = build.update_state_from_parts!
-    Rails.logger.info("Build #{build.id} state is now #{build.state}")
-    unless previous_state == new_state
-      BuildStateUpdateJob.enqueue(record.build_part.id)
-    end
+    BuildStateUpdateJob.enqueue(record.build_part.id)
   end
 end

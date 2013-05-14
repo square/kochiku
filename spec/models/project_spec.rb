@@ -7,7 +7,6 @@ describe Project do
       build = FactoryGirl.create(:build, :project => project, :state => :succeeded)
       build_part = FactoryGirl.create(:build_part, :build_instance => build)
       build_attempt = FactoryGirl.create(:build_attempt, :build_part => build_part, :finished_at => 1.minute.from_now)
-      build.update_attributes(:state => :succeeded)
     end
 
     it "gets the last builds duration" do
@@ -77,7 +76,7 @@ describe Project do
                            build.ref[0, 5],
                            0, 0, 0,
                            build.id,
-                           'running',
+                           'succeeded',
                            build.created_at.to_s
                          ]]}
           end
