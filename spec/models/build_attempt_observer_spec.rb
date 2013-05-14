@@ -11,6 +11,11 @@ describe BuildAttemptObserver do
 
     subject { observer.after_save(build_attempt) }
 
+    it "calls update_state_from_parts!" do
+      build.should_receive(:update_state_from_parts!).at_least(:once)
+      subject
+    end
+
     it "sends email for a timed out build" do
       BuildMailer.should_receive(:time_out_email).and_return(OpenStruct.new(:deliver => nil))
       build_attempt.assign_attributes(:state => :failed, :started_at => 21.minutes.ago)
