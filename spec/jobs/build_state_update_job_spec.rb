@@ -29,18 +29,6 @@ describe BuildStateUpdateJob do
   end
 
   describe "#perform" do
-    context "when incomplete but nothing has failed" do
-      before do
-        build.build_parts.first.build_attempts.create!(:state => :passed)
-      end
-
-      it "should be running" do
-        expect {
-          BuildStateUpdateJob.perform(build_part_id)
-        }.to change { build.reload.state }.from(:runnable).to(:running)
-      end
-    end
-
     it "updates github when a build passes" do
       states = []
       stub_request(:post, "https://git.squareup.com/api/v3/repos/square/kochiku/statuses/#{build.ref}").with do |request|
@@ -122,12 +110,6 @@ describe BuildStateUpdateJob do
         end
       end
 
-      it "should pass the build" do
-        expect {
-          BuildStateUpdateJob.perform(build_part_id)
-        }.to change { build.reload.state }.from(:runnable).to(:succeeded)
-      end
-
       it "should promote the build" do
         BuildStrategy.should_receive(:promote_build).with(build.ref, build.repository)
         BuildStrategy.should_not_receive(:run_success_script)
@@ -138,6 +120,7 @@ describe BuildStateUpdateJob do
         before do
           repository.update_attribute(:on_success_script, "./this_is_a_triumph")
         end
+
         it "promote the build only once" do
           BuildStrategy.should_receive(:run_success_script).once.with(build.ref, build.repository).and_return("this is a log file\n\n")
           2.times {
@@ -159,12 +142,6 @@ describe BuildStateUpdateJob do
         build.build_parts.first.build_attempts.create!(:state => :failed)
       end
 
-      it "should doom the build" do
-        expect {
-          BuildStateUpdateJob.perform(build_part_id)
-        }.to change { build.reload.state }.from(:runnable).to(:doomed)
-      end
-
       it_behaves_like "a non promotable state"
     end
 
@@ -174,12 +151,6 @@ describe BuildStateUpdateJob do
           part.build_attempts.create!(:state => :passed)
         end
         build.build_parts.first.build_attempts.create!(:state => :failed)
-      end
-
-      it "should fail the build" do
-        expect {
-          BuildStateUpdateJob.perform(build_part_id)
-        }.to change { build.reload.state }.from(:runnable).to(:failed)
       end
 
       it_behaves_like "a non promotable state"
