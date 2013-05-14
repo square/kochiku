@@ -14,7 +14,7 @@ describe BuildPart do
     end
 
     it "enqueues a job to update the build state" do
-      BuildStateUpdateJob.should_receive(:enqueue).with(build_part.id)
+      BuildStateUpdateJob.should_receive(:enqueue).with(build.id)
       build_part.create_and_enqueue_new_build_attempt!
     end
 

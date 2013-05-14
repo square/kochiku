@@ -17,13 +17,9 @@ describe BuildStateUpdateJob do
     stub_request(:post, /https:\/\/git\.squareup\.com\/api\/v3\/repos\/square\/kochiku\/statuses\//)
   end
 
-  let(:build_part_id) {
-    build.build_parts[0].id
-  }
-
   shared_examples "a non promotable state" do
     it "should not promote the build" do
-      BuildStateUpdateJob.perform(build_part_id)
+      BuildStateUpdateJob.perform(build.id)
       BuildStrategy.should_not_receive(:promote_build)
     end
   end
@@ -36,7 +32,7 @@ describe BuildStateUpdateJob do
 
       it "should be running" do
         expect {
-          BuildStateUpdateJob.perform(build_part_id)
+          BuildStateUpdateJob.perform(build.id)
         }.to change { build.reload.state }.from(:runnable).to(:running)
       end
     end
@@ -50,13 +46,13 @@ describe BuildStateUpdateJob do
         true
       end
 
-      BuildStateUpdateJob.perform(build_part_id)
+      BuildStateUpdateJob.perform(build.id)
 
       build.build_parts.each do |part|
         part.build_attempts.create!(:state => :passed)
       end
 
-      BuildStateUpdateJob.perform(build_part_id)
+      BuildStateUpdateJob.perform(build.id)
       states.should == ["pending", "success"]
     end
 
@@ -69,7 +65,7 @@ describe BuildStateUpdateJob do
       end
 
       describe "checking for newer sha's after finish" do
-        subject { BuildStateUpdateJob.perform(build_part_id) }
+        subject { BuildStateUpdateJob.perform(build.id) }
         it "doesn't kick off a new build for normal porjects" do
           expect { subject }.to_not change(project.builds, :count)
         end
@@ -124,14 +120,14 @@ describe BuildStateUpdateJob do
 
       it "should pass the build" do
         expect {
-          BuildStateUpdateJob.perform(build_part_id)
+          BuildStateUpdateJob.perform(build.id)
         }.to change { build.reload.state }.from(:runnable).to(:succeeded)
       end
 
       it "should promote the build" do
         BuildStrategy.should_receive(:promote_build).with(build.ref, build.repository)
         BuildStrategy.should_not_receive(:run_success_script)
-        BuildStateUpdateJob.perform(build_part_id)
+        BuildStateUpdateJob.perform(build.id)
       end
 
       context "with a success script" do
@@ -141,7 +137,7 @@ describe BuildStateUpdateJob do
         it "promote the build only once" do
           BuildStrategy.should_receive(:run_success_script).once.with(build.ref, build.repository).and_return("this is a log file\n\n")
           2.times {
-            BuildStateUpdateJob.perform(build_part_id)
+            BuildStateUpdateJob.perform(build.id)
           }
           build.reload.on_success_script_log_file.read.should == "this is a log file\n\n"
         end
@@ -150,7 +146,7 @@ describe BuildStateUpdateJob do
       it "should automerge the build" do
         build.update_attributes(:auto_merge => true, :queue => :developer)
         BuildStrategy.should_receive(:merge_ref).with(build)
-        BuildStateUpdateJob.perform(build_part_id)
+        BuildStateUpdateJob.perform(build.id)
       end
     end
 
@@ -161,7 +157,7 @@ describe BuildStateUpdateJob do
 
       it "should doom the build" do
         expect {
-          BuildStateUpdateJob.perform(build_part_id)
+          BuildStateUpdateJob.perform(build.id)
         }.to change { build.reload.state }.from(:runnable).to(:doomed)
       end
 
@@ -178,11 +174,26 @@ describe BuildStateUpdateJob do
 
       it "should fail the build" do
         expect {
-          BuildStateUpdateJob.perform(build_part_id)
+          BuildStateUpdateJob.perform(build.id)
         }.to change { build.reload.state }.from(:runnable).to(:failed)
       end
 
       it_behaves_like "a non promotable state"
+    end
+
+    context "when no parts" do
+      before do
+        build.build_parts.destroy_all
+      end
+
+      it "should not update the state" do
+        expect {
+          BuildStateUpdateJob.perform(build.id)
+        }.to_not change { build.reload.state }
+      end
+
+      it_behaves_like "a non promotable state"
+
     end
   end
 end
