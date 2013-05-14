@@ -92,7 +92,8 @@ class BuildsController < ApplicationController
     requested_branch = payload['ref'].split('/').last
 
     if @project.branch == requested_branch
-      @project.builds.find_existing_build_or_initialize(payload['after'], :state => :partitioning, :queue => :ci)
+      queue = @project.main_build? ? :ci : :developer
+      @project.builds.find_existing_build_or_initialize(payload['after'], :state => :partitioning, :queue => queue)
     end
   end
 
