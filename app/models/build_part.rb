@@ -19,7 +19,9 @@ class BuildPart < ActiveRecord::Base
       BuildAttemptJob.enqueue_on("#{build_instance.queue}-#{self.kind}", job_args(build_attempt))
     else
       # TODO: hopefully this is only temporary while we work to make these tests less flaky
-      if (kind == "maven" && (paths.include?("sake/rpc") ||
+      # franklin should only be in this list until we get chromedriver installed on EC2
+      if (kind == "maven" && (paths.include?("franklin") ||
+                              paths.include?("sake/rpc") ||
                               paths.include?("clustering/zookeeper") ||
                               paths.include?("bletchley") ||
                               paths.include?("searle")))
