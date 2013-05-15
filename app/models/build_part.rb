@@ -27,7 +27,7 @@ class BuildPart < ActiveRecord::Base
                               paths.include?("searle")))
         BuildAttemptJob.enqueue_on("ci-osx", job_args(build_attempt))
       else
-        if build_instance.repository.ci_queue_name == "ci-osx"
+        if build_instance.repository.ci_queue_name && build_instance.repository.ci_queue_name != "ci"
           BuildAttemptJob.enqueue_on(build_instance.repository.ci_queue_name, job_args(build_attempt))
         else
           BuildAttemptJob.enqueue_on(build_instance.queue.to_s, job_args(build_attempt))
