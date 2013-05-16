@@ -118,7 +118,7 @@ describe BuildStateUpdateJob do
         end
 
         it "promote the build only once" do
-          BuildStrategy.should_receive(:run_success_script).once.with(build.ref, build.repository).and_return("this is a log file\n\n")
+          BuildStrategy.should_receive(:run_success_script).once.with(build.repository, build.ref, build.branch).and_return("this is a log file\n\n")
           2.times {
             BuildStateUpdateJob.perform(build.id)
           }

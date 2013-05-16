@@ -35,8 +35,8 @@ class BuildStrategy
       Cocaine::CommandLine.new("git push -f origin refs/notes/#{namespace}").run
     end
 
-    def run_success_script(build_ref, repository)
-      GitRepo.inside_copy(repository, build_ref) do |dir|
+    def run_success_script(repository, build_ref, build_branch)
+      GitRepo.inside_copy(repository, build_ref, build_branch) do |dir|
         output, status = Open3.capture2e(repository.on_success_script, :chdir => dir)
         output += "\nExited with status: #{status.exitstatus}"
         return output

@@ -144,9 +144,9 @@ class Build < ActiveRecord::Base
   end
 
   def promote!
-    BuildStrategy.promote_build(self.ref, repository)
+    BuildStrategy.promote_build(ref, repository)
     if repository.has_on_success_script? && !promoted? && Build.update_all({:promoted => true}, {:id => self.id, :promoted => nil}) == 1
-      output = BuildStrategy.run_success_script(self.ref, repository)
+      output = BuildStrategy.run_success_script(repository, ref, branch)
       script_log = FilelessIO.new(output)
       script_log.original_filename = "on_success_script.log"
       self.on_success_script_log_file = script_log
@@ -155,7 +155,7 @@ class Build < ActiveRecord::Base
   end
 
   def add_note!
-    BuildStrategy.add_note(self.ref, "ci-#{self.project.name}", repository.on_success_note)
+    BuildStrategy.add_note(ref, "ci-#{project.name}", repository.on_success_note)
   end
 
   def completed?

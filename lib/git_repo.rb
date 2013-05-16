@@ -6,18 +6,18 @@ class GitRepo
   WORKING_DIR = Rails.root.join('tmp', 'build-partition')
 
   class << self
-    def inside_copy(repository, ref = "master")
+    def inside_copy(repository, sha, branch = "master")
       cached_repo_path = File.join(WORKING_DIR, repository.repo_cache_name)
-      synchronize_cache_repo(repository, ref)
+      synchronize_cache_repo(repository, branch)
 
       Dir.mktmpdir(nil, WORKING_DIR) do |dir|
         # clone local repo (fast!)
         run! "git clone #{cached_repo_path} #{dir}"
 
         Dir.chdir(dir) do
-          raise RefNotFoundError unless system("git rev-list --quiet -n1 #{ref}")
+          raise RefNotFoundError unless system("git rev-list --quiet -n1 #{sha}")
 
-          run! "git checkout --quiet #{ref}"
+          run! "git checkout --quiet #{sha}"
 
           run! "git submodule --quiet init"
           # redirect the submodules to the cached_repo
@@ -64,7 +64,7 @@ class GitRepo
 
     private
 
-    def synchronize_cache_repo(repository, ref)
+    def synchronize_cache_repo(repository, branch)
       cached_repo_path = File.join(WORKING_DIR, repository.repo_cache_name)
 
       if !File.directory?(cached_repo_path)
@@ -72,7 +72,7 @@ class GitRepo
       end
       Dir.chdir(cached_repo_path) do
         # update the cached repo
-        synchronize_with_remote('origin', ref)
+        synchronize_with_remote('origin', branch)
         Cocaine::CommandLine.new("git submodule update", "--init --quiet").run
       end
     end
@@ -87,8 +87,9 @@ class GitRepo
       Cocaine::CommandLine.new("git clone", "--recursive #{repo_url} #{cached_repo_path}").run
     end
 
-    def synchronize_with_remote(name, ref = nil)
-      Cocaine::CommandLine.new("git fetch", " --quiet --prune #{name} #{ref}").run
+    def synchronize_with_remote(name, branch = nil)
+      refspec = branch.to_s.empty? ? "" : "+#{branch}"
+      Cocaine::CommandLine.new("git fetch", "--quiet --prune --no-tags #{name} #{refspec}").run
     rescue Cocaine::ExitStatusError
       # likely caused by another 'git fetch' that is currently in progress. Wait a few seconds and try again
       tries = (tries || 0) + 1
