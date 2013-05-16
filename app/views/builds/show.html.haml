@@ -12,6 +12,9 @@
     = @build.ref[0, 7]
   %a.info{:href => show_link_to_commit(@build)}
     Show on GitHub
+  - if @project.main_build?
+    %a.info{:href => show_link_to_compare(@build, @build.previous_successful_build.try(:ref), @build.ref), :title => 'show changes since last green build'}
+    Compare to last green build
 
   .actions
     %form{action: toggle_auto_merge_project_build_path(@build.project, @build), method: :post}
