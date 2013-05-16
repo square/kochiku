@@ -8,7 +8,7 @@ class GitRepo
   class << self
     def inside_copy(repository, ref = "master")
       cached_repo_path = File.join(WORKING_DIR, repository.repo_cache_name)
-      synchronize_cache_repo(repository)
+      synchronize_cache_repo(repository, ref)
 
       Dir.mktmpdir(nil, WORKING_DIR) do |dir|
         # clone local repo (fast!)
@@ -36,7 +36,7 @@ class GitRepo
 
     def current_master_ref(repository)
       ref = nil
-      synchronize_cache_repo(repository)
+      synchronize_cache_repo(repository, "master")
       cached_repo_path = File.join(WORKING_DIR, repository.repo_cache_name)
       Dir.chdir(cached_repo_path) do
         ref = Cocaine::CommandLine.new("git show-ref refs/remotes/origin/master").run.split(" ").first
@@ -52,7 +52,7 @@ class GitRepo
       end
 
       Dir.chdir(cached_repo_path) do
-        synchronize_with_remote
+        synchronize_with_remote('origin')
 
         yield
       end
@@ -64,7 +64,7 @@ class GitRepo
 
     private
 
-    def synchronize_cache_repo(repository)
+    def synchronize_cache_repo(repository, ref)
       cached_repo_path = File.join(WORKING_DIR, repository.repo_cache_name)
 
       if !File.directory?(cached_repo_path)
@@ -72,7 +72,7 @@ class GitRepo
       end
       Dir.chdir(cached_repo_path) do
         # update the cached repo
-        synchronize_with_remote
+        synchronize_with_remote('origin', ref)
         Cocaine::CommandLine.new("git submodule update", "--init --quiet").run
       end
     end
@@ -87,8 +87,8 @@ class GitRepo
       Cocaine::CommandLine.new("git clone", "--recursive #{repo_url} #{cached_repo_path}").run
     end
 
-    def synchronize_with_remote(name = 'origin')
-      Cocaine::CommandLine.new("git fetch", "#{name} --quiet --prune").run
+    def synchronize_with_remote(name, ref = nil)
+      Cocaine::CommandLine.new("git fetch", " --quiet --prune #{name} #{ref}").run
     rescue Cocaine::ExitStatusError
       # likely caused by another 'git fetch' that is currently in progress. Wait a few seconds and try again
       tries = (tries || 0) + 1
