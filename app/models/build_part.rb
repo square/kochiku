@@ -20,7 +20,9 @@ class BuildPart < ActiveRecord::Base
     else
       # TODO: hopefully this is only temporary while we work to make these tests less flaky
       # franklin should only be in this list until we get chromedriver installed on EC2
+      # cogs/cogs-hbase should be in this list until we get hbase installed on EC2
       if (kind == "maven" && (paths.include?("franklin") ||
+                              paths.include?("cogs/cogs-hbase") ||
                               paths.include?("sake/rpc") ||
                               paths.include?("clustering/zookeeper") ||
                               paths.include?("bletchley") ||
