@@ -89,7 +89,9 @@ class GitRepo
 
     def synchronize_with_remote(name, branch = nil)
       refspec = branch.to_s.empty? ? "" : "+#{branch}"
-      Cocaine::CommandLine.new("git fetch", "--quiet --prune --no-tags #{name} #{refspec}").run
+      # Undo this for now, partition does not seem as stable with this enabled.
+      #Cocaine::CommandLine.new("git fetch", "--quiet --prune --no-tags #{name} #{refspec}").run
+      Cocaine::CommandLine.new("git fetch", "--quiet --prune --no-tags #{name}").run
     rescue Cocaine::ExitStatusError
       # likely caused by another 'git fetch' that is currently in progress. Wait a few seconds and try again
       tries = (tries || 0) + 1
