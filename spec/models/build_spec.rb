@@ -380,6 +380,7 @@ describe Build do
       it "does not send a email if the project setting is disabled" do
         build.update_attribute(:state, :failed)
         repository.update_attributes!(:send_build_failure_email => false)
+        build.reload
         BuildMailer.should_not_receive(:build_break_email)
         build.send_build_status_email!
       end

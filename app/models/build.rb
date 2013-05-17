@@ -65,7 +65,11 @@ class Build < ActiveRecord::Base
   end
 
   def enqueue_partitioning_job
-    Resque.enqueue(BuildPartitioningJob, self.id)
+    if repository.url == "git@git.squareup.com:square/java.git"
+      Resque.enqueue_to("java-partition", BuildPartitioningJob, self.id)
+    else
+      Resque.enqueue(BuildPartitioningJob, self.id)
+    end
   end
 
   def partition(parts)
