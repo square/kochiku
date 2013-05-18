@@ -2,7 +2,7 @@ require 'job_base'
 require 'github_request'
 
 # this job pushes a ref to a deployable branch. it is enqueued when a
-# build_part's state changes. the change is observed in BuildAttemptObserver
+# build_part's state changes.
 class BranchUpdateJob < JobBase
   @queue = :high
 

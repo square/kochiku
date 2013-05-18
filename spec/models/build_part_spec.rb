@@ -13,9 +13,10 @@ describe BuildPart do
       }.to change(build_part.build_attempts, :count).by(1)
     end
 
-    it "enqueues a job to update the build state" do
-      BuildStateUpdateJob.should_receive(:enqueue).with(build.id)
+    it "updates the build state to running" do
+      build.state.should_not == :running
       build_part.create_and_enqueue_new_build_attempt!
+      build.state.should == :running
     end
 
     it "enqueues onto a repository specific queue" do

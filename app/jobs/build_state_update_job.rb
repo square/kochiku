@@ -2,8 +2,7 @@ require 'job_base'
 require 'git_repo'
 require 'github_commit_status'
 
-# this job updates the remote repo. it is enqueued when a build's state
-# changes. the change is observed in BuildAttemptObserver
+# this job updates the remote repo. it is enqueued when a build's state changes.
 class BuildStateUpdateJob < JobBase
   @queue = :high
 

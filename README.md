@@ -38,7 +38,7 @@ Fills the queue with build part jobs. Enqueued by the master.
 Runs the tests for a particular part of the build. Updates status.
 
 ### BuildStateUpdateJob
-Promotes a tag if the build is successful. Enqueued by BuildAttemptObserver.
+Promotes a tag if the build is successful.
 
 
 Getting Started
