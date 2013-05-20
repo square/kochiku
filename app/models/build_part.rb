@@ -45,15 +45,16 @@ class BuildPart < ActiveRecord::Base
   def job_args(build_attempt)
     {
         "build_attempt_id" => build_attempt.id,
-        "build_kind" => self.kind,
-        "build_ref" => self.build_instance.ref,
-        "test_files" => self.paths,
-        "repo_name" => self.project.repository.repo_cache_name,
-        "test_command" => self.build_instance.test_command(self.paths),
-        "repo_url" => self.project.repository.url,
+        "build_kind" => kind,
+        "build_ref" => build_instance.ref,
+        "branch" => build_instance.branch,
+        "test_files" => paths,
+        "repo_name" => project.repository.repo_cache_name,
+        "test_command" => build_instance.test_command(paths),
+        "repo_url" => project.repository.url,
         "remote_name" => "origin",
-        "timeout" => self.project.repository.timeout.minutes,
-        "options" => self.options,
+        "timeout" => project.repository.timeout.minutes,
+        "options" => options,
     }
   end
 
