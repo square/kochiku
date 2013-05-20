@@ -22,8 +22,7 @@ class BuildAttempt < ActiveRecord::Base
   end
 
   def start!(builder)
-    result = update_attributes(:state => :running, :started_at => Time.now, :builder => builder)
-    return result if !result
+    return false unless update_attributes(:state => :running, :started_at => Time.now, :builder => builder)
 
     build = build_part.build_instance
     previous_state, new_state = build.update_state_from_parts!
@@ -31,11 +30,12 @@ class BuildAttempt < ActiveRecord::Base
     if previous_state != new_state
       BuildStateUpdateJob.enqueue(build.id)
     end
+
+    true
   end
 
   def finish!(state)
-    result = update_attributes(:state => state, :finished_at => Time.now)
-    return result if !result
+    return false unless update_attributes(:state => state, :finished_at => Time.now)
 
     if should_reattempt?
       build_part.rebuild!
@@ -64,6 +64,8 @@ class BuildAttempt < ActiveRecord::Base
     if previous_state != new_state
       BuildStateUpdateJob.enqueue(build.id)
     end
+
+    true
   end
 
   def unsuccessful?

@@ -213,7 +213,7 @@ class Build < ActiveRecord::Base
   end
 
   def running!
-    if state == :runnable || state == :partitioning
+    if %w(runnable partitioning).include?(state.to_s)
       update_attributes!(:state => :running)
     end
   end
