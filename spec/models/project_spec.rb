@@ -72,6 +72,7 @@ describe Project do
           end
 
           it 'still includes the build' do
+            build_attempt.finish!(:running)
             should == {
               'spec' => [[
                            build.ref[0, 5],

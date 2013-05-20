@@ -37,7 +37,8 @@ describe BuildStateUpdateJob do
       BuildStateUpdateJob.perform(build.id)
 
       build.build_parts.each do |part|
-        part.build_attempts.create!(:state => :passed)
+        build_attempt = part.build_attempts.create!(:state => :running)
+        build_attempt.finish!(:passed)
       end
 
       BuildStateUpdateJob.perform(build.id)
@@ -48,7 +49,8 @@ describe BuildStateUpdateJob do
     context "when all parts have passed" do
       before do
         build.build_parts.each do |part|
-          part.build_attempts.create!(:state => :passed)
+          attempt = part.build_attempts.create!(:state => :running)
+          attempt.finish!(:passed)
         end
       end
 
@@ -73,7 +75,7 @@ describe BuildStateUpdateJob do
 
             # TODO: this shouldn't be under the "when all parts have passed" context
             it "does not kick off a new build unless finished" do
-              build.build_parts.first.build_attempts.last.update_attribute(:state, :running)
+              build.build_parts.first.build_attempts.last.finish!(:running)
               expect { subject }.to_not change(project.builds, :count)
             end
 

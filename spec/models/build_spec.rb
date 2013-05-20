@@ -51,9 +51,9 @@ describe Build do
       build.build_parts.find_by_kind('cucumber').paths.should =~ ['a', 'b']
     end
 
-    it "should change state to runnable" do
+    it "should change state to running" do
       build.partition(parts)
-      build.state.should == :runnable
+      build.state.should == :running
     end
 
     it "creates parts with options" do
@@ -107,6 +107,7 @@ describe Build do
     let(:parts) { [{'type' => 'cucumber', 'files' => ['a']}, {'type' => 'rspec', 'files' => ['b']}] }
     before do
       stub_request(:post, /https:\/\/git\.squareup\.com\/api\/v3\/repos\/square\/kochiku\/statuses\//)
+      build.stub(:running!)
       build.partition(parts)
       build.state.should == :runnable
     end

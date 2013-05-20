@@ -212,6 +212,12 @@ class Build < ActiveRecord::Base
     end
   end
 
+  def running!
+    if %w(runnable partitioning).include?(state.to_s)
+      update_attributes!(:state => :running)
+    end
+  end
+
   def is_running?
     IN_PROGRESS_STATES.include?(self.state)
   end

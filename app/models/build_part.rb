@@ -11,6 +11,8 @@ class BuildPart < ActiveRecord::Base
 
   def create_and_enqueue_new_build_attempt!
     build_attempt = build_attempts.create!(:state => :runnable)
+    build_instance.running!
+
     # TODO: this is a hack, please fix the following and restore this code to it's former glory.
     # We need to do 2 things before enabling this:
     # 1) update the ssh key on ec2 builders
@@ -36,6 +38,7 @@ class BuildPart < ActiveRecord::Base
         end
       end
     end
+
     build_attempt
   end
 
