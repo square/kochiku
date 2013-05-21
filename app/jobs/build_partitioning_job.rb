@@ -22,7 +22,11 @@ class BuildPartitioningJob < JobBase
   end
 
   def on_exception(e)
-    @build.update_attributes!(:state => :errored)
+    if self.class.retry_exception?(e) && !self.class.retry_limit_reached?
+      @build.update_attributes!(:state => :waiting_for_sync)
+    else
+      @build.update_attributes!(:state => :errored)
+    end
     super
   end
 end

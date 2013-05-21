@@ -39,12 +39,21 @@ describe BuildPartitioningJob do
       end
     end
 
-    context "when an error occurs" do
+    context "when a no retryable error occurs" do
       before { GitRepo.stub(:inside_copy).and_raise(NameError) }
 
       it "should re-raise the error and set the build state to errored" do
         expect { subject }.to raise_error(NameError)
         build.reload.state.should == :errored
+      end
+    end
+
+    context "when a retryable error occurs" do
+      before { GitRepo.stub(:inside_copy).and_raise(GitRepo::RefNotFoundError) }
+
+      it "should re-raise the error and set the build state to waiting for sync" do
+        expect { subject }.to raise_error(GitRepo::RefNotFoundError)
+        build.reload.state.should == :waiting_for_sync
       end
     end
 

@@ -33,7 +33,7 @@ class Build < ActiveRecord::Base
   has_many :build_attempts, :through => :build_parts
   TERMINAL_STATES = [:failed, :succeeded, :errored, :aborted]
   FAILED_STATES = [:failed, :errored, :doomed]
-  IN_PROGRESS_STATES = [:partitioning, :runnable, :running, :doomed]
+  IN_PROGRESS_STATES = [:waiting_for_sync, :partitioning, :runnable, :running, :doomed]
   STATES = IN_PROGRESS_STATES + TERMINAL_STATES
   symbolize :state, :in => STATES
   symbolize :queue
