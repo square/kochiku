@@ -15,28 +15,28 @@ class GitBlame
 
     def changes_since_last_green(build)
       output = GitRepo.inside_repo(build.repository) do
-        Cocaine::CommandLine.new("git log --no-merges --format='::!::%H|%an <%ae>|%ad|%B::!::' #{build.previous_successful_build.try(:ref)}...#{build.ref}").run
+        Cocaine::CommandLine.new("git log --no-merges --format='::!::%H|%an <%ae>|%ad|%B::!::' '#{build.previous_successful_build.try(:ref)}...#{build.ref}'").run
       end
       parse_git_changes(output)
     end
 
     def changes_in_branch(build)
       output = GitRepo.inside_repo(build.repository) do
-        Cocaine::CommandLine.new("git log --no-merges --format='::!::%H|%an <%ae>|%ad|%B::!::' origin/master..origin/#{build.branch}").run
+        Cocaine::CommandLine.new("git log --no-merges --format='::!::%H|%an <%ae>|%ad|%B::!::' 'origin/master..origin/#{build.branch}'").run
       end
       parse_git_changes(output)
     end
 
     def files_changed_since_last_green(build)
       output = GitRepo.inside_repo(build.repository) do
-        Cocaine::CommandLine.new("git log --no-merges --format='::!::%H::!::' --name-only #{build.previous_successful_build.try(:ref)}...#{build.ref}").run
+        Cocaine::CommandLine.new("git log --no-merges --format='::!::%H::!::' --name-only '#{build.previous_successful_build.try(:ref)}...#{build.ref}'").run
       end
       parse_git_files_changes(output)
     end
 
     def files_changed_in_branch(build)
       output = GitRepo.inside_repo(build.repository) do
-        Cocaine::CommandLine.new("git log --no-merges --format='::!::%H::!::' --name-only origin/master..origin/#{build.branch}").run
+        Cocaine::CommandLine.new("git log --no-merges --format='::!::%H::!::' --name-only 'origin/master..origin/#{build.branch}'").run
       end
       parse_git_files_changes(output)
     end
@@ -85,13 +85,13 @@ class GitBlame
 
     def git_names_and_emails_since_last_green(build)
       GitRepo.inside_repo(build.repository) do
-        Cocaine::CommandLine.new("git log --format=%an:%ae --no-merges #{build.previous_successful_build.try(:ref)}...#{build.ref}").run
+        Cocaine::CommandLine.new("git log --format='%an:%ae' --no-merges '#{build.previous_successful_build.try(:ref)}...#{build.ref}'").run
       end
     end
 
     def git_names_and_emails_in_branch(build)
       GitRepo.inside_repo(build.repository) do
-        Cocaine::CommandLine.new("git log --format=%an:%ae --no-merges origin/master..origin/#{build.branch}").run
+        Cocaine::CommandLine.new("git log --format='%an:%ae' --no-merges 'origin/master..origin/#{build.branch}'").run
       end
     end
 
