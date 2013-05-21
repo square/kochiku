@@ -6,6 +6,10 @@
 <body>
 <h2>Project <%= @build.project.name %> failed on branch <%= @build.branch %></h2>
 <%= project_build_url(@build.project, @build) %><br>
+<% @java_emails.each do |email| %>
+  <br>
+  email: <%= email %><br>
+<% end %>
 <br>
 Failed build parts:
 <ul>
