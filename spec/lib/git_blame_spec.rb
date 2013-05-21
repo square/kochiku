@@ -138,34 +138,63 @@ describe GitBlame do
   end
 
   describe "#files_changed_since_last_green" do
-    subject { GitBlame.files_changed_since_last_green(build) }
+    let(:options) { {} }
+    subject { GitBlame.files_changed_since_last_green(build, options) }
 
     before do
       GitBlame.unstub(:files_changed_since_last_green)
+      GitBlame.stub(:people_from_ldap).and_return([{"First" => "User", "Last" => "One", "Email" => "userone@example.com"},
+                                                   {"First" => "User", "Last" => "Two", "Email" => "usertwo@example.com"}])
     end
 
     it "should parse the git log and return change file paths" do
-      GitRepo.stub(:inside_repo).and_return("::!::817b88be7488cab5e4f9d9975222db80d8bceb3b::!::\n\npath/one/file.java\npath/two/file.java")
+      GitRepo.stub(:inside_repo).and_return("::!::User One:userone@example.com::!::\n\npath/one/file.java\npath/two/file.java")
       git_file_changes = subject
       git_file_changes.size.should == 2
-      git_file_changes.should include("path/one/file.java")
-      git_file_changes.should include("path/two/file.java")
+      git_file_changes.should include({:file => "path/one/file.java", :emails => []})
+      git_file_changes.should include({:file => "path/two/file.java", :emails => []})
+    end
+
+    context "fetch emails with files changes" do
+      let(:options) { {:fetch_emails => true} }
+
+      it "should parse the git log and return change file paths with emails" do
+        GitRepo.stub(:inside_repo).and_return("::!::User One:userone@example.com::!::\n\npath/one/file.java\npath/two/file.java\n::!::User Two:usertwo@example.com::!::\n\npath/three/file.java")
+        git_file_changes = subject
+        git_file_changes.size.should == 3
+        git_file_changes.should include({:file => "path/one/file.java", :emails => ["userone@example.com"]})
+        git_file_changes.should include({:file => "path/two/file.java", :emails => ["userone@example.com"]})
+        git_file_changes.should include({:file => "path/three/file.java", :emails => ["usertwo@example.com"]})
+      end
+
+      it "should return nothing if the line doesn't have an email" do
+        GitRepo.stub(:inside_repo).and_return("::!::::!::\n")
+        subject.should be_empty
+      end
+
+      it "should work if the email address is not found" do
+        GitRepo.stub(:inside_repo).and_return("::!::Unknown:unknown@example.com::!::\n\npath/one/file.java")
+        git_file_changes = subject
+        git_file_changes.size.should == 1
+        git_file_changes.should include({:file => "path/one/file.java", :emails => []})
+      end
     end
   end
 
   describe "#files_changed_in_branch" do
-    subject { GitBlame.files_changed_in_branch(build) }
+    let(:options) { {} }
+    subject { GitBlame.files_changed_in_branch(build, options) }
 
     before do
       GitBlame.unstub(:files_changed_in_branch)
     end
 
     it "should parse the git log and return change file paths" do
-      GitRepo.stub(:inside_repo).and_return("::!::817b88be7488cab5e4f9d9975222db80d8bceb3b::!::\n\npath/one/file.java\npath/two/file.java")
+      GitRepo.stub(:inside_repo).and_return("::!::User One:userone@example.com::!::\n\npath/one/file.java\npath/two/file.java")
       git_file_changes = subject
       git_file_changes.size.should == 2
-      git_file_changes.should include("path/one/file.java")
-      git_file_changes.should include("path/two/file.java")
+      git_file_changes.should include({:file => "path/one/file.java", :emails => []})
+      git_file_changes.should include({:file => "path/two/file.java", :emails => []})
     end
   end
 end

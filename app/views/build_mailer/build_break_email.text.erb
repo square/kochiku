@@ -1,6 +1,10 @@
 Project <%= @build.project.name %> failed on branch <%= @build.branch %>
 <%= project_build_url(@build.project, @build) %>
 
+<% @java_emails.each do |email| %>
+  email: <%= email %>
+<% end %>
+
 Failed build parts:
 <% @failed_build_parts.each do |failed_build_part| %>
   Go to <%= project_build_part_url(@build.project, @build, failed_build_part) %> for details

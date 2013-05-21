@@ -11,7 +11,7 @@ class Partitioner
       if kochiku_yml.is_a?(Array)
         kochiku_yml.map { |subset| partitions_for(subset) }.flatten
       else
-        build_partions_from(kochiku_yml)
+        build_partitions_from(kochiku_yml)
       end
     elsif File.exist?(BUILD_YML)
       YAML.load_file(BUILD_YML).values.select { |part| part['type'].present? }
@@ -26,7 +26,7 @@ class Partitioner
 
   private
 
-  def build_partions_from(kochiku_yml)
+  def build_partitions_from(kochiku_yml)
     $stderr.puts "DEPRECATED: Your kochiku.yml file contains 'rvm' when it should be 'ruby'. Please update your config." if kochiku_yml.include?("rvm")
     (kochiku_yml["ruby"] || kochiku_yml["rvm"]).map do |rvm|
       options = {"language" => kochiku_yml["language"], "ruby" => rvm}
@@ -116,5 +116,4 @@ class Partitioner
       end
     end
   end
-
 end
