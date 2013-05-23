@@ -1,6 +1,28 @@
 require 'spec_helper'
 
 describe Repository do
+  describe '#main_project' do
+    let(:repository) { project.repository }
+    let(:project) { FactoryGirl.create :project }
+    subject { repository.main_project }
+
+    context 'without a main project' do
+      it 'returns nil' do
+        subject.should be_nil
+      end
+    end
+
+    context 'with a matching main project name' do
+      let!(:main_project) do
+        repository.projects.create name: repository.repository_name
+      end
+
+      it 'returns the main project' do
+        subject.should == main_project
+      end
+    end
+  end
+
   context "#interested_github_events" do
     it 'includes push if run_ci is enabled' do
       Repository.new(:run_ci => true).interested_github_events.should == ['pull_request', 'push']

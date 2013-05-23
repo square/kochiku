@@ -9,6 +9,10 @@ class Repository < ActiveRecord::Base
   validates_numericality_of :timeout, :only_integer => true
   validates_inclusion_of :timeout, :in => 0..1440
 
+  def main_project
+    projects.where(name: repository_name).first
+  end
+
   def base_html_url
     params = github_url_params
     "https://#{params[:host]}/#{params[:username]}/#{params[:repository]}"

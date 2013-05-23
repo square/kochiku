@@ -6,6 +6,10 @@
   = favicon_link_tag image_path("#{@build.to_color}.png"), :type => 'image/png'
 
 %h2.subheader
+  - unless @build.project.main?
+    - if main_project = @build.project.repository.main_project
+      = link_to main_project.name, main_project
+      &ndash;
   = link_to(@build.project.name, project_path(@build.project))
   &ndash;
   %code.build-status{ class: @build.state, title: @build.ref }

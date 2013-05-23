@@ -5,14 +5,19 @@
 
 - content_for :header do
   %ul.links
-    %li= link_to("Repository", edit_repository_path(@project.repository), class: "info")
-    %li= link_to("Projects", projects_repository_path(@project.repository))
+    %li= link_to("Settings", edit_repository_path(@project.repository), class: "info")
+    %li= link_to("Developer Builds", projects_repository_path(@project.repository))
   = form_for @build, url: request_project_builds_path(@project) do |f|
     - if !@project.main?
       = f.text_field :ref, {placeholder: 'SHA to build', class: 'sha', autocapitalize: 'off', autocorrect: 'off', spellcheck: 'false'}
     = f.submit "Build", {class: 'build-button'}
 
-%h2.subheader= @project.name
+%h2.subheader
+  - unless @build.project.main?
+    - if main_project = @build.project.repository.main_project
+      = link_to main_project.name, main_project
+      &ndash;
+  = @project.name
 
 #plot
 = content_for :javascript do
