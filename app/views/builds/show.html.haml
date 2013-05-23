@@ -12,7 +12,7 @@
     = @build.ref[0, 7]
   %a.info{:href => show_link_to_commit(@build)}
     Show on GitHub
-  - if @project.main_build?
+  - if @project.main?
     %a.info{:href => show_link_to_compare(@build, @build.previous_successful_build.try(:ref), @build.ref), :title => 'show changes since last green build'}
       Compare to last green build
 
@@ -31,7 +31,7 @@
     %span.state{:class => 'build-' + @build.state.to_s}= @build.state.to_s.capitalize
     on
     %span.queue #{@build.queue} queue
-  - if @build.succeeded? && !@project.main_build?
+  - if @build.succeeded? && !@project.main?
     %a.info{:href => show_link_to_create_pull_request(@build), :title => 'create a pull request against master'}
       Create pull request
   %span.info= "Created #{time_ago_in_words @build.created_at} ago"

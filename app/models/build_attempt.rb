@@ -53,7 +53,7 @@ class BuildAttempt < ActiveRecord::Base
     # projects each individual part corresponds to a distinct promotable project. We want
     # to promote this even if another part fails since there are a lot of projects and
     # one is usually broken!
-    if build.project.main_build? && build_part.successful?
+    if build.project.main? && build_part.successful?
       if promotion_ref = build.deployable_branch(build_part.paths.first)
         BranchUpdateJob.enqueue(build.id, promotion_ref)
       end

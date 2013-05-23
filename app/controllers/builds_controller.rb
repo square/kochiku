@@ -92,7 +92,7 @@ class BuildsController < ApplicationController
     requested_branch = payload['ref'].split('/').last
 
     if @project.branch == requested_branch
-      queue = @project.main_build? ? :ci : :developer
+      queue = @project.main? ? :ci : :developer
       @project.builds.find_existing_build_or_initialize(payload['after'], :state => :partitioning, :queue => queue)
     end
   end
@@ -105,7 +105,7 @@ class BuildsController < ApplicationController
     end
     auto_merge = params[:auto_merge] || false
     branch = params[:build][:branch] if params[:build]
-    queue = @project.main_build? ? :ci : :developer
+    queue = @project.main? ? :ci : :developer
     ref = params[:build][:ref] if params[:build]
     if queue == :ci
       ref = GitRepo.current_master_ref(@project.repository)

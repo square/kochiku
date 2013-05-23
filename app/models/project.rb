@@ -40,7 +40,7 @@ class Project < ActiveRecord::Base
     self.name.downcase
   end
 
-  def main_build?
+  def main?
     self.name == repository.repository_name
   end
 

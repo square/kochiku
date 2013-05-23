@@ -14,7 +14,7 @@ class BuildStateUpdateJob < JobBase
     build = Build.find(@build_id)
     GithubCommitStatus.new(build).update_commit_status!
 
-    if build.project.main_build? && build.completed?
+    if build.project.main? && build.completed?
       sha = GitRepo.current_master_ref(build.repository)
       build.project.builds.create_new_ci_build_for(sha)
     end
