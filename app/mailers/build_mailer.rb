@@ -25,7 +25,7 @@ class BuildMailer < ActionMailer::Base
   def build_break_email(build)
     @build = build
     @java_emails = []
-    if @build.project.main_build?
+    if @build.project.main?
       if @build.project.name == "java"
         # send this to the list for now, until we see it work for a day or two
         @emails = ["cheister@squareup.com"]

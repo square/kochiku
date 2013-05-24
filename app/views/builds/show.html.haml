@@ -6,13 +6,17 @@
   = favicon_link_tag image_path("#{@build.to_color}.png"), :type => 'image/png'
 
 %h2.subheader
+  - unless @build.project.main?
+    - if main_project = @build.project.repository.main_project
+      = link_to main_project.name, main_project
+      &ndash;
   = link_to(@build.project.name, project_path(@build.project))
   &ndash;
   %code.build-status{ class: @build.state, title: @build.ref }
     = @build.ref[0, 7]
   %a.info{:href => show_link_to_commit(@build)}
     Show on GitHub
-  - if @project.main_build?
+  - if @project.main?
     %a.info{:href => show_link_to_compare(@build, @build.previous_successful_build.try(:ref), @build.ref), :title => 'show changes since last green build'}
       Compare to last green build
 
@@ -31,7 +35,7 @@
     %span.state{:class => 'build-' + @build.state.to_s}= @build.state.to_s.capitalize
     on
     %span.queue #{@build.queue} queue
-  - if @build.succeeded? && !@project.main_build?
+  - if @build.succeeded? && !@project.main?
     %a.info{:href => show_link_to_create_pull_request(@build), :title => 'create a pull request against master'}
       Create pull request
   %span.info= "Created #{time_ago_in_words @build.created_at} ago"

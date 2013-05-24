@@ -20,15 +20,15 @@ describe Project do
     end
   end
 
-  describe "#main_build?" do
+  describe "#main?" do
     let(:repository) { FactoryGirl.create(:repository, :url => "git@git.squareup.com:square/kochiku.git") }
     it "returns true when the projects name is the same as the repo" do
       project = FactoryGirl.create(:project, :name => "kochiku", :repository => repository)
-      project.main_build?.should be_true
+      project.main?.should be_true
     end
     it "returns false when the projects name different then the repo" do
       project = FactoryGirl.create(:project, :name => "web", :repository => repository)
-      project.main_build?.should be_false
+      project.main?.should be_false
     end
   end
 

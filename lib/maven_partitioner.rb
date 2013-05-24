@@ -16,7 +16,7 @@ class MavenPartitioner
   def incremental_partitions(build)
     modules_to_build = Set.new
 
-    files_changed_method = build.project.main_build? ? :files_changed_since_last_green : :files_changed_in_branch
+    files_changed_method = build.project.main? ? :files_changed_since_last_green : :files_changed_in_branch
     GitBlame.send(files_changed_method, build).each do |file_and_emails|
       module_affected_by_file = file_to_module(file_and_emails[:file])
       return partitions if module_affected_by_file.nil?

@@ -10,7 +10,7 @@ describe MavenPartitioner do
       let(:build) { FactoryGirl.create(:build, :queue => :developer, :project => project, :branch => "master") }
 
       it "should be the main build" do
-        build.project.should be_main_build
+        build.project.should be_main
       end
 
       it "should return the set of modules to build for a given set of file changes" do
@@ -69,7 +69,7 @@ describe MavenPartitioner do
       let(:build) { FactoryGirl.create(:build, :queue => :developer, :branch => "branch-of-master") }
 
       it "should not be the main build" do
-        build.project.should_not be_main_build
+        build.project.should_not be_main
       end
 
       it "should return the set of modules to build for a given set of file changes" do

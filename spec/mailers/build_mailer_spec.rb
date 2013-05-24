@@ -43,7 +43,7 @@ describe BuildMailer do
       end
 
       it "sends the email" do
-        build.project.should be_main_build
+        build.project.should be_main
 
         build_part = build.build_parts.create!(:paths => ["a", "b"], :kind => "cucumber")
         build_part.build_attempts.create!(:state => :failed, :builder => "test-builder")

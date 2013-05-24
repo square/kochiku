@@ -203,7 +203,7 @@ class Build < ActiveRecord::Base
   end
 
   def send_build_status_email!
-    return if (project.main_build? && !previous_successful_build) || !repository.send_build_failure_email?
+    return if (project.main? && !previous_successful_build) || !repository.send_build_failure_email?
 
     if completed? && failed? && !build_failure_email_sent?
       if Build.update_all({:build_failure_email_sent => true}, {:id => self.id, :build_failure_email_sent => nil}) == 1
