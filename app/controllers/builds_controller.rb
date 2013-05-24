@@ -35,6 +35,7 @@ class BuildsController < ApplicationController
       # passed but the latest attempt failed. We do not want to rebuild those parts.
       part.rebuild! if part.unsuccessful?
     end
+    @build.update_attributes state: :running
 
     redirect_to [@project, @build]
   end
