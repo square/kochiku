@@ -57,6 +57,15 @@ describe BuildPart do
     end
   end
 
+  describe "#job_args" do
+    it "should substitute the git mirror for git.sqaureup url" do
+      build_attempt = build_part.build_attempts.create!(:state => :runnable)
+      project.repository.url.should == "git@git.squareup.com:square/kochiku.git"
+      args = build_part.job_args(build_attempt)
+      args["repo_url"].should == "git://git-mirror.corp.squareup.com/square/kochiku.git"
+    end
+  end
+
   describe "#unsuccessful?" do
     subject { build_part.unsuccessful? }
 
