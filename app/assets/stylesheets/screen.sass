@@ -63,8 +63,6 @@ body, input
   font-size: 12px
 
 #page
-  width: 1020px
-  margin: 0 auto
   min-height: 100%
 
 h1, h2, h3, h4, h5, h6
@@ -117,8 +115,7 @@ input[type=submit], button, .button
   border-bottom: solid 1px #e2e2e2
 .section
   +envelope
-  margin: 1em auto 0.25em
-  width: 1000px
+  margin: 1em
 
 .flash
   text-align: center
@@ -131,7 +128,6 @@ input[type=submit], button, .button
     background-color: #91f991
   &.error
     background-color: #ff9999
-
 
 #header
   a.logo
@@ -149,14 +145,12 @@ input[type=submit], button, .button
     display: inline-block
     li
       display: inline-block
-      padding-right: 8px
-      margin-right: 8px
+      padding-left: 8px
+      margin-left: 8px
   form
     display: inline-block
 
 #nav
-  width: 1000px
-  margin: 1em auto
   padding-bottom: 30px
 
 h2.subheader
@@ -198,7 +192,7 @@ form label
 
 #plot
   margin-bottom: 2em
-  width: 100%
+  min-width: 1000px
   height: 180px
   .legend table
     width: auto
@@ -477,25 +471,29 @@ ol#build-paths
 .new-repository-link
   padding-bottom: 20px
 
+.projects-grid
+  text-align: center
+
 .projects
   +pie-clearfix
+  margin-right: .75em
+  margin-left: .75em
 
   li.build-info
     margin: .3em 0
 
   .ci-build-info
     position: relative
+    display: inline-block
     width: 188px
     height: 188px
-    float: left
     border-radius: 10px
     text-align: center
-    margin: 0 10px 10px 0
+    vertical-align: top
+    margin: .5em
     color: rgba(black, 0.8)
     text-shadow: rgba(white, .1) 0 1px 0
     +box-shadow(0 1px 2px rgba(black, .5), inset 0 0 3px rgba(black, .3))
-    &:nth-child(5n)
-      margin-right: 0
     a
       color: rgba(white, 0.95)
       text-shadow: rgba(black, .2) 0 -1px 0
