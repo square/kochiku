@@ -173,7 +173,7 @@ describe BuildsController do
         GitRepo.stub(:current_master_ref).and_return(build.ref)
 
         expect{ post @action, @params.merge(:project_id => project.to_param, :build => {:ref => build.ref })}.to_not change{Build.count}
-        flash[:error].should start_with("Error adding build!")
+        flash[:error].should be_nil
       end
     end
 
