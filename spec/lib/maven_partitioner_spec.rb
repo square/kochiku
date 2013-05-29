@@ -177,6 +177,18 @@ describe MavenPartitioner do
       depends_on_map["a"].should == ["a", "module-one"].to_set
       depends_on_map["b"].should == ["b", "module-one", "module-two"].to_set
       depends_on_map["c"].should == ["c", "module-one", "module-two"].to_set
+      depends_on_map["all-protos"].should be_nil
+    end
+
+    it "should special case the all-protos dependency" do
+      subject.stub(:module_dependency_map).and_return({
+                                                          "module-one" => ["all-protos"].to_set,
+                                                          "module-two" => ["all-protos"].to_set,
+                                                          "all-protos" => Set.new
+                                                      })
+
+      depends_on_map = subject.depends_on_map
+      depends_on_map["all-protos"].should == ["all-protos"].to_set
     end
   end
 

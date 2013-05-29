@@ -66,6 +66,10 @@ class MavenPartitioner
       end
     end
 
+    #HACK do not treat all-protos as a dependency so it does not kill the
+    # incremental builds.  Anything that needs a deployable branch will be built separately
+    module_depends_on_map['all-protos'] = ["all-protos"].to_set unless module_depends_on_map['all-protos'].nil?
+
     @depends_on_map = module_depends_on_map
   end
 
@@ -151,5 +155,7 @@ class MavenPartitioner
     deployable_modules_map
   end
 
-  def self.deployable_modules_map; new.deployable_modules_map; end
+  def self.deployable_modules_map
+    new.deployable_modules_map
+  end
 end
