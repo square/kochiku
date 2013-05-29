@@ -2,7 +2,7 @@
   %ul.links
     %li= link_to("Repositories", repositories_path)
 
-.projects
+.projects.projects-grid
   - @projects.each do |project|
     %div.ci-build-info{:class => "ci-#{project.last_build_state}" }
       %div.project-name
