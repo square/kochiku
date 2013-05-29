@@ -13,16 +13,27 @@ class BranchUpdateJob < JobBase
 
   def perform
     build = Build.find(@build_id)
+
     GithubRequest.post(
       URI("#{build.repository.base_api_url}/git/refs"),
       :ref => "refs/heads/deployable-#{@promotion_ref}",
       :sha => build.ref
+    )
+    GithubRequest.patch(
+      URI("#{build.repository.base_api_url}/git/refs/heads/deployable-#{@promotion_ref}"),
+      :sha => build.ref,
+      :force => "true"
     )
 
     GithubRequest.post(
       URI("#{build.repository.base_api_url}/git/refs"),
       :ref => "refs/heads/ci-#{@promotion_ref}-master/latest",
       :sha => build.ref
+    )
+    GithubRequest.patch(
+      URI("#{build.repository.base_api_url}/git/refs/heads/ci-#{@promotion_ref}-master/latest"),
+      :sha => build.ref,
+      :force => "true"
     )
   end
 end

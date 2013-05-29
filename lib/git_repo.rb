@@ -15,7 +15,7 @@ class GitRepo
         run! "git clone #{cached_repo_path} #{dir}"
 
         Dir.chdir(dir) do
-          raise RefNotFoundError unless system("git rev-list --quiet -n1 #{sha}")
+          raise RefNotFoundError, "repo:#{repository.url} branch:#{branch}, sha:#{sha}"unless system("git rev-list --quiet -n1 #{sha}")
 
           run! "git checkout --quiet #{sha}"
 
