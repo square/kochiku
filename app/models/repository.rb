@@ -4,7 +4,7 @@ class Repository < ActiveRecord::Base
     "git:" => /:\/\/(.*)\/(.*)\/(.*)\.git/,
     "http" => /https?:\/\/(.*)\/(.*)\/([^.]*)\.?/,
   }
-  has_many :projects
+  has_many :projects, :dependent => :destroy
   validates_presence_of :url
   validates_numericality_of :timeout, :only_integer => true
   validates_inclusion_of :timeout, :in => 0..1440

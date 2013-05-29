@@ -47,6 +47,16 @@ describe RepositoriesController do
     end
   end
 
+  describe "delete /repositories/:id" do
+    let!(:repository) { FactoryGirl.create(:repository, :url => "git@git.squareup.com:square/kochiku.git", :test_command => "script/something")}
+    it "responds with success" do
+      expect {
+        get :destroy, :id => repository.id
+        response.should be_redirect
+      }.to change(Repository, :count).by(-1)
+    end
+  end
+
   describe "get /repositories" do
     it "responds with success" do
       get :index

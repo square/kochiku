@@ -43,4 +43,7 @@
       %label{:for => "send_build_failure_email"} Send email to build breakers:
       = f.check_box :send_build_failure_email, {:id => "send_build_failure_email"}
 
-  = f.submit "Update", {:class => 'build-button'}
+  = f.submit @repository.new_record? ? "Create" : "Update"
+
+- unless @repository.new_record?
+  = button_to "Delete", @repository, :method => :delete, :form_class => "delete-form", :class => "danger-button", :confirm => "This is a permanent destructive action, are you sure?"
