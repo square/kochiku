@@ -16,6 +16,11 @@ class RepositoriesController < ApplicationController
     @repository = Repository.new
   end
 
+  def destroy
+    Repository.find(params[:id]).destroy
+    redirect_to repositories_path
+  end
+
   def update
     repository = Repository.find(params[:id])
     repository.update_attributes!(params[:repository])
