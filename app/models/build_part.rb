@@ -23,8 +23,10 @@ class BuildPart < ActiveRecord::Base
       # TODO: hopefully this is only temporary while we work to make these tests less flaky
       # franklin should only be in this list until we get chromedriver installed on EC2
       # cogs/cogs-hbase should be in this list until we get hbase installed on EC2
+      # matador is on this list because it fails on ec2 because of a database null field not being null
       if (kind == "maven" && (paths.include?("franklin") ||
                               paths.include?("cogs/cogs-hbase") ||
+                              paths.include?("matador") ||
                               paths.include?("sake/rpc") ||
                               paths.include?("clustering/zookeeper") ||
                               paths.include?("bletchley") ||
