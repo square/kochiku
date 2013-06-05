@@ -27,7 +27,8 @@ describe MavenPartitioner do
         subject.should_not_receive(:partitions)
 
         partitions = subject.incremental_partitions(build)
-        partitions.size.should == 4
+        partitions.size.should == 5
+        partitions.should include({"type" => "maven", "files" => ["all-java"]})
         partitions.should include({"type" => "maven", "files" => ["module-one"]})
         partitions.should include({"type" => "maven", "files" => ["module-two"]})
         partitions.should include({"type" => "maven", "files" => ["module-three"]})
@@ -61,7 +62,8 @@ describe MavenPartitioner do
         subject.should_not_receive(:partitions)
 
         partitions = subject.incremental_partitions(build)
-        partitions.should be_empty
+        partitions.size.should == 1
+        partitions.should include({"type" => "maven", "files" => ["all-java"]})
       end
     end
 
@@ -86,7 +88,8 @@ describe MavenPartitioner do
         subject.should_not_receive(:partitions)
 
         partitions = subject.incremental_partitions(build)
-        partitions.size.should == 2
+        partitions.size.should == 3
+        partitions.should include({"type" => "maven", "files" => ["all-java"]})
         partitions.should include({"type" => "maven", "files" => ["module-three"]})
         partitions.should include({"type" => "maven", "files" => ["module-four"]})
       end
@@ -118,7 +121,8 @@ describe MavenPartitioner do
         subject.should_not_receive(:partitions)
 
         partitions = subject.incremental_partitions(build)
-        partitions.should be_empty
+        partitions.size.should == 1
+        partitions.should include({"type" => "maven", "files" => ["all-java"]})
       end
     end
   end
