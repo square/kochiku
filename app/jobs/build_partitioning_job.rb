@@ -8,7 +8,7 @@ class BuildPartitioningJob < JobBase
   @queue = :partition
 
   @retry_limit = 5
-  @retry_exceptions = {GitRepo::RefNotFoundError => [60, 60, 60, 120, 180]}
+  @retry_exceptions = {GitRepo::RefNotFoundError => [60, 60, 60, 180, 360]}
 
   def initialize(build_id)
     @build = Build.find(build_id)
