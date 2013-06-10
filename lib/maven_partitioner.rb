@@ -16,8 +16,10 @@ class MavenPartitioner
   def incremental_partitions(build)
     modules_to_build = Set.new
 
-    # Build all-java module for all changes
-    modules_to_build.add("all-java")
+    if build.project.name == "java"
+      # Build all-java module for all changes in the java repo
+      modules_to_build.add("all-java")
+    end
 
     files_changed_method = build.project.main? ? :files_changed_since_last_green : :files_changed_in_branch
     GitBlame.send(files_changed_method, build).each do |file_and_emails|
