@@ -48,6 +48,21 @@ describe MavenPartitioner do
         partitions.should == [{"type" => "maven", "files" => "ALL"}]
       end
 
+      it "should not build everything if the file change is from the all-protos subtree and ends in .proto" do
+        GitBlame.stub(:files_changed_since_last_green).with(build).and_return([{:file => "squareup/juno/internal.proto", :emails => []},
+                                                                              {:file => "module-two/src/main/java/com/squareup/bar.java", :emails => []}])
+        File.stub(:exists?).and_return(false)
+        File.stub(:exists?).with("module-two/pom.xml").and_return(true)
+
+        subject.stub(:depends_on_map).and_return({ "module-two" => ["module-two"].to_set })
+
+        subject.should_not_receive(:partitions)
+
+        partitions = subject.incremental_partitions(build)
+        partitions.size.should == 1
+        partitions.should include({"type" => "maven", "files" => ["module-two"]})
+      end
+
       it "should not fail if a file is reference in a top level module that is not in the top level pom" do
         GitBlame.stub(:files_changed_since_last_green).with(build).and_return([{:file => "new-module/src/main/java/com/squareup/foo.java", :emails => []}])
 
@@ -158,6 +173,24 @@ describe MavenPartitioner do
       emails.size.should == 2
       emails.should include("userone@example.com")
       emails.should include("userfour@example.com")
+    end
+
+    it "should not ignore changes in the all-protos subtree module" do
+      build_part = FactoryGirl.create(:build_part, :paths => ["module-one"], :build_instance => build)
+      FactoryGirl.create(:build_attempt, :state => :failed, :build_part => build_part)
+      build.build_parts.failed_or_errored.should == [build_part]
+
+      GitBlame.stub(:files_changed_since_last_green).with(build, :fetch_emails => true).and_return([{:file => "module-one/src/main/java/com/squareup/Foo.java", :emails => ["userone@example.com"]},
+                                                                                                   {:file => "squareup/juno/internal.proto", :emails => ["protouser@example.com"]}])
+      File.stub(:exists?).and_return(false)
+      File.stub(:exists?).with("module-one/pom.xml").and_return(true)
+
+      subject.stub(:depends_on_map).and_return({ "module-one" => ["module-one"].to_set })
+      subject.should_not_receive(:partitions)
+
+      emails = subject.emails_for_commits_causing_failures(build)
+      emails.size.should == 1
+      emails.should include("userone@example.com")
     end
   end
 
