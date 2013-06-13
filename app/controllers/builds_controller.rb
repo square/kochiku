@@ -1,7 +1,7 @@
 require 'git_repo'
 
 class BuildsController < ApplicationController
-  before_filter :load_project, :only => [:show, :abort, :build_status, :toggle_auto_merge, :rebuild_failed_parts]
+  before_filter :load_project, :only => [:show, :abort, :build_status, :toggle_auto_merge, :rebuild_failed_parts, :request_build]
   skip_before_filter :verify_authenticity_token, :only => [:create]
 
   def show
@@ -42,12 +42,23 @@ class BuildsController < ApplicationController
 
   # Used to request a developer build through the Web UI
   def request_build
-    build = project_build
-    if build.save
-      flash[:message] = "Build added!"
+    unless params[:build] && params[:build][:branch].present?
+      flash[:error] = "Error adding build! branch can't be blank"
     else
-      flash[:error] = "Error adding build! #{build.errors.full_messages.to_sentence}"
+      response_body = GithubRequest.get(URI("#{@project.repository.base_api_url}/git/refs/heads/#{params[:build][:branch]}"))
+      build_info = JSON.parse(response_body)
+      unless build_info['object'] && build_info['object']['sha'].present?
+        flash[:error] = "Error adding build! branch not found in Github"
+      else
+        build = project_build(params[:build][:branch], build_info['object']['sha'])
+        if build.save
+          flash[:message] = "Build added!"
+        else
+          flash[:error] = "Error adding build! #{build.errors.full_messages.to_sentence}"
+        end
+      end
     end
+
     redirect_to project_path(params[:project_id])
   end
 
@@ -78,7 +89,12 @@ class BuildsController < ApplicationController
     if params['payload']
       build_from_github
     elsif params['build']
-      project_build
+      @project = Project.where(:name => params[:project_id]).first
+      unless @project
+        repository = Repository.find_or_create_by_url(params[:repo_url])
+        @project = repository.projects.create!(:name => params[:project_id])
+      end
+      project_build(params[:build][:branch], params[:build][:ref])
     end
   end
 
@@ -98,17 +114,11 @@ class BuildsController < ApplicationController
     end
   end
 
-  def project_build
-    @project = Project.where(:name => params[:project_id]).first
-    if !@project
-      repository = Repository.find_or_create_by_url(params[:repo_url])
-      @project = repository.projects.create!(:name => params[:project_id])
-    end
+  def project_build(branch, ref)
     auto_merge = params[:auto_merge] || false
-    branch = params[:build][:branch] if params[:build]
-    queue = @project.main? ? :ci : :developer
-    ref = params[:build][:ref] if params[:build]
-    if queue == :ci
+    queue = :developer
+    if @project.main?
+      queue = :ci
       ref = GitRepo.current_master_ref(@project.repository)
       branch = "master"
     end

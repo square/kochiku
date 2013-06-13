@@ -66,13 +66,29 @@ feature "requesting a developer build" do
   before :each do
     repository = FactoryGirl.create(:repository, :url => "git@git.squareup.com:square/kochiku.git")
     @project = FactoryGirl.create(:project, :name => "kochiku-developer", :repository => repository)
+
+    @branch = "test/branch"
+    @branch_head_sha = "4b41fe773057b2f1e2063eb94814d32699a34541"
+
+    build_ref_info = <<RESPONSE
+{
+  "ref": "refs/heads/#{@branch}",
+  "url": "https://git.squareup.com/api/v3/repos/square/web/git/refs/heads/#{@branch}",
+  "object": {
+    "sha": "#{@branch_head_sha}",
+    "type": "commit",
+    "url": "https://git.squareup.com/api/v3/repos/square/web/git/commits/#{@branch_head_sha}"
+  }
+}
+RESPONSE
+    stub_request(:get, "https://git.squareup.com/api/v3/repos/square/kochiku/git/refs/heads/#{@branch}").to_return(:status => 200, :body => build_ref_info)
   end
   
-  it "creates a new build if a sha is given" do
+  it "creates a new build if a branch is given" do
     visit(project_path(@project))
-    fill_in("build_ref", :with => "DEADBEEF")
+    fill_in("build_branch", :with => @branch)
     click_button('Build')
-    page.should have_content("DEADB")
+    page.should have_content(@branch_head_sha[0..4])
     find(".flash.message").should have_content("Build added!")
   end
 
