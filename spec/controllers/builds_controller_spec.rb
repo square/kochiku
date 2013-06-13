@@ -184,6 +184,26 @@ RESPONSE
         build.ref.should == branch_head_sha
       end
 
+      context "and project is main project" do
+        let(:repo) { FactoryGirl.create(:repository) }
+        let(:project) { FactoryGirl.create(:project, :name => repo.repository_name, :repository => repo) }
+
+        before do
+          GitRepo.stub(:current_master_ref).and_return("deadbeef")
+        end
+
+        it "creates the build for main project if no branch is given" do
+          project.should be_main
+          expect {
+            post @action, @params.merge(:project_id => project.to_param)
+          }.to change { Build.count }.by(1)
+          build = Build.last
+          build.project.should == project
+          build.branch.should == "master"
+          build.ref.should == "deadbeef"
+        end
+      end
+
       it "doesn't create a build if no branch is given" do
         expect {
           post @action, @params.merge(:project_id => project.to_param, :build => {:branch => nil})

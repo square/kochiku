@@ -45,7 +45,7 @@ class BuildsController < ApplicationController
     build = nil
 
     if @project.main?
-      build = project_build('master', 'HEAD')
+      build = project_build('master', 'HEAD') # Arguments ignored
     else
       unless params[:build] && params[:build][:branch].present?
         flash[:error] = "Error adding build! branch can't be blank"
