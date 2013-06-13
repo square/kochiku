@@ -42,20 +42,29 @@ class BuildsController < ApplicationController
 
   # Used to request a developer build through the Web UI
   def request_build
-    unless params[:build] && params[:build][:branch].present?
-      flash[:error] = "Error adding build! branch can't be blank"
+    build = nil
+
+    if @project.main?
+      build = project_build('master', 'HEAD')
     else
-      response_body = GithubRequest.get(URI("#{@project.repository.base_api_url}/git/refs/heads/#{params[:build][:branch]}"))
-      build_info = JSON.parse(response_body)
-      unless build_info['object'] && build_info['object']['sha'].present?
-        flash[:error] = "Error adding build! branch not found in Github"
+      unless params[:build] && params[:build][:branch].present?
+        flash[:error] = "Error adding build! branch can't be blank"
       else
-        build = project_build(params[:build][:branch], build_info['object']['sha'])
-        if build.save
-          flash[:message] = "Build added!"
+        response_body = GithubRequest.get(URI("#{@project.repository.base_api_url}/git/refs/heads/#{params[:build][:branch]}"))
+        build_info = JSON.parse(response_body)
+        unless build_info['object'] && build_info['object']['sha'].present?
+          flash[:error] = "Error adding build! branch not found in Github"
         else
-          flash[:error] = "Error adding build! #{build.errors.full_messages.to_sentence}"
+          build = project_build(params[:build][:branch], build_info['object']['sha'])
         end
+      end
+    end
+
+    if build
+      if build.save
+        flash[:message] = "Build added!"
+      else
+        flash[:error] = "Error adding build! #{build.errors.full_messages.to_sentence}"
       end
     end
 
