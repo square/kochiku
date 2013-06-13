@@ -37,15 +37,15 @@ class MavenPartitioner
     end
   end
 
-  def emails_for_commits_causing_failures(build)
-    return [] if build.build_parts.failed_or_errored.empty?
+  def emails_for_commits_causing_failures(java_master_build)
+    return [] if java_master_build.build_parts.failed_or_errored.empty?
 
-    failed_modules = build.build_parts.failed_or_errored.inject(Set.new) do |failed_set, build_part|
-      failed_set.add(file_to_module(build_part.paths.first))
+    failed_modules = java_master_build.build_parts.failed_or_errored.inject(Set.new) do |failed_set, build_part|
+      failed_set.add(build_part.paths.first)
     end
 
     emails = []
-    GitBlame.files_changed_since_last_green(build, :fetch_emails => true).each do |file_and_emails|
+    GitBlame.files_changed_since_last_green(java_master_build, :fetch_emails => true).each do |file_and_emails|
       module_affected_by_file = file_to_module(file_and_emails[:file])
 
       if module_affected_by_file.nil? ||

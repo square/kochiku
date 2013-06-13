@@ -135,7 +135,7 @@ describe MavenPartitioner do
     end
 
     it "should return the emails for the modules that are failing" do
-      build_part = FactoryGirl.create(:build_part, :paths => ["module-four/src/test/java/com/squareup/BarTest.java"], :build_instance => build)
+      build_part = FactoryGirl.create(:build_part, :paths => ["module-four"], :build_instance => build)
       FactoryGirl.create(:build_attempt, :state => :failed, :build_part => build_part)
       build.build_parts.failed_or_errored.should == [build_part]
 
