@@ -17,8 +17,9 @@ class Project < ActiveRecord::Base
       existing_build || build(options.merge(:ref => ref))
     end
   end
-  validates_uniqueness_of :name
   belongs_to :repository
+
+  validates_uniqueness_of :name
 
   # The fuzzy_limit is used to set a upper bound on the amount of time that the
   # sql query will take

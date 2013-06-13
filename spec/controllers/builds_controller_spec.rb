@@ -142,80 +142,67 @@ describe BuildsController do
   end
 
   describe "#request_build" do
+    let(:branch) { "test/branch" }
+    let(:branch_head_sha) { "4b41fe773057b2f1e2063eb94814d32699a34541" }
+
     before do
       @action = :request_build
       @params = {}
+
+      build_ref_info = <<RESPONSE
+{
+  "ref": "refs/heads/#{branch}",
+  "url": "https://git.squareup.com/api/v3/repos/square/web/git/refs/heads/#{branch}",
+  "object": {
+    "sha": "#{branch_head_sha}",
+    "type": "commit",
+    "url": "https://git.squareup.com/api/v3/repos/square/web/git/commits/#{branch_head_sha}"
+  }
+}
+RESPONSE
+      stub_request(:get, "https://git.squareup.com/api/v3/repos/square/kochiku/git/refs/heads/#{branch}").to_return(:status => 200, :body => build_ref_info)
     end
 
     context "when a non existent project is specified" do
-      let(:repo) { FactoryGirl.create(:repository) }
-
-      before do
-        @params = {:repo_url => repo.url}
-      end
-      it "creates the project" do
-        expect{ post @action, @params.merge(:project_id => "foobar", :build => {:ref => "asdf"}) }.to change{Project.count}.by(1)
-      end
-
-      it "creates a build if a ref is given" do
-        expect{ post @action, @params.merge(:project_id => "foobar", :build => {:ref => "asdf"}) }.to change{Build.count}.by(1)
-        Build.last.queue.should == :developer
-      end
-
-      it "doesn't create a build if no ref is given" do
-        expect{ post @action, @params.merge(:project_id => "foobar", :build => {:ref => nil })}.to_not change{Build.count}
-        flash[:error].should start_with("Error adding build!")
-      end
-
-      it "doesn't create a build if the ref already exists" do
-        project = FactoryGirl.create(:project, :name => repo.repository_name)
-        build = FactoryGirl.create(:build, :state => :succeeded, :project => project, :branch => "master", :ref => "deadbeef12345")
-        GitRepo.stub(:current_master_ref).and_return(build.ref)
-
-        expect{ post @action, @params.merge(:project_id => project.to_param, :build => {:ref => build.ref })}.to_not change{Build.count}
-        flash[:error].should be_nil
-      end
-    end
-
-    context "when the project is the ci project" do
-      before do
-        GitRepo.stub(:current_master_ref).and_return("some-sha")
-      end
-      let(:repository){ FactoryGirl.create(:repository, :url => "git@git.squareup.com:square/web.git") }
-      let(:project){ FactoryGirl.create(:project, :name => "web", :repository => repository) }
-
-      it "creates the build if a ref is given" do
-        expect{
-          post @action, @params.merge(:project_id => project.to_param, :build => {:ref => "asdf"})
-          response.should be_redirect
-        }.to change(Build, :count).by(1)
-        build = Build.last
-        build.project.should == project
-        build.queue.should == :ci
-        build.ref.should_not == "asdf"
-      end
-
-      it "create a build if no ref is given" do
-        expect{
-          post @action, :project_id => project.to_param
-          response.should be_redirect
-        }.to change(Build, :count).by(1)
-        build = Build.last
-        build.project.should == project
-        build.queue.should == :ci
-        build.ref.should_not be_blank
+      it "throws not found exception" do
+        expect {
+          post @action, @params.merge(:project_id => "does-not-exist", :build => {:branch => branch})
+        }.to raise_exception(ActiveRecord::RecordNotFound)
       end
     end
 
     context "when the project exists" do
-      let(:project){ FactoryGirl.create(:project) }
+      let(:project) { FactoryGirl.create(:project) }
 
-      it "creates the build if a ref is given" do
-        expect{ post :create, @params.merge(:project_id => project.to_param, :build => {:ref => "asdf"}) }.to change{Build.count}.by(1)
+      it "creates the build if a branch is given" do
+        expect {
+          post @action, @params.merge(:project_id => project.to_param, :build => {:branch => branch})
+        }.to change { Build.count }.by(1)
+        build = Build.last
+        build.project.should == project
+        build.branch.should == branch
+        build.ref.should == branch_head_sha
       end
 
-      it "doesn't create a build if no ref is given" do
-        expect{ post :create, @params.merge(:project_id => project.to_param, :build => {:ref => nil}) }.to_not change{Build.count}
+      it "doesn't create a build if no branch is given" do
+        expect {
+          post @action, @params.merge(:project_id => project.to_param, :build => {:branch => nil})
+        }.to_not change { Build.count }
+      end
+
+      it "doesn't create a build if the ref already exists" do
+        project = FactoryGirl.create(:project)
+        build = FactoryGirl.create(:build, :state => :succeeded, :project => project, :branch => branch, :ref => branch_head_sha)
+
+        expect { post @action, @params.merge(:project_id => project.to_param, :build => {:branch => branch}) }.to_not change { Build.count }
+        flash[:error].should be_nil
+      end
+
+      context "when github returns a 404" do
+        it "throws not found exception" do
+          stub_request(:get, "https://git.squareup.com/api/v3/repos/square/kochiku/git/refs/heads/#{branch}").to_return(:status => 200, :body => '{"message": "Not Found"}')
+          expect { post @action, @params.merge(:project_id => project.to_param, :build => {:branch => branch}) }.to_not change { Build.count }
+        end
       end
     end
   end

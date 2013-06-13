@@ -52,8 +52,10 @@ end
 repo_infos.each do |repo_info|
   repo_name = repo_info[:name]
   repository = Repository.create!({:url => "git@git.squareup.com:square/#{repo_name}.git", :test_command => "script/ci", :run_ci => true})
-  project = Project.create!({:name => repo_name, :branch => 'master', :repository => repository})
-  create_builds_for(project, repo_info)
+  master_project = Project.create!({:name => repo_name, :branch => 'master', :repository => repository})
+  create_builds_for(master_project, repo_info)
+  developer_project = Project.create!({:name => "#{repo_name}_developer", :branch => 'developer', :repository => repository})
+  create_builds_for(developer_project, repo_info)
 end
 
 # create an extra running build for Regulator

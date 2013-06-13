@@ -9,7 +9,7 @@
     %li= link_to("Developer Builds", projects_repository_path(@project.repository))
   = form_for @build, url: request_project_builds_path(@project) do |f|
     - if !@project.main?
-      = f.text_field :ref, {placeholder: 'SHA to build', class: 'sha', autocapitalize: 'off', autocorrect: 'off', spellcheck: 'false'}
+      = f.text_field :branch, {placeholder: 'Branch to build', class: 'sha', autocapitalize: 'off', autocorrect: 'off', spellcheck: 'false'}
     = f.submit "Build", {class: 'build-button'}
 
 %h2.subheader
