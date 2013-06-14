@@ -24,7 +24,7 @@ class MavenPartitioner
     files_changed_method = build.project.main? ? :files_changed_since_last_green : :files_changed_in_branch
     GitBlame.send(files_changed_method, build).each do |file_and_emails|
       module_affected_by_file = file_to_module(file_and_emails[:file])
-      next if module_affected_by_file.nil? && file_and_emails[:file].end_with?(".proto")
+      next if module_affected_by_file.nil? && (file_and_emails[:file].end_with?(".proto") || file_and_emails[:file].starts_with?(".rig"))
       return partitions if module_affected_by_file.nil?
 
       modules_to_build.merge(depends_on_map[module_affected_by_file] || Set.new)

@@ -63,6 +63,21 @@ describe MavenPartitioner do
         partitions.should include({"type" => "maven", "files" => ["module-two"]})
       end
 
+      it "should not build everything if the file change is from the .rig directory" do
+        GitBlame.stub(:files_changed_since_last_green).with(build).and_return([{:file => ".rig/test", :emails => []},
+                                                                               {:file => "module-two/src/main/java/com/squareup/bar.java", :emails => []}])
+        File.stub(:exists?).and_return(false)
+        File.stub(:exists?).with("module-two/pom.xml").and_return(true)
+
+        subject.stub(:depends_on_map).and_return({ "module-two" => ["module-two"].to_set })
+
+        subject.should_not_receive(:partitions)
+
+        partitions = subject.incremental_partitions(build)
+        partitions.size.should == 1
+        partitions.should include({"type" => "maven", "files" => ["module-two"]})
+      end
+
       it "should not fail if a file is reference in a top level module that is not in the top level pom" do
         GitBlame.stub(:files_changed_since_last_green).with(build).and_return([{:file => "new-module/src/main/java/com/squareup/foo.java", :emails => []}])
 

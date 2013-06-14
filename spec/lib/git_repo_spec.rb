@@ -7,7 +7,6 @@ describe GitRepo do
   let(:branch_head_sha) { "4b41fe773057b2f1e2063eb94814d32699a34541" }
 
   before do
-    repo_name = repository.repository_name
     build_ref_info = <<RESPONSE
 {
   "ref": "refs/heads/#{branch}",
