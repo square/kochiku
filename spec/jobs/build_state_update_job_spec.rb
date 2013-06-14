@@ -11,7 +11,7 @@ describe BuildStateUpdateJob do
     build.build_parts.create!(:kind => :spec, :paths => ["foo", "bar"])
     build.build_parts.create!(:kind => :cucumber, :paths => ["baz"])
     GitRepo.stub(:run!)
-    GitRepo.stub(:current_master_ref).and_return(current_repo_master)
+    GitRepo.stub(:sha_for_branch).and_return(current_repo_master)
     BuildStrategy.stub(:promote_build)
     BuildStrategy.stub(:run_success_script)
     stub_request(:post, /https:\/\/git\.squareup\.com\/api\/v3\/repos\/square\/kochiku\/statuses\//)

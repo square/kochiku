@@ -189,7 +189,7 @@ RESPONSE
         let(:project) { FactoryGirl.create(:project, :name => repo.repository_name, :repository => repo) }
 
         before do
-          GitRepo.stub(:current_master_ref).and_return("deadbeef")
+          GitRepo.stub(:sha_for_branch).and_return("deadbeef")
         end
 
         it "creates the build for main project if no branch is given" do

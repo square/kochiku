@@ -50,8 +50,7 @@ class BuildsController < ApplicationController
       unless params[:build] && params[:build][:branch].present?
         flash[:error] = "Error adding build! branch can't be blank"
       else
-        sha = Git
-        Repo.sha_for_branch(@project.repository, params[:build][:branch])
+        sha = GitRepo.sha_for_branch(@project.repository, params[:build][:branch])
         if sha.nil?
           flash[:error] = "Error adding build! branch not found in Github"
         else
@@ -127,9 +126,8 @@ class BuildsController < ApplicationController
     auto_merge = params[:auto_merge] || false
     queue = :developer
     if @project.main?
-      puts "Testing current master ref"
       queue = :ci
-      ref = GitRepo.current_master_ref(@project.repository)
+      ref = GitRepo.sha_for_branch(@project.repository, "master")
       branch = "master"
     end
     @project.builds.find_existing_build_or_initialize(ref, :state => :partitioning, :queue => queue, :auto_merge => auto_merge, :branch => branch)
