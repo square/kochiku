@@ -207,6 +207,21 @@ describe MavenPartitioner do
       emails.size.should == 1
       emails.should include("userone@example.com")
     end
+
+    it "should not ignore changes in the .rig directory" do
+      build_part = FactoryGirl.create(:build_part, :paths => ["module-one"], :build_instance => build)
+      FactoryGirl.create(:build_attempt, :state => :failed, :build_part => build_part)
+      build.build_parts.failed_or_errored.should == [build_part]
+
+      GitBlame.stub(:files_changed_since_last_green).with(build, :fetch_emails => true).and_return([{:file => ".rig/build_keywhiz", :emails => ["riguser@example.com"]}])
+      File.stub(:exists?).and_return(false)
+
+      subject.stub(:depends_on_map).and_return({ "module-one" => ["module-one"].to_set })
+      subject.should_not_receive(:partitions)
+
+      emails = subject.emails_for_commits_causing_failures(build)
+      emails.should be_empty
+    end
   end
 
   describe "#depends_on_map" do

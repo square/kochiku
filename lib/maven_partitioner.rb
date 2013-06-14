@@ -48,7 +48,7 @@ class MavenPartitioner
     emails = []
     GitBlame.files_changed_since_last_green(java_master_build, :fetch_emails => true).each do |file_and_emails|
       module_affected_by_file = file_to_module(file_and_emails[:file])
-      next if module_affected_by_file.nil? && file_and_emails[:file].end_with?(".proto")
+      next if module_affected_by_file.nil? && (file_and_emails[:file].end_with?(".proto") || file_and_emails[:file].starts_with?(".rig"))
 
       if module_affected_by_file.nil? ||
           ((set = depends_on_map[module_affected_by_file]) && !set.intersection(failed_modules).empty?)
