@@ -2,7 +2,8 @@ require 'cocaine'
 require 'fileutils'
 
 class GitRepo
-  class RefNotFoundError < StandardError; end
+  class RefNotFoundError < StandardError;
+  end
   WORKING_DIR = Rails.root.join('tmp', 'build-partition')
 
   class << self
@@ -15,7 +16,7 @@ class GitRepo
         run! "git clone #{cached_repo_path} #{dir}"
 
         Dir.chdir(dir) do
-          raise RefNotFoundError, "repo:#{repository.url} branch:#{branch}, sha:#{sha}"unless system("git rev-list --quiet -n1 #{sha}")
+          raise RefNotFoundError, "repo:#{repository.url} branch:#{branch}, sha:#{sha}" unless system("git rev-list --quiet -n1 #{sha}")
 
           run! "git checkout --quiet #{sha}"
 
@@ -35,13 +36,23 @@ class GitRepo
     end
 
     def current_master_ref(repository)
-      ref = nil
-      synchronize_cache_repo(repository, "master")
-      cached_repo_path = File.join(WORKING_DIR, repository.repo_cache_name)
-      Dir.chdir(cached_repo_path) do
-        ref = Cocaine::CommandLine.new("git show-ref refs/remotes/origin/master").run.split(" ").first
+      #ref = nil
+      #synchronize_cache_repo(repository, "master")
+      #cached_repo_path = File.join(WORKING_DIR, repository.repo_cache_name)
+      #Dir.chdir(cached_repo_path) do
+      #  ref = Cocaine::CommandLine.new("git show-ref refs/remotes/origin/master").run.split(" ").first
+      #end
+      sha_for_branch(repository, "master")
+    end
+
+    def sha_for_branch(repo, branch)
+      response_body = GithubRequest.get(URI("#{repo.base_api_url}/git/refs/heads/#{branch}"))
+      branch_info = JSON.parse(response_body)
+      sha = nil
+      if branch_info['object'] && branch_info['object']['sha'].present?
+        sha = branch_info['object']['sha']
       end
-      ref
+      sha
     end
 
     def inside_repo(repository)

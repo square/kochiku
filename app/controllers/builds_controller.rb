@@ -50,12 +50,12 @@ class BuildsController < ApplicationController
       unless params[:build] && params[:build][:branch].present?
         flash[:error] = "Error adding build! branch can't be blank"
       else
-        response_body = GithubRequest.get(URI("#{@project.repository.base_api_url}/git/refs/heads/#{params[:build][:branch]}"))
-        build_info = JSON.parse(response_body)
-        unless build_info['object'] && build_info['object']['sha'].present?
+        sha = Git
+        Repo.sha_for_branch(@project.repository, params[:build][:branch])
+        if sha.nil?
           flash[:error] = "Error adding build! branch not found in Github"
         else
-          build = project_build(params[:build][:branch], build_info['object']['sha'])
+          build = project_build(params[:build][:branch], sha)
         end
       end
     end
@@ -127,6 +127,7 @@ class BuildsController < ApplicationController
     auto_merge = params[:auto_merge] || false
     queue = :developer
     if @project.main?
+      puts "Testing current master ref"
       queue = :ci
       ref = GitRepo.current_master_ref(@project.repository)
       branch = "master"
