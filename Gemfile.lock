@@ -117,7 +117,7 @@ GEM
     net-ssh-gateway (1.2.0)
       net-ssh (>= 2.6.5)
     nokogiri (1.5.9)
-    passenger (4.0.1)
+    passenger (4.0.5)
       daemon_controller (>= 1.1.0)
       rack
       rake (>= 0.8.1)
@@ -250,7 +250,7 @@ DEPENDENCIES
   launchy
   mysql2
   nokogiri
-  passenger (= 4.0.1)
+  passenger (= 4.0.5)
   pry-rails
   quiet_assets
   rails (= 3.2.13)
