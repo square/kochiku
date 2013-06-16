@@ -36,7 +36,7 @@
 # Install the passenger gem
 
     $ cd ~/kochiku/current
-    $ gem install passenger -v 4.0.1
+    $ gem install passenger -v 4.0.5
     $ which passenger-install-nginx-module
     # => /Users/square/.rvm/gems/ruby-2.0.0-p195/bin/passenger-install-nginx-module
 
