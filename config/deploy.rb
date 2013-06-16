@@ -1,6 +1,6 @@
 require "rvm/capistrano"
 set :rvm_type, :user
-set :rvm_ruby_string, 'ruby-2.0.0-p0'
+set :rvm_ruby_string, 'ruby-2.0.0-p195'
 
 require 'bundler/capistrano' # adds bundle:install step to deploy pipeline
 require 'squash/rails/capistrano'

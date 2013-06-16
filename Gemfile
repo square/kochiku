@@ -5,7 +5,7 @@ def square_gem(org, name, opts = {})
 end
 
 gem 'rails', '3.2.13'
-gem 'passenger', '4.0.1', group: :production
+gem 'passenger', '4.0.5', group: :production
 
 gem 'squash_ruby', require: 'squash/ruby'
 gem 'squash_rails', require: 'squash/rails'
