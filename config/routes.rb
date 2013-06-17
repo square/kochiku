@@ -15,7 +15,7 @@ Kochiku::Application.routes.draw do
     get 'status-report', :action => "status_report", :on => :collection
     get 'build-time-history', :action => "build_time_history", :defaults => { :format => 'json' }
 
-    resources :builds, :only => [:create, :show] do
+    resources :builds, :only => [:index, :create, :show] do
       post 'request', :action => "request_build", :on => :collection
       post 'toggle-auto-merge', :action => "toggle_auto_merge", :on => :member, :as => :toggle_auto_merge
       put 'abort', :action => "abort", :on => :member
