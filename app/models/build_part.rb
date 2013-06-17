@@ -28,6 +28,7 @@ class BuildPart < ActiveRecord::Base
                               paths.include?("sake/rpc") ||
                               paths.include?("clustering/zookeeper") ||
                               paths.include?("bletchley") ||
+                              paths.include?("openpgp") ||
                               paths.include?("searle")))
         BuildAttemptJob.enqueue_on("ci-osx", job_args(build_attempt))
       else
