@@ -1,14 +1,30 @@
 require 'git_repo'
+require 'json'
 
 class BuildsController < ApplicationController
-  before_filter :load_project, :only => [:index, :show, :abort, :build_status, :toggle_auto_merge, :rebuild_failed_parts, :request_build]
+  before_filter :load_project, :only => [:show, :abort, :build_status, :toggle_auto_merge, :rebuild_failed_parts, :request_build]
   skip_before_filter :verify_authenticity_token, :only => [:create]
 
+  #def index
+  #  @builds = @project.builds.order('id desc').limit(20)
+  #  respond_to do |format|
+  #    format.xml
+  #  end
+  #end
+
   def index
-    @builds = @project.builds.order('id desc').limit(20)
-    respond_to do |format|
-      format.xml
-    end
+    @test = JSON.parse(File.read('./tmp/index.json'))
+    render :json => @test
+  end
+
+  def module_info
+    @test = JSON.parse(File.read('./tmp/module.json'))
+    render :json => @test
+  end
+
+  def last_build_info
+    @test = JSON.parse(File.read('./tmp/last-completed.json'))
+    render :json => @test
   end
 
   def show

@@ -14,6 +14,7 @@ Kochiku::Application.routes.draw do
   resources :projects, :only => [:index, :new, :show] do
     get 'status-report', :action => "status_report", :on => :collection
     get 'build-time-history', :action => "build_time_history", :defaults => { :format => 'json' }
+    #get ':path', :action => "build_feed", :on => member, :defaults => { :format => 'xml' }
 
     resources :builds, :only => [:index, :create, :show] do
       post 'request', :action => "request_build", :on => :collection
@@ -28,6 +29,10 @@ Kochiku::Application.routes.draw do
   end
   match '/XmlStatusReport.aspx', :to => "projects#status_report", :defaults => { :format => 'xml' }
 
+  #match '/projects/:project_id/:path' => "projects#path_feed", :via => :get, :defaults => { :format => 'xml' }
+  match '/tmp/api/json' => "builds#index"
+  match '/tmp/job/Amex-Certification/api/json' => "builds#module_info"
+  match '/tmp/job/Amex-Certification/lastCompletedBuild/api/json' => "builds#last_build_info"
   match '/build_attempts/:build_attempt_id/build_artifacts' => "build_artifacts#create", :via => :post
   match '/build_attempts/:id/start' => "build_attempts#start", :via => :post
   match '/build_attempts/:id/finish' => "build_attempts#finish", :via => :post, :as => :finish_build_attempt
