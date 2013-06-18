@@ -1,0 +1,57 @@
+
+<Projects>
+  <Project webUrl="https://jenkins.corp.squareup.com/job/all-in-one-java/" name="all-in-one-java" lastBuildLabel="4136" lastBuildTime="2013-06-18T18:07:36Z" lastBuildStatus="Success" activity="Sleeping"/>
+  <Project webUrl="https://jenkins.corp.squareup.com/job/Amex-Certification/" name="Amex-Certification" lastBuildLabel="2909" lastBuildTime="2013-06-18T18:31:16Z" lastBuildStatus="Failure" activity="Sleeping"/>
+  <Project webUrl="https://jenkins.corp.squareup.com/job/aqueduct/" name="aqueduct" lastBuildLabel="456" lastBuildTime="2013-06-18T10:24:16Z" lastBuildStatus="Success" activity="Sleeping"/>
+  <Project webUrl="https://jenkins.corp.squareup.com/job/Batcave/" name="Batcave" lastBuildLabel="399" lastBuildTime="2013-06-14T01:47:28Z" lastBuildStatus="Success" activity="Sleeping"/>
+  <Project webUrl="https://jenkins.corp.squareup.com/job/Buttercore/" name="Buttercore" lastBuildLabel="14" lastBuildTime="2013-06-13T19:16:24Z" lastBuildStatus="Failure" activity="Sleeping"/>
+  <Project webUrl="https://jenkins.corp.squareup.com/job/cafis-integration/" name="cafis-integration" lastBuildLabel="2369" lastBuildTime="2013-06-18T18:06:21Z" lastBuildStatus="Failure" activity="Sleeping"/>
+  <Project webUrl="https://jenkins.corp.squareup.com/job/cane/" name="cane" lastBuildLabel="627" lastBuildTime="2013-06-18T10:29:19Z" lastBuildStatus="Success" activity="Sleeping"/>
+  <Project webUrl="https://jenkins.corp.squareup.com/job/Card/" name="Card" lastBuildLabel="3764" lastBuildTime="2013-06-18T18:02:07Z" lastBuildStatus="Success" activity="Sleeping"/>
+  <Project webUrl="https://jenkins.corp.squareup.com/job/cascading-helpers/" name="cascading-helpers" lastBuildLabel="2" lastBuildTime="2013-06-14T18:12:17Z" lastBuildStatus="Failure" activity="Sleeping"/>
+  <Project webUrl="https://jenkins.corp.squareup.com/job/cascading2-protobuf/" name="cascading2-protobuf" lastBuildLabel="1" lastBuildTime="2013-06-11T17:53:43Z" lastBuildStatus="Failure" activity="Sleeping"/>
+  <Project webUrl="https://jenkins.corp.squareup.com/job/compliance-admin/" name="compliance-admin" lastBuildLabel="504" lastBuildTime="2013-06-18T10:55:16Z" lastBuildStatus="Success" activity="Sleeping"/>
+  <Project webUrl="https://jenkins.corp.squareup.com/job/Connections/" name="Connections" lastBuildLabel="559" lastBuildTime="2013-06-18T10:25:41Z" lastBuildStatus="Success" activity="Sleeping"/>
+  <Project webUrl="https://jenkins.corp.squareup.com/job/dbmigrate-tool/" name="dbmigrate-tool" lastBuildLabel="3796" lastBuildTime="2013-06-18T18:11:03Z" lastBuildStatus="Success" activity="Building"/>
+  <Project webUrl="https://jenkins.corp.squareup.com/job/device_parser/" name="device_parser" lastBuildLabel="46" lastBuildTime="2013-06-05T07:42:35Z" lastBuildStatus="Success" activity="Sleeping"/>
+  <Project webUrl="https://jenkins.corp.squareup.com/job/Eero-certification/" name="Eero-certification" lastBuildLabel="2846" lastBuildTime="2013-06-18T18:16:18Z" lastBuildStatus="Success" activity="Building"/>
+  <Project webUrl="https://jenkins.corp.squareup.com/job/exemplar/" name="exemplar" lastBuildLabel="2786" lastBuildTime="2013-05-11T00:53:21Z" lastBuildStatus="Unknown" activity="Sleeping"/>
+  <Project webUrl="https://jenkins.corp.squareup.com/job/fdoc/" name="fdoc" lastBuildLabel="88" lastBuildTime="2013-06-05T07:42:37Z" lastBuildStatus="Failure" activity="Sleeping"/>
+  <Project webUrl="https://jenkins.corp.squareup.com/job/Fidelius%20Client%20(ruby)/" name="Fidelius Client (ruby)" lastBuildLabel="133" lastBuildTime="2013-06-05T07:45:11Z" lastBuildStatus="Failure" activity="Sleeping"/>
+  <Project webUrl="https://jenkins.corp.squareup.com/job/Fidelius-Client/" name="Fidelius-Client" lastBuildLabel="1737" lastBuildTime="2013-06-18T18:02:07Z" lastBuildStatus="Success" activity="Sleeping"/>
+  <Project webUrl="https://jenkins.corp.squareup.com/job/Gandalf/" name="Gandalf" lastBuildLabel="528" lastBuildTime="2013-06-18T10:27:57Z" lastBuildStatus="Success" activity="Sleeping"/>
+  <Project webUrl="https://jenkins.corp.squareup.com/job/geo/" name="geo" lastBuildLabel="44" lastBuildTime="2013-06-05T07:42:31Z" lastBuildStatus="Success" activity="Sleeping"/>
+  <Project webUrl="https://jenkins.corp.squareup.com/job/gift-cards/" name="gift-cards" lastBuildLabel="124" lastBuildTime="2013-06-05T07:42:46Z" lastBuildStatus="Failure" activity="Sleeping"/>
+  <Project webUrl="https://jenkins.corp.squareup.com/job/hoist/" name="hoist" lastBuildLabel="7685" lastBuildTime="2013-06-18T17:50:22Z" lastBuildStatus="Success" activity="Sleeping"/>
+  <Project webUrl="https://jenkins.corp.squareup.com/job/hoistbuild/" name="hoistbuild" lastBuildLabel="44" lastBuildTime="2013-06-18T17:49:25Z" lastBuildStatus="Success" activity="Sleeping"/>
+  <Project webUrl="https://jenkins.corp.squareup.com/job/hoistrepo/" name="hoistrepo" lastBuildLabel="517" lastBuildTime="2013-06-06T00:42:20Z" lastBuildStatus="Failure" activity="Sleeping"/>
+  <Project webUrl="https://jenkins.corp.squareup.com/job/hoptoad-java/" name="hoptoad-java" lastBuildLabel="3584" lastBuildTime="2013-06-18T18:05:26Z" lastBuildStatus="Success" activity="Sleeping"/>
+  <Project webUrl="https://jenkins.corp.squareup.com/job/Insecure%20Content%20Check/" name="Insecure Content Check" lastBuildLabel="16021" lastBuildTime="2013-06-18T18:31:58Z" lastBuildStatus="Success" activity="Sleeping"/>
+  <Project webUrl="https://jenkins.corp.squareup.com/job/keystoreutility/" name="keystoreutility" lastBuildLabel="33" lastBuildTime="2013-06-18T17:58:48Z" lastBuildStatus="Success" activity="Building"/>
+  <Project webUrl="https://jenkins.corp.squareup.com/job/Keywhiz-Integration-Tests/" name="Keywhiz-Integration-Tests" lastBuildLabel="4194" lastBuildTime="2013-06-18T17:22:42Z" lastBuildStatus="Success" activity="Sleeping"/>
+  <Project webUrl="https://jenkins.corp.squareup.com/job/Kilo/" name="Kilo" lastBuildLabel="16" lastBuildTime="2013-06-01T02:50:05Z" lastBuildStatus="Success" activity="Sleeping"/>
+  <Project webUrl="https://jenkins.corp.squareup.com/job/NexusUploader/" name="NexusUploader" lastBuildLabel="917" lastBuildTime="2013-06-18T17:57:37Z" lastBuildStatus="Success" activity="Building"/>
+  <Project webUrl="https://jenkins.corp.squareup.com/job/O1%20Firmware/" name="O1 Firmware" lastBuildLabel="93" lastBuildTime="2013-06-05T07:45:13Z" lastBuildStatus="Failure" activity="Sleeping"/>
+  <Project webUrl="https://jenkins.corp.squareup.com/job/Panopticon/" name="Panopticon" lastBuildLabel="30883" lastBuildTime="2013-06-18T04:48:32Z" lastBuildStatus="Failure" activity="Sleeping"/>
+  <Project webUrl="https://jenkins.corp.squareup.com/job/payments-cert-compile/" name="payments-cert-compile" lastBuildLabel="1670" lastBuildTime="2013-06-18T18:02:33Z" lastBuildStatus="Success" activity="Sleeping"/>
+  <Project webUrl="https://jenkins.corp.squareup.com/job/Payments-Certification/" name="Payments-Certification" lastBuildLabel="3995" lastBuildTime="2013-06-18T18:16:18Z" lastBuildStatus="Success" activity="Building"/>
+  <Project webUrl="https://jenkins.corp.squareup.com/job/Payments-Certification-Japan/" name="Payments-Certification-Japan" lastBuildLabel="1943" lastBuildTime="2013-06-18T18:06:36Z" lastBuildStatus="Failure" activity="Sleeping"/>
+  <Project webUrl="https://jenkins.corp.squareup.com/job/plastic/" name="plastic" lastBuildLabel="86" lastBuildTime="2013-06-05T07:44:12Z" lastBuildStatus="Success" activity="Sleeping"/>
+  <Project webUrl="https://jenkins.corp.squareup.com/job/protos/" name="protos" lastBuildLabel="3668" lastBuildTime="2013-06-18T18:02:07Z" lastBuildStatus="Success" activity="Sleeping"/>
+  <Project webUrl="https://jenkins.corp.squareup.com/job/Query%20Sniper/" name="Query Sniper" lastBuildLabel="32" lastBuildTime="2013-06-01T02:35:56Z" lastBuildStatus="Failure" activity="Sleeping"/>
+  <Project webUrl="https://jenkins.corp.squareup.com/job/resque/" name="resque" lastBuildLabel="39" lastBuildTime="2013-06-05T07:44:23Z" lastBuildStatus="Failure" activity="Sleeping"/>
+  <Project webUrl="https://jenkins.corp.squareup.com/job/risk-common/" name="risk-common" lastBuildLabel="698" lastBuildTime="2013-06-18T11:22:05Z" lastBuildStatus="Success" activity="Sleeping"/>
+  <Project webUrl="https://jenkins.corp.squareup.com/job/risk-suspicions/" name="risk-suspicions" lastBuildLabel="485" lastBuildTime="2013-06-18T01:41:25Z" lastBuildStatus="Success" activity="Sleeping"/>
+  <Project webUrl="https://jenkins.corp.squareup.com/job/sar_generator/" name="sar_generator" lastBuildLabel="23" lastBuildTime="2013-06-05T07:44:32Z" lastBuildStatus="Success" activity="Sleeping"/>
+  <Project webUrl="https://jenkins.corp.squareup.com/job/scm-test/" name="scm-test" lastBuildLabel="35" lastBuildTime="2012-07-27T09:00:47Z" lastBuildStatus="Success" activity="Sleeping"/>
+  <Project webUrl="https://jenkins.corp.squareup.com/job/siren-acceptance/" name="siren-acceptance" lastBuildLabel="132" lastBuildTime="2013-03-22T01:39:25Z" lastBuildStatus="Unknown" activity="Sleeping"/>
+  <Project webUrl="https://jenkins.corp.squareup.com/job/Slug/" name="Slug" lastBuildLabel="746" lastBuildTime="2013-06-18T18:06:41Z" lastBuildStatus="Success" activity="Sleeping"/>
+  <Project webUrl="https://jenkins.corp.squareup.com/job/solr_merchant_directory/" name="solr_merchant_directory" lastBuildLabel="25" lastBuildTime="2013-06-12T01:16:28Z" lastBuildStatus="Success" activity="Sleeping"/>
+  <Project webUrl="https://jenkins.corp.squareup.com/job/sq-compost-install-integration/" name="sq-compost-install-integration" lastBuildLabel="374" lastBuildTime="2013-06-18T11:05:37Z" lastBuildStatus="Failure" activity="Sleeping"/>
+  <Project webUrl="https://jenkins.corp.squareup.com/job/square-features/" name="square-features" lastBuildLabel="2835" lastBuildTime="2012-10-16T17:20:26Z" lastBuildStatus="Unknown" activity="Sleeping"/>
+  <Project webUrl="https://jenkins.corp.squareup.com/job/square-java-apns/" name="square-java-apns" lastBuildLabel="21" lastBuildTime="2013-06-05T07:44:38Z" lastBuildStatus="Failure" activity="Sleeping"/>
+  <Project webUrl="https://jenkins.corp.squareup.com/job/SSH%20Key%20Collector/" name="SSH Key Collector" lastBuildLabel="2" lastBuildTime="2012-07-21T00:29:31Z" lastBuildStatus="Success" activity="Sleeping"/>
+  <Project webUrl="https://jenkins.corp.squareup.com/job/starbucks-acceptance/" name="starbucks-acceptance" lastBuildLabel="2376" lastBuildTime="2013-03-21T18:33:02Z" lastBuildStatus="Unknown" activity="Sleeping"/>
+  <Project webUrl="https://jenkins.corp.squareup.com/job/Taxi-web/" name="Taxi-web" lastBuildLabel="710" lastBuildTime="2013-02-12T19:45:13Z" lastBuildStatus="Success" activity="Sleeping"/>
+</Projects>
+

@@ -29,10 +29,6 @@ Kochiku::Application.routes.draw do
   end
   match '/XmlStatusReport.aspx', :to => "projects#status_report", :defaults => { :format => 'xml' }
 
-  #match '/projects/:project_id/:path' => "projects#path_feed", :via => :get, :defaults => { :format => 'xml' }
-  match '/tmp/api/json' => "rss#index"
-  match '/tmp/job/Amex-Certification/api/json' => "rss#module_info"
-  match '/tmp/job/Amex-Certification/lastCompletedBuild/api/json' => "rss#last_build_info"
   match '/build_attempts/:build_attempt_id/build_artifacts' => "build_artifacts#create", :via => :post
   match '/build_attempts/:id/start' => "build_attempts#start", :via => :post
   match '/build_attempts/:id/finish' => "build_attempts#finish", :via => :post, :as => :finish_build_attempt

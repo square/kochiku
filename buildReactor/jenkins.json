@@ -1,0 +1,597 @@
+
+{"assignedLabels":[
+  {"actions":[],
+    "busyExecutors":0,
+    "clouds":[],
+    "description":"the master Jenkins node",
+    "idleExecutors":0,
+    "loadStatistics":
+    {},
+    "name":"master",
+    "nodes":[
+    {"nodeName":""}],
+    "offline":false,
+    "tiedJobs":[],
+    "totalExecutors":0,
+    "propertiesList":[]}],
+    "mode":"NORMAL",
+    "nodeDescription":"the master Jenkins node",
+    "nodeName":"",
+    "numExecutors":0,
+    "description":null,
+    "jobs":[
+    {"actions":[
+      {},
+
+      {},
+
+      {},
+
+      {}],
+      "description":"",
+      "displayName":"all-in-one-java",
+      "displayNameOrNull":null,
+      "name":"all-in-one-java",
+      "url":"https://jenkins.corp.squareup.com/job/all-in-one-java/",
+      "buildable":true,
+      "builds":[
+      {"number":4115,
+        "url":"https://jenkins.corp.squareup.com/job/all-in-one-java/4115/"},
+
+      {"number":4114,
+        "url":"https://jenkins.corp.squareup.com/job/all-in-one-java/4114/"},
+
+      {"number":4113,
+        "url":"https://jenkins.corp.squareup.com/job/all-in-one-java/4113/"},
+
+      {"number":4112,
+        "url":"https://jenkins.corp.squareup.com/job/all-in-one-java/4112/"},
+
+      {"number":4111,
+        "url":"https://jenkins.corp.squareup.com/job/all-in-one-java/4111/"},
+
+      {"number":4110,
+        "url":"https://jenkins.corp.squareup.com/job/all-in-one-java/4110/"},
+
+      {"number":4109,
+        "url":"https://jenkins.corp.squareup.com/job/all-in-one-java/4109/"},
+
+      {"number":4108,
+        "url":"https://jenkins.corp.squareup.com/job/all-in-one-java/4108/"},
+
+      {"number":4107,
+        "url":"https://jenkins.corp.squareup.com/job/all-in-one-java/4107/"},
+
+      {"number":4106,
+        "url":"https://jenkins.corp.squareup.com/job/all-in-one-java/4106/"},
+
+      {"number":4105,
+        "url":"https://jenkins.corp.squareup.com/job/all-in-one-java/4105/"},
+
+      {"number":4104,
+        "url":"https://jenkins.corp.squareup.com/job/all-in-one-java/4104/"},
+
+      {"number":4103,
+        "url":"https://jenkins.corp.squareup.com/job/all-in-one-java/4103/"},
+
+      {"number":4102,
+        "url":"https://jenkins.corp.squareup.com/job/all-in-one-java/4102/"},
+
+      {"number":4101,
+        "url":"https://jenkins.corp.squareup.com/job/all-in-one-java/4101/"},
+
+      {"number":4100,
+        "url":"https://jenkins.corp.squareup.com/job/all-in-one-java/4100/"},
+
+      {"number":4099,
+        "url":"https://jenkins.corp.squareup.com/job/all-in-one-java/4099/"},
+
+      {"number":4098,
+        "url":"https://jenkins.corp.squareup.com/job/all-in-one-java/4098/"},
+
+      {"number":4097,
+        "url":"https://jenkins.corp.squareup.com/job/all-in-one-java/4097/"},
+
+      {"number":4096,
+        "url":"https://jenkins.corp.squareup.com/job/all-in-one-java/4096/"},
+
+      {"number":4095,
+        "url":"https://jenkins.corp.squareup.com/job/all-in-one-java/4095/"},
+
+      {"number":4094,
+        "url":"https://jenkins.corp.squareup.com/job/all-in-one-java/4094/"},
+
+      {"number":4093,
+        "url":"https://jenkins.corp.squareup.com/job/all-in-one-java/4093/"},
+
+      {"number":4092,
+        "url":"https://jenkins.corp.squareup.com/job/all-in-one-java/4092/"},
+
+      {"number":4091,
+        "url":"https://jenkins.corp.squareup.com/job/all-in-one-java/4091/"},
+
+      {"number":4090,
+        "url":"https://jenkins.corp.squareup.com/job/all-in-one-java/4090/"},
+
+      {"number":4089,
+        "url":"https://jenkins.corp.squareup.com/job/all-in-one-java/4089/"},
+
+      {"number":4088,
+        "url":"https://jenkins.corp.squareup.com/job/all-in-one-java/4088/"},
+
+      {"number":4087,
+        "url":"https://jenkins.corp.squareup.com/job/all-in-one-java/4087/"},
+
+      {"number":4086,
+        "url":"https://jenkins.corp.squareup.com/job/all-in-one-java/4086/"},
+
+      {"number":4085,
+        "url":"https://jenkins.corp.squareup.com/job/all-in-one-java/4085/"},
+
+      {"number":4084,
+        "url":"https://jenkins.corp.squareup.com/job/all-in-one-java/4084/"},
+
+      {"number":4083,
+        "url":"https://jenkins.corp.squareup.com/job/all-in-one-java/4083/"},
+
+      {"number":4082,
+        "url":"https://jenkins.corp.squareup.com/job/all-in-one-java/4082/"},
+
+      {"number":4081,
+        "url":"https://jenkins.corp.squareup.com/job/all-in-one-java/4081/"},
+
+      {"number":4080,
+        "url":"https://jenkins.corp.squareup.com/job/all-in-one-java/4080/"},
+
+      {"number":4079,
+        "url":"https://jenkins.corp.squareup.com/job/all-in-one-java/4079/"},
+
+      {"number":4078,
+        "url":"https://jenkins.corp.squareup.com/job/all-in-one-java/4078/"},
+
+      {"number":4077,
+        "url":"https://jenkins.corp.squareup.com/job/all-in-one-java/4077/"},
+
+      {"number":4076,
+        "url":"https://jenkins.corp.squareup.com/job/all-in-one-java/4076/"},
+
+      {"number":4075,
+        "url":"https://jenkins.corp.squareup.com/job/all-in-one-java/4075/"},
+
+      {"number":4074,
+        "url":"https://jenkins.corp.squareup.com/job/all-in-one-java/4074/"},
+
+      {"number":4073,
+        "url":"https://jenkins.corp.squareup.com/job/all-in-one-java/4073/"},
+
+      {"number":4072,
+        "url":"https://jenkins.corp.squareup.com/job/all-in-one-java/4072/"},
+
+      {"number":4071,
+        "url":"https://jenkins.corp.squareup.com/job/all-in-one-java/4071/"},
+
+      {"number":4070,
+        "url":"https://jenkins.corp.squareup.com/job/all-in-one-java/4070/"},
+
+      {"number":4069,
+        "url":"https://jenkins.corp.squareup.com/job/all-in-one-java/4069/"},
+
+      {"number":4068,
+        "url":"https://jenkins.corp.squareup.com/job/all-in-one-java/4068/"},
+
+      {"number":4067,
+        "url":"https://jenkins.corp.squareup.com/job/all-in-one-java/4067/"},
+
+      {"number":4066,
+        "url":"https://jenkins.corp.squareup.com/job/all-in-one-java/4066/"}],
+      "color":"red",
+      "firstBuild":
+      {"number":4066,
+        "url":"https://jenkins.corp.squareup.com/job/all-in-one-java/4066/"},
+      "healthReport":[
+      {"description":"Build stability: All recent builds failed.",
+        "iconUrl":"health-00to19.png",
+        "score":0}],
+      "inQueue":false,
+      "keepDependencies":false,
+      "lastBuild":
+      {"number":4115,
+        "url":"https://jenkins.corp.squareup.com/job/all-in-one-java/4115/"},
+      "lastCompletedBuild":
+      {"number":4115,
+        "url":"https://jenkins.corp.squareup.com/job/all-in-one-java/4115/"},
+      "lastFailedBuild":
+      {"number":4115,
+        "url":"https://jenkins.corp.squareup.com/job/all-in-one-java/4115/"},
+      "lastStableBuild":
+      {"number":4107,
+        "url":"https://jenkins.corp.squareup.com/job/all-in-one-java/4107/"},
+      "lastSuccessfulBuild":
+      {"number":4107,
+        "url":"https://jenkins.corp.squareup.com/job/all-in-one-java/4107/"},
+      "lastUnstableBuild":null,
+      "lastUnsuccessfulBuild":
+      {"number":4115,
+        "url":"https://jenkins.corp.squareup.com/job/all-in-one-java/4115/"},
+      "nextBuildNumber":4116,
+      "property":[
+      {}],
+      "queueItem":null,
+      "concurrentBuild":false,
+      "downstreamProjects":[],
+      "scm":
+      {},
+      "upstreamProjects":[]},
+
+    {"actions":[
+      {},
+
+      {},
+
+      {},
+
+      {},
+
+      {}],
+      "description":"Runs test in Payments Certification Suite\r\n\r\nJee : This build is set to run periodically every hour to test the validitiy of our staging environment.",
+      "displayName":"Amex-Certification",
+      "displayNameOrNull":null,
+      "name":"Amex-Certification",
+      "url":"https://jenkins.corp.squareup.com/job/Amex-Certification/",
+      "buildable":true,
+      "builds":[
+      {"number":2856,
+        "url":"https://jenkins.corp.squareup.com/job/Amex-Certification/2856/"},
+
+      {"number":2855,
+        "url":"https://jenkins.corp.squareup.com/job/Amex-Certification/2855/"},
+
+      {"number":2854,
+        "url":"https://jenkins.corp.squareup.com/job/Amex-Certification/2854/"},
+
+      {"number":2853,
+        "url":"https://jenkins.corp.squareup.com/job/Amex-Certification/2853/"},
+
+      {"number":2852,
+        "url":"https://jenkins.corp.squareup.com/job/Amex-Certification/2852/"},
+
+      {"number":2851,
+        "url":"https://jenkins.corp.squareup.com/job/Amex-Certification/2851/"},
+
+      {"number":2850,
+        "url":"https://jenkins.corp.squareup.com/job/Amex-Certification/2850/"},
+
+      {"number":2849,
+        "url":"https://jenkins.corp.squareup.com/job/Amex-Certification/2849/"},
+
+      {"number":2848,
+        "url":"https://jenkins.corp.squareup.com/job/Amex-Certification/2848/"},
+
+      {"number":2847,
+        "url":"https://jenkins.corp.squareup.com/job/Amex-Certification/2847/"},
+
+      {"number":2846,
+        "url":"https://jenkins.corp.squareup.com/job/Amex-Certification/2846/"},
+
+      {"number":2845,
+        "url":"https://jenkins.corp.squareup.com/job/Amex-Certification/2845/"},
+
+      {"number":2844,
+        "url":"https://jenkins.corp.squareup.com/job/Amex-Certification/2844/"},
+
+      {"number":2843,
+        "url":"https://jenkins.corp.squareup.com/job/Amex-Certification/2843/"},
+
+      {"number":2842,
+        "url":"https://jenkins.corp.squareup.com/job/Amex-Certification/2842/"},
+
+      {"number":2841,
+        "url":"https://jenkins.corp.squareup.com/job/Amex-Certification/2841/"},
+
+      {"number":2840,
+        "url":"https://jenkins.corp.squareup.com/job/Amex-Certification/2840/"},
+
+      {"number":2839,
+        "url":"https://jenkins.corp.squareup.com/job/Amex-Certification/2839/"},
+
+      {"number":2838,
+        "url":"https://jenkins.corp.squareup.com/job/Amex-Certification/2838/"},
+
+      {"number":2837,
+        "url":"https://jenkins.corp.squareup.com/job/Amex-Certification/2837/"},
+
+      {"number":2836,
+        "url":"https://jenkins.corp.squareup.com/job/Amex-Certification/2836/"},
+
+      {"number":2835,
+        "url":"https://jenkins.corp.squareup.com/job/Amex-Certification/2835/"},
+
+      {"number":2834,
+        "url":"https://jenkins.corp.squareup.com/job/Amex-Certification/2834/"},
+
+      {"number":2833,
+        "url":"https://jenkins.corp.squareup.com/job/Amex-Certification/2833/"},
+
+      {"number":2832,
+        "url":"https://jenkins.corp.squareup.com/job/Amex-Certification/2832/"},
+
+      {"number":2831,
+        "url":"https://jenkins.corp.squareup.com/job/Amex-Certification/2831/"},
+
+      {"number":2830,
+        "url":"https://jenkins.corp.squareup.com/job/Amex-Certification/2830/"},
+
+      {"number":2829,
+        "url":"https://jenkins.corp.squareup.com/job/Amex-Certification/2829/"},
+
+      {"number":2828,
+        "url":"https://jenkins.corp.squareup.com/job/Amex-Certification/2828/"},
+
+      {"number":2827,
+        "url":"https://jenkins.corp.squareup.com/job/Amex-Certification/2827/"},
+
+      {"number":2826,
+        "url":"https://jenkins.corp.squareup.com/job/Amex-Certification/2826/"},
+
+      {"number":2825,
+        "url":"https://jenkins.corp.squareup.com/job/Amex-Certification/2825/"},
+
+      {"number":2824,
+        "url":"https://jenkins.corp.squareup.com/job/Amex-Certification/2824/"},
+
+      {"number":2823,
+        "url":"https://jenkins.corp.squareup.com/job/Amex-Certification/2823/"},
+
+      {"number":2822,
+        "url":"https://jenkins.corp.squareup.com/job/Amex-Certification/2822/"},
+
+      {"number":2821,
+        "url":"https://jenkins.corp.squareup.com/job/Amex-Certification/2821/"},
+
+      {"number":2820,
+        "url":"https://jenkins.corp.squareup.com/job/Amex-Certification/2820/"},
+
+      {"number":2819,
+        "url":"https://jenkins.corp.squareup.com/job/Amex-Certification/2819/"},
+
+      {"number":2818,
+        "url":"https://jenkins.corp.squareup.com/job/Amex-Certification/2818/"},
+
+      {"number":2817,
+        "url":"https://jenkins.corp.squareup.com/job/Amex-Certification/2817/"},
+
+      {"number":2816,
+        "url":"https://jenkins.corp.squareup.com/job/Amex-Certification/2816/"},
+
+      {"number":2815,
+        "url":"https://jenkins.corp.squareup.com/job/Amex-Certification/2815/"},
+
+      {"number":2814,
+        "url":"https://jenkins.corp.squareup.com/job/Amex-Certification/2814/"},
+
+      {"number":2813,
+        "url":"https://jenkins.corp.squareup.com/job/Amex-Certification/2813/"},
+
+      {"number":2812,
+        "url":"https://jenkins.corp.squareup.com/job/Amex-Certification/2812/"},
+
+      {"number":2811,
+        "url":"https://jenkins.corp.squareup.com/job/Amex-Certification/2811/"},
+
+      {"number":2810,
+        "url":"https://jenkins.corp.squareup.com/job/Amex-Certification/2810/"},
+
+      {"number":2809,
+        "url":"https://jenkins.corp.squareup.com/job/Amex-Certification/2809/"},
+
+      {"number":2808,
+        "url":"https://jenkins.corp.squareup.com/job/Amex-Certification/2808/"},
+
+      {"number":2807,
+        "url":"https://jenkins.corp.squareup.com/job/Amex-Certification/2807/"},
+
+      {"number":2806,
+        "url":"https://jenkins.corp.squareup.com/job/Amex-Certification/2806/"},
+
+      {"number":2805,
+        "url":"https://jenkins.corp.squareup.com/job/Amex-Certification/2805/"},
+
+      {"number":2804,
+        "url":"https://jenkins.corp.squareup.com/job/Amex-Certification/2804/"},
+
+      {"number":2803,
+        "url":"https://jenkins.corp.squareup.com/job/Amex-Certification/2803/"},
+
+      {"number":2802,
+        "url":"https://jenkins.corp.squareup.com/job/Amex-Certification/2802/"},
+
+      {"number":2801,
+        "url":"https://jenkins.corp.squareup.com/job/Amex-Certification/2801/"},
+
+      {"number":2800,
+        "url":"https://jenkins.corp.squareup.com/job/Amex-Certification/2800/"},
+
+      {"number":2799,
+        "url":"https://jenkins.corp.squareup.com/job/Amex-Certification/2799/"},
+
+      {"number":2798,
+        "url":"https://jenkins.corp.squareup.com/job/Amex-Certification/2798/"},
+
+      {"number":2797,
+        "url":"https://jenkins.corp.squareup.com/job/Amex-Certification/2797/"},
+
+      {"number":2796,
+        "url":"https://jenkins.corp.squareup.com/job/Amex-Certification/2796/"},
+
+      {"number":2795,
+        "url":"https://jenkins.corp.squareup.com/job/Amex-Certification/2795/"},
+
+      {"number":2794,
+        "url":"https://jenkins.corp.squareup.com/job/Amex-Certification/2794/"},
+
+      {"number":2793,
+        "url":"https://jenkins.corp.squareup.com/job/Amex-Certification/2793/"},
+
+      {"number":2792,
+        "url":"https://jenkins.corp.squareup.com/job/Amex-Certification/2792/"},
+
+      {"number":2791,
+        "url":"https://jenkins.corp.squareup.com/job/Amex-Certification/2791/"},
+
+      {"number":2790,
+        "url":"https://jenkins.corp.squareup.com/job/Amex-Certification/2790/"},
+
+      {"number":2789,
+        "url":"https://jenkins.corp.squareup.com/job/Amex-Certification/2789/"},
+
+      {"number":2788,
+        "url":"https://jenkins.corp.squareup.com/job/Amex-Certification/2788/"},
+
+      {"number":2787,
+        "url":"https://jenkins.corp.squareup.com/job/Amex-Certification/2787/"},
+
+      {"number":2786,
+        "url":"https://jenkins.corp.squareup.com/job/Amex-Certification/2786/"},
+
+      {"number":2785,
+        "url":"https://jenkins.corp.squareup.com/job/Amex-Certification/2785/"},
+
+      {"number":2784,
+        "url":"https://jenkins.corp.squareup.com/job/Amex-Certification/2784/"},
+
+      {"number":2783,
+        "url":"https://jenkins.corp.squareup.com/job/Amex-Certification/2783/"},
+
+      {"number":2782,
+        "url":"https://jenkins.corp.squareup.com/job/Amex-Certification/2782/"},
+
+      {"number":2781,
+        "url":"https://jenkins.corp.squareup.com/job/Amex-Certification/2781/"},
+
+      {"number":2780,
+        "url":"https://jenkins.corp.squareup.com/job/Amex-Certification/2780/"},
+
+      {"number":2779,
+        "url":"https://jenkins.corp.squareup.com/job/Amex-Certification/2779/"},
+
+      {"number":2778,
+        "url":"https://jenkins.corp.squareup.com/job/Amex-Certification/2778/"},
+
+      {"number":2777,
+        "url":"https://jenkins.corp.squareup.com/job/Amex-Certification/2777/"},
+
+      {"number":2776,
+        "url":"https://jenkins.corp.squareup.com/job/Amex-Certification/2776/"},
+
+      {"number":2775,
+        "url":"https://jenkins.corp.squareup.com/job/Amex-Certification/2775/"},
+
+      {"number":2774,
+        "url":"https://jenkins.corp.squareup.com/job/Amex-Certification/2774/"},
+
+      {"number":2773,
+        "url":"https://jenkins.corp.squareup.com/job/Amex-Certification/2773/"},
+
+      {"number":2772,
+        "url":"https://jenkins.corp.squareup.com/job/Amex-Certification/2772/"},
+
+      {"number":2771,
+        "url":"https://jenkins.corp.squareup.com/job/Amex-Certification/2771/"},
+
+      {"number":2770,
+        "url":"https://jenkins.corp.squareup.com/job/Amex-Certification/2770/"},
+
+      {"number":2769,
+        "url":"https://jenkins.corp.squareup.com/job/Amex-Certification/2769/"},
+
+      {"number":2768,
+        "url":"https://jenkins.corp.squareup.com/job/Amex-Certification/2768/"},
+
+      {"number":2767,
+        "url":"https://jenkins.corp.squareup.com/job/Amex-Certification/2767/"},
+
+      {"number":2766,
+        "url":"https://jenkins.corp.squareup.com/job/Amex-Certification/2766/"},
+
+      {"number":2765,
+        "url":"https://jenkins.corp.squareup.com/job/Amex-Certification/2765/"},
+
+      {"number":2764,
+        "url":"https://jenkins.corp.squareup.com/job/Amex-Certification/2764/"},
+
+      {"number":2763,
+        "url":"https://jenkins.corp.squareup.com/job/Amex-Certification/2763/"},
+
+      {"number":2762,
+        "url":"https://jenkins.corp.squareup.com/job/Amex-Certification/2762/"},
+
+      {"number":2761,
+        "url":"https://jenkins.corp.squareup.com/job/Amex-Certification/2761/"},
+
+      {"number":2760,
+        "url":"https://jenkins.corp.squareup.com/job/Amex-Certification/2760/"},
+
+      {"number":2759,
+        "url":"https://jenkins.corp.squareup.com/job/Amex-Certification/2759/"},
+
+      {"number":2758,
+        "url":"https://jenkins.corp.squareup.com/job/Amex-Certification/2758/"},
+
+      {"number":2757,
+        "url":"https://jenkins.corp.squareup.com/job/Amex-Certification/2757/"}],
+      "color":"blue",
+      "firstBuild":
+      {"number":2371,
+        "url":"https://jenkins.corp.squareup.com/job/Amex-Certification/2371/"},
+      "healthReport":[
+      {"description":"Build stability: 1 out of the last 5 builds failed.",
+        "iconUrl":"health-60to79.png",
+        "score":80},
+
+      {"description":"Test Result: 0 tests failing out of a total of 9 tests.",
+        "iconUrl":"health-80plus.png",
+        "score":100}],
+      "inQueue":true,
+      "keepDependencies":false,
+      "lastBuild":
+      {"number":2856,
+        "url":"https://jenkins.corp.squareup.com/job/Amex-Certification/2856/"},
+      "lastCompletedBuild":
+      {"number":2856,
+        "url":"https://jenkins.corp.squareup.com/job/Amex-Certification/2856/"},
+      "lastFailedBuild":
+      {"number":2852,
+        "url":"https://jenkins.corp.squareup.com/job/Amex-Certification/2852/"},
+      "lastStableBuild":
+      {"number":2856,
+        "url":"https://jenkins.corp.squareup.com/job/Amex-Certification/2856/"},
+      "lastSuccessfulBuild":
+      {"number":2856,
+        "url":"https://jenkins.corp.squareup.com/job/Amex-Certification/2856/"},
+      "lastUnstableBuild":null,
+      "lastUnsuccessfulBuild":
+      {"number":2852,
+        "url":"https://jenkins.corp.squareup.com/job/Amex-Certification/2852/"},
+      "nextBuildNumber":2857,
+      "property":[
+      {}],
+      "queueItem":
+      {"blocked":false,
+        "buildable":true,
+        "id":22351,
+        "inQueueSince":1371514658912,
+        "params":"",
+        "stuck":false,
+        "task":
+        {"name":"Amex-Certification",
+          "url":"https://jenkins.corp.squareup.com/job/Amex-Certification/"},
+        "why":"Waiting for next available executor on sqnetwork",
+        "buildableStartMilliseconds":1371514663914,
+        "pending":false},
+      "concurrentBuild":false,
+      "downstreamProjects":[],
+      "scm":
+      {},
+      "upstreamProjects":[]}
+
+      ]}

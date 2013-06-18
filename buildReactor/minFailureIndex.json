@@ -1,0 +1,23 @@
+{
+  "jobs":[{
+    "displayName":"Other than java","name":"javaUrl","buildable":true
+  },
+  {
+    "displayName":"Amex-Certification","name":"Amex-Certification","buildable":true
+  }
+  ],"primaryView":{
+    "jobs":[{
+      "name":"javaUrl"
+    },{
+      "name":"Amex-Certification"
+    }],"name":"All","url":"https://macbuild-master.sfo.squareup.com/"
+  },"views":[{
+    "jobs":[{
+      "name":"javaUrl"
+    },{
+      "name":"Amex-Certification"
+    }],"name":"All","property":[],"url":"https://macbuild-master.sfo.squareup.com/"
+  },{
+    "description":null,"jobs":[],"name":"List","property":[],"url":"https://macbuild-master.sfo.squareup.com/view/List/"
+  }]
+}
