@@ -55,7 +55,8 @@ class BuildAttempt < ActiveRecord::Base
     # one is usually broken!
     if build.project.main? && build_part.successful?
       if promotion_ref = build.deployable_branch(build_part.paths.first)
-        BranchUpdateJob.enqueue(build.id, promotion_ref)
+        # Disable until we get GHE in better shape -CH XS
+        # BranchUpdateJob.enqueue(build.id, promotion_ref)
       end
     end
 

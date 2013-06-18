@@ -16,7 +16,7 @@ class MavenPartitioner
   def incremental_partitions(build)
     modules_to_build = Set.new
 
-    if build.project.name == "java"
+    if build.repository.url.ends_with?("square/java.git")
       # Build all-java module for all changes in the java repo
       modules_to_build.add("all-java")
     end
