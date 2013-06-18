@@ -1,61 +1,6 @@
 require 'spec_helper'
 
 describe BuildsController do
-
-  describe "#index" do
-    render_views
-
-    before do
-      @action = :index
-      @params = {:format => 'xml'}
-    end
-
-    context "when a non-existant project is specified" do
-      it "throws an exception" do
-        expect {
-          get @action, @params.merge(:project_id => "does-not-exist")
-        }.to raise_exception(ActiveRecord::RecordNotFound)
-      end
-    end
-
-    context "when an existing project is specified" do
-      let(:project) { FactoryGirl.create(:project) }
-
-      before do
-        @params.merge!(:project_id => project.to_param)
-      end
-
-      it "feed has no entries if the project hasn't been built before" do
-        get @action, @params
-        response.should be_success
-        body = response.body
-        body.lines.grep(/entry/).count.should == 0
-      end
-
-      context "and the project has been built before" do
-        it "reports stable when last build is successful" do
-          build = FactoryGirl.create(:build, :project => project, :state => :succeeded)
-
-          get @action, @params
-          response.should be_success
-          body = response.body
-          body.lines.grep(/<entry>/).count.should == 1
-          body.lines.grep(/stable/).count.should == 1
-        end
-
-        it "reports broken if the last build failed" do
-          build = FactoryGirl.create(:build, :project => project, :state => :failed)
-
-          get :index, @params
-          response.should be_success
-          body = response.body
-          body.lines.grep(/<entry>/).count.should == 1
-          body.lines.grep(/broken/).count.should == 1
-        end
-      end
-    end
-  end
-
   describe "#create" do
     let(:repo) { FactoryGirl.create(:repository) }
     before do

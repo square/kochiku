@@ -1,5 +1,4 @@
 require 'git_repo'
-require 'json'
 
 class BuildsController < ApplicationController
   before_filter :load_project, :only => [:show, :abort, :build_status, :toggle_auto_merge, :rebuild_failed_parts, :request_build]
