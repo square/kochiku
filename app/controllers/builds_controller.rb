@@ -5,13 +5,6 @@ class BuildsController < ApplicationController
   before_filter :load_project, :only => [:show, :abort, :build_status, :toggle_auto_merge, :rebuild_failed_parts, :request_build]
   skip_before_filter :verify_authenticity_token, :only => [:create]
 
-  def index
-    @builds = @project.builds.order('id desc').limit(20)
-    respond_to do |format|
-      format.xml
-    end
-  end
-
   def show
     @build = @project.builds.find(params[:id], :include => {:build_parts => [:last_attempt, :last_completed_attempt, :build_attempts]})
 
