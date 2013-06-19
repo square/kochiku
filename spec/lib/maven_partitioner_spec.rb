@@ -59,7 +59,8 @@ describe MavenPartitioner do
         subject.should_not_receive(:partitions)
 
         partitions = subject.incremental_partitions(build)
-        partitions.size.should == 1
+        partitions.size.should == 2
+        partitions.should include({"type" => "maven", "files" => ["all-protos"]})
         partitions.should include({"type" => "maven", "files" => ["module-two"]})
       end
 
