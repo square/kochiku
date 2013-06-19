@@ -57,16 +57,13 @@ class MavenPartitioner
 
       if module_affected_by_file.nil?
         if file_and_emails[:file].end_with?(".proto")
-          !["all-protos"].to_set.intersection(failed_modules).empty?
+          if failed_modules.include?("all-protos")
+            emails << file_and_emails[:emails]
+          end
+        elsif !file_and_emails[:file].starts_with?(".rig")
+          emails << file_and_emails[:emails]
         end
       elsif (set = depends_on_map[module_affected_by_file]) && !set.intersection(failed_modules).empty?
-        emails << file_and_emails[:emails]
-      end
-
-      next if module_affected_by_file.nil? && (file_and_emails[:file].end_with?(".proto") || file_and_emails[:file].starts_with?(".rig"))
-
-      if module_affected_by_file.nil? ||
-          ((set = depends_on_map[module_affected_by_file]) && !set.intersection(failed_modules).empty?)
         emails << file_and_emails[:emails]
       end
     end

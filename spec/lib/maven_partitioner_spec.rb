@@ -191,9 +191,11 @@ describe MavenPartitioner do
       emails.should include("userfour@example.com")
     end
 
-    it "should not ignore changes in the all-protos subtree module" do
+    it "should ignore changes in the all-protos subtree module if all-protos doesn't fail" do
       build_part = FactoryGirl.create(:build_part, :paths => ["module-one"], :build_instance => build)
       FactoryGirl.create(:build_attempt, :state => :failed, :build_part => build_part)
+      protos_part = FactoryGirl.create(:build_part, :paths => ["all-protos"], :build_instance => build)
+      FactoryGirl.create(:build_attempt, :state => :passed, :build_part => protos_part)
       build.build_parts.failed_or_errored.should == [build_part]
 
       GitBlame.stub(:files_changed_since_last_green).with(build, :fetch_emails => true).and_return([{:file => "module-one/src/main/java/com/squareup/Foo.java", :emails => ["userone@example.com"]},
@@ -207,6 +209,27 @@ describe MavenPartitioner do
       emails = subject.emails_for_commits_causing_failures(build)
       emails.size.should == 1
       emails.should include("userone@example.com")
+    end
+
+    it "should email changes to all-protos subtree module if all-protos fails" do
+      build_part = FactoryGirl.create(:build_part, :paths => ["module-one"], :build_instance => build)
+      FactoryGirl.create(:build_attempt, :state => :failed, :build_part => build_part)
+      protos_part = FactoryGirl.create(:build_part, :paths => ["all-protos"], :build_instance => build)
+      FactoryGirl.create(:build_attempt, :state => :failed, :build_part => protos_part)
+      build.build_parts.failed_or_errored.should == [build_part, protos_part]
+
+      GitBlame.stub(:files_changed_since_last_green).with(build, :fetch_emails => true).and_return([{:file => "module-one/src/main/java/com/squareup/Foo.java", :emails => ["userone@example.com"]},
+                                                                                                    {:file => "squareup/juno/internal.proto", :emails => ["protouser@example.com"]}])
+      File.stub(:exists?).and_return(false)
+      File.stub(:exists?).with("module-one/pom.xml").and_return(true)
+
+      subject.stub(:depends_on_map).and_return({ "module-one" => ["module-one"].to_set })
+      subject.should_not_receive(:partitions)
+
+      emails = subject.emails_for_commits_causing_failures(build)
+      emails.size.should == 2
+      emails.should include("userone@example.com")
+      emails.should include("protouser@example.com")
     end
 
     it "should not ignore changes in the .rig directory" do
