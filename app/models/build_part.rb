@@ -27,6 +27,7 @@ class BuildPart < ActiveRecord::Base
       if (kind == "maven" && (paths.include?("franklin") ||
                               paths.include?("cogs/cogs-hbase") ||
                               paths.include?("esperanto") ||
+                              paths.include?("esperanto/riak") ||
                               paths.include?("sake/rpc") ||
                               paths.include?("clustering/zookeeper") ||
                               paths.include?("openpgp") ||
