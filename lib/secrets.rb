@@ -34,7 +34,7 @@ module Secrets
   end
 
   def laptop_path
-    Rails.root.join(*%w(config secrets))
+    Rails.root.join(*%w(config dev_secrets))
   end
 
   def server_path
