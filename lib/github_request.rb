@@ -1,8 +1,9 @@
 require 'uri'
 require 'net/http'
+require 'secrets'
 
 class GithubRequest
-  OAUTH_TOKEN = "39408724f3a92bd017caa212cc7cf2bbb5ac02b6"
+  OAUTH_TOKEN = Secrets.github_oauth
   AUTH = {"Authorization" => "token #{OAUTH_TOKEN}"}
 
   def self.post(uri, args)
