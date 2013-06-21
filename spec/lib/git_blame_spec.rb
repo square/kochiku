@@ -148,7 +148,7 @@ describe GitBlame do
     end
 
     it "should parse the git log and return change file paths" do
-      GitRepo.stub(:inside_repo).and_return("::!::User One:userone@example.com::!::\n\npath/one/file.java\npath/two/file.java")
+      Cocaine::CommandLine.any_instance.stub(:run).and_return("::!::User One:userone@example.com::!::\n\npath/one/file.java\npath/two/file.java")
       git_file_changes = subject
       git_file_changes.size.should == 2
       git_file_changes.should include({:file => "path/one/file.java", :emails => []})
@@ -159,7 +159,7 @@ describe GitBlame do
       let(:options) { {:fetch_emails => true} }
 
       it "should parse the git log and return change file paths with emails" do
-        GitRepo.stub(:inside_repo).and_return("::!::User One:userone@example.com::!::\n\npath/one/file.java\npath/two/file.java\n::!::User Two:usertwo@example.com::!::\n\npath/three/file.java")
+        Cocaine::CommandLine.any_instance.stub(:run).and_return("::!::User One:userone@example.com::!::\n\npath/one/file.java\npath/two/file.java\n::!::User Two:usertwo@example.com::!::\n\npath/three/file.java")
         git_file_changes = subject
         git_file_changes.size.should == 3
         git_file_changes.should include({:file => "path/one/file.java", :emails => ["userone@example.com"]})
@@ -168,12 +168,12 @@ describe GitBlame do
       end
 
       it "should return nothing if the line doesn't have an email" do
-        GitRepo.stub(:inside_repo).and_return("::!::::!::\n")
+        Cocaine::CommandLine.any_instance.stub(:run).and_return("::!::::!::\n")
         subject.should be_empty
       end
 
       it "should work if the email address is not found" do
-        GitRepo.stub(:inside_repo).and_return("::!::Unknown:unknown@example.com::!::\n\npath/one/file.java")
+        Cocaine::CommandLine.any_instance.stub(:run).and_return("::!::Unknown:unknown@example.com::!::\n\npath/one/file.java")
         git_file_changes = subject
         git_file_changes.size.should == 1
         git_file_changes.should include({:file => "path/one/file.java", :emails => []})
@@ -190,7 +190,7 @@ describe GitBlame do
     end
 
     it "should parse the git log and return change file paths" do
-      GitRepo.stub(:inside_repo).and_return("::!::User One:userone@example.com::!::\n\npath/one/file.java\npath/two/file.java")
+      Cocaine::CommandLine.any_instance.stub(:run).and_return("::!::User One:userone@example.com::!::\n\npath/one/file.java\npath/two/file.java")
       git_file_changes = subject
       git_file_changes.size.should == 2
       git_file_changes.should include({:file => "path/one/file.java", :emails => []})

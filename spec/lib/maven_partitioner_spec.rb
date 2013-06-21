@@ -170,6 +170,7 @@ describe MavenPartitioner do
       FactoryGirl.create(:build_attempt, :state => :failed, :build_part => build_part)
       build.build_parts.failed_or_errored.should == [build_part]
 
+      GitRepo.stub(:inside_copy).and_yield
       GitBlame.stub(:files_changed_since_last_green).with(build, :fetch_emails => true).and_return([{:file => "module-one/src/main/java/com/squareup/Foo.java", :emails => ["userone@example.com"]},
                                                                              {:file => "module-two/src/main/java/com/squareup/Bar.java", :emails => ["usertwo@example.com"]},
                                                                              {:file => "module-four/src/main/java/com/squareup/Baz.java", :emails => ["userfour@example.com"]},
@@ -201,6 +202,7 @@ describe MavenPartitioner do
       FactoryGirl.create(:build_attempt, :state => :passed, :build_part => protos_part)
       build.build_parts.failed_or_errored.should == [build_part]
 
+      GitRepo.stub(:inside_copy).and_yield
       GitBlame.stub(:files_changed_since_last_green).with(build, :fetch_emails => true).and_return([{:file => "module-one/src/main/java/com/squareup/Foo.java", :emails => ["userone@example.com"]},
                                                                                                    {:file => "squareup/juno/internal.proto", :emails => ["protouser@example.com"]}])
       File.stub(:exists?).and_return(false)
@@ -221,6 +223,7 @@ describe MavenPartitioner do
       FactoryGirl.create(:build_attempt, :state => :failed, :build_part => protos_part)
       build.build_parts.failed_or_errored.should == [build_part, protos_part]
 
+      GitRepo.stub(:inside_copy).and_yield
       GitBlame.stub(:files_changed_since_last_green).with(build, :fetch_emails => true).and_return([{:file => "module-one/src/main/java/com/squareup/Foo.java", :emails => ["userone@example.com"]},
                                                                                                     {:file => "squareup/juno/internal.proto", :emails => ["protouser@example.com"]}])
       File.stub(:exists?).and_return(false)
@@ -240,6 +243,7 @@ describe MavenPartitioner do
       FactoryGirl.create(:build_attempt, :state => :failed, :build_part => build_part)
       build.build_parts.failed_or_errored.should == [build_part]
 
+      GitRepo.stub(:inside_copy).and_yield
       GitBlame.stub(:files_changed_since_last_green).with(build, :fetch_emails => true).and_return([{:file => ".rig/build_keywhiz", :emails => ["riguser@example.com"]}])
       File.stub(:exists?).and_return(false)
 
