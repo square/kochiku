@@ -101,9 +101,11 @@ class MavenPartitioner
 
     top_level_pom.css('project>modules>module').each do |mvn_module|
       module_pom = Nokogiri::XML(File.read("#{mvn_module.text}/pom.xml"))
-
-      group_id = module_pom.css('project>groupId').first.text
-      artifact_id = module_pom.css('project>artifactId').first.text
+      group_id = module_pom.css('project>groupId').first
+      artifact_id = module_pom.css('project>artifactId').first
+      next unless group_id && artifact_id
+      group_id = group_id.text
+      artifact_id = artifact_id.text
 
       group_artifact_map["#{group_id}:#{artifact_id}"] = "#{mvn_module.text}"
     end
