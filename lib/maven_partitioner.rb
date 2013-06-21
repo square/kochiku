@@ -51,24 +51,26 @@ class MavenPartitioner
       failed_set.add(build_part.paths.first)
     end
 
-    emails = []
+    email_and_files = Hash.new { |hash, key| hash[key] = [] }
     GitBlame.files_changed_since_last_green(java_master_build, :fetch_emails => true).each do |file_and_emails|
-      module_affected_by_file = file_to_module(file_and_emails[:file])
+      file = file_and_emails[:file]
+      emails = file_and_emails[:emails]
+      module_affected_by_file = file_to_module(file)
 
       if module_affected_by_file.nil?
-        if file_and_emails[:file].end_with?(".proto")
+        if file.end_with?(".proto")
           if failed_modules.include?("all-protos")
-            emails << file_and_emails[:emails]
+            emails.each { |email| email_and_files[email] << file }
           end
-        elsif !file_and_emails[:file].starts_with?(".rig")
-          emails << file_and_emails[:emails]
+        elsif !file.starts_with?(".rig")
+          emails.each { |email| email_and_files[email] << file }
         end
       elsif (set = depends_on_map[module_affected_by_file]) && !set.intersection(failed_modules).empty?
-        emails << file_and_emails[:emails]
+        emails.each { |email| email_and_files[email] << file }
       end
     end
 
-    emails.flatten.compact.uniq
+    email_and_files
   end
 
   def depends_on_map

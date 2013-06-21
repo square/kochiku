@@ -6,9 +6,9 @@
 <body>
 <h2>Project <%= @build.project.name %> failed on branch <%= @build.branch %></h2>
 <%= project_build_url(@build.project, @build) %><br>
-<% @java_emails.each do |email| %>
+<% @java_email_and_files.each do |email, files| %>
   <br>
-  email: <%= email %><br>
+  email: <%= email %> because of changes to <%= files.join(", ") %><br>
 <% end %>
 <br>
 Failed build parts:

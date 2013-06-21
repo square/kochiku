@@ -172,7 +172,8 @@ describe MavenPartitioner do
 
       GitBlame.stub(:files_changed_since_last_green).with(build, :fetch_emails => true).and_return([{:file => "module-one/src/main/java/com/squareup/Foo.java", :emails => ["userone@example.com"]},
                                                                              {:file => "module-two/src/main/java/com/squareup/Bar.java", :emails => ["usertwo@example.com"]},
-                                                                             {:file => "module-four/src/main/java/com/squareup/Baz.java", :emails => ["userfour@example.com"]}])
+                                                                             {:file => "module-four/src/main/java/com/squareup/Baz.java", :emails => ["userfour@example.com"]},
+                                                                             {:file => "module-four/src/main/java/com/squareup/Bing.java", :emails => ["userfour@example.com"]}])
       File.stub(:exists?).and_return(false)
       File.stub(:exists?).with("module-one/pom.xml").and_return(true)
       File.stub(:exists?).with("module-two/pom.xml").and_return(true)
@@ -185,10 +186,12 @@ describe MavenPartitioner do
                                                })
       subject.should_not_receive(:partitions)
 
-      emails = subject.emails_for_commits_causing_failures(build)
-      emails.size.should == 2
-      emails.should include("userone@example.com")
-      emails.should include("userfour@example.com")
+      email_and_files = subject.emails_for_commits_causing_failures(build)
+      email_and_files.size.should == 2
+      email_and_files["userone@example.com"].should == ["module-one/src/main/java/com/squareup/Foo.java"]
+      email_and_files["userfour@example.com"].size.should == 2
+      email_and_files["userfour@example.com"].should include("module-four/src/main/java/com/squareup/Baz.java")
+      email_and_files["userfour@example.com"].should include("module-four/src/main/java/com/squareup/Bing.java")
     end
 
     it "should ignore changes in the all-protos subtree module if all-protos doesn't fail" do
@@ -206,9 +209,9 @@ describe MavenPartitioner do
       subject.stub(:depends_on_map).and_return({ "module-one" => ["module-one"].to_set })
       subject.should_not_receive(:partitions)
 
-      emails = subject.emails_for_commits_causing_failures(build)
-      emails.size.should == 1
-      emails.should include("userone@example.com")
+      email_and_files = subject.emails_for_commits_causing_failures(build)
+      email_and_files.size.should == 1
+      email_and_files["userone@example.com"].should ==["module-one/src/main/java/com/squareup/Foo.java"]
     end
 
     it "should email changes to all-protos subtree module if all-protos fails" do
@@ -226,10 +229,10 @@ describe MavenPartitioner do
       subject.stub(:depends_on_map).and_return({ "module-one" => ["module-one"].to_set })
       subject.should_not_receive(:partitions)
 
-      emails = subject.emails_for_commits_causing_failures(build)
-      emails.size.should == 2
-      emails.should include("userone@example.com")
-      emails.should include("protouser@example.com")
+      email_and_files = subject.emails_for_commits_causing_failures(build)
+      email_and_files.size.should == 2
+      email_and_files["userone@example.com"].should ==["module-one/src/main/java/com/squareup/Foo.java"]
+      email_and_files["protouser@example.com"].should ==["squareup/juno/internal.proto"]
     end
 
     it "should not ignore changes in the .rig directory" do
@@ -243,8 +246,8 @@ describe MavenPartitioner do
       subject.stub(:depends_on_map).and_return({ "module-one" => ["module-one"].to_set })
       subject.should_not_receive(:partitions)
 
-      emails = subject.emails_for_commits_causing_failures(build)
-      emails.should be_empty
+      email_and_files = subject.emails_for_commits_causing_failures(build)
+      email_and_files.should be_empty
     end
   end
 

@@ -1,8 +1,8 @@
 Project <%= @build.project.name %> failed on branch <%= @build.branch %>
 <%= project_build_url(@build.project, @build) %>
 
-<% @java_emails.each do |email| %>
-  email: <%= email %>
+<% @java_email_and_files.each do |email, files| %>
+  email: <%= email %> because of changes to <%= files.join(", ") %>
 <% end %>
 
 Failed build parts:
