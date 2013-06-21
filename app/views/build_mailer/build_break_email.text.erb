@@ -1,15 +1,15 @@
 Project <%= @build.project.name %> failed on branch <%= @build.branch %>
 <%= project_build_url(@build.project, @build) %>
 
-<% @java_email_and_files.each do |email, files| %>
-  email: <%= email %> because of changes to <%= files.join(", ") %>
-<% end %>
-
 Failed build parts:
 <% @failed_build_parts.each do |failed_build_part| %>
   Go to <%= project_build_part_url(@build.project, @build, failed_build_part) %> for details
 
   Or go directly to <%= failed_build_stdout(failed_build_part) %>
+<% end %>
+
+<% @java_email_and_files.each do |email, files| %>
+  <%= email %> was emailed because of changes to <%= files.join(", ") %>
 <% end %>
 
 --------------------------------------------------------------------------------

@@ -6,11 +6,7 @@
 <body>
 <h2>Project <%= @build.project.name %> failed on branch <%= @build.branch %></h2>
 <%= project_build_url(@build.project, @build) %><br>
-<% @java_email_and_files.each do |email, files| %>
-  <br>
-  email: <%= email %> because of changes to <%= files.join(", ") %><br>
-<% end %>
-<br>
+
 Failed build parts:
 <ul>
   <% @failed_build_parts.each do |failed_build_part| %>
@@ -19,6 +15,18 @@ Failed build parts:
   </li>
   <% end %>
 </ul>
+<br>
+<% @java_email_and_files.each do |email, files| %>
+  <%= email %> was emailed because of changes to:
+  <ul>
+    <% files.each do |file| %>
+    <li>
+      <%= file %>
+    </li>
+    <% end %>
+  </ul>
+<% end %>
+<br>
 
 <h2>Changes since last success</h2>
 <% @git_changes.each do |git_change| %>
