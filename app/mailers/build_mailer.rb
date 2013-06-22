@@ -26,10 +26,9 @@ class BuildMailer < ActionMailer::Base
     @build = build
     @java_email_and_files = {}
     if @build.project.main?
-      if @build.project.name == "java"
-        # send this to the list for now, until we see it work for a day or two
-        @emails = ["cheister@squareup.com"]
+      if @build.repository.url.end_with?("square/java.git")
         @java_email_and_files = MavenPartitioner.new.emails_for_commits_causing_failures(@build)
+        @emails = @java_email_and_files.keys
       else
         @emails = GitBlame.emails_since_last_green(@build)
       end
