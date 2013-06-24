@@ -27,15 +27,17 @@ class GitBlame
       parse_git_changes(output)
     end
 
-    # Note this method only works if called within an inside_copy or inside_repo block
     def files_changed_since_last_green(build, options = {})
-      output = Cocaine::CommandLine.new("git log --no-merges --format='::!::%an:%ae::!::' --name-only '#{build.previous_successful_build.try(:ref)}...#{build.ref}'").run
+      output = GitRepo.inside_repo(build.repository) do
+        Cocaine::CommandLine.new("git log --no-merges --format='::!::%an:%ae::!::' --name-only '#{build.previous_successful_build.try(:ref)}...#{build.ref}'").run
+      end
       parse_git_files_changes(output, options)
     end
 
-    # Note this method only works if called within an inside_copy or inside_repo block
     def files_changed_in_branch(build, options = {})
-      output = Cocaine::CommandLine.new("git log --no-merges --format='::!::%an:%ae::!::' --name-only 'origin/master..origin/#{build.branch}'").run
+      output = GitRepo.inside_repo(build.repository) do
+        Cocaine::CommandLine.new("git log --no-merges --format='::!::%an:%ae::!::' --name-only 'origin/master..origin/#{build.branch}'").run
+      end
       parse_git_files_changes(output, options)
     end
 
