@@ -72,6 +72,8 @@ class MavenPartitioner
       end
     end
 
+    email_and_files.each_key { |email| email_and_files[email] = email_and_files[email].uniq.sort }
+
     email_and_files
   end
 
