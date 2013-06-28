@@ -51,4 +51,11 @@ class ProjectsController < ApplicationController
       Project.where(:repository_id => repo.id, :name => repo.repository_name).first
     }.compact
   end
+
+   # GET /java/XmlStatusReport.aspx
+  #
+  # This action returns the current build status for all of the java maven modules
+  def status_report_java
+    @project = Project.joins(:repository).where(:repositories => {:url => "git@git.squareup.com:square/java.git"}, :name => 'java').first
+  end
 end

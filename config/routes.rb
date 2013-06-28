@@ -27,6 +27,7 @@ Kochiku::Application.routes.draw do
     end
   end
   match '/XmlStatusReport.aspx', :to => "projects#status_report", :defaults => { :format => 'xml' }
+  match '/java/XmlStatusReport.aspx', :to => "projects#status_report_java", :defaults => { :format => 'xml' }
 
   match '/build_attempts/:build_attempt_id/build_artifacts' => "build_artifacts#create", :via => :post
   match '/build_attempts/:id/start' => "build_attempts#start", :via => :post

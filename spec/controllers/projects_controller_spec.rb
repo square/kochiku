@@ -38,7 +38,7 @@ describe ProjectsController do
   describe "#status_report" do
     render_views
     let(:repository) { FactoryGirl.create(:repository) }
-    let(:project) { FactoryGirl.create(:project, :name => repository.repository_name) }
+    let(:project) { FactoryGirl.create(:project, :repository => repository, :name => repository.repository_name) }
 
     context "when a project has no builds" do
       before { project.builds.should be_empty }
@@ -84,22 +84,41 @@ describe ProjectsController do
 
     context "with a java project" do
       let(:repository) { FactoryGirl.create(:repository, :url => "git@git.squareup.com:square/java.git") }
-      let(:project) { FactoryGirl.create(:project, :repository => repository, :name => repository.repository_name) }
 
       context "with a in-progress build" do
-        let(:module_name) { 'module1' }
-        let(:build) { FactoryGirl.create(:build, :state => :running, :project => project, :maven_modules => [module_name]) }
-        let!(:build_part) { FactoryGirl.create(:build_part, :build_instance => build, :paths => [module_name]) }
+        let!(:build) { FactoryGirl.create(:build, :state => :running, :project => project) }
 
         it "should return 'Building' for activity" do
           get :status_report, :format => :xml
           response.should be_success
 
           doc = Nokogiri::XML(response.body)
-          element = doc.at_xpath("/Projects/Project[@name='#{module_name}']")
+          element = doc.at_xpath("/Projects/Project[@name='java']")
 
           element['activity'].should == 'Building'
         end
+      end
+    end
+  end
+
+  describe "#status_report_java" do
+    render_views
+    let(:repository) { FactoryGirl.create(:repository, :url => "git@git.squareup.com:square/java.git") }
+    let(:project) { FactoryGirl.create(:project, :repository => repository, :name => repository.repository_name) }
+
+    context "with a in-progress build" do
+      let(:module_name) { 'module1' }
+      let(:build) { FactoryGirl.create(:build, :state => :running, :project => project, :maven_modules => [module_name]) }
+      let!(:build_part) { FactoryGirl.create(:build_part, :build_instance => build, :paths => [module_name]) }
+
+      it "should return 'Building' for activity" do
+        get :status_report_java, :format => :xml
+        response.should be_success
+
+        doc = Nokogiri::XML(response.body)
+        element = doc.at_xpath("/Projects/Project[@name='#{module_name}']")
+
+        element['activity'].should == 'Building'
       end
     end
   end
