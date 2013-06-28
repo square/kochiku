@@ -57,5 +57,6 @@ class ProjectsController < ApplicationController
   # This action returns the current build status for all of the java maven modules
   def status_report_java
     @project = Project.joins(:repository).where(:repositories => {:url => "git@git.squareup.com:square/java.git"}, :name => 'java').first
+    @maven_modules = Array(params[:maven_module])
   end
 end

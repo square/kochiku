@@ -107,12 +107,12 @@ describe ProjectsController do
     let(:project) { FactoryGirl.create(:project, :repository => repository, :name => repository.repository_name) }
 
     context "with a in-progress build" do
-      let(:module_name) { 'module1' }
+      let(:module_name) { 'core/module1' }
       let(:build) { FactoryGirl.create(:build, :state => :running, :project => project, :maven_modules => [module_name]) }
       let!(:build_part) { FactoryGirl.create(:build_part, :build_instance => build, :paths => [module_name]) }
 
       it "should return 'Building' for activity" do
-        get :status_report_java, :format => :xml
+        get :status_report_java, :maven_module => module_name, :format => :xml
         response.should be_success
 
         doc = Nokogiri::XML(response.body)

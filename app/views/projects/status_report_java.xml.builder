@@ -1,5 +1,5 @@
 xml.Projects do
-  BuildPart.most_recent_results_for(@project.builds.last.maven_modules).each do |build_part|
+  BuildPart.most_recent_results_for(@maven_modules).each do |build_part|
     xml.Project({
         :name => build_part.paths.first,
         :activity => build_part.try(:is_running?) ? "Building" : "CheckingModification",
