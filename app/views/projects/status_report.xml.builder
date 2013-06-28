@@ -1,7 +1,7 @@
 xml.Projects do
   @projects.each do |project|
     # currently cimonitor only utilizes the activity attribute
-    if project.repository.url.end_with?("square/java.git")
+    if project.repository && project.repository.url.end_with?("square/java.git")
       BuildPart.most_recent_results_for(project.builds.last.maven_modules).each do |build_part|
         xml.Project({
           :name => build_part.paths.first,
