@@ -38,6 +38,7 @@ class Build < ActiveRecord::Base
   symbolize :state, :in => STATES
   symbolize :queue
   serialize :deployable_map, Hash
+  serialize :maven_modules, Array
 
   validates_presence_of :queue
   validates_presence_of :project_id

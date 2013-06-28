@@ -24,8 +24,9 @@ describe Partitioner do
     { 'type' => 'rspec', 'glob' => 'spec/**/*_spec.rb', 'workers' => 3, 'balance' => balance, 'manifest' => manifest }
   ]}
 
+  let(:kochiku_yml_exists) { false }
   let(:pom_xml_exists) { false }
-  let(:build_yml_exists) { true }
+  let(:build_yml_exists) { false }
   let(:balance) { 'alphabetically' }
   let(:manifest) { nil }
 
@@ -71,8 +72,6 @@ describe Partitioner do
     let(:build_yml_exists) { false }
 
     it "should return a single partiion" do
-      #File.stub(:exist?).with(Partitioner::KOCHIKU_YML).and_return(false)
-      #File.stub(:exist?).with(Partitioner::BUILD_YML).and_return(false)
       partitions = partitioner.partitions(build)
       partitions.size.should == 1
       partitions.first["type"].should == "spec"
@@ -85,6 +84,7 @@ describe Partitioner do
 
     context 'when there is not a kochiku.yml' do
       let(:kochiku_yml_exists) { false }
+      let(:build_yml_exists) { true }
       it { should == [{'type' => 'rspec', 'files' => '<FILES>'}] }
     end
 
@@ -194,6 +194,56 @@ describe Partitioner do
             { 'type' => 'rspec', 'files' => %w(d) },
           ] }
         end
+      end
+    end
+
+    context 'when there is pom.xml' do
+      let(:pom_xml_exists) { true }
+      let(:repository) { FactoryGirl.create(:repository, :url => "git@git.squareup.com:square/java.git") }
+      let(:project) { FactoryGirl.create(:project, :repository => repository) }
+      let(:build) { FactoryGirl.create(:build, :project => project) }
+
+      let(:top_level_pom) { <<-POM
+  <project>
+    <modules>
+      <module>module-one</module>
+    </modules>
+  </project>
+      POM
+      }
+
+      let(:module_one_pom) { <<-POM
+  <project>
+    <properties>
+      <deployableBranch>one-branch</deployableBranch>
+    </properties>
+
+    <groupId>com.squareup</groupId>
+    <artifactId>module-core</artifactId>
+
+    <dependencies>
+      <dependency>
+        <groupId>com.squareup</groupId>
+        <artifactId>module-extras</artifactId>
+      </dependency>
+      <dependency>
+        <groupId>junit</groupId>
+        <artifactId>junit</artifactId>
+      </dependency>
+    </dependencies>
+  </project>
+      POM
+      }
+
+      it "should call the maven paritioner" do
+        File.stub(:read).with(MavenPartitioner::POM_XML).and_return(top_level_pom)
+        File.stub(:read).with("module-one/pom.xml").and_return(module_one_pom)
+
+        subject.should == [{"type" => "maven", "files" => ["all-java"]}]
+
+        build.reload
+        build.maven_modules.should == ["module-one"]
+        build.deployable_map.should == {"module-one" => "one-branch"}
       end
     end
   end

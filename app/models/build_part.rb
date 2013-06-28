@@ -9,6 +9,12 @@ class BuildPart < ActiveRecord::Base
   serialize :paths, Array
   serialize :options, Hash
 
+  def self.most_recent_results_for(maven_modules)
+    yaml_paths = maven_modules.map { |mvn_module| YAML.dump(Array(mvn_module)) }
+    paths_to_ids = BuildPart.where(paths: yaml_paths).group(:paths).maximum(:id)
+    BuildPart.find(paths_to_ids.values)
+  end
+
   def create_and_enqueue_new_build_attempt!
     build_attempt = build_attempts.create!(:state => :runnable)
     build_instance.running!
