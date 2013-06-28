@@ -45,8 +45,10 @@ class ProjectsController < ApplicationController
 
   # GET /XmlStatusReport.aspx
   #
-  # This action returns the current build status for all of the projects in the system
+  # This action returns the current build status for all of the main projects in the system
   def status_report
-    @projects = Project.all
+    @projects = Repository.all.map { |repo|
+      Project.where(:repository_id => repo.id, :name => repo.repository_name).first
+    }.compact
   end
 end

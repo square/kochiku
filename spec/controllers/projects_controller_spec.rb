@@ -5,7 +5,7 @@ describe ProjectsController do
   render_views
 
   describe "#ci_projects" do
-    let(:repository) { FactoryGirl.create(:repository)}
+    let(:repository) { FactoryGirl.create(:repository) }
     let!(:ci_project) { FactoryGirl.create(:project, :name => repository.repository_name) }
     let!(:non_ci_project) { FactoryGirl.create(:project, :name => repository.repository_name + "-pull_requests") }
 
@@ -37,7 +37,8 @@ describe ProjectsController do
 
   describe "#status_report" do
     render_views
-    let(:project) { FactoryGirl.create(:big_rails_project) }
+    let(:repository) { FactoryGirl.create(:repository) }
+    let(:project) { FactoryGirl.create(:project, :name => repository.repository_name) }
 
     context "when a project has no builds" do
       before { project.builds.should be_empty }
@@ -83,7 +84,7 @@ describe ProjectsController do
 
     context "with a java project" do
       let(:repository) { FactoryGirl.create(:repository, :url => "git@git.squareup.com:square/java.git") }
-      let(:project) { FactoryGirl.create(:project, :repository => repository) }
+      let(:project) { FactoryGirl.create(:project, :repository => repository, :name => repository.repository_name) }
 
       context "with a in-progress build" do
         let(:module_name) { 'module1' }
