@@ -4,11 +4,17 @@ require 'set'
 class MavenPartitioner
   POM_XML = 'pom.xml'
 
+  def maven_modules
+    return @maven_modules if @maven_modules
+    top_level_pom = Nokogiri::XML(File.read(POM_XML))
+    @maven_modules = top_level_pom.css('project>modules>module').map { |mvn_module| mvn_module.text }
+  end
+
   def partitions
-    Nokogiri::XML(File.read(POM_XML)).css('project>modules>module').map do |partition|
+    maven_modules.map do |mvn_module|
       {
           'type' => 'maven',
-          'files' => [partition.text]
+          'files' => [mvn_module]
       }
     end
   end
@@ -103,31 +109,29 @@ class MavenPartitioner
 
     group_artifact_map = {}
 
-    top_level_pom = Nokogiri::XML(File.read(POM_XML))
-
-    top_level_pom.css('project>modules>module').each do |mvn_module|
-      module_pom = Nokogiri::XML(File.read("#{mvn_module.text}/pom.xml"))
+    maven_modules.each do |mvn_module|
+      module_pom = Nokogiri::XML(File.read("#{mvn_module}/pom.xml"))
       group_id = module_pom.css('project>groupId').first
       artifact_id = module_pom.css('project>artifactId').first
       next unless group_id && artifact_id
       group_id = group_id.text
       artifact_id = artifact_id.text
 
-      group_artifact_map["#{group_id}:#{artifact_id}"] = "#{mvn_module.text}"
+      group_artifact_map["#{group_id}:#{artifact_id}"] = "#{mvn_module}"
     end
 
     module_dependency_map = {}
 
-    top_level_pom.css('project>modules>module').each do |mvn_module|
-      module_pom = Nokogiri::XML(File.read("#{mvn_module.text}/pom.xml"))
-      module_dependency_map["#{mvn_module.text}"] ||= Set.new
+    maven_modules.each do |mvn_module|
+      module_pom = Nokogiri::XML(File.read("#{mvn_module}/pom.xml"))
+      module_dependency_map[mvn_module] ||= Set.new
 
       module_pom.css('project>dependencies>dependency').each do |dep|
         group_id = dep.css('groupId').first.text
         artifact_id = dep.css('artifactId').first.text
 
         if mod = group_artifact_map["#{group_id}:#{artifact_id}"]
-          module_dependency_map["#{mvn_module.text}"].add(mod)
+          module_dependency_map[mvn_module].add(mod)
         end
       end
     end
@@ -168,14 +172,12 @@ class MavenPartitioner
   def deployable_modules_map
     deployable_modules_map = {}
 
-    top_level_pom = Nokogiri::XML(File.read(POM_XML))
-
-    top_level_pom.css('project>modules>module').each do |mvn_module|
-      module_pom = Nokogiri::XML(File.read("#{mvn_module.text}/pom.xml"))
+    maven_modules.each do |mvn_module|
+      module_pom = Nokogiri::XML(File.read("#{mvn_module}/pom.xml"))
       deployable_branch = module_pom.css('project>properties>deployableBranch').first
 
       if deployable_branch
-        deployable_modules_map[mvn_module.text] = deployable_branch.text
+        deployable_modules_map[mvn_module] = deployable_branch.text
       end
     end
 

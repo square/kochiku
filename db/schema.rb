@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20130511012855) do
+ActiveRecord::Schema.define(:version => 20130627194433) do
 
   create_table "build_artifacts", :force => true do |t|
     t.integer  "build_attempt_id"
@@ -44,6 +44,7 @@ ActiveRecord::Schema.define(:version => 20130511012855) do
   end
 
   add_index "build_parts", ["build_id"], :name => "index_build_parts_on_build_id"
+  add_index "build_parts", ["paths"], :name => "index_build_parts_on_paths", :length => {"paths"=>255}
 
   create_table "builds", :force => true do |t|
     t.string   "ref"
@@ -59,6 +60,7 @@ ActiveRecord::Schema.define(:version => 20130511012855) do
     t.boolean  "promoted"
     t.string   "on_success_script_log_file"
     t.text     "deployable_map"
+    t.text     "maven_modules"
   end
 
   add_index "builds", ["project_id"], :name => "index_builds_on_project_id"
