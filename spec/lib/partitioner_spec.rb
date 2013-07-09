@@ -238,8 +238,9 @@ describe Partitioner do
       it "should call the maven paritioner" do
         File.stub(:read).with(MavenPartitioner::POM_XML).and_return(top_level_pom)
         File.stub(:read).with("module-one/pom.xml").and_return(module_one_pom)
+        File.stub(:read).with("all-java/pom.xml").and_return("")
 
-        subject.should == [{"type" => "maven", "files" => ["all-java"]}]
+        subject.should == [{"type" => "maven", "files" => ["all-java"], "upload_artifacts" => false}]
 
         build.reload
         build.maven_modules.should == ["module-one"]

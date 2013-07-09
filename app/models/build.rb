@@ -77,7 +77,7 @@ class Build < ActiveRecord::Base
     transaction do
       update_attributes!(:state => :runnable)
       parts.each do |part|
-        build_parts.create!(:kind => part['type'], :paths => part['files'], :options => part['options'])
+        build_parts.create!(:kind => part['type'], :paths => part['files'], :upload_artifacts => part['upload_artifacts'], :options => part['options'])
       end
     end
 

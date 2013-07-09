@@ -20,6 +20,10 @@ describe MavenPartitioner do
         File.stub(:exists?).with("module-one/pom.xml").and_return(true)
         File.stub(:exists?).with("module-two/pom.xml").and_return(true)
 
+        subject.stub(:deployable_modules_map).and_return({"module-four" => {}})
+        subject.stub(:integration_modules_for).and_return([])
+        subject.stub(:integration_modules_for).with("module-two").and_return(["module-two/integration"])
+
         subject.stub(:depends_on_map).and_return({
                                                    "module-one" => ["module-one", "module-three", "module-four"].to_set,
                                                    "module-two" => ["module-two", "module-three"].to_set
@@ -28,10 +32,10 @@ describe MavenPartitioner do
 
         partitions = subject.incremental_partitions(build)
         partitions.size.should == 4
-        partitions.should include({"type" => "maven", "files" => ["module-one"]})
-        partitions.should include({"type" => "maven", "files" => ["module-two"]})
-        partitions.should include({"type" => "maven", "files" => ["module-three"]})
-        partitions.should include({"type" => "maven", "files" => ["module-four"]})
+        partitions.should include({"type" => "maven", "files" => ["module-one"], "upload_artifacts" => false})
+        partitions.should include({"type" => "maven", "files" => ["module-two", "module-two/integration"], "upload_artifacts" => false})
+        partitions.should include({"type" => "maven", "files" => ["module-three"], "upload_artifacts" => false})
+        partitions.should include({"type" => "maven", "files" => ["module-four"], "upload_artifacts" => true})
       end
 
       it "should build everything if one of the files does not map to a module" do
@@ -55,13 +59,14 @@ describe MavenPartitioner do
         File.stub(:exists?).with("module-two/pom.xml").and_return(true)
 
         subject.stub(:depends_on_map).and_return({ "module-two" => ["module-two"].to_set })
-
+        subject.stub(:deployable_modules_map).and_return({})
+        subject.stub(:integration_modules_for).and_return([])
         subject.should_not_receive(:partitions)
 
         partitions = subject.incremental_partitions(build)
         partitions.size.should == 2
-        partitions.should include({"type" => "maven", "files" => ["all-protos"]})
-        partitions.should include({"type" => "maven", "files" => ["module-two"]})
+        partitions.should include({"type" => "maven", "files" => ["all-protos"], "upload_artifacts" => false})
+        partitions.should include({"type" => "maven", "files" => ["module-two"], "upload_artifacts" => false})
       end
 
       it "should not build everything if the file change is from the .rig directory" do
@@ -71,12 +76,14 @@ describe MavenPartitioner do
         File.stub(:exists?).with("module-two/pom.xml").and_return(true)
 
         subject.stub(:depends_on_map).and_return({ "module-two" => ["module-two"].to_set })
+        subject.stub(:deployable_modules_map).and_return({})
+        subject.stub(:integration_modules_for).and_return([])
 
         subject.should_not_receive(:partitions)
 
         partitions = subject.incremental_partitions(build)
         partitions.size.should == 1
-        partitions.should include({"type" => "maven", "files" => ["module-two"]})
+        partitions.should include({"type" => "maven", "files" => ["module-two"], "upload_artifacts" => false})
       end
 
       it "should not fail if a file is reference in a top level module that is not in the top level pom" do
@@ -114,12 +121,14 @@ describe MavenPartitioner do
                                                    "module-one" => ["module-three", "module-four"].to_set,
                                                    "module-two" => ["module-three"].to_set
                                                  })
+        subject.stub(:deployable_modules_map).and_return({})
+        subject.stub(:integration_modules_for).and_return([])
         subject.should_not_receive(:partitions)
 
         partitions = subject.incremental_partitions(build)
         partitions.size.should == 2
-        partitions.should include({"type" => "maven", "files" => ["module-three"]})
-        partitions.should include({"type" => "maven", "files" => ["module-four"]})
+        partitions.should include({"type" => "maven", "files" => ["module-three"], "upload_artifacts" => false})
+        partitions.should include({"type" => "maven", "files" => ["module-four"], "upload_artifacts" => false})
       end
 
       it "should build everything if one of the files does not map to a module" do

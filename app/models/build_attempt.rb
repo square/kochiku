@@ -54,8 +54,10 @@ class BuildAttempt < ActiveRecord::Base
     # to promote this even if another part fails since there are a lot of projects and
     # one is usually broken!
     if build.project.main? && build_part.successful?
-      if promotion_ref = build.deployable_branch(build_part.paths.first)
-        BranchUpdateJob.enqueue(build.id, promotion_ref)
+      build_part.paths.each do |path|
+        if promotion_ref = build.deployable_branch(path)
+          BranchUpdateJob.enqueue(build.id, promotion_ref)
+        end
       end
     end
 

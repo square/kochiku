@@ -11,12 +11,30 @@ class MavenPartitioner
   end
 
   def partitions
-    maven_modules.map do |mvn_module|
-      {
-          'type' => 'maven',
-          'files' => [mvn_module]
-      }
-    end
+    maven_modules.map { |mvn_module| partition_info(mvn_module) }.compact
+  end
+
+  def pom_for(mvn_module)
+    Nokogiri::XML(File.read("#{mvn_module}/pom.xml"))
+  end
+
+  def partition_info(mvn_module_name)
+    integration_modules = integration_modules_for(mvn_module_name)
+
+    return nil if /\/integration$/ =~ mvn_module_name
+
+    modules = [mvn_module_name] + integration_modules
+
+    {
+      'type' => 'maven',
+      'files' => modules,
+      'upload_artifacts' => (!!deployable_modules_map[mvn_module_name])
+    }
+  end
+
+  def integration_modules_for(mvn_module_name)
+    pom = pom_for(mvn_module_name)
+    pom.css('project>properties>integrationModule').map(&:text)
   end
 
   def incremental_partitions(build)
@@ -42,19 +60,15 @@ class MavenPartitioner
       end
     end
 
-    modules_to_build.map do |module_name|
-      {
-          'type' => 'maven',
-          'files' => [module_name]
-      }
-    end
+    modules_to_build.map  { |mvn_module| partition_info(mvn_module) }.compact
   end
 
   def emails_for_commits_causing_failures(java_master_build)
     return [] if java_master_build.build_parts.failed_or_errored.empty?
 
     failed_modules = java_master_build.build_parts.failed_or_errored.inject(Set.new) do |failed_set, build_part|
-      failed_set.add(build_part.paths.first)
+      build_part.paths.each { |path| failed_set.add(path) }
+      failed_set
     end
 
     email_and_files = Hash.new { |hash, key| hash[key] = [] }
@@ -110,7 +124,7 @@ class MavenPartitioner
     group_artifact_map = {}
 
     maven_modules.each do |mvn_module|
-      module_pom = Nokogiri::XML(File.read("#{mvn_module}/pom.xml"))
+      module_pom = pom_for(mvn_module)
       group_id = module_pom.css('project>groupId').first
       artifact_id = module_pom.css('project>artifactId').first
       next unless group_id && artifact_id
@@ -123,7 +137,7 @@ class MavenPartitioner
     module_dependency_map = {}
 
     maven_modules.each do |mvn_module|
-      module_pom = Nokogiri::XML(File.read("#{mvn_module}/pom.xml"))
+      module_pom = pom_for(mvn_module)
       module_dependency_map[mvn_module] ||= Set.new
 
       module_pom.css('project>dependencies>dependency').each do |dep|
@@ -173,7 +187,7 @@ class MavenPartitioner
     deployable_modules_map = {}
 
     maven_modules.each do |mvn_module|
-      module_pom = Nokogiri::XML(File.read("#{mvn_module}/pom.xml"))
+      module_pom = pom_for(mvn_module)
       deployable_branch = module_pom.css('project>properties>deployableBranch').first
 
       if deployable_branch
