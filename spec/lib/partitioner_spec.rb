@@ -235,7 +235,7 @@ describe Partitioner do
       POM
       }
 
-      it "should call the maven paritioner" do
+      it "should call the maven partitioner" do
         File.stub(:read).with(MavenPartitioner::POM_XML).and_return(top_level_pom)
         File.stub(:read).with("module-one/pom.xml").and_return(module_one_pom)
         File.stub(:read).with("all-java/pom.xml").and_return("")
