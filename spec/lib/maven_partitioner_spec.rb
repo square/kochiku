@@ -20,14 +20,12 @@ describe MavenPartitioner do
         File.stub(:exists?).with("module-one/pom.xml").and_return(true)
         File.stub(:exists?).with("module-two/pom.xml").and_return(true)
 
-        subject.stub(:deployable_modules_map).and_return({"module-four" => {}})
-        subject.stub(:integration_modules_for).and_return([])
-        subject.stub(:integration_modules_for).with("module-two").and_return(["module-two/integration"])
-
+        subject.stub(:maven_modules).and_return(["module-one", "module-two", "module-two/integration", "module-three", "module-four"])
         subject.stub(:depends_on_map).and_return({
                                                    "module-one" => ["module-one", "module-three", "module-four"].to_set,
                                                    "module-two" => ["module-two", "module-three"].to_set
                                                  })
+        subject.stub(:deployable_modules_map).and_return({"module-four" => {}})
         subject.should_not_receive(:partitions)
 
         partitions = subject.incremental_partitions(build)
@@ -58,9 +56,9 @@ describe MavenPartitioner do
         File.stub(:exists?).and_return(false)
         File.stub(:exists?).with("module-two/pom.xml").and_return(true)
 
+        subject.stub(:maven_modules).and_return(["module-one", "module-two"])
         subject.stub(:depends_on_map).and_return({ "module-two" => ["module-two"].to_set })
         subject.stub(:deployable_modules_map).and_return({})
-        subject.stub(:integration_modules_for).and_return([])
         subject.should_not_receive(:partitions)
 
         partitions = subject.incremental_partitions(build)
@@ -75,9 +73,9 @@ describe MavenPartitioner do
         File.stub(:exists?).and_return(false)
         File.stub(:exists?).with("module-two/pom.xml").and_return(true)
 
+        subject.stub(:maven_modules).and_return(["module-one", "module-two"])
         subject.stub(:depends_on_map).and_return({ "module-two" => ["module-two"].to_set })
         subject.stub(:deployable_modules_map).and_return({})
-        subject.stub(:integration_modules_for).and_return([])
 
         subject.should_not_receive(:partitions)
 
@@ -117,12 +115,12 @@ describe MavenPartitioner do
         File.stub(:exists?).with("module-one/pom.xml").and_return(true)
         File.stub(:exists?).with("module-two/pom.xml").and_return(true)
 
+        subject.stub(:maven_modules).and_return(["module-one", "module-two", "module-three", "module-four"])
         subject.stub(:depends_on_map).and_return({
                                                    "module-one" => ["module-three", "module-four"].to_set,
                                                    "module-two" => ["module-three"].to_set
                                                  })
         subject.stub(:deployable_modules_map).and_return({})
-        subject.stub(:integration_modules_for).and_return([])
         subject.should_not_receive(:partitions)
 
         partitions = subject.incremental_partitions(build)

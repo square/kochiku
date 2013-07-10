@@ -19,22 +19,17 @@ class MavenPartitioner
   end
 
   def partition_info(mvn_module_name)
-    integration_modules = integration_modules_for(mvn_module_name)
-
     return nil if /\/integration$/ =~ mvn_module_name
 
-    modules = [mvn_module_name] + integration_modules
+    modules = [mvn_module_name]
+    integration_module_name = "#{mvn_module_name}/integration"
+    modules << integration_module_name if maven_modules.include?(integration_module_name)
 
     {
       'type' => 'maven',
       'files' => modules,
       'upload_artifacts' => (!!deployable_modules_map[mvn_module_name])
     }
-  end
-
-  def integration_modules_for(mvn_module_name)
-    pom = pom_for(mvn_module_name)
-    pom.css('project>properties>integrationModule').map(&:text)
   end
 
   def incremental_partitions(build)
