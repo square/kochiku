@@ -1,14 +1,14 @@
 require 'spec_helper'
 
 describe MavenPartitioner do
-  subject { MavenPartitioner.new }
+  let(:repository) { FactoryGirl.create(:repository, :url => "git@git.squareup.com:square/java.git") }
+  let(:project) { FactoryGirl.create(:project, :repository => repository, :name => repository.repository_name) }
+  let(:build) { FactoryGirl.create(:build, :queue => :developer, :project => project, :branch => "master") }
+
+  subject { MavenPartitioner.new(build) }
 
   describe "#incremental_partitions" do
     context "on master as the main build for the project" do
-      let(:repository) { FactoryGirl.create(:repository) }
-      let(:project) { FactoryGirl.create(:project, :name => repository.repository_name) }
-      let(:build) { FactoryGirl.create(:build, :queue => :developer, :project => project, :branch => "master") }
-
       it "should be the main build" do
         build.project.should be_main
       end
@@ -28,8 +28,9 @@ describe MavenPartitioner do
         subject.stub(:deployable_modules_map).and_return({"module-four" => {}})
         subject.should_not_receive(:partitions)
 
-        partitions = subject.incremental_partitions(build)
-        partitions.size.should == 4
+        partitions = subject.incremental_partitions
+        partitions.size.should == 5
+        partitions.should include({"type" => "maven", "files" => ["all-java"], "upload_artifacts" => false})
         partitions.should include({"type" => "maven", "files" => ["module-one"], "upload_artifacts" => false})
         partitions.should include({"type" => "maven", "files" => ["module-two", "module-two/integration"], "upload_artifacts" => false})
         partitions.should include({"type" => "maven", "files" => ["module-three"], "upload_artifacts" => false})
@@ -46,7 +47,7 @@ describe MavenPartitioner do
 
         subject.should_receive(:partitions).and_return([{"type" => "maven", "files" => "ALL"}])
 
-        partitions = subject.incremental_partitions(build)
+        partitions = subject.incremental_partitions
         partitions.should == [{"type" => "maven", "files" => "ALL"}]
       end
 
@@ -61,8 +62,9 @@ describe MavenPartitioner do
         subject.stub(:deployable_modules_map).and_return({})
         subject.should_not_receive(:partitions)
 
-        partitions = subject.incremental_partitions(build)
-        partitions.size.should == 2
+        partitions = subject.incremental_partitions
+        partitions.size.should == 3
+        partitions.should include({"type" => "maven", "files" => ["all-java"], "upload_artifacts" => false})
         partitions.should include({"type" => "maven", "files" => ["all-protos"], "upload_artifacts" => false})
         partitions.should include({"type" => "maven", "files" => ["module-two"], "upload_artifacts" => false})
       end
@@ -79,8 +81,9 @@ describe MavenPartitioner do
 
         subject.should_not_receive(:partitions)
 
-        partitions = subject.incremental_partitions(build)
-        partitions.size.should == 1
+        partitions = subject.incremental_partitions
+        partitions.size.should == 2
+        partitions.should include({"type" => "maven", "files" => ["all-java"], "upload_artifacts" => false})
         partitions.should include({"type" => "maven", "files" => ["module-two"], "upload_artifacts" => false})
       end
 
@@ -90,14 +93,17 @@ describe MavenPartitioner do
         File.stub(:exists?).and_return(false)
         File.stub(:exists?).with("new-module/pom.xml").and_return(true)
 
+        subject.stub(:maven_modules).and_return(["module-one", "module-two"])
         subject.stub(:depends_on_map).and_return({
                                                   "module-one" => ["module-one", "module-three", "module-four"].to_set,
                                                   "module-two" => ["module-two", "module-three"].to_set
                                                  })
+        subject.stub(:deployable_modules_map).and_return({})
         subject.should_not_receive(:partitions)
 
-        partitions = subject.incremental_partitions(build)
-        partitions.should be_empty
+        partitions = subject.incremental_partitions
+        partitions.size.should == 1
+        partitions.should include({"type" => "maven", "files" => ["all-java"], "upload_artifacts" => false})
       end
     end
 
@@ -123,7 +129,7 @@ describe MavenPartitioner do
         subject.stub(:deployable_modules_map).and_return({})
         subject.should_not_receive(:partitions)
 
-        partitions = subject.incremental_partitions(build)
+        partitions = subject.incremental_partitions
         partitions.size.should == 2
         partitions.should include({"type" => "maven", "files" => ["module-three"], "upload_artifacts" => false})
         partitions.should include({"type" => "maven", "files" => ["module-four"], "upload_artifacts" => false})
@@ -139,7 +145,7 @@ describe MavenPartitioner do
 
         subject.should_receive(:partitions).and_return([{"type" => "maven", "files" => "ALL"}])
 
-        partitions = subject.incremental_partitions(build)
+        partitions = subject.incremental_partitions
         partitions.should == [{"type" => "maven", "files" => "ALL"}]
       end
 
@@ -155,20 +161,16 @@ describe MavenPartitioner do
                                                  })
         subject.should_not_receive(:partitions)
 
-        partitions = subject.incremental_partitions(build)
+        partitions = subject.incremental_partitions
         partitions.should be_empty
       end
     end
   end
 
   describe "#emails_for_commits_causing_failures" do
-    let(:repository) { FactoryGirl.create(:repository) }
-    let(:project) { FactoryGirl.create(:project, :name => repository.repository_name) }
-    let(:build) { FactoryGirl.create(:build, :queue => :developer, :project => project, :branch => "master") }
-
     it "should return nothing if there are no failed parts" do
       build.build_parts.failed_or_errored.should be_empty
-      emails = subject.emails_for_commits_causing_failures(build)
+      emails = subject.emails_for_commits_causing_failures
       emails.should be_empty
     end
 
@@ -194,7 +196,7 @@ describe MavenPartitioner do
                                                })
       subject.should_not_receive(:partitions)
 
-      email_and_files = subject.emails_for_commits_causing_failures(build)
+      email_and_files = subject.emails_for_commits_causing_failures
       email_and_files.size.should == 2
       email_and_files["userone@example.com"].should == ["module-one/src/main/java/com/squareup/Foo.java"]
       email_and_files["userfour@example.com"].size.should == 2
@@ -218,7 +220,7 @@ describe MavenPartitioner do
       subject.stub(:depends_on_map).and_return({ "module-one" => ["module-one"].to_set })
       subject.should_not_receive(:partitions)
 
-      email_and_files = subject.emails_for_commits_causing_failures(build)
+      email_and_files = subject.emails_for_commits_causing_failures
       email_and_files.size.should == 1
       email_and_files["userone@example.com"].should ==["module-one/src/main/java/com/squareup/Foo.java"]
     end
@@ -239,7 +241,7 @@ describe MavenPartitioner do
       subject.stub(:depends_on_map).and_return({ "module-one" => ["module-one"].to_set })
       subject.should_not_receive(:partitions)
 
-      email_and_files = subject.emails_for_commits_causing_failures(build)
+      email_and_files = subject.emails_for_commits_causing_failures
       email_and_files.size.should == 2
       email_and_files["userone@example.com"].should ==["module-one/src/main/java/com/squareup/Foo.java"]
       email_and_files["protouser@example.com"].should ==["squareup/juno/internal.proto"]
@@ -257,7 +259,7 @@ describe MavenPartitioner do
       subject.stub(:depends_on_map).and_return({ "module-one" => ["module-one"].to_set })
       subject.should_not_receive(:partitions)
 
-      email_and_files = subject.emails_for_commits_causing_failures(build)
+      email_and_files = subject.emails_for_commits_causing_failures
       email_and_files.should be_empty
     end
   end

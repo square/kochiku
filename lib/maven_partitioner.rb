@@ -4,6 +4,10 @@ require 'set'
 class MavenPartitioner
   POM_XML = 'pom.xml'
 
+  def initialize(build)
+    @build = build
+  end
+
   def maven_modules
     return @maven_modules if @maven_modules
     top_level_pom = Nokogiri::XML(File.read(POM_XML))
@@ -25,23 +29,29 @@ class MavenPartitioner
     integration_module_name = "#{mvn_module_name}/integration"
     modules << integration_module_name if maven_modules.include?(integration_module_name)
 
+
+    upload_artifacts = false
+    if @build.project.main? && @build.repository.url.end_with?("square/java.git")
+      upload_artifacts = (!!deployable_modules_map[mvn_module_name])
+    end
+
     {
       'type' => 'maven',
       'files' => modules,
-      'upload_artifacts' => (!!deployable_modules_map[mvn_module_name])
+      'upload_artifacts' => upload_artifacts
     }
   end
 
-  def incremental_partitions(build)
+  def incremental_partitions
     modules_to_build = Set.new
 
-    if build.repository.url.end_with?("square/java.git")
+    if @build.repository.url.end_with?("square/java.git")
       # Build all-java module for all changes in the java repo
       modules_to_build.add("all-java")
     end
 
-    files_changed_method = build.project.main? ? :files_changed_since_last_green : :files_changed_in_branch
-    GitBlame.send(files_changed_method, build).each do |file_and_emails|
+    files_changed_method = @build.project.main? ? :files_changed_since_last_green : :files_changed_in_branch
+    GitBlame.send(files_changed_method, @build).each do |file_and_emails|
       module_affected_by_file = file_to_module(file_and_emails[:file])
 
       if module_affected_by_file.nil?
@@ -58,17 +68,18 @@ class MavenPartitioner
     modules_to_build.map  { |mvn_module| partition_info(mvn_module) }.compact
   end
 
-  def emails_for_commits_causing_failures(java_master_build)
-    return [] if java_master_build.build_parts.failed_or_errored.empty?
+  def emails_for_commits_causing_failures
+    return [] unless @build.project.main? && @build.repository.url.end_with?("square/java.git")
+    return [] if @build.build_parts.failed_or_errored.empty?
 
-    failed_modules = java_master_build.build_parts.failed_or_errored.inject(Set.new) do |failed_set, build_part|
+    failed_modules = @build.build_parts.failed_or_errored.inject(Set.new) do |failed_set, build_part|
       build_part.paths.each { |path| failed_set.add(path) }
       failed_set
     end
 
     email_and_files = Hash.new { |hash, key| hash[key] = [] }
-    GitRepo.inside_copy(java_master_build.repository, java_master_build.ref) do
-      GitBlame.files_changed_since_last_green(java_master_build, :fetch_emails => true).each do |file_and_emails|
+    GitRepo.inside_copy(@build.repository, @build.ref) do
+      GitBlame.files_changed_since_last_green(@build, :fetch_emails => true).each do |file_and_emails|
         file = file_and_emails[:file]
         emails = file_and_emails[:emails]
         module_affected_by_file = file_to_module(file)
