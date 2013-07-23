@@ -44,7 +44,7 @@ class Partitioner
     strategy = subset.fetch('balance', 'alphabetically')
     strategy = 'alphabetically' unless Strategies.respond_to?(strategy)
 
-    files = Array(load_manifest(manifest)) | Dir[glob]
+    files = Array(load_manifest(manifest)) | Dir[*glob]
     parts = Strategies.send(strategy, files, workers).map do |files|
       part = {'type' => type, 'files' => files.compact}
       if subset['options']
