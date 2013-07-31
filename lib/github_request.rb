@@ -27,6 +27,7 @@ class GithubRequest
       body = response.body
       Rails.logger.info("Github response: #{response.inspect}")
       Rails.logger.info("Github response body: #{body.inspect}")
+      raise body unless response.is_a? Net::HTTPSuccess
     end
     body
   end
