@@ -3,26 +3,52 @@
 # this file lives at git@git.squareup.com:square/kochiku.git under scripts/clean_nexus_app_releases.rb
 #
 
-Dir.chdir "/app/nexus/sonatype-work/nexus/storage/app-releases"
+RELEASES_DIR = "/app/nexus/sonatype-work/nexus/storage/app-releases"
 
 REFS_API_URLS = [
   "https://git.squareup.com/api/v3/repos/square/java/git/refs/heads"
 ]
 
-BRANCHES_TO_KEEP = [
-  /^ci-master-distributed-latest$/,
-  /^ci-.*-master\/latest$/, /^deployable-/,
-  /\/staging$/, /-staging\/latest$/, /staging-latest$/,
-  /\/production$/, /-production\/latest$/, /production-latest$/
-]
+BRANCHES_TO_KEEP = {
+  # mtv-styley:
+  /^ci-(.*)-master\/latest$/ => '\1',
+  /^(.*)-staging\/latest$/ => '\1',
+  /^(.*)-production\/latest$/ => '\1',
+
+  # hoist I guess?
+  /^deployable-(.*)$/ => '\1',
+  /^hoist\/(.*)\/.*\/staging$/ => '\1',
+  /^hoist\/(.*)\/.*\/production/ => '\1',
+}
 
 HOURS_TO_RETAIN = 12
+
+Dir.chdir RELEASES_DIR
+
+puts "Running #{[$0, ARGV].flatten.join(" ")} at #{Time.now.to_s}"
+puts ""
 
 require 'uri'
 require 'net/http'
 require 'json'
 require 'pathname'
 require 'fileutils'
+
+def dump_disk_info(stage)
+  puts "#{stage}: df -h #{RELEASES_DIR}:"
+  system "df -h ."
+  puts ""
+
+  puts "#{stage}: du -sh #{RELEASES_DIR}:"
+  system "du -sh"
+  puts ""
+
+  puts "#{stage}: du -sh #{RELEASES_DIR}/com/squareup/*:"
+  system "du -sh com/squareup/*"
+  puts ""
+end
+
+dump_disk_info("before")
 
 class GithubRequest
   def self.get(uri)
@@ -47,14 +73,17 @@ REFS_API_URLS.each do |url|
   ref_infos = JSON.parse(GithubRequest.get(URI.parse(url)))
   ref_infos.each do |ref_info|
     branch_name = ref_info["ref"].gsub(/^refs\/heads\//, '')
-    if BRANCHES_TO_KEEP.any? { |re| re =~ branch_name }
-      (shas_to_keep[ref_info["object"]["sha"]] ||= []) << branch_name
+    BRANCHES_TO_KEEP.each do |re, replacement|
+      if re =~ branch_name
+        sha = ref_info["object"]["sha"]
+        sha_info = shas_to_keep[sha] ||= { artifacts: {} }
+        (sha_info[:artifacts][branch_name.gsub(re, replacement)] ||= []) << branch_name
+      end
     end
   end
 end
 
 puts "We want to retain #{shas_to_keep.size} shas."
-retaining_because = {}
 
 elderly_shaded_jars = `find . -name .nexus -prune -o -name *-shaded.jar -mmin +#{HOURS_TO_RETAIN * 60}`.split(/\n/)
 elderly_shaded_jars.each do |jar|
@@ -62,18 +91,27 @@ elderly_shaded_jars.each do |jar|
   next if jar_file.basename.to_s == ".nexus"
   sha_dir = jar_file.dirname
   sha = sha_dir.basename.to_s
-  refering_branches = shas_to_keep[sha] || []
-  if refering_branches.size > 0
-    refering_branches.each { |branch| retaining_because[branch] ||= 0; retaining_because[branch] += 1 }
-  else
-    puts "Removing #{sha_dir}."
-    #FileUtils.rm_rf(sha_dir)
+
+  artifact_name = jar_file.parent.parent.basename.to_s
+
+  sha_info = shas_to_keep[sha]
+  retain = false
+  if sha_info
+    sha_info[:artifacts].each do |artifact_to_keep, triggering_branches|
+      if artifact_name == artifact_to_keep
+        puts "Retaining #{jar_file} because #{triggering_branches.join(", ")}"
+        retain = true
+      end
+    end
+  end
+
+  unless retain
+    puts "Removing #{sha_dir}"
+    FileUtils.rm_rf(sha_dir)
   end
 end
 
-retaining_because.keys.sort.each do |branch|
-  puts "#{branch} caused #{retaining_because[branch]} artifacts to be retained."
-end
+dump_disk_info("after")
 
 File.write("clean-info.txt", "Last cleaned by ~nexus/bin/clean_nexus_app_releases.rb at #{`date`.chomp}.")
 
