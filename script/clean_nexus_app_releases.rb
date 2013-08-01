@@ -9,17 +9,17 @@ REFS_API_URLS = [
   "https://git.squareup.com/api/v3/repos/square/java/git/refs/heads"
 ]
 
-BRANCHES_TO_KEEP = {
+BRANCHES_TO_KEEP = [
   # mtv-styley:
-  /^ci-(.*)-master\/latest$/ => '\1',
-  /^(.*)-staging\/latest$/ => '\1',
-  /^(.*)-production\/latest$/ => '\1',
+  /^ci-(\w+)-master\/latest$/,
+  /^(\w+)-staging\/latest$/,
+  /^(\w+)-production\/latest$/,
 
   # hoist I guess?
-  /^deployable-(.*)$/ => '\1',
-  /^hoist\/(.*)\/.*\/staging$/ => '\1',
-  /^hoist\/(.*)\/.*\/production/ => '\1',
-}
+  /^deployable-(\w+)$/,
+  /^hoist\/(\w+)\/\w+\/staging$/,
+  /^hoist\/(\w+)\/\w+\/production/,
+]
 
 HOURS_TO_RETAIN = 12
 
@@ -73,11 +73,11 @@ REFS_API_URLS.each do |url|
   ref_infos = JSON.parse(GithubRequest.get(URI.parse(url)))
   ref_infos.each do |ref_info|
     branch_name = ref_info["ref"].gsub(/^refs\/heads\//, '')
-    BRANCHES_TO_KEEP.each do |re, replacement|
-      if re =~ branch_name
+    BRANCHES_TO_KEEP.each do |branch_regexp|
+      branch_regexp.match(branch_name) do |m|
         sha = ref_info["object"]["sha"]
         sha_info = shas_to_keep[sha] ||= { artifacts: {} }
-        (sha_info[:artifacts][branch_name.gsub(re, replacement)] ||= []) << branch_name
+        (sha_info[:artifacts][m[1]] ||= []) << branch_name
       end
     end
   end
