@@ -7,6 +7,18 @@ describe MavenPartitioner do
 
   subject { MavenPartitioner.new(build) }
 
+  describe "#group_modules" do
+    it "should group modules based on the top level directory" do
+      subject.stub(:deployable_modules_map).and_return({})
+      modules = ["a", "b", "b/1", "b/2", "b/1/2", "c/1"]
+      partitions = subject.group_modules(modules)
+      partitions.size.should == 3
+      partitions.should include({"type" => "maven", "files" => ["a"], "upload_artifacts" => false})
+      partitions.should include({"type" => "maven", "files" => ["b", "b/1", "b/2", "b/1/2"], "upload_artifacts" => false})
+      partitions.should include({"type" => "maven", "files" => ["c/1"], "upload_artifacts" => false})
+    end
+  end
+
   describe "#incremental_partitions" do
     context "on master as the main build for the project" do
       it "should be the main build" do
@@ -23,7 +35,7 @@ describe MavenPartitioner do
         subject.stub(:maven_modules).and_return(["module-one", "module-two", "module-two/integration", "module-three", "module-four"])
         subject.stub(:depends_on_map).and_return({
                                                    "module-one" => ["module-one", "module-three", "module-four"].to_set,
-                                                   "module-two" => ["module-two", "module-three"].to_set
+                                                   "module-two" => ["module-two", "module-two/integration", "module-three"].to_set,
                                                  })
         subject.stub(:deployable_modules_map).and_return({"module-four" => {}})
         subject.should_not_receive(:partitions)

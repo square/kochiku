@@ -15,29 +15,30 @@ class MavenPartitioner
   end
 
   def partitions
-    maven_modules.map { |mvn_module| partition_info(mvn_module) }.compact
+    group_modules(maven_modules)
   end
 
   def pom_for(mvn_module)
     Nokogiri::XML(File.read("#{mvn_module}/pom.xml"))
   end
 
-  def partition_info(mvn_module_name)
-    return nil if /\/integration$/ =~ mvn_module_name
-
-    modules = [mvn_module_name]
-    integration_module_name = "#{mvn_module_name}/integration"
-    modules << integration_module_name if maven_modules.include?(integration_module_name)
-
-
-    upload_artifacts = false
-    if @build.project.main? && @build.repository.url.end_with?("square/java.git")
-      upload_artifacts = (!!deployable_modules_map[mvn_module_name])
+  def group_modules(mvn_modules)
+    module_groups = {}
+    mvn_modules.each do |mvn_module|
+      (module_groups[mvn_module.split('/').first] ||= []) << mvn_module
     end
+
+    module_groups.values.map { |modules| partition_info(modules) }
+  end
+
+  def partition_info(mvn_modules)
+    upload_artifacts = @build.project.main? &&
+        @build.repository.url.end_with?("square/java.git") &&
+        mvn_modules.any? { |module_name| (!!deployable_modules_map[module_name]) }
 
     {
       'type' => 'maven',
-      'files' => modules,
+      'files' => mvn_modules,
       'upload_artifacts' => upload_artifacts
     }
   end
@@ -65,7 +66,7 @@ class MavenPartitioner
       end
     end
 
-    modules_to_build.map  { |mvn_module| partition_info(mvn_module) }.compact
+    group_modules(modules_to_build)
   end
 
   def emails_for_commits_causing_failures
