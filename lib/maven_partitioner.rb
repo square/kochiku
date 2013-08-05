@@ -23,18 +23,13 @@ class MavenPartitioner
   end
 
   def group_modules(mvn_modules)
-    module_groups = {}
-    mvn_modules.each do |mvn_module|
-      (module_groups[mvn_module.split('/').first] ||= []) << mvn_module
-    end
-
-    module_groups.values.map { |modules| partition_info(modules) }
+    mvn_modules.group_by {|m| m.split("/").first }.values.map { |modules| partition_info(modules) }
   end
 
   def partition_info(mvn_modules)
     upload_artifacts = @build.project.main? &&
         @build.repository.url.end_with?("square/java.git") &&
-        mvn_modules.any? { |module_name| (!!deployable_modules_map[module_name]) }
+        mvn_modules.any? { |module_name| deployable_modules_map[module_name] }
 
     {
       'type' => 'maven',
