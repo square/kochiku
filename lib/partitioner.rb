@@ -1,7 +1,6 @@
 require 'maven_partitioner'
 
 class Partitioner
-  BUILD_YML = 'config/ci/build.yml'
   KOCHIKU_YML = 'config/ci/kochiku.yml'
 
   def partitions(build)
@@ -13,8 +12,6 @@ class Partitioner
       else
         build_partitions_from(kochiku_yml)
       end
-    elsif File.exist?(BUILD_YML)
-      YAML.load_file(BUILD_YML).values.select { |part| part['type'].present? }
     elsif File.exist?(MavenPartitioner::POM_XML)
       partitioner = MavenPartitioner.new(build)
       build.update_attributes!(:deployable_map => partitioner.deployable_modules_map,

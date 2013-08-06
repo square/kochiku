@@ -5,20 +5,10 @@ describe Partitioner do
   let(:partitioner) { Partitioner.new }
 
   before do
-    YAML.stub(:load_file).with(Partitioner::BUILD_YML).and_return(build_yml)
     YAML.stub(:load_file).with(Partitioner::KOCHIKU_YML).and_return(kochiku_yml)
     File.stub(:exist?).with(MavenPartitioner::POM_XML).and_return(pom_xml_exists)
     File.stub(:exist?).with(Partitioner::KOCHIKU_YML).and_return(kochiku_yml_exists)
-    File.stub(:exist?).with(Partitioner::BUILD_YML).and_return(build_yml_exists)
   end
-
-  let(:build_yml) {{
-    'host1' => {
-      'type'  => 'rspec',
-      'files' => '<FILES>'
-    },
-    'bad config' => {}
-  }}
 
   let(:kochiku_yml) {[
     { 'type' => 'rspec', 'glob' => 'spec/**/*_spec.rb', 'workers' => 3, 'balance' => balance, 'manifest' => manifest }
@@ -26,7 +16,6 @@ describe Partitioner do
 
   let(:kochiku_yml_exists) { false }
   let(:pom_xml_exists) { false }
-  let(:build_yml_exists) { false }
   let(:balance) { 'alphabetically' }
   let(:manifest) { nil }
 
@@ -85,7 +74,6 @@ describe Partitioner do
 
   context "when there is no config yml" do
     let(:kochiku_yml_exists) { false }
-    let(:build_yml_exists) { false }
 
     it "should return a single partiion" do
       partitions = partitioner.partitions(build)
@@ -100,8 +88,7 @@ describe Partitioner do
 
     context 'when there is not a kochiku.yml' do
       let(:kochiku_yml_exists) { false }
-      let(:build_yml_exists) { true }
-      it { should == [{'type' => 'rspec', 'files' => '<FILES>'}] }
+      it { should == [{"type" => "spec", "files" => ['no-manifest']}] }
     end
 
     context 'when there is a kochiku.yml' do
