@@ -40,7 +40,7 @@ describe BuildStrategy do
 
     context "when pushing to a ref that doesn't exist" do
       before(:each) {
-        mock_git_command = mock()
+        mock_git_command = double
         mock_git_command.should_receive(:run).and_return ""
         Cocaine::CommandLine.stub(:new).with("git show-ref", anything, anything).and_return mock_git_command
       }
@@ -58,7 +58,7 @@ describe BuildStrategy do
     }
 
     it "should promote a sha" do
-      mock_git_command = mock()
+      mock_git_command = double
       mock_git_command.should_receive(:run).and_return ""
       Cocaine::CommandLine.stub(:new).with(["git push", "origin abc123:refs/heads/last-green -f"]).and_return mock_git_command
 

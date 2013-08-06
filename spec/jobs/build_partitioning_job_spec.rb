@@ -16,7 +16,7 @@ describe BuildPartitioningJob do
         build.stub(:partition).with('PARTITIONS')
       end
 
-      let(:partitioner) { stub }
+      let(:partitioner) { double }
 
       it "uses the partitioner to partition the build" do
         stub_request(:post, /https:\/\/git\.squareup\.com\/api\/v3\/repos\/square\/kochiku\/statuses\//)
