@@ -25,9 +25,8 @@ class Partitioner
   private
 
   def build_partitions_from(kochiku_yml)
-    $stderr.puts "DEPRECATED: Your kochiku.yml file contains 'rvm' when it should be 'ruby'. Please update your config." if kochiku_yml.include?("rvm")
-    (kochiku_yml["ruby"] || kochiku_yml["rvm"]).map do |rvm|
-      options = {"language" => kochiku_yml["language"], "ruby" => rvm}
+    kochiku_yml["ruby"].map do |ruby|
+      options = {"language" => kochiku_yml["language"], "ruby" => ruby}
       kochiku_yml["targets"].map { |subset| partitions_for(subset.merge("options" => options)) }.flatten
     end.flatten
   end
