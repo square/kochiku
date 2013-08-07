@@ -27,7 +27,9 @@ class GithubRequest
       body = response.body
       Rails.logger.info("Github response: #{response.inspect}")
       Rails.logger.info("Github response body: #{body.inspect}")
-      raise body unless response.is_a? Net::HTTPSuccess
+      # Need to revisit this, sometimes we want allow a 422 request when
+      # we try to update branches
+      #raise body unless response.is_a? Net::HTTPSuccess
     end
     body
   end
