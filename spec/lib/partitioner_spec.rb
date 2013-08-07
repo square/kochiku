@@ -38,6 +38,38 @@ describe Partitioner do
       partitions.first["type"].should == "rspec"
       partitions.first["files"].should_not be_empty
     end
+
+    describe "using the deprecated rvm option" do
+      let(:kochiku_yml) do
+        {
+          "ruby" => ["ree-1.8.7-2011.12"],
+          "language" => "ruby",
+          "targets" => [
+            { 'type' => 'rspec', 'glob' => 'spec/**/*_spec.rb', 'workers' => 3, 'balance' => balance, 'manifest' => manifest }
+          ]
+        }
+      end
+
+      it "parses the rvm option as ruby" do
+        partitioner.partitions(build).first["options"]["ruby"].should == "ree-1.8.7-2011.12"
+      end
+
+      context "when there is an array of globs" do
+        let(:kochiku_yml) do
+          {
+            "ruby" => ["ree-1.8.7-2011.12"],
+            "language" => "ruby",
+            "targets" => [
+              { 'type' => 'rspec', 'glob' => ['spec/models/**/*_spec.rb', 'spec/controllers/**/*_spec.rb'], 'workers' => 3, 'balance' => balance, 'manifest' => manifest }
+            ]
+          }
+        end
+
+        it "globs the right files" do
+          partitioner.partitions(build).first["files"].should_not be_empty
+        end
+      end
+    end
   end
 
   context "when there is no config yml" do
