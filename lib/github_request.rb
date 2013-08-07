@@ -6,6 +6,8 @@ class GithubRequest
   OAUTH_TOKEN = Secrets.github_oauth
   AUTH = {"Authorization" => "token #{OAUTH_TOKEN}"}
 
+  class ResponseError < Exception; end
+
   def self.post(uri, args)
     make_request(:post, uri, [args.to_json, AUTH])
   end
@@ -27,9 +29,7 @@ class GithubRequest
       body = response.body
       Rails.logger.info("Github response: #{response.inspect}")
       Rails.logger.info("Github response body: #{body.inspect}")
-      # Need to revisit this, sometimes we want allow a 422 request when
-      # we try to update branches
-      #raise body unless response.is_a? Net::HTTPSuccess
+      raise ResponseError.new("response: #{response.class} body: #{body}") unless response.is_a? Net::HTTPSuccess
     end
     body
   end

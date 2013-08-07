@@ -14,22 +14,32 @@ class BranchUpdateJob < JobBase
   def perform
     build = Build.find(@build_id)
 
-    GithubRequest.post(
-      URI("#{build.repository.base_api_url}/git/refs"),
-      :ref => "refs/heads/deployable-#{@promotion_ref}",
-      :sha => build.ref
-    )
+    begin
+      GithubRequest.post(
+          URI("#{build.repository.base_api_url}/git/refs"),
+          :ref => "refs/heads/deployable-#{@promotion_ref}",
+          :sha => build.ref
+      )
+    rescue GithubRequest::ResponseError
+       # We expect a 422 when the branch exists
+      Rails.logger.info("Failed to create git ref for #{@promotion_ref}")
+    end
     GithubRequest.patch(
       URI("#{build.repository.base_api_url}/git/refs/heads/deployable-#{@promotion_ref}"),
       :sha => build.ref,
       :force => "true"
     )
 
-    GithubRequest.post(
-      URI("#{build.repository.base_api_url}/git/refs"),
-      :ref => "refs/heads/ci-#{@promotion_ref}-master/latest",
-      :sha => build.ref
-    )
+    begin
+      GithubRequest.post(
+          URI("#{build.repository.base_api_url}/git/refs"),
+          :ref => "refs/heads/ci-#{@promotion_ref}-master/latest",
+          :sha => build.ref
+      )
+    rescue GithubRequest::ResponseError
+      # We expect a 422 when the branch exists
+      Rails.logger.info("Failed to create git ref for #{@promotion_ref}")
+    end
     GithubRequest.patch(
       URI("#{build.repository.base_api_url}/git/refs/heads/ci-#{@promotion_ref}-master/latest"),
       :sha => build.ref,
