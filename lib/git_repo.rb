@@ -85,6 +85,7 @@ class GitRepo
 
     def clone_repo(repo_url, cached_repo_path)
       mirror_url = repo_url.gsub('git@git.squareup.com:', 'git://git-mirror.corp.squareup.com/')
+      # Note: the -c option is not avaiable on git 1.7.x
       Cocaine::CommandLine.new("git clone", "--recursive -c remote.origin.pushurl=#{repo_url} #{mirror_url} #{cached_repo_path}").run
     end
 
