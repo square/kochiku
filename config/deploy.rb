@@ -13,13 +13,13 @@ set :branch, "master"
 set :scm, :git
 set :scm_command, 'git'
 
-set :user, "square"
-set :deploy_to, "/Users/#{user}/kochiku"
+set :user, "kochiku"
+set :deploy_to, "/app/#{user}/kochiku"
 set :deploy_via, :remote_cache
 set :keep_releases, 10
 set :use_sudo, false
 
-server "macbuild-master.sfo.squareup.com", :app, :web, :db, :worker, :primary => true
+server "kochiku.corp.squareup.com", :app, :web, :db, :worker, :primary => true
 
 set :rails_env, "production"
 
@@ -83,10 +83,10 @@ end
 
 namespace :kochiku do
   task :setup, :roles => [:app, :worker] do
-    run "rvm gemset create 'kochiku'"
     run "gem install bundler -v '~> 1.0.21' --conservative"
     run "mkdir -p #{shared_path}/{build-partition,log_files}"
     run "[ -d #{shared_path}/build-partition/web-cache ] || #{scm_command} clone --recursive git@git.squareup.com:square/web.git #{shared_path}/build-partition/web-cache"
+    run "[ -d #{shared_path}/build-partition/java-cache ] || #{scm_command} clone --recursive git@git.squareup.com:square/java.git #{shared_path}/build-partition/java-cache"
   end
 
   task :symlinks, :roles => [:app, :worker] do

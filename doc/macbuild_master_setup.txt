@@ -30,8 +30,9 @@
 
 # Download the nginx version to be installed
 
-    cd /Users/square
-    curl http://nginx.org/download/nginx-1.5.0.tar.gz | tar xvz
+    sudo su - kochiku
+    cd ~
+    curl http://nginx.org/download/nginx-1.4.2.tar.gz | tar xvz
 
 # Install the passenger gem
 
@@ -49,7 +50,7 @@ Provide the path the nginx source (/Users/square/nginx-1.5.0)
 Use the default install dir (/opt/nginx)
 Ensure that nginx is configured with the following additional options:
 
-    --with-http_gzip_static_module --with-cc-opt=-I/usr/local/include --with-ld-opt=-L/usr/local/lib
+    --with-http_gzip_static_module
 
 Explanation for extra options:
 The http_gzip_static_module is used by kochiku to when serving the

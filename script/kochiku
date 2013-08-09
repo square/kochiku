@@ -39,7 +39,7 @@ end
 repo_url = `git remote -v`.split("\n").map {|r| r.split(/\s/) }.detect {|r| r.first.downcase == "origin" && r.last.include?("fetch") }[1]
 
 project = repo_url.split("/").last.split(".").first
-uri = URI.parse("http://macbuild-master.sfo.squareup.com/projects/#{hostname}-#{project}/builds")
+uri = URI.parse("https://kochiku.corp.squareup.com/projects/#{hostname}-#{project}/builds")
 
 params = {
   'build[hostname]' => hostname,
