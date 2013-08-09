@@ -38,7 +38,7 @@ module Secrets
   end
 
   def server_path
-    File.join("/Users/square/secrets")
+    File.join("/app/kochiku/secrets")
   end
 
   secret :github_oauth, 'kochiku-github.yaml', %w(oauth)
