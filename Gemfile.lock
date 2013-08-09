@@ -120,7 +120,7 @@ GEM
       net-ssh (>= 2.6.5)
     nokogiri (1.6.0)
       mini_portile (~> 0.5.0)
-    passenger (4.0.5)
+    passenger (4.0.10)
       daemon_controller (>= 1.1.0)
       rack
       rake (>= 0.8.1)
@@ -254,7 +254,7 @@ DEPENDENCIES
   launchy
   mysql2
   nokogiri
-  passenger (= 4.0.5)
+  passenger (= 4.0.10)
   pry-rails
   quiet_assets
   rails (= 3.2.13)

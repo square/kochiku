@@ -20,7 +20,7 @@ production:
   adapter: mysql2
   encoding: utf8
   reconnect: true
-  username: kochiku
-  password: tKB7YJVVEFjhKQzI86ce81FhZpNWgm
-  database: kochiku_production
-  host: macbuild-master.sfo.squareup.com
+  username: <%= YAML.load_file("/app/kochiku/secrets/credentials.yml")["mysql_username"] rescue '' %>
+  password: <%= YAML.load_file("/app/kochiku/secrets/credentials.yml")["mysql_password"] rescue '' %>
+  database: kochiku
+  host: servicedb.corp.squareup.com
