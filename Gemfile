@@ -4,7 +4,7 @@ def square_gem(org, name, opts = {})
   gem name, opts.merge(git: "git@git.squareup.com:#{org}/#{name}.git")
 end
 
-gem 'rails', '3.2.13'
+gem 'rails', '3.2.14'
 gem 'passenger', '4.0.10', group: :production
 
 gem 'squash_ruby', require: 'squash/ruby'
