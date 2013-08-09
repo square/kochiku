@@ -84,7 +84,8 @@ class GitRepo
     end
 
     def clone_repo(repo_url, cached_repo_path)
-      Cocaine::CommandLine.new("git clone", "--recursive #{repo_url} #{cached_repo_path}").run
+      mirror_url = repo_url.gsub('git@git.squareup.com:', 'git://git-mirror.corp.squareup.com/')
+      Cocaine::CommandLine.new("git clone", "--recursive -c remote.origin.pushurl=#{repo_url} #{mirror_url} #{cached_repo_path}").run
     end
 
     def synchronize_with_remote(name, branch = nil)
