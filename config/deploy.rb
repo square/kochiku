@@ -85,8 +85,8 @@ namespace :kochiku do
   task :setup, :roles => [:app, :worker] do
     run "gem install bundler -v '~> 1.0.21' --conservative"
     run "mkdir -p #{shared_path}/{build-partition,log_files}"
-    run "[ -d #{shared_path}/build-partition/web-cache ] || #{scm_command} clone --recursive git@git.squareup.com:square/web.git #{shared_path}/build-partition/web-cache"
-    run "[ -d #{shared_path}/build-partition/java-cache ] || #{scm_command} clone --recursive git@git.squareup.com:square/java.git #{shared_path}/build-partition/java-cache"
+    run "[ -d #{shared_path}/build-partition/web-cache ] || #{scm_command} clone --recursive -c remote.origin.pushurl=git@git.squareup.com:square/web.git git://git-mirror.corp.squareup.com/square/web.git #{shared_path}/build-partition/web-cache"
+    run "[ -d #{shared_path}/build-partition/java-cache ] || #{scm_command} clone --recursive -c remote.origin.pushurl=git@git.squareup.com:square/java.git git://git-mirror.corp.squareup.com/square/java.git #{shared_path}/build-partition/java-cache"
   end
 
   task :symlinks, :roles => [:app, :worker] do
