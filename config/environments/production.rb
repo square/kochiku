@@ -68,7 +68,7 @@ Kochiku::Application.configure do
   Resque.redis = Redis.new(:host => "kochiku.corp.squareup.com")
   Rails.application.routes.default_url_options[:host] = "kochiku.corp.squareup.com"
   Rails.application.routes.default_url_options[:protocol] = 'https'
-  config.action_mailer.default_url_options = {:host => "kochiku.corp.squareup.com", :protocol = 'https'}
+  config.action_mailer.default_url_options = {:host => "kochiku.corp.squareup.com", :protocol => 'https'}
 
   config.action_mailer.delivery_method = :smtp
   config.action_mailer.smtp_settings = {
