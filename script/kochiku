@@ -50,7 +50,19 @@ params = {
   'build[target_name]' => target_name,
 }
 
-response = Net::HTTP.post_form(uri, params)
-puts response['location']
-`open -g #{response['location']}`
+http = Net::HTTP.new(uri.host, uri.port)
+http.use_ssl = true
 
+request = Net::HTTP::Post.new(uri.request_uri)
+request.set_form_data(params)
+
+response = http.request(request)
+
+if response.code.to_i >= 400
+  puts "#{response.code} #{response.message}:"
+  puts response.body
+  exit(1)
+else
+  puts response['location']
+  `open -g #{response['location']}`
+end
