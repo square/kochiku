@@ -26,15 +26,20 @@ class GithubPostReceiveHook
   end
 
   def synchronize_or_create!
-    response_body = GithubRequest.get(@root_uri)
-    existing_hooks = JSON.parse(response_body)
-    existing_subscription = existing_hooks.detect do |hook|
-      hook["active"] && hook["events"] == @interested_events && hook["config"]["url"] == @receive_url
+    begin
+      response_body = GithubRequest.get(@root_uri)
+      existing_hooks = JSON.parse(response_body)
+      existing_subscription = existing_hooks.detect do |hook|
+        hook["active"] && hook["events"] == @interested_events && hook["config"]["url"] == @receive_url
+      end
+      if existing_subscription
+        @repository.update_attributes(:github_post_receive_hook_id => existing_subscription["id"])
+        return response_body
+      end
+    rescue GithubRequest::ResponseError
+      Rails.logger.info("Failed to get hooks for #{@root_uri}")
     end
-    if existing_subscription
-      @repository.update_attributes(:github_post_receive_hook_id => existing_subscription["id"])
-      return response_body
-    end
+
     GithubRequest.post(@root_uri, @subscribe_args)
   end
 end
