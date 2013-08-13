@@ -25,7 +25,7 @@ class GithubPostReceiveHook
     begin
       GithubRequest.patch(@hook_uri, @subscribe_args)
     rescue GithubRequest::ResponseError => e
-      if e.reason.is_a?(Net::HTTPNotFound)
+      if e.response.class == Net::HTTPNotFound
         create_hook
       else
         raise e

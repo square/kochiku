@@ -7,8 +7,7 @@ class GithubRequest
   AUTH = {"Authorization" => "token #{OAUTH_TOKEN}"}
 
   class ResponseError < Exception
-    attr_accessor :reason
-    attr_accessor :body
+    attr_accessor :response
   end
 
   def self.post(uri, args)
@@ -34,8 +33,7 @@ class GithubRequest
       Rails.logger.info("Github response body: #{body.inspect}")
       unless response.is_a? Net::HTTPSuccess
         response_error = ResponseError.new("response: #{response.class} body: #{body}")
-        response_error.reason = response.class
-        response_error.body = response.body
+        response_error.response = response
         raise response_error
       end
     end
