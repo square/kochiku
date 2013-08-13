@@ -1,5 +1,6 @@
 #!/usr/bin/env ruby
 require 'net/http'
+require 'openssl'
 require 'uri'
 require 'shellwords'
 
