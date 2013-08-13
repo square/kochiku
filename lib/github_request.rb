@@ -6,7 +6,9 @@ class GithubRequest
   OAUTH_TOKEN = Secrets.github_oauth
   AUTH = {"Authorization" => "token #{OAUTH_TOKEN}"}
 
-  class ResponseError < Exception; end
+  class ResponseError < Exception
+    attr :reason, :body
+  end
 
   def self.post(uri, args)
     make_request(:post, uri, [args.to_json, AUTH])
@@ -29,7 +31,12 @@ class GithubRequest
       body = response.body
       Rails.logger.info("Github response: #{response.inspect}")
       Rails.logger.info("Github response body: #{body.inspect}")
-      raise ResponseError.new("response: #{response.class} body: #{body}") unless response.is_a? Net::HTTPSuccess
+      unless response.is_a? Net::HTTPSuccess
+        response_error = ResponseError.new("response: #{response.class} body: #{body}")
+        response_error.reason = response.class
+        response_error.body = response.body
+        raise response_error
+      end
     end
     body
   end

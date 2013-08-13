@@ -22,7 +22,15 @@ class GithubPostReceiveHook
   private
 
   def update_repository_hook!
-    GithubRequest.patch(@hook_uri, @subscribe_args)
+    begin
+      GithubRequest.patch(@hook_uri, @subscribe_args)
+    rescue GithubRequest::ResponseError => e
+      if e.reason.is_a?(Net::HTTPNotFound)
+        create_hook
+      else
+        raise e
+      end
+    end
   end
 
   def synchronize_or_create!
@@ -40,6 +48,10 @@ class GithubPostReceiveHook
       Rails.logger.info("Failed to get hooks for #{@root_uri}")
     end
 
+    create_hook
+  end
+
+  def create_hook
     GithubRequest.post(@root_uri, @subscribe_args)
   end
 end
