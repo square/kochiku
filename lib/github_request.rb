@@ -7,7 +7,8 @@ class GithubRequest
   AUTH = {"Authorization" => "token #{OAUTH_TOKEN}"}
 
   class ResponseError < Exception
-    attr :reason, :body
+    attr_accessor :reason
+    attr_accessor :body
   end
 
   def self.post(uri, args)
