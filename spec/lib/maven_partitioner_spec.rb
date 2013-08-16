@@ -81,8 +81,10 @@ describe MavenPartitioner do
         partitions.should include({"type" => "maven", "files" => ["module-two"], "upload_artifacts" => false})
       end
 
-      it "should not build everything if the file change is from the .rig directory" do
+      it "should not build everything if the file change is from the .rig or .hoist directory or the toplevel pom.xml" do
         GitBlame.stub(:files_changed_since_last_green).with(build).and_return([{:file => ".rig/test", :emails => []},
+                                                                               {:file => ".hoist/test", :emails => []},
+                                                                               {:file => "pom.xml", :emails => []},
                                                                                {:file => "module-two/src/main/java/com/squareup/bar.java", :emails => []}])
         File.stub(:exists?).and_return(false)
         File.stub(:exists?).with("module-two/pom.xml").and_return(true)

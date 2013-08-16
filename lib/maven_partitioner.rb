@@ -53,7 +53,9 @@ class MavenPartitioner
       if module_affected_by_file.nil?
         if file_and_emails[:file].end_with?(".proto")
           modules_to_build.add("all-protos")
-        elsif !file_and_emails[:file].start_with?(".rig")
+        elsif !file_and_emails[:file].start_with?(".rig") &&
+            !file_and_emails[:file].start_with?(".hoist") &&
+            file_and_emails[:file] != "pom.xml"
           return partitions
         end
       else
@@ -85,7 +87,9 @@ class MavenPartitioner
             if failed_modules.include?("all-protos")
               emails.each { |email| email_and_files[email] << file }
             end
-          elsif !file.starts_with?(".rig")
+          elsif !file.starts_with?(".rig") &&
+              !file.starts_with?(".hoist") &&
+              file != "pom.xml"
             emails.each { |email| email_and_files[email] << file }
           end
         elsif (set = depends_on_map[module_affected_by_file]) && !set.intersection(failed_modules).empty?
