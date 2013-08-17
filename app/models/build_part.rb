@@ -2,12 +2,18 @@ class BuildPart < ActiveRecord::Base
   belongs_to :build_instance, :class_name => "Build", :foreign_key => "build_id", :inverse_of => :build_parts    # using build_instance because AR defines #build for associations, and it wins
   has_many :build_attempts, :dependent => :destroy, :inverse_of => :build_part
   has_one :project, :through => :build_instance
-  has_one :last_attempt, :class_name => "BuildAttempt", :order => "id DESC"
-  has_one :last_completed_attempt, :class_name => "BuildAttempt", :conditions => ['state in (?)', BuildAttempt::COMPLETED_BUILD_STATES], :order => 'id DESC'
   validates_presence_of :kind, :paths
 
   serialize :paths, Array
   serialize :options, Hash
+
+  def last_attempt
+    build_attempts.last
+  end
+
+  def last_completed_attempt
+    build_attempts.select { |bp| BuildAttempt::COMPLETED_BUILD_STATES.include?(bp.state) }.last
+  end
 
   def self.most_recent_results_for(maven_modules)
     yaml_paths = maven_modules.map { |mvn_module| YAML.dump(Array(mvn_module)) }
