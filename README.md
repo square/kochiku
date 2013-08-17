@@ -25,6 +25,7 @@ Responsibilities:
  - Build attempts: Each build part can have many build attempts. This records state so we can retry parts.
  - Build artifacts: Each attempt has artifacts (only log files right now) that are associated with that run.
 
+![Entity Relationship Diagram](erd.png "ERD")
 
 Worker
 ------

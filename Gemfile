@@ -50,6 +50,7 @@ group :development do
   gem 'quiet_assets'
   gem 'rvm-capistrano', require: false
   gem 'thin'
+  gem 'rails-erd'
 end
 
 group :test do
