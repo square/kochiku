@@ -50,13 +50,43 @@ class Partitioner
 
     files = Array(load_manifest(manifest)) | Dir[*glob]
 
-    Strategies.send(strategy, files, workers).map do |files|
+    file_to_times_hash = load_manifest(subset['time_manifest'])
+
+    balanced_partitions = if file_to_times_hash.is_a?(Hash)
+      time_greedy_partitions_for(file_to_times_hash)
+    else
+      []
+    end
+
+    files -= balanced_partitions.flatten
+
+    (Strategies.send(strategy, files, workers) + balanced_partitions).map do |files|
       part = {'type' => type, 'files' => files.compact}
       if subset['options']
         part['options'] = subset['options']
       end
       part
     end.select { |p| p['files'].present? }
+  end
+
+  def time_greedy_partitions_for(file_to_times_hash)
+    setup_time, max_time = file_to_times_hash.values.flatten.minmax
+
+    files_by_worker = []
+    runtimes_by_worker = []
+
+    file_to_times_hash.each do |file, times|
+      file_runtime = times.max
+      fastest_worker_time, fastest_worker_index = runtimes_by_worker.each_with_index.min
+      if fastest_worker_time && fastest_worker_time + file_runtime <= max_time
+        files_by_worker[fastest_worker_index] << file
+        runtimes_by_worker[fastest_worker_index] += file_runtime - setup_time
+      else
+        files_by_worker << [file]
+        runtimes_by_worker << file_runtime
+      end
+    end
+    files_by_worker
   end
 
   def load_manifest(file_name)

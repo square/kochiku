@@ -18,6 +18,7 @@ describe Partitioner do
         'workers' => 3,
         'balance' => balance,
         'manifest' => manifest,
+        'time_manifest' => time_manifest,
       }
     ]
   }
@@ -26,6 +27,7 @@ describe Partitioner do
   let(:pom_xml_exists) { false }
   let(:balance) { 'alphabetically' }
   let(:manifest) { nil }
+  let(:time_manifest) { nil }
 
   context "with a ruby-based kochiku.yml" do
     let(:kochiku_yml_exists) { true }
@@ -103,7 +105,7 @@ describe Partitioner do
           }
 
           context 'and a manifest file is specified' do
-            before { YAML.stub(:load_file).with(manifest).and_return { %w(c b a) } }
+            before { YAML.stub(:load_file).with(manifest).and_return(%w(c b a)) }
             let(:manifest) { 'manifest.yml' }
             let(:matches) { %w(a b c d) }
 
@@ -114,6 +116,28 @@ describe Partitioner do
                 { 'type' => 'rspec', 'files' => %w(a) },
               ]
             }
+          end
+
+          context 'and a time_manifest file is specified' do
+            before do YAML.stub(:load_file).with(time_manifest).and_return(
+                {
+                  'a' => [2],
+                  'b' => [5, 6],
+                  'c' => [6, 8],
+                  'd' => [15, 16],
+                }
+              )
+            end
+            let(:time_manifest) { 'time_manifest.yml' }
+            let(:matches) { %w(a b c d e) }
+
+            it 'should greedily partition files in the time_manifest, and round robin the remaining files' do
+              subject.should =~ [
+                { 'type' => 'rspec', 'files' => %w(d) },
+                { 'type' => 'rspec', 'files' => %w(a b c) },
+                { 'type' => 'rspec', 'files' => %w(e) },
+              ]
+            end
           end
         end
 
