@@ -5,7 +5,7 @@ class BuildsController < ApplicationController
   skip_before_filter :verify_authenticity_token, :only => [:create]
 
   def show
-    @build = @project.builds.find(params[:id], :include => {:build_parts => [:last_attempt, :last_completed_attempt, :build_attempts]})
+    @build = @project.builds.includes(build_parts: :build_attempts).find(params[:id])
 
     respond_to do |format|
       format.html

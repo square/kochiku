@@ -38,6 +38,8 @@ GEM
     arel (3.0.2)
     awesome_print (1.1.0)
     builder (3.0.4)
+    bullet (4.6.0)
+      uniform_notifier
     capistrano (2.15.5)
       highline
       net-scp (>= 1.0.0)
@@ -232,6 +234,7 @@ GEM
     uglifier (2.1.2)
       execjs (>= 0.3.0)
       multi_json (~> 1.0, >= 1.0.2)
+    uniform_notifier (1.2.0)
     vegas (0.1.11)
       rack (>= 1.0.0)
     webmock (1.13.0)
@@ -245,6 +248,7 @@ PLATFORMS
 
 DEPENDENCIES
   awesome_print
+  bullet
   capistrano
   capybara
   carrierwave
