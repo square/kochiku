@@ -75,7 +75,7 @@ class Partitioner
     files_by_worker = []
     runtimes_by_worker = []
 
-    file_to_times_hash.each do |file, times|
+    file_to_times_hash.to_a.sort_by { |a| a.last.max }.reverse.each do |file, times|
       file_runtime = times.max
       fastest_worker_time, fastest_worker_index = runtimes_by_worker.each_with_index.min
       if fastest_worker_time && fastest_worker_time + file_runtime <= max_time

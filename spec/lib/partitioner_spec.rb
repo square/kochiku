@@ -134,7 +134,7 @@ describe Partitioner do
             it 'should greedily partition files in the time_manifest, and round robin the remaining files' do
               subject.should =~ [
                 { 'type' => 'rspec', 'files' => %w(d) },
-                { 'type' => 'rspec', 'files' => %w(a b c) },
+                { 'type' => 'rspec', 'files' => %w(c b a) },
                 { 'type' => 'rspec', 'files' => %w(e) },
               ]
             end
