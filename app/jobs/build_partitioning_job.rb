@@ -17,7 +17,7 @@ class BuildPartitioningJob < JobBase
   def perform
     GitRepo.inside_copy(@build.repository, @build.ref, @build.branch) do
       @build.partition(Partitioner.new.partitions(@build))
-      GithubCommitStatus.new(@build).update_commit_status!
+      @build.repository.remote_server.update_commit_status!(@build)
     end
   end
 

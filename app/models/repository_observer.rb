@@ -4,12 +4,12 @@ class RepositoryObserver < ActiveRecord::Observer
   observe :repository
 
   def after_save(record)
-    if should_contact_github?
-      GithubPostReceiveHook.new(record).subscribe!
+    if setup_hook?
+      record.remote_server.install_post_receive_hook!
     end
   end
 
-  def should_contact_github?
+  def setup_hook?
     Rails.env == "production"
   end
 end

@@ -7,3 +7,4 @@ tmp/
 public/uploads
 public/log_files
 vendor/ruby
+robot-password

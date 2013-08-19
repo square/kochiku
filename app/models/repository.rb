@@ -1,30 +1,31 @@
 class Repository < ActiveRecord::Base
+  UnknownServer = Class.new(RuntimeError)
+
   URL_PARSERS = {
     "git@" => /@(.*):(.*)\/(.*)\.git/,
     "git:" => /:\/\/(.*)\/(.*)\/(.*)\.git/,
     "http" => /https?:\/\/(.*)\/(.*)\/([^.]*)\.?/,
+
+    # TODO: This isn't github, need to adapt rest of code.
+    'ssh:' => %r{ssh://git@(.*):7999/(.*)/([^.]+)\.git}
   }
   has_many :projects, :dependent => :destroy
   validates_presence_of :url
   validates_numericality_of :timeout, :only_integer => true
   validates_inclusion_of :timeout, :in => 0..1440
 
+  def remote_server
+    self.class.remote_server(url).new(self)
+  end
+
   def main_project
     projects.where(name: repository_name).first
   end
 
-  def base_html_url
-    params = github_url_params
-    "https://#{params[:host]}/#{params[:username]}/#{params[:repository]}"
-  end
-
-  def base_api_url
-    params = github_url_params
-    "https://#{params[:host]}/api/v3/repos/#{params[:username]}/#{params[:repository]}"
-  end
+  delegate :base_html_url, :base_api_url, to: :remote_server
 
   def repository_name
-    github_url_params[:repository]
+    project_params[:repository]
   end
 
   def repo_cache_name
@@ -41,9 +42,22 @@ class Repository < ActiveRecord::Base
     event_types
   end
 
-  def self.covert_to_ssh_url(url)
-    params = Repository.github_url_params(url)
-    "git@#{params[:host]}:#{params[:username]}/#{params[:repository]}.git"
+  def self.remote_server(url)
+    server = [
+      RemoteServer::Stash,
+      RemoteServer::Github
+    ].find {|x| x.match?(url) }
+
+    raise UnknownServer, url unless server
+
+    server
+  end
+
+  # This is ugly. Is there a better way?
+  def self.convert_to_ssh_url(url)
+    params = Repository.project_params(url)
+
+    remote_server(url).convert_to_ssh_url(params)
   end
 
   def has_on_success_script?
@@ -58,13 +72,14 @@ class Repository < ActiveRecord::Base
     queue_override.presence || "ci"
   end
 
-  private
-
-  def github_url_params
-    Repository.github_url_params(url)
+  def project_params
+    Repository.project_params(url)
   end
 
-  def self.github_url_params(url)
+  private
+
+  def self.project_params(url)
+    # TODO: Move these parsers to RemoteServer classes.
     parser = URL_PARSERS[url.slice(0,4)]
     match = url.match(parser)
     {:host => match[1], :username => match[2], :repository => match[3]}
