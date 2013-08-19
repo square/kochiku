@@ -145,11 +145,23 @@ describe BuildsController do
     let(:branch) { "test/branch" }
     let(:branch_head_sha) { "4b41fe773057b2f1e2063eb94814d32699a34541" }
 
-    before do
-      @action = :request_build
-      @params = {}
 
-      build_ref_info = <<RESPONSE
+
+    context "when a non existent project is specified" do
+      it "throws not found exception" do
+        expect {
+          post :request_build, {:project_id => "does-not-exist", :build => {:branch => branch}}
+        }.to raise_exception(ActiveRecord::RecordNotFound)
+      end
+    end
+
+    context "when the project exists" do
+      let(:project) { FactoryGirl.create(:project) }
+
+      before do
+        @action = :request_build
+
+        build_ref_info = <<RESPONSE
 {
   "ref": "refs/heads/#{branch}",
   "url": "https://git.squareup.com/api/v3/repos/square/web/git/refs/heads/#{branch}",
@@ -160,23 +172,12 @@ describe BuildsController do
   }
 }
 RESPONSE
-      stub_request(:get, "https://git.squareup.com/api/v3/repos/square/kochiku/git/refs/heads/#{branch}").to_return(:status => 200, :body => build_ref_info)
-    end
-
-    context "when a non existent project is specified" do
-      it "throws not found exception" do
-        expect {
-          post @action, @params.merge(:project_id => "does-not-exist", :build => {:branch => branch})
-        }.to raise_exception(ActiveRecord::RecordNotFound)
+        stub_request(:get, "#{project.repository.base_api_url}/git/refs/heads/#{branch}").to_return(:status => 200, :body => build_ref_info)
       end
-    end
-
-    context "when the project exists" do
-      let(:project) { FactoryGirl.create(:project) }
 
       it "creates the build if a branch is given" do
         expect {
-          post @action, @params.merge(:project_id => project.to_param, :build => {:branch => branch})
+          post @action, {:project_id => project.to_param, :build => {:branch => branch}}
         }.to change { Build.count }.by(1)
         build = Build.last
         build.project.should == project
@@ -195,7 +196,7 @@ RESPONSE
         it "creates the build for main project if no branch is given" do
           project.should be_main
           expect {
-            post @action, @params.merge(:project_id => project.to_param)
+            post @action, {:project_id => project.to_param}
           }.to change { Build.count }.by(1)
           build = Build.last
           build.project.should == project
@@ -206,7 +207,7 @@ RESPONSE
 
       it "doesn't create a build if no branch is given" do
         expect {
-          post @action, @params.merge(:project_id => project.to_param, :build => {:branch => nil})
+          post @action, {:project_id => project.to_param, :build => {:branch => nil}}
         }.to_not change { Build.count }
       end
 
@@ -214,14 +215,18 @@ RESPONSE
         project = FactoryGirl.create(:project)
         build = FactoryGirl.create(:build, :state => :succeeded, :project => project, :branch => branch, :ref => branch_head_sha)
 
-        expect { post @action, @params.merge(:project_id => project.to_param, :build => {:branch => branch}) }.to_not change { Build.count }
+        expect do
+          post @action, {:project_id => project.to_param, :build => {:branch => branch}}
+        end.to_not change { Build.count }
         flash[:error].should be_nil
       end
 
       context "when github returns a 404" do
         it "throws not found exception" do
-          stub_request(:get, "https://git.squareup.com/api/v3/repos/square/kochiku/git/refs/heads/#{branch}").to_return(:status => 200, :body => '{"message": "Not Found"}')
-          expect { post @action, @params.merge(:project_id => project.to_param, :build => {:branch => branch}) }.to_not change { Build.count }
+          stub_request(:get, "https://github.com/api/v3/repos/square/#{project.repository.repository_name}/git/refs/heads/#{branch}").to_return(:status => 200, :body => '{"message": "Not Found"}')
+          expect do
+            post @action, {:project_id => project.to_param, :build => {:branch => branch}}
+          end.to_not change { Build.count }
         end
       end
     end

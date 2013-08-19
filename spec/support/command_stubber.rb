@@ -7,7 +7,6 @@ class CommandStubber
 
     # Always stub to prevent executing git commands.
     stub_capture2e
-    stub_cocaine
   end
 
   def create_stubbed_process_status(exitstatus=0)
@@ -15,10 +14,6 @@ class CommandStubber
     obj.stub(:exitstatus).and_return(exitstatus)
     obj.stub(:success?).and_return(exitstatus == 0)
     obj
-  end
-
-  def stub_cocaine
-    Cocaine::CommandLine.stub(:run).and_return("")
   end
 
   def stub_capture2e_failure(fail_on_cmd)
