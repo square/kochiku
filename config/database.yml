@@ -15,6 +15,7 @@ development: &defaults
 test: &TEST
   <<: *defaults
   database: kochiku_test
+  host: 127.0.0.1
 
 production:
   adapter: mysql2
