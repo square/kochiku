@@ -31,6 +31,8 @@ gem 'awesome_print', require: false
 gem 'nokogiri'
 gem 'httparty'
 
+gem 'bullet'
+
 group :assets do
   gem 'compass-rails'
   gem 'jquery-rails'
@@ -43,7 +45,6 @@ group :test, :development do
   gem 'rspec-rails'
   gem 'factory_girl_rails'
   gem 'launchy'
-  gem 'bullet'
 end
 
 group :development do
