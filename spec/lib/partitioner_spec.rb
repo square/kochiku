@@ -122,8 +122,8 @@ describe Partitioner do
             before do YAML.stub(:load_file).with(time_manifest).and_return(
                 {
                   'a' => [2],
-                  'b' => [5, 6],
-                  'c' => [6, 8],
+                  'b' => [5, 8],
+                  'c' => [6, 9],
                   'd' => [15, 16],
                 }
               )
