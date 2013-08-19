@@ -18,17 +18,25 @@ class Partitioner
                                :maven_modules => partitioner.maven_modules)
       partitioner.incremental_partitions
     else
-      [{"type" => "spec", "files" => ['no-manifest']}]
+      [{'type' => 'spec', 'files' => ['no-manifest']}]
     end
   end
 
   private
 
   def build_partitions_from(kochiku_yml)
-    kochiku_yml["ruby"].map do |ruby|
-      options = {"language" => kochiku_yml["language"], "ruby" => ruby}
-      kochiku_yml["targets"].map { |subset| partitions_for(subset.merge("options" => options)) }.flatten
-    end.flatten
+    kochiku_yml['ruby'].flat_map do |ruby|
+      kochiku_yml['targets'].flat_map do |subset|
+        partitions_for(
+          subset.merge(
+            'options' => {
+              'language' => kochiku_yml['language'],
+              'ruby' => ruby,
+            }
+          )
+        )
+      end
+    end
   end
 
   def partitions_for(subset)
@@ -41,15 +49,44 @@ class Partitioner
     strategy = 'alphabetically' unless Strategies.respond_to?(strategy)
 
     files = Array(load_manifest(manifest)) | Dir[*glob]
-    parts = Strategies.send(strategy, files, workers).map do |files|
+
+    file_to_times_hash = load_manifest(subset['time_manifest'])
+
+    balanced_partitions = if file_to_times_hash.is_a?(Hash)
+      time_greedy_partitions_for(file_to_times_hash)
+    else
+      []
+    end
+
+    files -= balanced_partitions.flatten
+
+    (Strategies.send(strategy, files, workers) + balanced_partitions).map do |files|
       part = {'type' => type, 'files' => files.compact}
       if subset['options']
         part['options'] = subset['options']
       end
       part
-    end
+    end.select { |p| p['files'].present? }
+  end
 
-    parts.select { |p| p['files'].present? }
+  def time_greedy_partitions_for(file_to_times_hash)
+    setup_time, max_time = file_to_times_hash.values.flatten.minmax
+
+    files_by_worker = []
+    runtimes_by_worker = []
+
+    file_to_times_hash.each do |file, times|
+      file_runtime = times.max
+      fastest_worker_time, fastest_worker_index = runtimes_by_worker.each_with_index.min
+      if fastest_worker_time && fastest_worker_time + file_runtime <= max_time
+        files_by_worker[fastest_worker_index] << file
+        runtimes_by_worker[fastest_worker_index] += file_runtime - setup_time
+      else
+        files_by_worker << [file]
+        runtimes_by_worker << file_runtime
+      end
+    end
+    files_by_worker
   end
 
   def load_manifest(file_name)

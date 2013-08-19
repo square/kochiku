@@ -10,14 +10,24 @@ describe Partitioner do
     File.stub(:exist?).with(Partitioner::KOCHIKU_YML).and_return(kochiku_yml_exists)
   end
 
-  let(:kochiku_yml) {[
-    { 'type' => 'rspec', 'glob' => 'spec/**/*_spec.rb', 'workers' => 3, 'balance' => balance, 'manifest' => manifest }
-  ]}
+  let(:kochiku_yml) {
+    [
+      {
+        'type' => 'rspec',
+        'glob' => 'spec/**/*_spec.rb',
+        'workers' => 3,
+        'balance' => balance,
+        'manifest' => manifest,
+        'time_manifest' => time_manifest,
+      }
+    ]
+  }
 
   let(:kochiku_yml_exists) { false }
   let(:pom_xml_exists) { false }
   let(:balance) { 'alphabetically' }
   let(:manifest) { nil }
+  let(:time_manifest) { nil }
 
   context "with a ruby-based kochiku.yml" do
     let(:kochiku_yml_exists) { true }
@@ -76,31 +86,58 @@ describe Partitioner do
 
       context 'when there are many files matching the glob' do
         let(:matches) { %w(a b c d) }
-        it { should == [
-          { 'type' => 'rspec', 'files' => %w(a b) },
-          { 'type' => 'rspec', 'files' => %w(c) },
-          { 'type' => 'rspec', 'files' => %w(d) },
-        ] }
+        it {
+          should == [
+            { 'type' => 'rspec', 'files' => %w(a b) },
+            { 'type' => 'rspec', 'files' => %w(c) },
+            { 'type' => 'rspec', 'files' => %w(d) },
+          ]
+        }
 
         context 'and balance is round_robin' do
           let(:balance) { 'round_robin' }
-          it { should == [
-            { 'type' => 'rspec', 'files' => %w(a d) },
-            { 'type' => 'rspec', 'files' => %w(b) },
-            { 'type' => 'rspec', 'files' => %w(c) },
-          ] }
+          it {
+            should == [
+              { 'type' => 'rspec', 'files' => %w(a d) },
+              { 'type' => 'rspec', 'files' => %w(b) },
+              { 'type' => 'rspec', 'files' => %w(c) },
+            ]
+          }
 
           context 'and a manifest file is specified' do
-            before { YAML.stub(:load_file).with(manifest).and_return { %w(c b a) } }
+            before { YAML.stub(:load_file).with(manifest).and_return(%w(c b a)) }
             let(:manifest) { 'manifest.yml' }
             let(:matches) { %w(a b c d) }
 
-            it { should == [
-              { 'type' => 'rspec', 'files' => %w(c d) },
-              { 'type' => 'rspec', 'files' => %w(b) },
-              { 'type' => 'rspec', 'files' => %w(a) },
-            ]
+            it {
+              should == [
+                { 'type' => 'rspec', 'files' => %w(c d) },
+                { 'type' => 'rspec', 'files' => %w(b) },
+                { 'type' => 'rspec', 'files' => %w(a) },
+              ]
             }
+          end
+
+          context 'and a time_manifest file is specified' do
+            before do YAML.stub(:load_file).with(time_manifest).and_return(
+                {
+                  'a' => [2],
+                  'b' => [5, 6],
+                  'c' => [6, 8],
+                  'd' => [15, 16],
+                }
+              )
+            end
+            let(:time_manifest) { 'time_manifest.yml' }
+            let(:matches) { %w(a b c d e) }
+
+            it 'should greedily partition files in the time_manifest, and round robin the remaining files' do
+              subject.should =~ [
+                { 'type' => 'rspec', 'files' => %w(d) },
+                { 'type' => 'rspec', 'files' => %w(a b c) },
+                { 'type' => 'rspec', 'files' => %w(e) },
+              ]
+            end
           end
         end
 
@@ -114,11 +151,13 @@ describe Partitioner do
             File.stub(:size).with('d').and_return(10)
           end
 
-          it { should == [
-            { 'type' => 'rspec', 'files' => %w(b a) },
-            { 'type' => 'rspec', 'files' => %w(c) },
-            { 'type' => 'rspec', 'files' => %w(d) },
-          ] }
+          it {
+            should == [
+              { 'type' => 'rspec', 'files' => %w(b a) },
+              { 'type' => 'rspec', 'files' => %w(c) },
+              { 'type' => 'rspec', 'files' => %w(d) },
+            ]
+          }
         end
 
         context 'and balance is size_greedy_partitioning' do
@@ -131,11 +170,13 @@ describe Partitioner do
             File.stub(:size).with('d').and_return(10)
           end
 
-          it { should =~ [
-            { 'type' => 'rspec', 'files' => %w(b) },
-            { 'type' => 'rspec', 'files' => %w(c) },
-            { 'type' => 'rspec', 'files' => %w(d a) },
-          ] }
+          it {
+            should =~ [
+              { 'type' => 'rspec', 'files' => %w(b) },
+              { 'type' => 'rspec', 'files' => %w(c) },
+              { 'type' => 'rspec', 'files' => %w(d a) },
+            ]
+          }
         end
 
         context 'and balance is size_average_partitioning' do
@@ -148,22 +189,26 @@ describe Partitioner do
             File.stub(:size).with('d').and_return(10)
           end
 
-          it { should == [
-            { 'type' => 'rspec', 'files' => %w(a b) },
-            { 'type' => 'rspec', 'files' => %w(c) },
-            { 'type' => 'rspec', 'files' => %w(d) },
-          ] }
+          it {
+            should == [
+              { 'type' => 'rspec', 'files' => %w(a b) },
+              { 'type' => 'rspec', 'files' => %w(c) },
+              { 'type' => 'rspec', 'files' => %w(d) },
+            ]
+          }
         end
 
         context 'and balance is isolated' do
           let(:balance) { 'isolated' }
 
-          it { should == [
-            { 'type' => 'rspec', 'files' => %w(a) },
-            { 'type' => 'rspec', 'files' => %w(b) },
-            { 'type' => 'rspec', 'files' => %w(c) },
-            { 'type' => 'rspec', 'files' => %w(d) },
-          ] }
+          it {
+            should == [
+              { 'type' => 'rspec', 'files' => %w(a) },
+              { 'type' => 'rspec', 'files' => %w(b) },
+              { 'type' => 'rspec', 'files' => %w(c) },
+              { 'type' => 'rspec', 'files' => %w(d) },
+            ]
+          }
         end
       end
     end
@@ -174,36 +219,38 @@ describe Partitioner do
       let(:project) { FactoryGirl.create(:project, :repository => repository) }
       let(:build) { FactoryGirl.create(:build, :project => project) }
 
-      let(:top_level_pom) { <<-POM
-  <project>
-    <modules>
-      <module>module-one</module>
-    </modules>
-  </project>
-      POM
+      let(:top_level_pom) {
+        <<-POM
+<project>
+  <modules>
+    <module>module-one</module>
+  </modules>
+</project>
+        POM
       }
 
-      let(:module_one_pom) { <<-POM
-  <project>
-    <properties>
-      <deployableBranch>one-branch</deployableBranch>
-    </properties>
+      let(:module_one_pom) {
+        <<-POM
+<project>
+  <properties>
+    <deployableBranch>one-branch</deployableBranch>
+  </properties>
 
-    <groupId>com.squareup</groupId>
-    <artifactId>module-core</artifactId>
+  <groupId>com.squareup</groupId>
+  <artifactId>module-core</artifactId>
 
-    <dependencies>
-      <dependency>
-        <groupId>com.squareup</groupId>
-        <artifactId>module-extras</artifactId>
-      </dependency>
-      <dependency>
-        <groupId>junit</groupId>
-        <artifactId>junit</artifactId>
-      </dependency>
-    </dependencies>
-  </project>
-      POM
+  <dependencies>
+    <dependency>
+      <groupId>com.squareup</groupId>
+      <artifactId>module-extras</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+    </dependency>
+  </dependencies>
+</project>
+        POM
       }
 
       it "should call the maven partitioner" do
