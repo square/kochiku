@@ -11,10 +11,11 @@ describe BuildStateUpdateJob do
     build.build_parts.create!(:kind => :spec, :paths => ["foo", "bar"])
     build.build_parts.create!(:kind => :cucumber, :paths => ["baz"])
     GitRepo.stub(:run!)
+    GitRepo.stub(:synchronize_with_remote).and_return(true)
     GitRepo.stub(:sha_for_branch).and_return(current_repo_master)
     BuildStrategy.stub(:promote_build)
     BuildStrategy.stub(:run_success_script)
-    stub_request(:post, /https:\/\/git\.squareup\.com\/api\/v3\/repos\/square\/kochiku\/statuses\//)
+    stub_request(:post, %r{#{repository.base_api_url}/statuses})
   end
 
   shared_examples "a non promotable state" do
@@ -27,7 +28,7 @@ describe BuildStateUpdateJob do
   describe "#perform" do
     it "updates github when a build passes" do
       states = []
-      stub_request(:post, "https://git.squareup.com/api/v3/repos/square/kochiku/statuses/#{build.ref}").with do |request|
+      stub_request(:post, "#{repository.base_api_url}/statuses/#{build.ref}").with do |request|
         request.headers["Authorization"].should == "token #{GithubRequest::OAUTH_TOKEN}"
         body = JSON.parse(request.body)
         states << body["state"]

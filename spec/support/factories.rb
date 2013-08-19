@@ -34,7 +34,7 @@ FactoryGirl.define do
   end
 
   factory :repository do
-    url "git@git.squareup.com:square/kochiku.git"
+    url "git@github.com:square/test-repo.git"  # this repo does not exist on purpose
     test_command "script/ci worker"
     on_green_update 'last-green-build'
   end

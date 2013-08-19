@@ -58,6 +58,8 @@ describe BuildPart do
   end
 
   describe "#job_args" do
+    let(:repository) { FactoryGirl.create(:repository, :url => "git@git.squareup.com:square/kochiku.git") }
+
     it "should substitute the git mirror for git.sqaureup url" do
       build_attempt = build_part.build_attempts.create!(:state => :runnable)
       project.repository.url.should == "git@git.squareup.com:square/kochiku.git"
