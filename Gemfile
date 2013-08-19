@@ -32,6 +32,7 @@ gem 'nokogiri'
 gem 'httparty'
 
 gem 'bullet'
+gem 'pry-rails'
 
 group :assets do
   gem 'compass-rails'
@@ -41,7 +42,6 @@ group :assets do
 end
 
 group :test, :development do
-  gem 'pry-rails'
   gem 'rspec-rails'
   gem 'factory_girl_rails'
   gem 'launchy'
