@@ -78,7 +78,7 @@
         %td= part.kind.to_s.capitalize
         %td.right
           - builder = part.last_attempt.try(:builder)
-          = builder ? builder.sub('.squareup.com', '') : "pending"
+          = builder ? builder.sub(".#{Settings.domain_name}", '') : "pending"
         %td.right= part.elapsed_time ? duration_strftime(part.elapsed_time) : "pending"
         %td.right= part.build_attempts.size
         %td.right
