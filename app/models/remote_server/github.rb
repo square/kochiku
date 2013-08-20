@@ -1,3 +1,7 @@
+require 'github_commit_status'
+require 'github_post_receive_hook'
+require 'github_request'
+
 module RemoteServer
 
   # All integration with Github must go via this class.

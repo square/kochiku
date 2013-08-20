@@ -1,5 +1,3 @@
-require 'github_post_receive_hook'
-
 class RepositoryObserver < ActiveRecord::Observer
   observe :repository
 

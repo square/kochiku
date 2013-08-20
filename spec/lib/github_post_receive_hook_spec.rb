@@ -1,4 +1,5 @@
 require 'spec_helper'
+require 'github_post_receive_hook'
 
 describe GithubPostReceiveHook do
   subject { GithubPostReceiveHook.new(repository) }
