@@ -52,7 +52,7 @@ module ApplicationHelper
   end
 
   def show_link_to_create_pull_request(build)
-    "#{build.repository.base_html_url}/pull/new/square:master...#{build.ref}"
+    "#{build.repository.base_html_url}/pull/new/master...#{build.ref}"
   end
 
   def failed_build_stdout(failed_build_part)
