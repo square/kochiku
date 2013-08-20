@@ -18,7 +18,8 @@ set :rails_env, "production"
 
 after "deploy:setup",          "kochiku:setup"
 after "deploy:create_symlink", "kochiku:symlinks"
-after "deploy:update_code",    "deploy:overwrite_database_yml", "deploy:migrate"
+before "deploy:finalize_update", "deploy:overwrite_database_yml"
+after "deploy:update_code",    "deploy:migrate"
 after "deploy:restart",        "deploy:cleanup"
 
 namespace :deploy do
