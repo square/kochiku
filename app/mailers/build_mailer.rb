@@ -34,7 +34,6 @@ class BuildMailer < ActionMailer::Base
     email_user, email_domain = Settings.sender_email_address.split('@')
 
     mail :to => @emails,
-         :bcc => NOTIFICATIONS_EMAIL,
          :subject => "[kochiku] #{@build.project.name} build for branch #{@build.branch} failed",
          :from => "#{email_user}+#{@build.project.name.parameterize}@#{email_domain}"
   end
