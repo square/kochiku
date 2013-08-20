@@ -1,0 +1,6 @@
+# Copy this file to config/deploy.custom.rb
+
+# Server you will be running kochiku on
+set :kochiku_host, "kochiku.example.com"
+
+# Add any other capistrano configuration that you like here

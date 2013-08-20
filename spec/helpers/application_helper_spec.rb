@@ -59,7 +59,7 @@ describe ApplicationHelper do
 
   describe "#show_link_to_create_pull_request" do
     it "creates a url to github for a pull request" do
-      show_link_to_create_pull_request(@build).should == 'https://git.squareup.com/square/web/pull/new/square:master...SHA1FORCOMMIT'
+      show_link_to_create_pull_request(@build).should == 'https://git.squareup.com/square/web/pull/new/master...SHA1FORCOMMIT'
     end
   end
 end

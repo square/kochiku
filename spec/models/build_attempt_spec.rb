@@ -83,20 +83,6 @@ describe BuildAttempt do
       build_attempt.finish!(:passed)
     end
 
-    it "sends email for a timed out build" do
-      BuildMailer.should_receive(:time_out_email).and_return(OpenStruct.new(:deliver => nil))
-      build_attempt.stub(:should_reattempt?).and_return(false)
-      build_attempt.update_attributes(:started_at => 21.minutes.ago)
-      build_attempt.finish!(:failed)
-    end
-
-    it "does not send a timeout mail for a failed non timed out build" do
-      BuildMailer.should_not_receive(:time_out_email)
-      build_attempt.stub(:should_reattempt?).and_return(false)
-      build_attempt.update_attributes(:started_at => 10.minutes.ago)
-      build_attempt.finish!(:failed)
-    end
-
     it "sends an email for an errored build" do
       BuildMailer.should_receive(:error_email).and_return(OpenStruct.new(:deliver => nil))
       build_attempt.stub(:should_reattempt?).and_return(false)
