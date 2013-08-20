@@ -7,3 +7,9 @@ kochiku_notifications_email_address: 'kochiku-notifications@example.com'
 
 # Domain name to use in constructing generic addresses. For example noreply@example.com in git commits.
 domain_name: 'example.com'
+
+# Set to true if Kochiku is served over https
+use_https: false
+
+# Host name where Kochiku is serving web pages.
+kochiku_host: 'kochiku.example.com'

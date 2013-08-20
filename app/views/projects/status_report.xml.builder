@@ -5,7 +5,7 @@ xml.Projects do
       :name => project.name,
       :activity => build_activity(project.builds.last),
       :lastBuildLabel => project.builds.last.object_id,
-      :webUrl => "https://kochiku.corp.squareup.com/projects/#{project.name}/",
+      :webUrl => "#{Settings.kochiku_host_with_protocol}/projects/#{project.name}/",
       :lastBuildStatus => (project.last_completed_build.try(:succeeded?) ? "Success" : "Failure"),
       :lastBuildTime => project.last_completed_build.try(:finished_at).try(:strftime, "%Y-%m-%dT%H:%M:%SZ")
     })

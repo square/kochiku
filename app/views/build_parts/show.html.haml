@@ -42,9 +42,7 @@
         %td.right= duration_strftime(attempt.elapsed_time)
         %td.right= attempt.builder ? attempt.builder.sub('.squareup.com', '') : "pending"
         %td
-          -# ci_reporter in square-web generates a bunch of xml files that we
-          -# do not want to show in the web interface.
-          - attempt.build_artifacts.reject {|artifact| artifact.log_file.path =~ /\.xml\.gz/}.each do |artifact|
+          - attempt.build_artifacts.each do |artifact|
             = link_to File.basename(artifact.log_file.to_s), artifact.log_file.url
             %br
         %td

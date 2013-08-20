@@ -4,7 +4,7 @@ xml.Projects do
         :name => build_part.paths.first,
         :activity => build_part.try(:is_running?) ? "Building" : "CheckingModification",
         :lastBuildLabel => build_part.object_id,
-        :webUrl => "https://kochiku.corp.squareup.com/projects/#{@project.name}/",
+        :webUrl => "#{Settings.kochiku_host_with_protocol}/projects/#{@project.name}/",
         :lastBuildStatus => build_part.try(:successful?) ? "Success" : "Failure",
         :lastBuildTime => build_part.try(:finished_at).try(:strftime, "%Y-%m-%dT%H:%M:%SZ")
     })

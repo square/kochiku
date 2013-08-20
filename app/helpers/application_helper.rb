@@ -58,6 +58,6 @@ module ApplicationHelper
   def failed_build_stdout(failed_build_part)
     build = failed_build_part.build_instance
     failed_build_attempt = failed_build_part.build_attempts.unsuccessful.last
-    link_to("stdout.log.gz", "https://kochiku.corp.squareup.com/log_files/#{build.project.to_param}/build_#{build.id}/part_#{failed_build_part.id}/attempt_#{failed_build_attempt.id}/stdout.log.gz")
+    link_to("stdout.log.gz", "#{Settings.kochiku_host_with_protocol}/log_files/#{build.project.to_param}/build_#{build.id}/part_#{failed_build_part.id}/attempt_#{failed_build_attempt.id}/stdout.log.gz")
   end
 end

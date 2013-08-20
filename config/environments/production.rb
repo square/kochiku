@@ -66,9 +66,9 @@ Kochiku::Application.configure do
   # config.active_record.auto_explain_threshold_in_seconds = 0.5
 
   Resque.redis = Redis.new(:host => "kochiku.corp.squareup.com")
-  Rails.application.routes.default_url_options[:host] = "kochiku.corp.squareup.com"
-  Rails.application.routes.default_url_options[:protocol] = 'https'
-  config.action_mailer.default_url_options = {:host => "kochiku.corp.squareup.com", :protocol => 'https'}
+  Rails.application.routes.default_url_options[:host] = Settings.kochiku_host
+  Rails.application.routes.default_url_options[:protocol] = Settings.kochiku_protocol
+  config.action_mailer.default_url_options = {:host => Settings.kochiku_host, :protocol => Settings.kochiku_protocol}
 
   config.action_mailer.delivery_method = :smtp
   config.action_mailer.smtp_settings = {

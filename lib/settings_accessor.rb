@@ -1,7 +1,7 @@
 class SettingsAccessor
   def initialize(file_location)
     if !File.exist?(file_location)
-      raise "config/application.yml is required to start Kochiku"
+      raise "#{file_location} is required to start Kochiku"
     else
       @hash = YAML.load_file(file_location).with_indifferent_access
     end
@@ -18,6 +18,16 @@ class SettingsAccessor
   def domain_name
     @hash[:domain_name]
   end
-end
 
-Settings = SettingsAccessor.new(Rails.root.join('config', 'application.yml'))
+  def kochiku_protocol
+    @hash[:use_https] == 'true' ? "https" : "http"
+  end
+
+  def kochiku_host
+    @hash[:kochiku_host]
+  end
+
+  def kochiku_host_with_protocol
+    "#{kochiku_protocol}://#{kochiku_host}"
+  end
+end
