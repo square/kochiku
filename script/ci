@@ -1,7 +1,6 @@
 #!/usr/bin/env bash
 
 echo Command: $0 $*
-echo square/web is at `pwd`
 echo
 echo "Environment:"
 env
