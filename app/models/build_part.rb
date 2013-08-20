@@ -29,7 +29,7 @@ class BuildPart < ActiveRecord::Base
     # We need to do 2 things before enabling this:
     # 1) update the ssh key on ec2 builders
     # 2) get more space on the ec2 builders
-    if build_instance.repository.use_spec_and_ci_queues
+    if build_instance.repository.use_spec_and_ci_queues && !build_instance.repository.queue_override
       BuildAttemptJob.enqueue_on("#{build_instance.queue}-#{self.kind}", job_args(build_attempt))
     else
       # TODO: hopefully this is only temporary while we work to make these tests less flaky
@@ -44,7 +44,7 @@ class BuildPart < ActiveRecord::Base
                               paths.include?("searle")))
         BuildAttemptJob.enqueue_on("ci-osx", job_args(build_attempt))
       else
-        if build_instance.repository.ci_queue_name && build_instance.repository.ci_queue_name != "ci"
+        if build_instance.repository.queue_override
           BuildAttemptJob.enqueue_on(build_instance.repository.ci_queue_name, job_args(build_attempt))
         else
           BuildAttemptJob.enqueue_on(build_instance.queue.to_s, job_args(build_attempt))
