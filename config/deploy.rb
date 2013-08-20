@@ -25,7 +25,7 @@ set :rails_env, "production"
 
 after "deploy:setup",          "kochiku:setup"
 after "deploy:create_symlink", "kochiku:symlinks"
-after "deploy:update_code",    "deploy:migrate"
+after "deploy:update_code",    "deploy:overwrite_database_yml", "deploy:migrate"
 after "deploy:restart",        "deploy:cleanup"
 
 namespace :deploy do
@@ -68,6 +68,10 @@ namespace :deploy do
         sleep 5;
       done;
     CMD
+  end
+
+  task :overwrite_database_yml do
+    top.upload("config/database.production.yml", "#{release_path}/config/database.yml")
   end
 end
 

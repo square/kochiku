@@ -16,12 +16,3 @@ test: &TEST
   <<: *defaults
   database: kochiku_test
   host: 127.0.0.1
-
-production:
-  adapter: mysql2
-  encoding: utf8
-  reconnect: true
-  username: <%= YAML.load_file("/app/kochiku/secrets/credentials.yml")["mysql_username"] rescue '' %>
-  password: <%= YAML.load_file("/app/kochiku/secrets/credentials.yml")["mysql_password"] rescue '' %>
-  database: kochiku
-  host: servicedb.corp.squareup.com
