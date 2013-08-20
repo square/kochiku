@@ -6,6 +6,7 @@ describe BuildMailer do
   describe "#error_email" do
     before do
       Settings.stub(:sender_email_address).and_return('kochiku@example.com')
+      Settings.stub(:kochiku_notifications_email_address).and_return('notify@example.com')
     end
 
     it "sends the email" do
@@ -13,7 +14,7 @@ describe BuildMailer do
 
       email = BuildMailer.error_email(build_attempt, "error text")
 
-      email.to.should include(BuildMailer::NOTIFICATIONS_EMAIL)
+      email.to.should include('notify@example.com')
 
       expect(email.from).to eq(['kochiku@example.com'])
 
@@ -47,7 +48,6 @@ describe BuildMailer do
 
         email.to.should == ["foo@example.com"]
 
-        email.bcc.should include(BuildMailer::NOTIFICATIONS_EMAIL)
         email.html_part.body.should include(build_part.project.name)
         email.text_part.body.should include(build_part.project.name)
         email.html_part.body.should include("http://")
@@ -71,7 +71,6 @@ describe BuildMailer do
 
         email.to.should == ["foo@example.com"]
 
-        email.bcc.should include(BuildMailer::NOTIFICATIONS_EMAIL)
         email.html_part.body.should include(build_part.project.name)
         email.text_part.body.should include(build_part.project.name)
         email.html_part.body.should include("http://")

@@ -1,6 +1,5 @@
 class BuildMailer < ActionMailer::Base
   helper :application
-  NOTIFICATIONS_EMAIL = 'kochiku-notifications@squareup.com'
 
   default :from => Proc.new { Settings.sender_email_address }
 
@@ -8,7 +7,7 @@ class BuildMailer < ActionMailer::Base
     @build_part = build_attempt.build_part
     @builder = build_attempt.builder
     @error_text = error_text
-    mail :to => NOTIFICATIONS_EMAIL,
+    mail :to => Settings.kochiku_notifications_email_address,
          :subject => "[kochiku] Build part errored on #{@builder}",
          :from => Settings.sender_email_address
   end

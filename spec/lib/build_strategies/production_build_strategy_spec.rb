@@ -15,7 +15,7 @@ describe BuildStrategy do
   describe "#merge_ref" do
     context "when auto_merge is enabled" do
       before do
-        GitBlame.should_receive(:emails_in_branch).with(build)
+        GitBlame.should_receive(:emails_in_branch).with(build).and_return("the-committers@example.com")
       end
 
       it "should merge to master" do

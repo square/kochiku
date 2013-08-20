@@ -10,6 +10,10 @@ class SettingsAccessor
   def sender_email_address
     @hash[:sender_email_address]
   end
+
+  def kochiku_notifications_email_address
+    @hash[:kochiku_notifications_email_address]
+  end
 end
 
 Settings = SettingsAccessor.new(Rails.root.join('config', 'application.yml'))

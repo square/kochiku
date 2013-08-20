@@ -1,1 +1,6 @@
+# Email address to use in the 'from' field for emails sent by Kochiku.
 sender_email_address: 'kochiku@example.com'
+
+# Email address where kochiku should send problems with the build system (for example, errors),
+# as distinct from failures in a particular test (which go to the people who committed code).
+kochiku_notifications_email_address: 'kochiku-notifications@example.com'
