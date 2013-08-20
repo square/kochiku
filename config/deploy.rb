@@ -14,8 +14,6 @@ set :deploy_via, :remote_cache
 set :keep_releases, 10
 set :use_sudo, false
 
-server kochiku_host, :app, :web, :db, :worker, :primary => true
-
 set :rails_env, "production"
 
 after "deploy:setup",          "kochiku:setup"
@@ -97,4 +95,6 @@ namespace :kochiku do
 end
 
 # load installation specific capistrano config
-require 'config/deploy.custom'
+load File.expand_path('deploy.custom.rb', File.dirname(__FILE__))
+
+server kochiku_host, :app, :web, :db, :worker, :primary => true
