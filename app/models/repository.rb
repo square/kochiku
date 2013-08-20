@@ -5,8 +5,6 @@ class Repository < ActiveRecord::Base
     "git@" => /@(.*):(.*)\/(.*)\.git/,
     "git:" => /:\/\/(.*)\/(.*)\/(.*)\.git/,
     "http" => /https?:\/\/(.*)\/(.*)\/([^.]*)\.?/,
-
-    # TODO: This isn't github, need to adapt rest of code.
     'ssh:' => %r{ssh://git@(.*):7999/(.*)/([^.]+)\.git}
   }
   has_many :projects, :dependent => :destroy
