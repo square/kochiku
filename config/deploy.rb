@@ -1,14 +1,9 @@
-require "rvm/capistrano"
-set :rvm_type, :user
-set :rvm_ruby_string, 'ruby-2.0.0-p195'
-
 require 'bundler/capistrano' # adds bundle:install step to deploy pipeline
-require 'squash/rails/capistrano'
 
 default_run_options[:env] = {'PATH' => '/usr/local/bin:$PATH'}
 
 set :application, "Kochiku"
-set :repository,  "git@git.squareup.com:square/kochiku.git"
+set :repository,  "https://github.com/square/kochiku.git"
 set :branch, "master"
 set :scm, :git
 set :scm_command, 'git'
@@ -19,7 +14,7 @@ set :deploy_via, :remote_cache
 set :keep_releases, 10
 set :use_sudo, false
 
-server "kochiku.corp.squareup.com", :app, :web, :db, :worker, :primary => true
+server kochiku_host, :app, :web, :db, :worker, :primary => true
 
 set :rails_env, "production"
 
@@ -87,19 +82,19 @@ end
 
 namespace :kochiku do
   task :setup, :roles => [:app, :worker] do
-    run "gem install bundler -v '~> 1.0.21' --conservative"
+    run "gem install bundler -v '~> 1.3' --conservative"
     run "mkdir -p #{shared_path}/{build-partition,log_files}"
-    run "[ -d #{shared_path}/build-partition/web-cache ] || #{scm_command} clone --recursive -c remote.origin.pushurl=git@git.squareup.com:square/web.git git://git-mirror.corp.squareup.com/square/web.git #{shared_path}/build-partition/web-cache"
-    run "[ -d #{shared_path}/build-partition/java-cache ] || #{scm_command} clone --recursive -c remote.origin.pushurl=git@git.squareup.com:square/java.git git://git-mirror.corp.squareup.com/square/java.git #{shared_path}/build-partition/java-cache"
   end
 
   task :symlinks, :roles => [:app, :worker] do
     run "ln -nfFs #{shared_path}/build-partition #{current_path}/tmp/build-partition"
     run "ln -nfFs #{shared_path}/log_files #{current_path}/public/log_files"
-    run "ln -nfFs #{shared_path}/secrets #{current_path}/config/secrets"
   end
 
   task :cleanup_zombies, :roles => [:worker] do
     run "ps -eo 'pid ppid comm' |grep -i resque |grep Paused | awk '$2 == 1 { print $1 }' | xargs kill"
   end
 end
+
+# load installation specific capistrano config
+require 'config/deploy.custom'
