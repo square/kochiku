@@ -1,6 +1,6 @@
 xml.rss({:version => "2.0"}) do
   xml.channel do
-    xml.title("Square Build Server RSS Feed")
+    xml.title("Kochiku RSS Feed")
     xml.link(root_url)
     xml.language("en")
     xml.ttl(10)
