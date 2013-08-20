@@ -16,18 +16,29 @@ describe Partitioner do
         'type' => 'rspec',
         'glob' => 'spec/**/*_spec.rb',
         'workers' => 3,
-        'balance' => balance,
-        'manifest' => manifest,
-        'time_manifest' => time_manifest,
+        'balance' => rspec_balance,
+        'manifest' => rspec_manifest,
+        'time_manifest' => rspec_time_manifest,
+      },
+      {
+        'type' => 'cuke',
+        'glob' => 'features/**/*.feature',
+        'workers' => 3,
+        'balance' => cuke_balance,
+        'manifest' => cuke_manifest,
+        'time_manifest' => cuke_time_manifest,
       }
     ]
   }
 
   let(:kochiku_yml_exists) { false }
   let(:pom_xml_exists) { false }
-  let(:balance) { 'alphabetically' }
-  let(:manifest) { nil }
-  let(:time_manifest) { nil }
+  let(:rspec_balance) { 'alphabetically' }
+  let(:rspec_manifest) { nil }
+  let(:cuke_balance) { 'alphabetically' }
+  let(:cuke_manifest) { nil }
+  let(:rspec_time_manifest) { nil }
+  let(:cuke_time_manifest) { nil }
 
   context "with a ruby-based kochiku.yml" do
     let(:kochiku_yml_exists) { true }
@@ -36,7 +47,7 @@ describe Partitioner do
         "ruby" => ["ree-1.8.7-2011.12"],
         "language" => "ruby",
         "targets" => [
-          { 'type' => 'rspec', 'glob' => 'spec/**/*_spec.rb', 'workers' => 3, 'balance' => balance, 'manifest' => manifest }
+          { 'type' => 'rspec', 'glob' => 'spec/**/*_spec.rb', 'workers' => 3, 'balance' => rspec_balance, 'manifest' => rspec_manifest }
         ]
       }
     end
@@ -81,68 +92,85 @@ describe Partitioner do
 
       context 'when there is one file matching the glob' do
         let(:matches) { %w(a) }
-        it { should == [{ 'type' => 'rspec', 'files' => %w(a) }] }
+        it { [{ 'type' => 'rspec', 'files' => %w(a) }].each { |partition| should include(partition) } }
       end
 
       context 'when there are many files matching the glob' do
         let(:matches) { %w(a b c d) }
         it {
-          should == [
+          [
             { 'type' => 'rspec', 'files' => %w(a b) },
             { 'type' => 'rspec', 'files' => %w(c) },
             { 'type' => 'rspec', 'files' => %w(d) },
-          ]
+          ].each { |partition| should include(partition) }
         }
 
         context 'and balance is round_robin' do
-          let(:balance) { 'round_robin' }
+          let(:rspec_balance) { 'round_robin' }
           it {
-            should == [
+            [
               { 'type' => 'rspec', 'files' => %w(a d) },
               { 'type' => 'rspec', 'files' => %w(b) },
               { 'type' => 'rspec', 'files' => %w(c) },
-            ]
+            ].each { |partition| should include(partition) }
           }
 
           context 'and a manifest file is specified' do
-            before { YAML.stub(:load_file).with(manifest).and_return(%w(c b a)) }
-            let(:manifest) { 'manifest.yml' }
+            before { YAML.stub(:load_file).with(rspec_manifest).and_return(%w(c b a)) }
+            let(:rspec_manifest) { 'manifest.yml' }
             let(:matches) { %w(a b c d) }
 
             it {
-              should == [
+              [
                 { 'type' => 'rspec', 'files' => %w(c d) },
                 { 'type' => 'rspec', 'files' => %w(b) },
                 { 'type' => 'rspec', 'files' => %w(a) },
-              ]
+              ].each { |partition| should include(partition) }
             }
           end
 
-          context 'and a time_manifest file is specified' do
-            before do YAML.stub(:load_file).with(time_manifest).and_return(
+          context 'and time manifest files are specified' do
+            before do YAML.stub(:load_file).with(rspec_time_manifest).and_return(
                 {
                   'a' => [2],
                   'b' => [5, 8],
                   'c' => [6, 9],
-                  'd' => [15, 16],
+                  'd' => [5, 8],
                 }
               )
             end
-            let(:time_manifest) { 'time_manifest.yml' }
+
+            before do YAML.stub(:load_file).with(cuke_time_manifest).and_return(
+              {
+                'f' => [2],
+                'g' => [5, 8],
+                'h' => [6, 9],
+                'i' => [15, 16],
+              }
+            )
+            end
+
+            let(:rspec_time_manifest) { 'rspec_time_manifest.yml' }
+            let(:cuke_time_manifest) { 'cuke_time_manifest.yml' }
             let(:matches) { %w(a b c d e) }
 
             it 'should greedily partition files in the time_manifest, and round robin the remaining files' do
-              subject.should =~ [
-                { 'type' => 'rspec', 'files' => %w(d) },
-                { 'type' => 'rspec', 'files' => %w(c b a) },
-                { 'type' => 'rspec', 'files' => %w(e) },
-              ]
+              [
+                {'type' => 'rspec', 'files' => ['e']},
+                {'type' => 'rspec', 'files' => ['c', 'd']},
+                {'type' => 'rspec', 'files' => ['b', 'a']},
+                {'type' => 'cuke', 'files' => ['a', 'b']},
+                {'type' => 'cuke', 'files' => ['c', 'd']},
+                {'type' => 'cuke', 'files' => ['e']},
+                {'type' => 'cuke', 'files' => ['i']},
+                {'type' => 'cuke', 'files' => ['h', 'g', 'f']}
+              ].each { |partition| should include(partition) }
             end
           end
         end
 
         context 'and balance is size' do
-          let(:balance) { 'size' }
+          let(:rspec_balance) { 'size' }
 
           before do
             File.stub(:size).with('a').and_return(1)
@@ -152,16 +180,16 @@ describe Partitioner do
           end
 
           it {
-            should == [
+            [
               { 'type' => 'rspec', 'files' => %w(b a) },
               { 'type' => 'rspec', 'files' => %w(c) },
               { 'type' => 'rspec', 'files' => %w(d) },
-            ]
+            ].each { |partition| should include(partition) }
           }
         end
 
         context 'and balance is size_greedy_partitioning' do
-          let(:balance) { 'size_greedy_partitioning' }
+          let(:rspec_balance) { 'size_greedy_partitioning' }
 
           before do
             File.stub(:size).with('a').and_return(1)
@@ -171,16 +199,16 @@ describe Partitioner do
           end
 
           it {
-            should =~ [
+            [
               { 'type' => 'rspec', 'files' => %w(b) },
               { 'type' => 'rspec', 'files' => %w(c) },
               { 'type' => 'rspec', 'files' => %w(d a) },
-            ]
+            ].each { |partition| should include(partition) }
           }
         end
 
         context 'and balance is size_average_partitioning' do
-          let(:balance) { 'size_average_partitioning' }
+          let(:rspec_balance) { 'size_average_partitioning' }
 
           before do
             File.stub(:size).with('a').and_return(1)
@@ -190,24 +218,24 @@ describe Partitioner do
           end
 
           it {
-            should == [
+            [
               { 'type' => 'rspec', 'files' => %w(a b) },
               { 'type' => 'rspec', 'files' => %w(c) },
               { 'type' => 'rspec', 'files' => %w(d) },
-            ]
+            ].each { |partition| should include(partition) }
           }
         end
 
         context 'and balance is isolated' do
-          let(:balance) { 'isolated' }
+          let(:rspec_balance) { 'isolated' }
 
           it {
-            should == [
+            [
               { 'type' => 'rspec', 'files' => %w(a) },
               { 'type' => 'rspec', 'files' => %w(b) },
               { 'type' => 'rspec', 'files' => %w(c) },
               { 'type' => 'rspec', 'files' => %w(d) },
-            ]
+            ].each { |partition| should include(partition) }
           }
         end
       end

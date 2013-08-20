@@ -6,11 +6,10 @@ class Partitioner
   def partitions(build)
     if File.exist?(KOCHIKU_YML)
       # Handle old kochiku.yml
-      kochiku_yml = YAML.load_file(KOCHIKU_YML)
       if kochiku_yml.is_a?(Array)
         kochiku_yml.map { |subset| partitions_for(subset) }.flatten
       else
-        build_partitions_from(kochiku_yml)
+        build_partitions_from
       end
     elsif File.exist?(MavenPartitioner::POM_XML)
       partitioner = MavenPartitioner.new(build)
@@ -24,7 +23,24 @@ class Partitioner
 
   private
 
-  def build_partitions_from(kochiku_yml)
+  def kochiku_yml
+    @kochiku_yml ||= YAML.load_file(KOCHIKU_YML)
+  end
+
+  def max_build_time
+    if kochiku_yml.is_a?(Array)
+      kochiku_yml
+    else
+      kochiku_yml.fetch('targets')
+    end.map do |subset|
+      file_to_times_hash = load_manifest(subset['time_manifest'])
+      if file_to_times_hash.is_a?(Hash)
+        file_to_times_hash.values
+      end
+    end.flatten.compact.max
+  end
+
+  def build_partitions_from
     kochiku_yml['ruby'].flat_map do |ruby|
       kochiku_yml['targets'].flat_map do |subset|
         partitions_for(
@@ -53,6 +69,7 @@ class Partitioner
     file_to_times_hash = load_manifest(subset['time_manifest'])
 
     balanced_partitions = if file_to_times_hash.is_a?(Hash)
+      @max_time ||= max_build_time
       time_greedy_partitions_for(file_to_times_hash)
     else
       []
@@ -70,7 +87,7 @@ class Partitioner
   end
 
   def time_greedy_partitions_for(file_to_times_hash)
-    setup_time, max_time = file_to_times_hash.values.flatten.minmax
+    setup_time = file_to_times_hash.values.flatten.min
 
     files_by_worker = []
     runtimes_by_worker = []
@@ -78,7 +95,7 @@ class Partitioner
     file_to_times_hash.to_a.sort_by { |a| a.last.max }.reverse.each do |file, times|
       file_runtime = times.max
       fastest_worker_time, fastest_worker_index = runtimes_by_worker.each_with_index.min
-      if fastest_worker_time && fastest_worker_time + (file_runtime - setup_time) <= max_time
+      if fastest_worker_time && fastest_worker_time + (file_runtime - setup_time) <= @max_time
         files_by_worker[fastest_worker_index] << file
         runtimes_by_worker[fastest_worker_index] += file_runtime - setup_time
       else
