@@ -14,6 +14,10 @@ class SettingsAccessor
   def kochiku_notifications_email_address
     @hash[:kochiku_notifications_email_address]
   end
+
+  def domain_name
+    @hash[:domain_name]
+  end
 end
 
 Settings = SettingsAccessor.new(Rails.root.join('config', 'application.yml'))

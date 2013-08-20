@@ -24,7 +24,7 @@ class GitAutomerge
 
   def merge_env
     author_name  = "kochiku-automerger"
-    author_email = "noreply+kochiku-automerger@squareup.com"
+    author_email = "noreply+kochiku-automerger@#{Settings.domain_name}"
     {"GIT_AUTHOR_NAME" => author_name, "GIT_COMMITTER_NAME" => author_name,
      "GIT_AUTHOR_EMAIL" => author_email, "GIT_COMMITTER_EMAIL" => author_email}
   end
