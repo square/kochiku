@@ -39,10 +39,6 @@ class BuildAttempt < ActiveRecord::Base
 
     if should_reattempt?
       build_part.rebuild!
-    elsif state == :failed
-      if elapsed_time.try(:>=, build_part.project.repository.timeout.minutes)
-        BuildMailer.time_out_email(self).deliver
-      end
     elsif state == :errored
       BuildMailer.error_email(self, error_txt).deliver
     end

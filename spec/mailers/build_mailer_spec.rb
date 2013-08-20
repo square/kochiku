@@ -3,24 +3,19 @@ require "spec_helper"
 describe BuildMailer do
   let(:build) { FactoryGirl.create(:build, :queue => :developer) }
 
-  describe "#time_out_email" do
-    it "sends the email" do
-      build_attempt = FactoryGirl.build(:build_attempt, :state => :errored, :builder => "test-builder")
-
-      email = BuildMailer.time_out_email(build_attempt)
-      email.to.should include(BuildMailer::NOTIFICATIONS_EMAIL)
-      email.body.should include("test-builder")
-      email.body.should include("http://")
-    end
-  end
-
   describe "#error_email" do
+    before do
+      Settings.stub(:sender_email_address).and_return('kochiku@example.com')
+    end
+
     it "sends the email" do
       build_attempt = FactoryGirl.build(:build_attempt, :state => :errored, :builder => "test-builder")
 
       email = BuildMailer.error_email(build_attempt, "error text")
 
       email.to.should include(BuildMailer::NOTIFICATIONS_EMAIL)
+
+      expect(email.from).to eq(['kochiku@example.com'])
 
       email.html_part.body.should include("test-builder")
       email.text_part.body.should include("test-builder")
