@@ -64,7 +64,7 @@ class BuildPart < ActiveRecord::Base
         "test_files" => paths,
         "repo_name" => project.repository.repo_cache_name,
         "test_command" => build_instance.test_command(paths),
-        "repo_url" => project.repository.url.gsub('git@git.squareup.com:', 'git://git-mirror.corp.squareup.com/'),
+        "repo_url" => project.repository.url_for_fetching,
         "remote_name" => "origin",
         "timeout" => project.repository.timeout.minutes,
         "options" => options,

@@ -58,13 +58,22 @@ describe BuildPart do
   end
 
   describe "#job_args" do
-    let(:repository) { FactoryGirl.create(:repository, :url => "git@git.squareup.com:square/kochiku.git") }
+    let(:repository) { FactoryGirl.create(:repository, :url => "git@git.example.com:org/test-repo.git") }
 
-    it "should substitute the git mirror for git.sqaureup url" do
+    it "should substitute the git mirror if it is specified" do
+      Settings.stub(:git_mirror).and_return("git://git-mirror.example.com/")
+
       build_attempt = build_part.build_attempts.create!(:state => :runnable)
-      project.repository.url.should == "git@git.squareup.com:square/kochiku.git"
       args = build_part.job_args(build_attempt)
-      args["repo_url"].should == "git://git-mirror.corp.squareup.com/square/kochiku.git"
+      args["repo_url"].should == "git://git-mirror.example.com/org/test-repo.git"
+    end
+
+    it "should return the original git url if there is no git_mirror" do
+      Settings.stub(:git_mirror).and_return(nil)
+
+      build_attempt = build_part.build_attempts.create!(:state => :runnable)
+      args = build_part.job_args(build_attempt)
+      args["repo_url"].should == repository.url
     end
   end
 

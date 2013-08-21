@@ -48,7 +48,7 @@ class GitRepo
       cached_repo_path = File.join(WORKING_DIR, repository.repo_cache_name)
 
       if !File.directory?(cached_repo_path)
-        clone_repo(repository.url, cached_repo_path)
+        clone_repo(repository, cached_repo_path)
       end
 
       Dir.chdir(cached_repo_path) do
@@ -68,7 +68,7 @@ class GitRepo
       cached_repo_path = File.join(WORKING_DIR, repository.repo_cache_name)
 
       if !File.directory?(cached_repo_path)
-        clone_repo(repository.url, cached_repo_path)
+        clone_repo(repository, cached_repo_path)
       end
       Dir.chdir(cached_repo_path) do
         # update the cached repo
@@ -83,10 +83,12 @@ class GitRepo
       end
     end
 
-    def clone_repo(repo_url, cached_repo_path)
-      mirror_url = repo_url.gsub('git@git.squareup.com:', 'git://git-mirror.corp.squareup.com/')
-      # Note: the -c option is not avaiable on git 1.7.x
-      Cocaine::CommandLine.new("git clone", "--recursive -c remote.origin.pushurl=#{repo_url} #{mirror_url} #{cached_repo_path}").run
+    def clone_repo(repo, cached_repo_path)
+      # Note: the -c option is not available on git 1.7.x
+      Cocaine::CommandLine.new(
+          "git clone",
+          "--recursive -c remote.origin.pushurl=#{repo.url} #{repo.url_for_fetching} #{cached_repo_path}").
+          run
     end
 
     def synchronize_with_remote(name, branch = nil)

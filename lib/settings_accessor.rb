@@ -30,4 +30,8 @@ class SettingsAccessor
   def kochiku_host_with_protocol
     "#{kochiku_protocol}://#{kochiku_host}"
   end
+
+  def git_mirror
+    @hash[:git_mirror]
+  end
 end

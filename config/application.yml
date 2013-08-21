@@ -13,3 +13,7 @@ use_https: false
 
 # Host name where Kochiku is serving web pages.
 kochiku_host: 'kochiku.example.com'
+
+# If you would like Kochiku to clone and fetch repositories from a git mirror
+# uncomment this setting and fill in the url to your mirror.
+# git_mirror: 'git://git-mirror.example.com/'

@@ -23,6 +23,15 @@ class Repository < ActiveRecord::Base
     "https://#{params[:host]}/api/v3/repos/#{params[:username]}/#{params[:repository]}"
   end
 
+  # Where to fetch from (git mirror if defined, otherwise the regular git url)
+  def url_for_fetching
+    if Settings.git_mirror.present?
+      url.gsub(%r{(git@|https://).*?(:|/)}, Settings.git_mirror)
+    else
+      url
+    end
+  end
+
   def repository_name
     github_url_params[:repository]
   end
