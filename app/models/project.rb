@@ -5,6 +5,7 @@ class Project < ActiveRecord::Base
       return last_build if last_build && !last_build.completed?
       build = find_or_initialize_by_ref(sha, :state => :partitioning, :queue => :ci, :branch => 'master')
       build.save!
+      build
     end
 
     def find_existing_build_or_initialize(ref, options)

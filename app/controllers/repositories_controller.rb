@@ -48,12 +48,14 @@ class RepositoriesController < ApplicationController
 
     project = repository.projects.find_or_create_by_name(project_name)
 
-    if ref == 'master'
+    build = if ref == 'master'
       project.ensure_master_build_exists(sha)
     else
       project.ensure_developer_build_exists(ref, sha)
     end
 
-    head(200)
+    render json: {
+      build_url: project_build_url(project, build)
+    }
   end
 end

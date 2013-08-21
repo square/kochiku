@@ -85,6 +85,7 @@ describe RepositoriesController do
       expect {
         post :build_ref, id: repository.to_param, ref: 'master', sha: 'abc123'
         response.should be_success
+        expect(JSON.parse(response.body)['build_url']).not_to eq(nil)
       }.to change(Build, :count).by(1)
       build = Build.last
       build.branch.should == "master"
@@ -97,6 +98,7 @@ describe RepositoriesController do
       expect {
         post :build_ref, id: repository.to_param, ref: 'blah', sha: 'abc123'
         response.should be_success
+        expect(JSON.parse(response.body)['build_url']).not_to eq(nil)
       }.to change(Build, :count).by(1)
       build = Build.last
       build.branch.should == "blah"

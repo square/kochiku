@@ -5,13 +5,10 @@ describe Project do
     let(:project) { FactoryGirl.create(:project) }
 
     it 'creates a new build only if one does not exist' do
-      expect {
-        project.ensure_master_build_exists('abc123')
-      }.to change(Build, :count).by(1)
-
-      expect {
-        project.ensure_master_build_exists('abc123')
-      }.not_to change(Build, :count)
+      build1 = project.ensure_master_build_exists('abc123')
+      build2 = project.ensure_master_build_exists('abc123')
+      expect(build1).not_to eq(nil)
+      expect(build1).to eq(build2)
     end
   end
 
@@ -19,13 +16,10 @@ describe Project do
     let(:project) { FactoryGirl.create(:project) }
 
     it 'creates a new build only if one does not exist' do
-      expect {
-        project.ensure_developer_build_exists('mybranch', 'abc123')
-      }.to change(Build, :count).by(1)
-
-      expect {
-        project.ensure_developer_build_exists('mybranch', 'abc123')
-      }.not_to change(Build, :count)
+      build1 = project.ensure_developer_build_exists('mybranch', 'abc123')
+      build2 = project.ensure_developer_build_exists('mybranch', 'abc123')
+      expect(build1).not_to eq(nil)
+      expect(build1).to eq(build2)
     end
   end
 
