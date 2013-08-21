@@ -57,4 +57,4 @@ Getting Started
 Make sure to also clone the [kochiku-worker] repository if you need to run
 build jobs.
 
-[kochiku-worker]: https://git.squareup.com/square/kochiku-worker
+[kochiku-worker]: https://github.com/square/kochiku-worker
