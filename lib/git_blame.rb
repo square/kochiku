@@ -2,8 +2,6 @@ require 'cocaine'
 require 'git_repo'
 
 class GitBlame
-  PEOPLE_JSON_URL = 'https://people.squareup.com/people.json'
-
   class << self
     def emails_since_last_green(build)
       lookup_git_names_and_emails(git_names_and_emails_since_last_green(build).split("\n"))
@@ -44,43 +42,13 @@ class GitBlame
     private
 
     def email_from_git_email(email)
-      if people_lookup[:by_email][email].present?
+      if email =~ /^#{Settings.git_pair_email_prefix}\+/
+        localpart, domain = email.split('@')
+        usernames = localpart.strip.split('+')
+        usernames[1..-1].map { |username| "#{username}@#{domain}"}
+      else
         email
-      else
-        usernames = email.split('@').first.split('+')
-        usernames.map do |username|
-          username.strip!
-          people_lookup[:by_username][username].try(:[], :email)
-        end
       end
-    end
-
-    def email_from_git_name(name)
-      if people_lookup[:by_name][name].present?
-        people_lookup[:by_name][name][:email]
-      else
-        names = (name.split(/ and /i) | name.split('+') | name.split(',') | name.split('&')) - [name]
-        names.map do |_name|
-          _name.strip!
-          people_lookup[:by_name][_name].try(:[], :email)
-        end
-      end
-    end
-
-    def people_lookup
-      return @people_lookup if @people_lookup
-
-      @people_lookup = {:by_email => {}, :by_name => {}, :by_username => {}}
-      people_from_ldap.each { |person|
-        @people_lookup[:by_email][person['Email']] = {:name => "#{person['First']} #{person['Last']}"}
-        @people_lookup[:by_name]["#{person['First']} #{person['Last']}"] = {:email => "#{person['Email']}"}
-        @people_lookup[:by_username]["#{person['Username']}"] = {:email => "#{person['Email']}"}
-      }
-      @people_lookup
-    end
-
-    def people_from_ldap
-      @people_from_ldap ||= JSON.parse(HTTParty.get(PEOPLE_JSON_URL).body)
     end
 
     def git_names_and_emails_since_last_green(build)
@@ -98,7 +66,7 @@ class GitBlame
     def lookup_git_names_and_emails(git_names_and_emails)
       git_names_and_emails.map do |git_name_and_email|
         name, email = git_name_and_email.split(":")
-        Array(email_from_git_email(email)) | Array(email_from_git_name(name))
+        Array(email_from_git_email(email))
       end.flatten.compact.uniq
     end
 
@@ -120,7 +88,7 @@ class GitBlame
             line.split("::!::").each do |line_part|
               next if line_part.nil? || line_part.empty?
               name, email = line_part.split(":")
-              email_addresses = email_addresses + (Array(email_from_git_email(email)) | Array(email_from_git_name(name)))
+              email_addresses = email_addresses + Array(email_from_git_email(email))
             end
             email_addresses.compact!
           end

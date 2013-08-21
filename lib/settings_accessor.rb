@@ -34,4 +34,8 @@ class SettingsAccessor
   def git_mirror
     @hash[:git_mirror]
   end
+
+  def git_pair_email_prefix
+    @hash[:git_pair_email_prefix]
+  end
 end

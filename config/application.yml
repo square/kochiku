@@ -17,3 +17,8 @@ kochiku_host: 'kochiku.example.com'
 # If you would like Kochiku to clone and fetch repositories from a git mirror
 # uncomment this setting and fill in the url to your mirror.
 # git_mirror: 'git://git-mirror.example.com/'
+
+# If you commit with hitch/git-pair, etc, set this in order to send email to each person in the pair.
+# For example, github+joe+bob@example.com will turn into emails to joe@example.com and bob@example.com
+# if git_pair_email_prefix is set to 'github'.
+git_pair_email_prefix: 'github'

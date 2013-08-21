@@ -33,7 +33,6 @@ RSpec.configure do |config|
     WebMock.disable_net_connect!
     JobBase.stub(:enqueue_in)
 
-    stub_request(:get, GitBlame::PEOPLE_JSON_URL).to_return(:status => 200, :body => "[]", :headers => {})
     GitBlame.stub(:git_names_and_emails_since_last_green).and_return("")
     GitBlame.stub(:git_names_and_emails_in_branch).and_return("")
     GitBlame.stub(:changes_since_last_green).and_return([])

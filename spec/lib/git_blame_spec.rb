@@ -7,24 +7,13 @@ describe GitBlame do
   describe "#emails_since_last_green" do
     subject { GitBlame.emails_since_last_green(build) }
 
-    after do
-      GitBlame.instance_variable_set(:@people_lookup, nil)
-    end
-
-    context "with many build breakers" do
+    context "with many build breakers, and no git prefix" do
       before do
         GitBlame.stub(:git_names_and_emails_since_last_green).and_return("User One:userone@example.com\nUser Two:usertwo@example.com")
-        GitBlame.stub(:people_from_ldap).and_return([{"First" => "User", "Last" => "One", "Email" => "userone@example.com"},
-                                                     {"First" => "User", "Last" => "Two", "Email" => "usertwo@example.com"}])
       end
 
       it "returns the emails of the users" do
         subject.should == ["userone@example.com", "usertwo@example.com"]
-      end
-
-      it "will only return an email if it is in the ldap list of names and emails" do
-        GitBlame.stub(:people_from_ldap).and_return([{"First" => "User", "Last" => "Two", "Email" => "usertwo@example.com"}])
-        subject.should == ["usertwo@example.com"]
       end
 
       it "will not return the same user twice" do
@@ -33,46 +22,29 @@ describe GitBlame do
       end
     end
 
-    context "when the email does not point to a user" do
+    context "with a git prefix" do
       before do
-        GitBlame.stub(:people_from_ldap).and_return([{"First" => "User", "Last" => "One", "Email" => "userone@example.com", "Username" => "usero"},
-                                                     {"First" => "User", "Last" => "Two", "Email" => "usertwo@example.com", "Username" => "usert"},
-                                                     {"First" => "User", "Last" => "Three", "Email" => "userthree@example.com", "Username" => "userth"}])
+        allow(Settings).to receive(:git_pair_email_prefix).and_return("git")
       end
 
-      it "should look up the users by their names" do
-        GitBlame.stub(:git_names_and_emails_since_last_green).and_return("User Two:git+ut@git.squareup.com")
-        subject.should == ["usertwo@example.com"]
-      end
-
-      it "returns the emails of all users mentioned by name with and" do
-        GitBlame.stub(:git_names_and_emails_since_last_green).and_return("User One and User Two:git+uo+ut@git.squareup.com")
-        subject.should == ["userone@example.com", "usertwo@example.com"]
-      end
-
-      it "returns the emails of all users mentioned by name with +" do
-        GitBlame.stub(:git_names_and_emails_since_last_green).and_return("User One + User Two:git+uo+ut@git.squareup.com")
-        subject.should == ["userone@example.com", "usertwo@example.com"]
-      end
-
-      it "returns the emails of all users mentioned by name with 'and' and an oxford comma" do
-        GitBlame.stub(:git_names_and_emails_since_last_green).and_return("User One, and User Two:git+uo+ut@git.squareup.com")
-        subject.should =~ ["userone@example.com", "usertwo@example.com"]
-      end
-
-      it "returns the emails of all users mentioned by name with a combination of 'and' and ','" do
-        GitBlame.stub(:git_names_and_emails_since_last_green).and_return("User One, User Two, and User Three:git+uo+ut+ut@git.squareup.com")
-        subject.should =~ ["userone@example.com", "usertwo@example.com", "userthree@example.com"]
-      end
-
-      it "should lookup the email based on the username" do
-        GitBlame.stub(:git_names_and_emails_since_last_green).and_return("First Last:git+usero@git.squareup.com")
+      it "should be able to extract a single user" do
+        GitBlame.stub(:git_names_and_emails_since_last_green).and_return("First Last:git+userone@example.com")
         subject.should == ["userone@example.com"]
       end
 
-      it "should send emails to usernames and emails" do
-        GitBlame.stub(:git_names_and_emails_since_last_green).and_return("User Two:git+usero@git.squareup.com")
-        subject.should =~ ["userone@example.com", "usertwo@example.com"]
+      it "should be able to extract multiple users" do
+        GitBlame.stub(:git_names_and_emails_since_last_green).and_return("First Last:git+one+two+three@example.com")
+        subject.should == ["one@example.com", "two@example.com", "three@example.com"]
+      end
+
+      it "does not affect users with no plus sign" do
+        GitBlame.stub(:git_names_and_emails_since_last_green).and_return("One:one@example.com\nTwo:two@foo.example.org")
+        subject.should == ["one@example.com", "two@foo.example.org"]
+      end
+
+      it "does not affect an email with a similar format but not starting with the prefix and a plus sign" do
+        GitBlame.stub(:git_names_and_emails_since_last_green).and_return("One:github+one+two@example.com")
+        subject.should == ["github+one+two@example.com"]
       end
     end
   end
@@ -87,8 +59,6 @@ describe GitBlame do
     context "with many build breakers" do
       before do
         GitBlame.stub(:git_names_and_emails_in_branch).and_return("User One:userone@example.com\nUser Two:usertwo@example.com")
-        GitBlame.stub(:people_from_ldap).and_return([{"First" => "User", "Last" => "One", "Email" => "userone@example.com"},
-                                                     {"First" => "User", "Last" => "Two", "Email" => "usertwo@example.com"}])
       end
 
       it "returns the emails of the users" do
@@ -143,8 +113,6 @@ describe GitBlame do
 
     before do
       GitBlame.unstub(:files_changed_since_last_green)
-      GitBlame.stub(:people_from_ldap).and_return([{"First" => "User", "Last" => "One", "Email" => "userone@example.com"},
-                                                   {"First" => "User", "Last" => "Two", "Email" => "usertwo@example.com"}])
     end
 
     it "should parse the git log and return change file paths" do
@@ -170,13 +138,6 @@ describe GitBlame do
       it "should return nothing if the line doesn't have an email" do
         Cocaine::CommandLine.any_instance.stub(:run).and_return("::!::::!::\n")
         subject.should be_empty
-      end
-
-      it "should work if the email address is not found" do
-        Cocaine::CommandLine.any_instance.stub(:run).and_return("::!::Unknown:unknown@example.com::!::\n\npath/one/file.java")
-        git_file_changes = subject
-        git_file_changes.size.should == 1
-        git_file_changes.should include({:file => "path/one/file.java", :emails => []})
       end
     end
   end
