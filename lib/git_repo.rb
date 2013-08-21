@@ -35,13 +35,7 @@ class GitRepo
     end
 
     def sha_for_branch(repo, branch)
-      response_body = GithubRequest.get(URI("#{repo.base_api_url}/git/refs/heads/#{branch}"))
-      branch_info = JSON.parse(response_body)
-      sha = nil
-      if branch_info['object'] && branch_info['object']['sha'].present?
-        sha = branch_info['object']['sha']
-      end
-      sha
+      repo.remote_server.sha_for_branch(branch)
     end
 
     def inside_repo(repository)

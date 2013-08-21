@@ -83,6 +83,15 @@ describe Repository do
     end
   end
 
+  context "with stash repository" do
+    context "#repository_name" do
+      it "returns the repositories name" do
+        repo = Repository.new(:url => "ssh://git@stash.squareup.com:7999/pe/host-tools.git")
+        repo.repository_name.should == "host-tools"
+      end
+    end
+  end
+
   context "#repo_cache_name" do
     it "returns the cache from the settings or the default from the repo name" do
       repository = Repository.new(:repo_cache_dir => "foobar")

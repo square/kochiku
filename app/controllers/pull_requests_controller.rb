@@ -10,7 +10,11 @@ class PullRequestsController < ApplicationController
   protected
 
   def handle_repo_push_request
-    ssh_url = Repository.covert_to_ssh_url(payload['repository']['url'])
+    ssh_url = begin
+      Repository.convert_to_ssh_url(payload['repository']['url'])
+    rescue Repository::UnknownServer
+      nil
+    end
     repository = Repository.find_by_url(ssh_url)
     return unless repository
     project = repository.projects.find_or_create_by_name(repository.repository_name)

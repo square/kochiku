@@ -52,7 +52,7 @@ class BuildsController < ApplicationController
       else
         sha = GitRepo.sha_for_branch(@project.repository, params[:build][:branch])
         if sha.nil?
-          flash[:error] = "Error adding build! branch not found in Github"
+          flash[:error] = "Error adding build! branch not found on remote server."
         else
           build = project_build(params[:build][:branch], sha)
         end

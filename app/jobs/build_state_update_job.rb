@@ -12,7 +12,7 @@ class BuildStateUpdateJob < JobBase
 
   def perform
     build = Build.find(@build_id)
-    GithubCommitStatus.new(build).update_commit_status!
+    build.repository.remote_server.update_commit_status!(build)
 
     if build.project.main? && build.completed?
       sha = GitRepo.sha_for_branch(build.repository, "master")
