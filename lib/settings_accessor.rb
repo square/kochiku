@@ -27,6 +27,10 @@ class SettingsAccessor
     "#{kochiku_protocol}://#{kochiku_host}"
   end
 
+  def smtp_server
+    @hash[:smtp_server]
+  end
+
   def git_mirror
     @hash[:git_mirror]
   end

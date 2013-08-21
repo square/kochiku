@@ -22,3 +22,8 @@ kochiku_host: 'kochiku.example.com'
 # For example, github+joe+bob@example.com will turn into emails to joe@example.com and bob@example.com
 # if git_pair_email_prefix is set to 'github'.
 git_pair_email_prefix: 'github'
+
+# Mail server which will accept mail on port 25 (standard SMTP port). If you need to use another port,
+# or other settings, you currently need to edit the kochiku source (config.action_mailer settings in
+# config/environments/production.rb).
+smtp_server: 'localhost'

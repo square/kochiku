@@ -71,7 +71,7 @@ Kochiku::Application.configure do
 
   config.action_mailer.delivery_method = :smtp
   config.action_mailer.smtp_settings = {
-    :address => "daisy.corp.squareup.com",
+    :address => Settings.smtp_server,
     :port => 25
   }
 end
