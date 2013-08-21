@@ -1,10 +1,6 @@
 class SettingsAccessor
-  def initialize(file_location)
-    if !File.exist?(file_location)
-      raise "#{file_location} is required to start Kochiku"
-    else
-      @hash = YAML.load_file(file_location).with_indifferent_access
-    end
+  def initialize(yaml)
+    @hash = YAML.load(yaml).with_indifferent_access
   end
 
   def sender_email_address
@@ -20,7 +16,7 @@ class SettingsAccessor
   end
 
   def kochiku_protocol
-    @hash[:use_https] == 'true' ? "https" : "http"
+    @hash[:use_https] ? "https" : "http"
   end
 
   def kochiku_host
