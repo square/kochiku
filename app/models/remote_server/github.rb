@@ -34,6 +34,25 @@ module RemoteServer
       GithubPostReceiveHook.new(repo).subscribe!
     end
 
+    def promote_branch!(branch, ref)
+      begin
+        GithubRequest.post(
+          URI("#{base_api_url}/git/refs"),
+          :ref => "refs/heads/deployable-#{@promotion_ref}",
+          :sha => ref
+        )
+      rescue GithubRequest::ResponseError
+         # We expect a 422 when the branch exists
+        Rails.logger.info("Failed to create git ref for #{@promotion_ref}")
+      end
+
+      GithubRequest.patch(
+        URI("#{base_api_url}/git/refs/heads/deployable-#{@promotion_ref}"),
+        :sha => ref,
+        :force => "true"
+      )
+    end
+
     def base_api_url
       params = repo.project_params
 

@@ -43,6 +43,12 @@ module RemoteServer
       # Unimplemented
     end
 
+    def promote_branch!(branch, ref)
+      GitRepo.in_repo(repo) do
+        BuildStrategy.promote(:branch, branch, ref)
+      end
+    end
+
     def base_api_url
       params = repo.project_params
 
