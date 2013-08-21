@@ -1,17 +1,7 @@
 source 'https://rubygems.org'
 
-def square_gem(org, name, opts = {})
-  gem name, opts.merge(git: "git@git.squareup.com:#{org}/#{name}.git")
-end
-
 gem 'rails', '3.2.14'
 gem 'passenger', '4.0.10', group: :production
-
-gem 'squash_ruby', require: 'squash/ruby'
-gem 'squash_rails', require: 'squash/rails'
-
-# TODO: this should use square_root, not guard_dog
-square_gem 'square', 'guard_dog'
 
 gem 'carrierwave'
 gem 'mysql2'

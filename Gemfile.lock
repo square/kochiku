@@ -1,9 +1,3 @@
-GIT
-  remote: git@git.squareup.com:square/guard_dog.git
-  revision: a4eb7a7bc262c614e680217972c7e0b6d6b7be6b
-  specs:
-    guard_dog (0.0.3)
-
 GEM
   remote: https://rubygems.org/
   specs:
@@ -216,10 +210,6 @@ GEM
       multi_json (~> 1.0)
       rack (~> 1.0)
       tilt (~> 1.1, != 1.3.0)
-    squash_rails (1.1.4)
-      squash_ruby
-    squash_ruby (1.2.0)
-      json
     symbolize (4.3.4)
     thin (1.5.1)
       daemons (>= 1.0.9)
@@ -257,7 +247,6 @@ DEPENDENCIES
   compass
   compass-rails
   factory_girl_rails
-  guard_dog!
   haml-rails
   httparty
   jquery-rails
@@ -276,8 +265,6 @@ DEPENDENCIES
   rvm-capistrano
   sass
   sass-rails
-  squash_rails
-  squash_ruby
   symbolize
   thin
   uglifier

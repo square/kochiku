@@ -1,4 +1,0 @@
----
-key: /app/kochiku/kochiku/current/config/secrets/kochiku-kochiku-s2s.key
-cert: /app/kochiku/kochiku/current/config/secrets/kochiku-kochiku-s2s.crt
-ca: /app/kochiku/kochiku/current/config/secrets/square_root.crt
