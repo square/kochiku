@@ -1,6 +1,34 @@
 require 'spec_helper'
 
 describe Project do
+  describe '#ensure_master_build_exists' do
+    let(:project) { FactoryGirl.create(:project) }
+
+    it 'creates a new build only if one does not exist' do
+      expect {
+        project.ensure_master_build_exists('abc123')
+      }.to change(Build, :count).by(1)
+
+      expect {
+        project.ensure_master_build_exists('abc123')
+      }.not_to change(Build, :count)
+    end
+  end
+
+  describe '#ensure_developer_build_exists' do
+    let(:project) { FactoryGirl.create(:project) }
+
+    it 'creates a new build only if one does not exist' do
+      expect {
+        project.ensure_developer_build_exists('mybranch', 'abc123')
+      }.to change(Build, :count).by(1)
+
+      expect {
+        project.ensure_developer_build_exists('mybranch', 'abc123')
+      }.not_to change(Build, :count)
+    end
+  end
+
   describe "#last_build_duration" do
     let(:project) { FactoryGirl.create(:project, :name => "kochiku") }
     before do

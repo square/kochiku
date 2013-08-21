@@ -21,6 +21,19 @@ class Project < ActiveRecord::Base
 
   validates_uniqueness_of :name
 
+  def ensure_master_build_exists(sha)
+    builds.create_new_ci_build_for(sha)
+  end
+
+  def ensure_developer_build_exists(branch, sha)
+    build = builds.find_existing_build_or_initialize(sha,
+      :state  => :partitioning,
+      :queue  => :developer,
+      :branch => branch
+    )
+    build.save!
+  end
+
   # The fuzzy_limit is used to set a upper bound on the amount of time that the
   # sql query will take
   def build_time_history(fuzzy_limit=1000)

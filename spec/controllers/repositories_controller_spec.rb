@@ -77,4 +77,32 @@ describe RepositoriesController do
       response.should be_success
     end
   end
+
+  describe 'post /build-ref' do
+    let(:repository) { FactoryGirl.create(:repository) }
+
+    it "creates a master build" do
+      expect {
+        post :build_ref, id: repository.to_param, ref: 'master', sha: 'abc123'
+        response.should be_success
+      }.to change(Build, :count).by(1)
+      build = Build.last
+      build.branch.should == "master"
+      build.ref.should == "abc123"
+      build.queue.should == :ci
+      build.project.name.should == "kochiku"
+    end
+
+    it "creates a PR build" do
+      expect {
+        post :build_ref, id: repository.to_param, ref: 'blah', sha: 'abc123'
+        response.should be_success
+      }.to change(Build, :count).by(1)
+      build = Build.last
+      build.branch.should == "blah"
+      build.ref.should == "abc123"
+      build.queue.should == :developer
+      build.project.name.should == "kochiku-pull_requests"
+    end
+  end
 end

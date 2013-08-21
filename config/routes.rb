@@ -5,9 +5,11 @@ Kochiku::Application.routes.draw do
 
   root :to => "projects#ci_projects"
 
+  # /repositories/1/build-ref?ref=master&sha=abc123
   resources :repositories do
     member do
       get :projects
+      post "build-ref", :action => 'build_ref'
     end
   end
 
