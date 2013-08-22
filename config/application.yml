@@ -27,3 +27,9 @@ git_pair_email_prefix: 'github'
 # or other settings, you currently need to edit the kochiku source (config.action_mailer settings in
 # config/environments/production.rb).
 smtp_server: 'localhost'
+
+# Optional settings for Atlassian Stash integration.
+# stash:
+#   host: stash.example.com
+#   username: kochiku-robot
+#   password: config/secrets/kochiku-robot-password
