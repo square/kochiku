@@ -3,8 +3,8 @@ require 'spec_helper'
 describe BuildPart do
   let(:repository) { FactoryGirl.create(:repository) }
   let(:project) { FactoryGirl.create(:project, :repository => repository) }
-  let(:build) { FactoryGirl.create(:build, :queue => :ci, :project => project) }
-  let(:build_part) { FactoryGirl.create(:build_part, :paths => ["a", "b"], :kind => "spec", :build_instance => build) }
+  let(:build) { FactoryGirl.create(:build, :project => project) }
+  let(:build_part) { FactoryGirl.create(:build_part, :paths => ["a", "b"], :kind => "spec", :build_instance => build, :queue => 'ci') }
 
   describe "#create_and_enqueue_new_build_attempt!" do
     it "should create a new build attempt" do
@@ -28,21 +28,19 @@ describe BuildPart do
       build_part.create_and_enqueue_new_build_attempt!
     end
 
-    # TODO: Please fix this code and delete this spec
-    it "enqueues onto a different queue then square web" do
+    it "enqueues onto the queue specified in the build part" do
+      build_part.update_attribute(:queue, 'queueX')
       BuildAttemptJob.should_receive(:enqueue_on).once.with do |queue, arg_hash|
-        queue.should == "ci"
+        queue.should == "queueX"
         true
       end
       build_part.create_and_enqueue_new_build_attempt!
     end
 
     it "should enqueue the build attempt for building" do
-      repository.update_attributes!(:use_spec_and_ci_queues => true)
       build_part.update_attributes!(:options => {"ruby" => "ree"})
-      # the queue name should include the queue name of the build instance and the type of the test file
       BuildAttemptJob.should_receive(:enqueue_on).once.with do |queue, arg_hash|
-        queue.should == "ci-spec"
+        queue.should == "ci"
         arg_hash["build_attempt_id"].should_not be_blank
         arg_hash["build_ref"].should_not be_blank
         arg_hash["build_kind"].should_not be_blank

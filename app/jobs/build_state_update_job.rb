@@ -14,9 +14,10 @@ class BuildStateUpdateJob < JobBase
     build = Build.find(@build_id)
     build.repository.remote_server.update_commit_status!(build)
 
+    # trigger another build if there are new commits to build
     if build.project.main? && build.completed?
       sha = GitRepo.sha_for_branch(build.repository, "master")
-      build.project.builds.create_new_ci_build_for(sha)
+      build.project.builds.create_new_build_for(sha)
     end
 
     if build.succeeded? && build.repository.has_on_success_note?

@@ -2,10 +2,9 @@
 require "spec_helper"
 
 feature "viewing an in process build" do
-  let(:repository) { FactoryGirl.create(:repository) }
-  let(:project) { FactoryGirl.create(:project, :name => repository.repository_name) }
+  let(:project) { FactoryGirl.create(:main_project) }
   let(:build) { FactoryGirl.create(:build, :project => project) }
-  let(:build_part) { FactoryGirl.create(:build_part, :build_instance => build)}
+  let(:build_part) { FactoryGirl.create(:build_part, :build_instance => build, :queue => 'ci')}
   let!(:build_attempt) { FactoryGirl.create(:build_attempt, :build_part => build_part, :state => :runnable)}
 
   it "view the current status of the build attempts" do
@@ -19,8 +18,6 @@ feature "viewing an in process build" do
     click_link(project.name)
     page.should have_content(build.ref[0, 5])
     click_link(build.ref[0, 5])
-
-    page.should have_content("Runnable on ci queue")
 
     within("table.build-summary") do
       find("td:nth-child(1)").should have_content(build_part.id)
@@ -37,6 +34,7 @@ feature "viewing an in process build" do
   it "should return to the home page when the logo is clicked" do
     # visit a deep page
     visit project_build_part_path(project, build, build_part)
+    page.should have_content("Runnable on ci queue")
 
     click_link("Home")
 

@@ -8,9 +8,9 @@ class Partitioner
     if kochiku_yml_location
       # Handle old kochiku.yml
       if kochiku_yml.is_a?(Array)
-        kochiku_yml.map { |subset| partitions_for(subset) }.flatten
+        kochiku_yml.map { |subset| partitions_for(build, subset) }.flatten
       else
-        build_partitions_from
+        build_partitions(build)
       end
     elsif File.exist?(MavenPartitioner::POM_XML)
       partitioner = MavenPartitioner.new(build)
@@ -51,10 +51,11 @@ class Partitioner
     end.flatten.compact.max
   end
 
-  def build_partitions_from
+  def build_partitions(build)
     kochiku_yml['ruby'].flat_map do |ruby|
       kochiku_yml['targets'].flat_map do |subset|
         partitions_for(
+          build,
           subset.merge(
             'options' => {
               'language' => kochiku_yml['language'],
@@ -66,11 +67,14 @@ class Partitioner
     end
   end
 
-  def partitions_for(subset)
+  def partitions_for(build, subset)
     glob = subset.fetch('glob', '/dev/null')
     type = subset.fetch('type', 'test')
     workers = subset.fetch('workers', 1)
     manifest = subset['manifest']
+    append_type_to_queue = subset.fetch('append_type_to_queue', false)
+    queue = build.project.main? ? 'ci' : 'developer'
+    queue += "-#{type}" if append_type_to_queue
 
     strategy = subset.fetch('balance', 'alphabetically')
     strategy = 'alphabetically' unless Strategies.respond_to?(strategy)
@@ -89,7 +93,7 @@ class Partitioner
     files -= balanced_partitions.flatten
 
     (Strategies.send(strategy, files, workers) + balanced_partitions).map do |files|
-      part = {'type' => type, 'files' => files.compact}
+      part = {'type' => type, 'files' => files.compact, 'queue' => queue}
       if subset['options']
         part['options'] = subset['options']
       end

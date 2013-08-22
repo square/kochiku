@@ -4,7 +4,7 @@ describe BuildArtifactsController do
   describe "#create" do
     let(:project) { FactoryGirl.create(:big_rails_project) }
     let(:build) { FactoryGirl.create(:build, :project => project) }
-    let(:build_part) { build.build_parts.create!(:paths => ["a"], :kind => "test") }
+    let(:build_part) { build.build_parts.create!(:paths => ["a"], :kind => "test", :queue => :ci) }
     let(:build_attempt) { build_part.build_attempts.create!(:state => :failed) }
     let(:log_file) { fixture_file_upload("/build_artifact.log", 'text/xml') }
 

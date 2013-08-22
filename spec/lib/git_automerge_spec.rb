@@ -3,7 +3,7 @@ require 'spec_helper'
 describe GitAutomerge do
   describe "#automerge" do
     let(:project) { FactoryGirl.create(:big_rails_project) }
-    let(:build) { FactoryGirl.create(:build, :project => project, :queue => "developer") }
+    let(:build) { FactoryGirl.create(:build, :project => project) }
     let(:merger) { GitAutomerge.new }
 
     subject { merger.automerge(build) }

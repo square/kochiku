@@ -1,7 +1,7 @@
 require "spec_helper"
 
 describe BuildMailer do
-  let(:build) { FactoryGirl.create(:build, :queue => :developer) }
+  let(:build) { FactoryGirl.create(:build) }
 
   describe "#error_email" do
     before do
@@ -29,9 +29,7 @@ describe BuildMailer do
 
   describe "#build_break_email" do
     context "on master as the main build for the project" do
-      let(:repository) { FactoryGirl.create(:repository) }
-      let(:project) { FactoryGirl.create(:project, :name => repository.repository_name)}
-      let(:build) { FactoryGirl.create(:build, :queue => :developer, :project => project, :branch => "master") }
+      let(:build) { FactoryGirl.create(:main_project_build) }
 
       before do
         GitBlame.stub(:changes_since_last_green).and_return([{:hash => "sha", :author => "Joe", :date => "some day", :message => "always be shipping it"}])
@@ -41,7 +39,7 @@ describe BuildMailer do
       it "sends the email" do
         build.project.should be_main
 
-        build_part = build.build_parts.create!(:paths => ["a", "b"], :kind => "cucumber")
+        build_part = build.build_parts.create!(:paths => ["a", "b"], :kind => "cucumber", :queue => :ci)
         build_part.build_attempts.create!(:state => :failed, :builder => "test-builder")
 
         email = BuildMailer.build_break_email(build)
@@ -56,7 +54,7 @@ describe BuildMailer do
     end
 
     context "on a branch" do
-      let(:build) { FactoryGirl.create(:build, :queue => :developer, :branch => "branch-of-master") }
+      let(:build) { FactoryGirl.create(:build, :branch => "branch-of-master") }
 
       before do
         GitBlame.stub(:changes_in_branch).and_return([{:hash => "sha", :author => "Joe", :date => "some day", :message => "always be shipping it"}])
@@ -64,7 +62,7 @@ describe BuildMailer do
       end
 
       it "sends the email" do
-        build_part = build.build_parts.create!(:paths => ["a", "b"], :kind => "cucumber")
+        build_part = build.build_parts.create!(:paths => ["a", "b"], :kind => "cucumber", :queue => :ci)
         build_part.build_attempts.create!(:state => :failed, :builder => "test-builder")
 
         email = BuildMailer.build_break_email(build)

@@ -22,7 +22,7 @@ class PullRequestsController < ApplicationController
     project = repository.projects.find_or_create_by_name(repository.repository_name)
     if payload["ref"] == "refs/heads/master" && repository.run_ci?
       sha = payload["after"]
-      project.builds.create_new_ci_build_for(sha)
+      project.builds.create_new_build_for(sha)
     end
   end
 
@@ -32,7 +32,7 @@ class PullRequestsController < ApplicationController
     if active_pull_request? && (build_requested_for_pull_request? || repository.build_pull_requests)
       sha = payload["pull_request"]["head"]["sha"]
       branch = payload["pull_request"]["head"]["ref"]
-      build = project.builds.find_existing_build_or_initialize(sha, :state => :partitioning, :queue => :developer, :branch => branch)
+      build = project.builds.find_existing_build_or_initialize(sha, :state => :partitioning, :branch => branch)
       build.save!
     end
   end

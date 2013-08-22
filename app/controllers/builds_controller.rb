@@ -117,19 +117,16 @@ class BuildsController < ApplicationController
     requested_branch = payload['ref'].split('/').last
 
     if @project.branch == requested_branch
-      queue = @project.main? ? :ci : :developer
-      @project.builds.find_existing_build_or_initialize(payload['after'], :state => :partitioning, :queue => queue)
+      @project.builds.find_existing_build_or_initialize(payload['after'], :state => :partitioning)
     end
   end
 
   def project_build(branch, ref)
     auto_merge = params[:auto_merge] || false
-    queue = :developer
     if @project.main?
-      queue = :ci
       ref = GitRepo.sha_for_branch(@project.repository, "master")
       branch = "master"
     end
-    @project.builds.find_existing_build_or_initialize(ref, :state => :partitioning, :queue => queue, :auto_merge => auto_merge, :branch => branch)
+    @project.builds.find_existing_build_or_initialize(ref, :state => :partitioning, :auto_merge => auto_merge, :branch => branch)
   end
 end

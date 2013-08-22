@@ -2,8 +2,8 @@ require 'spec_helper'
 
 describe Build do
   let(:project) { FactoryGirl.create(:big_rails_project) }
-  let(:build) { FactoryGirl.create(:build, :project => project, :queue => "developer") }
-  let(:parts) { [{'type' => 'cucumber', 'files' => ['a', 'b']}, {'type' => 'rspec', 'files' => ['c', 'd']}] }
+  let(:build) { FactoryGirl.create(:build, :project => project) }
+  let(:parts) { [{'type' => 'cucumber', 'files' => ['a', 'b'], 'queue' => 'ci'}, {'type' => 'rspec', 'files' => ['c', 'd'], 'queue' => 'ci'}] }
 
   describe "#test_command" do
     before do
@@ -27,16 +27,13 @@ describe Build do
       build.should_not be_valid
       build.should have(1).error_on(:ref)
     end
+
     it "requires a project_id to be set" do
       build.project_id = nil
       build.should_not be_valid
       build.should have(1).error_on(:project_id)
     end
-    it "requires a queue to be set" do
-      build.queue = nil
-      build.should_not be_valid
-      build.should have(1).error_on(:queue)
-    end
+
     it "should force uniqueness on project_id and ref pairs" do
       build2 = FactoryGirl.build(:build, :project => project, :ref => build.ref)
       build2.should_not be_valid
@@ -48,6 +45,7 @@ describe Build do
     it "should create a BuildPart for each path" do
       build.partition(parts)
       build.build_parts.map(&:kind).should =~ ['cucumber', 'rspec']
+      build.build_parts.map(&:queue).should =~ [:ci, :ci]
       build.build_parts.find_by_kind('cucumber').paths.should =~ ['a', 'b']
     end
 
@@ -57,7 +55,7 @@ describe Build do
     end
 
     it "creates parts with options" do
-      build.partition([{"type" => "cucumber", "files" => ['a'], 'options' => {"ruby" => "ree", "language" => 'ruby'}}])
+      build.partition([{"type" => "cucumber", "files" => ['a'], 'queue' => 'developer', 'options' => {"ruby" => "ree", "language" => 'ruby'}}])
       build_part = build.build_parts.first
       build_part.reload
       build_part.options.should == {"ruby" => "ree", "language" => 'ruby'}
@@ -75,7 +73,7 @@ describe Build do
 
     it "rolls back any changes to the database if an error occurs" do
       # set parts to an illegal value
-      parts = [{'type' => 'rspec', 'files' => []}]
+      parts = [{'type' => 'rspec', 'files' => [], 'queue' => 'ci'}]
 
       build.build_parts.should be_empty
       build.state.should == :partitioning
@@ -104,7 +102,7 @@ describe Build do
   end
 
   describe "#update_state_from_parts!" do
-    let(:parts) { [{'type' => 'cucumber', 'files' => ['a']}, {'type' => 'rspec', 'files' => ['b']}] }
+    let(:parts) { [{'type' => 'cucumber', 'files' => ['a'], 'queue' => 'ci'}, {'type' => 'rspec', 'files' => ['b'], 'queue' => 'ci'}] }
     before do
       stub_request(:post, /https:\/\/git\.squareup\.com\/api\/v3\/repos\/square\/kochiku\/statuses\//)
       build.stub(:running!)
@@ -199,7 +197,7 @@ describe Build do
   end
 
   describe "#abort!" do
-    let(:build) { FactoryGirl.create(:build, :state => :runnable, :queue => :developer) }
+    let(:build) { FactoryGirl.create(:build, :state => :runnable) }
 
     it "should mark the build as aborted" do
       expect{ build.abort! }.to change(build, :state).from(:runnable).to(:aborted)
@@ -308,21 +306,22 @@ describe Build do
 
   describe "#auto_merge_enabled?" do
     it "is true if it is a developer build with auto_merge" do
-      build.queue = :developer
       build.auto_merge = true
       build.auto_merge_enabled?.should be_true
     end
 
     it "is false if it is a developer build without auto_merge" do
-      build.queue = :developer
       build.auto_merge = false
       build.auto_merge_enabled?.should be_false
     end
 
-    it "is false if it is a ci build" do
-      build.queue = :ci
-      build.auto_merge = true
-      build.auto_merge_enabled?.should be_false
+    context "for a build on the main project" do
+      let(:build) { FactoryGirl.create(:main_project_build) }
+
+      it "is false if it is a main build" do
+        build.auto_merge = true
+        build.auto_merge_enabled?.should be_false
+      end
     end
   end
 

@@ -9,7 +9,8 @@ repo_infos = [{:name => 'kandan', :location => "git@github.com:kandanapp/kandan.
 def create_build_part(build, kind, paths, build_attempt_state)
   bp = BuildPart.create!(:build_instance => build,
                          :kind => kind,
-                         :paths => paths)
+                         :paths => paths,
+                         :queue => 'ci')
   build_attempt_state ||= (BuildAttempt::STATES + [:passed] * 5).sample
   BuildAttempt.create!(:build_part => bp, :builder => @builders.sample,
                        :state => build_attempt_state,
@@ -21,8 +22,7 @@ def create_builds_for(project, repo_info)
   10.times do
     build = Build.create!(:project => project,
                           :ref => SecureRandom.hex,
-                          :state => :runnable,
-                          :queue => "ci")
+                          :state => :runnable)
 
     (repo_info[:types] || [:spec, :cucumber]).each do |kind|
       if repo_info[:paths]

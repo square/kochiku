@@ -8,19 +8,27 @@ FactoryGirl.define do
       name "web"
       branch "master"
     end
+
+    factory :main_project do
+      name { repository.repository_name }
+    end
   end
 
   factory :build do
     project
     state :partitioning
-    queue :ci
     ref { SecureRandom.hex }
+
+    factory :main_project_build do
+      association :project, :factory => :main_project
+    end
   end
 
   factory :build_part do
     association :build_instance, :factory => :build, :state => :runnable
     kind :test
     paths ["/foo/1.test", "foo/baz/a.test", "foo/baz/b.test"]
+    queue :ci
   end
 
   factory :build_attempt do

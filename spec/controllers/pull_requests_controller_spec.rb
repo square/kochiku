@@ -42,7 +42,6 @@ describe PullRequestsController do
           build = Build.last
           build.branch.should == "master"
           build.ref.should == "SOME-SHA1"
-          build.queue.should == :ci
         end
 
         it "does not a build for not master" do
@@ -61,10 +60,10 @@ describe PullRequestsController do
         end
 
         it "does not build if there is an active ci build" do
-          project.builds.create!(:ref => "sha", :state => :succeeded, :queue => :ci, :branch => 'master')
+          project.builds.create!(:ref => "sha", :state => :succeeded, :branch => 'master')
           frozen_time = 3.seconds.from_now
           Time.stub(:now).and_return(frozen_time)
-          project.builds.create!(:ref => "sha2", :state => :partitioning, :queue => :ci, :branch => 'master')
+          project.builds.create!(:ref => "sha2", :state => :partitioning, :branch => 'master')
           expect {
             post :build, 'payload' => push_payload
             response.should be_success
@@ -72,7 +71,7 @@ describe PullRequestsController do
         end
 
         it "builds if there is completed ci build" do
-          project.builds.create!(:ref => "sha", :state => :succeeded, :queue => :ci, :branch => 'master')
+          project.builds.create!(:ref => "sha", :state => :succeeded, :branch => 'master')
           expect {
             post :build, 'payload' => push_payload
             response.should be_success
@@ -80,10 +79,10 @@ describe PullRequestsController do
         end
 
         it "builds if there is completed ci build after a build that is still building" do
-          project.builds.create!(:ref => "sha", :state => :partitioning, :queue => :ci, :branch => 'master')
+          project.builds.create!(:ref => "sha", :state => :partitioning, :branch => 'master')
           frozen_time = 3.seconds.from_now
           Time.stub(:now).and_return(frozen_time)
-          project.builds.create!(:ref => "sha2", :state => :succeeded, :queue => :ci, :branch => 'master')
+          project.builds.create!(:ref => "sha2", :state => :succeeded, :branch => 'master')
           expect {
             post :build, 'payload' => push_payload
             response.should be_success
@@ -107,6 +106,7 @@ describe PullRequestsController do
           Project.last.repository.should == repository
           Project.last.name.should == "web-pull_requests"
         end
+
         it "creates a build for a pull request" do
           expect {
             post :build, 'payload' => pull_request_payload
@@ -115,8 +115,8 @@ describe PullRequestsController do
           build = Build.last
           build.branch.should == "branch-name"
           build.ref.should == "Some-sha"
-          build.queue.should == :developer
         end
+
         it "will enqueue a build if autobuild pull requests is enabled" do
           repository.build_pull_requests = "1"
           repository.save!

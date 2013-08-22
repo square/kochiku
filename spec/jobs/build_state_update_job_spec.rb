@@ -1,15 +1,15 @@
 require 'spec_helper'
 
 describe BuildStateUpdateJob do
-  let(:project) { FactoryGirl.create(:big_rails_project, :repository => repository, :name => name) }
   let(:repository) { FactoryGirl.create(:repository)}
+  let(:project) { FactoryGirl.create(:big_rails_project, :repository => repository, :name => name) }
   let(:build) { FactoryGirl.create(:build, :state => :runnable, :project => project) }
   let(:name) { repository.repository_name + "_pull_requests" }
   let(:current_repo_master) { build.ref }
 
   before do
-    build.build_parts.create!(:kind => :spec, :paths => ["foo", "bar"])
-    build.build_parts.create!(:kind => :cucumber, :paths => ["baz"])
+    build.build_parts.create!(:kind => :spec, :paths => ["foo", "bar"], :queue => :ci)
+    build.build_parts.create!(:kind => :cucumber, :paths => ["baz"], :queue => :ci)
     GitRepo.stub(:run!)
     GitRepo.stub(:synchronize_with_remote).and_return(true)
     GitRepo.stub(:sha_for_branch).and_return(current_repo_master)
@@ -70,7 +70,6 @@ describe BuildStateUpdateJob do
             it "builds when there is a new sha to build" do
               expect { subject }.to change(project.builds, :count).by(1)
               build = project.builds.last
-              build.queue.should == :ci
               build.ref.should == "new-sha"
             end
 
@@ -84,17 +83,16 @@ describe BuildStateUpdateJob do
               build.build_parts.first.create_and_enqueue_new_build_attempt!
               expect { subject }.to change(project.builds, :count).by(1)
               build = project.builds.last
-              build.queue.should == :ci
               build.ref.should == "new-sha"
             end
 
             it "does not kick off a new build if one is already running" do
-              project.builds.create!(:ref => 'some-other-sha', :state => :partitioning, :queue => :ci, :branch => 'master')
+              project.builds.create!(:ref => 'some-other-sha', :state => :partitioning, :branch => 'master')
               expect { subject }.to_not change(project.builds, :count)
             end
 
             it "does not roll back a builds state" do
-              new_build = project.builds.create!(:ref => current_repo_master, :state => :failed, :queue => :ci, :branch => 'master')
+              new_build = project.builds.create!(:ref => current_repo_master, :state => :failed, :branch => 'master')
               expect { subject }.to_not change(project.builds, :count)
               new_build.reload.state.should == :failed
             end
@@ -109,28 +107,32 @@ describe BuildStateUpdateJob do
         end
       end
 
-      it "should promote the build" do
-        BuildStrategy.should_receive(:promote_build).with(build.ref, build.repository)
-        BuildStrategy.should_not_receive(:run_success_script)
-        BuildStateUpdateJob.perform(build.id)
-      end
+      context "on main project" do
+        let(:project) { FactoryGirl.create(:project, :repository => repository, :name => repository.repository_name) }
 
-      context "with a success script" do
-        before do
-          repository.update_attribute(:on_success_script, "./this_is_a_triumph")
+        it "should promote the build" do
+          BuildStrategy.should_receive(:promote_build).with(build.ref, build.repository)
+          BuildStrategy.should_not_receive(:run_success_script)
+          BuildStateUpdateJob.perform(build.id)
         end
 
-        it "promote the build only once" do
-          BuildStrategy.should_receive(:run_success_script).once.with(build.repository, build.ref, build.branch).and_return("this is a log file\n\n")
-          2.times {
-            BuildStateUpdateJob.perform(build.id)
-          }
-          build.reload.on_success_script_log_file.read.should == "this is a log file\n\n"
+        context "with a success script" do
+          before do
+            repository.update_attribute(:on_success_script, "./this_is_a_triumph")
+          end
+
+          it "promote the build only once" do
+            BuildStrategy.should_receive(:run_success_script).once.with(build.repository, build.ref, build.branch).and_return("this is a log file\n\n")
+            2.times {
+              BuildStateUpdateJob.perform(build.id)
+            }
+            build.reload.on_success_script_log_file.read.should == "this is a log file\n\n"
+          end
         end
       end
 
       it "should automerge the build" do
-        build.update_attributes(:auto_merge => true, :queue => :developer)
+        build.update_attributes(:auto_merge => true)
         BuildStrategy.should_receive(:merge_ref).with(build)
         BuildStateUpdateJob.perform(build.id)
       end

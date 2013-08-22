@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20130709123456) do
+ActiveRecord::Schema.define(:version => 20130822191419) do
 
   create_table "build_artifacts", :force => true do |t|
     t.integer  "build_attempt_id"
@@ -42,6 +42,7 @@ ActiveRecord::Schema.define(:version => 20130709123456) do
     t.datetime "updated_at",       :null => false
     t.text     "options"
     t.boolean  "upload_artifacts"
+    t.string   "queue"
   end
 
   add_index "build_parts", ["build_id"], :name => "index_build_parts_on_build_id"
@@ -50,7 +51,6 @@ ActiveRecord::Schema.define(:version => 20130709123456) do
   create_table "builds", :force => true do |t|
     t.string   "ref"
     t.string   "state"
-    t.string   "queue"
     t.datetime "created_at",                 :null => false
     t.datetime "updated_at",                 :null => false
     t.integer  "project_id"
@@ -88,7 +88,6 @@ ActiveRecord::Schema.define(:version => 20130709123456) do
     t.boolean  "use_branches_on_green"
     t.boolean  "build_pull_requests"
     t.string   "on_green_update"
-    t.boolean  "use_spec_and_ci_queues"
     t.string   "repo_cache_dir"
     t.string   "command_flag"
     t.boolean  "send_build_failure_email",    :default => true

@@ -10,7 +10,7 @@ class ProjectsController < ApplicationController
 
   def show
     @project = Project.find_by_name!(params[:id])
-    @build = @project.builds.build(:queue => "developer")
+    @build = @project.builds.build
     @builds = @project.builds.includes(build_parts: :build_attempts).last(12)
     @current_build = @builds.last
 

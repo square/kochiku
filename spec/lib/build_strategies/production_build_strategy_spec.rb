@@ -4,7 +4,7 @@ require "#{Rails.root}/lib/build_strategies/production_build_strategy.rb"
 
 describe BuildStrategy do
   let(:project) { FactoryGirl.create(:big_rails_project) }
-  let(:build) { FactoryGirl.create(:build, :project => project, :queue => "developer") }
+  let(:build) { FactoryGirl.create(:build, :project => project) }
 
   before(:each) do
     CommandStubber.new # ensure Open3 is stubbed

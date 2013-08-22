@@ -36,11 +36,9 @@ class Build < ActiveRecord::Base
   IN_PROGRESS_STATES = [:waiting_for_sync, :partitioning, :runnable, :running, :doomed]
   STATES = IN_PROGRESS_STATES + TERMINAL_STATES
   symbolize :state, :in => STATES
-  symbolize :queue
   serialize :deployable_map, Hash
   serialize :maven_modules, Array
 
-  validates_presence_of :queue
   validates_presence_of :project_id
   validates_presence_of :ref
   validates_uniqueness_of :ref, :scope => :project_id
@@ -77,7 +75,7 @@ class Build < ActiveRecord::Base
     transaction do
       update_attributes!(:state => :runnable)
       parts.each do |part|
-        build_parts.create!(:kind => part['type'], :paths => part['files'], :upload_artifacts => part['upload_artifacts'], :options => part['options'])
+        build_parts.create!(:kind => part['type'], :paths => part['files'], :upload_artifacts => part['upload_artifacts'], :queue => part['queue'], :options => part['options'])
       end
     end
 
@@ -125,7 +123,7 @@ class Build < ActiveRecord::Base
   end
 
   def promotable?
-    succeeded? && queue == :ci
+    succeeded? && project.main?
   end
 
   def auto_mergable?
@@ -133,11 +131,11 @@ class Build < ActiveRecord::Base
   end
 
   def auto_merge_togglable?
-    queue == :developer && !succeeded?
+    !succeeded? && !project.main?
   end
 
   def auto_merge_enabled?
-    queue == :developer && self.auto_merge
+    !project.main? && self.auto_merge
   end
 
   def maven?

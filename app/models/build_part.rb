@@ -2,7 +2,8 @@ class BuildPart < ActiveRecord::Base
   belongs_to :build_instance, :class_name => "Build", :foreign_key => "build_id", :inverse_of => :build_parts    # using build_instance because AR defines #build for associations, and it wins
   has_many :build_attempts, :dependent => :destroy, :inverse_of => :build_part
   has_one :project, :through => :build_instance
-  validates_presence_of :kind, :paths
+  symbolize :queue
+  validates_presence_of :kind, :paths, :queue
 
   serialize :paths, Array
   serialize :options, Hash
@@ -25,30 +26,22 @@ class BuildPart < ActiveRecord::Base
     build_attempt = build_attempts.create!(:state => :runnable)
     build_instance.running!
 
-    # TODO: this is a hack, please fix the following and restore this code to it's former glory.
-    # We need to do 2 things before enabling this:
-    # 1) update the ssh key on ec2 builders
-    # 2) get more space on the ec2 builders
-    if build_instance.repository.use_spec_and_ci_queues && !build_instance.repository.queue_override
-      BuildAttemptJob.enqueue_on("#{build_instance.queue}-#{self.kind}", job_args(build_attempt))
+    # TODO: hopefully this is only temporary while we work to make these tests less flaky
+    # franklin should only be in this list until we get chromedriver installed on EC2
+    # esperanto needs riak which is only on the macbuilds at the moment
+    if (kind == "maven" && (paths.include?("franklin") ||
+        paths.include?("esperanto") ||
+        paths.include?("esperanto/riak") ||
+        paths.include?("sake/rpc") ||
+        paths.include?("clustering/zookeeper") ||
+        paths.include?("openpgp") ||
+        paths.include?("searle")))
+      BuildAttemptJob.enqueue_on("ci-osx", job_args(build_attempt))
     else
-      # TODO: hopefully this is only temporary while we work to make these tests less flaky
-      # franklin should only be in this list until we get chromedriver installed on EC2
-      # esperanto needs riak which is only on the macbuilds at the moment
-      if (kind == "maven" && (paths.include?("franklin") ||
-                              paths.include?("esperanto") ||
-                              paths.include?("esperanto/riak") ||
-                              paths.include?("sake/rpc") ||
-                              paths.include?("clustering/zookeeper") ||
-                              paths.include?("openpgp") ||
-                              paths.include?("searle")))
-        BuildAttemptJob.enqueue_on("ci-osx", job_args(build_attempt))
+      if build_instance.repository.queue_override
+        BuildAttemptJob.enqueue_on(build_instance.repository.ci_queue_name, job_args(build_attempt))
       else
-        if build_instance.repository.queue_override
-          BuildAttemptJob.enqueue_on(build_instance.repository.ci_queue_name, job_args(build_attempt))
-        else
-          BuildAttemptJob.enqueue_on(build_instance.queue.to_s, job_args(build_attempt))
-        end
+        BuildAttemptJob.enqueue_on(queue.to_s, job_args(build_attempt))
       end
     end
 
@@ -130,7 +123,7 @@ class BuildPart < ActiveRecord::Base
 
   def should_reattempt?
     build_attempts.unsuccessful.count < 3 &&
-        (build_instance.auto_merge? || build_instance.queue == :ci) &&
+        (build_instance.auto_merge? || build_instance.project.main?) &&
         (kind == "cucumber" || kind == "maven" )
   end
 

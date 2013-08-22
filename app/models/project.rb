@@ -1,20 +1,16 @@
 class Project < ActiveRecord::Base
   has_many :builds, :dependent => :destroy, :inverse_of => :project do
-    def create_new_ci_build_for(sha)
-      last_build = where(:queue => :ci).last
+    def create_new_build_for(sha)
+      last_build = all.last
       return last_build if last_build && !last_build.completed?
-      build = find_or_initialize_by_ref(sha, :state => :partitioning, :queue => :ci, :branch => 'master')
+      build = find_or_initialize_by_ref(sha, :state => :partitioning, :branch => 'master')
       build.save!
       build
     end
 
     def find_existing_build_or_initialize(ref, options)
-      existing_build = if options[:queue] == :ci
-        find_or_initialize_by_ref(ref, :state => :partitioning, :queue => :ci, :branch => 'master')
-      else
       # Always create another build for CI purposes - it would be nice to not do this but we need to link builds to achieve this.
-        Build.first(:joins => :project, :conditions => ["projects.repository_id = ? AND builds.ref = ?", proxy_association.owner.repository_id, ref], :readonly => false)
-      end
+      existing_build = Build.first(:joins => :project, :conditions => ["projects.repository_id = ? AND builds.ref = ?", proxy_association.owner.repository_id, ref], :readonly => false)
       existing_build || build(options.merge(:ref => ref))
     end
   end
@@ -23,15 +19,11 @@ class Project < ActiveRecord::Base
   validates_uniqueness_of :name
 
   def ensure_master_build_exists(sha)
-    builds.create_new_ci_build_for(sha)
+    builds.create_new_build_for(sha)
   end
 
   def ensure_developer_build_exists(branch, sha)
-    build = builds.find_existing_build_or_initialize(sha,
-      :state  => :partitioning,
-      :queue  => :developer,
-      :branch => branch
-    )
+    build = builds.find_existing_build_or_initialize(sha, :state  => :partitioning, :branch => branch)
     build.save!
     build
   end

@@ -22,6 +22,12 @@
       = check_box_tag :refresh, true, @build_part.is_running?
       Refresh
 
+.build-info.build-info-subheader
+  %span.info
+    %span.status{:class => 'build-part-' + @build_part.status.to_s}= @build_part.status.to_s.capitalize
+    on
+    %span.queue #{@build_part.queue} queue
+
 %table.build-part-info
   %thead
     %tr

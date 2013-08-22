@@ -43,12 +43,20 @@ describe Partitioner do
 
   context "with a ruby-based kochiku.yml" do
     let(:kochiku_yml_exists) { true }
+    let(:append_type_to_queue) { nil }
     let(:kochiku_yml) do
       {
         "ruby" => ["ree-1.8.7-2011.12"],
         "language" => "ruby",
         "targets" => [
-          { 'type' => 'rspec', 'glob' => 'spec/**/*_spec.rb', 'workers' => 3, 'balance' => rspec_balance, 'manifest' => rspec_manifest }
+          {
+            'type' => 'rspec',
+            'glob' => 'spec/**/*_spec.rb',
+            'workers' => 3,
+            'balance' => rspec_balance,
+            'manifest' => rspec_manifest,
+            'append_type_to_queue' => append_type_to_queue
+          }
         ]
       }
     end
@@ -59,10 +67,47 @@ describe Partitioner do
       partitions.first["options"]["ruby"].should == "ree-1.8.7-2011.12"
       partitions.first["type"].should == "rspec"
       partitions.first["files"].should_not be_empty
+      partitions.first["queue"].should == "developer"
+    end
+
+    context "with a master build" do
+      let(:build) { FactoryGirl.create(:main_project_build) }
+
+      it "should use the ci queue" do
+        expect(build.project).to be_main
+        partitions = partitioner.partitions(build)
+        partitions.first["queue"].should == "ci"
+      end
+
+      context "when append_type_to_queue is in kochiku.yml" do
+        let(:append_type_to_queue) { true }
+
+        it "should append the type" do
+          partitions = partitioner.partitions(build)
+          partitions.first["queue"].should == "ci-rspec"
+        end
+      end
+    end
+
+    context "with a branch build" do
+      it "should use the developer queue" do
+        expect(build.project).to_not be_main
+        partitions = partitioner.partitions(build)
+        partitions.first["queue"].should == "developer"
+      end
+
+      context "when append_type_to_queue is in kochiku.yml" do
+        let(:append_type_to_queue) { true }
+
+        it "should append the type" do
+          partitions = partitioner.partitions(build)
+          partitions.first["queue"].should == "developer-rspec"
+        end
+      end
     end
   end
 
-  context "when there is no config yml" do
+  context "when there is no kochiku yml" do
     let(:kochiku_yml_exists) { false }
 
     it "should return a single partiion" do
@@ -93,16 +138,16 @@ describe Partitioner do
 
       context 'when there is one file matching the glob' do
         let(:matches) { %w(a) }
-        it { [{ 'type' => 'rspec', 'files' => %w(a) }].each { |partition| should include(partition) } }
+        it { [{ 'type' => 'rspec', 'files' => %w(a), 'queue' => 'developer' }].each { |partition| should include(partition) } }
       end
 
       context 'when there are many files matching the glob' do
         let(:matches) { %w(a b c d) }
         it {
           [
-            { 'type' => 'rspec', 'files' => %w(a b) },
-            { 'type' => 'rspec', 'files' => %w(c) },
-            { 'type' => 'rspec', 'files' => %w(d) },
+            { 'type' => 'rspec', 'files' => %w(a b), 'queue' => 'developer' },
+            { 'type' => 'rspec', 'files' => %w(c), 'queue' => 'developer' },
+            { 'type' => 'rspec', 'files' => %w(d), 'queue' => 'developer' },
           ].each { |partition| should include(partition) }
         }
 
@@ -110,9 +155,9 @@ describe Partitioner do
           let(:rspec_balance) { 'round_robin' }
           it {
             [
-              { 'type' => 'rspec', 'files' => %w(a d) },
-              { 'type' => 'rspec', 'files' => %w(b) },
-              { 'type' => 'rspec', 'files' => %w(c) },
+              { 'type' => 'rspec', 'files' => %w(a d), 'queue' => 'developer' },
+              { 'type' => 'rspec', 'files' => %w(b), 'queue' => 'developer' },
+              { 'type' => 'rspec', 'files' => %w(c), 'queue' => 'developer' },
             ].each { |partition| should include(partition) }
           }
 
@@ -123,9 +168,9 @@ describe Partitioner do
 
             it {
               [
-                { 'type' => 'rspec', 'files' => %w(c d) },
-                { 'type' => 'rspec', 'files' => %w(b) },
-                { 'type' => 'rspec', 'files' => %w(a) },
+                { 'type' => 'rspec', 'files' => %w(c d), 'queue' => 'developer' },
+                { 'type' => 'rspec', 'files' => %w(b), 'queue' => 'developer' },
+                { 'type' => 'rspec', 'files' => %w(a), 'queue' => 'developer' },
               ].each { |partition| should include(partition) }
             }
           end
@@ -157,14 +202,14 @@ describe Partitioner do
 
             it 'should greedily partition files in the time_manifest, and round robin the remaining files' do
               [
-                {'type' => 'rspec', 'files' => ['e']},
-                {'type' => 'rspec', 'files' => ['c', 'd']},
-                {'type' => 'rspec', 'files' => ['b', 'a']},
-                {'type' => 'cuke', 'files' => ['a', 'b']},
-                {'type' => 'cuke', 'files' => ['c', 'd']},
-                {'type' => 'cuke', 'files' => ['e']},
-                {'type' => 'cuke', 'files' => ['i']},
-                {'type' => 'cuke', 'files' => ['h', 'g', 'f']}
+                {'type' => 'rspec', 'files' => ['e'], 'queue' => 'developer'},
+                {'type' => 'rspec', 'files' => ['c', 'd'], 'queue' => 'developer'},
+                {'type' => 'rspec', 'files' => ['b', 'a'], 'queue' => 'developer'},
+                {'type' => 'cuke', 'files' => ['a', 'b'], 'queue' => 'developer'},
+                {'type' => 'cuke', 'files' => ['c', 'd'], 'queue' => 'developer'},
+                {'type' => 'cuke', 'files' => ['e'], 'queue' => 'developer'},
+                {'type' => 'cuke', 'files' => ['i'], 'queue' => 'developer'},
+                {'type' => 'cuke', 'files' => ['h', 'g', 'f'], 'queue' => 'developer'}
               ].each { |partition| should include(partition) }
             end
           end
@@ -182,9 +227,9 @@ describe Partitioner do
 
           it {
             [
-              { 'type' => 'rspec', 'files' => %w(b a) },
-              { 'type' => 'rspec', 'files' => %w(c) },
-              { 'type' => 'rspec', 'files' => %w(d) },
+              { 'type' => 'rspec', 'files' => %w(b a), 'queue' => 'developer' },
+              { 'type' => 'rspec', 'files' => %w(c), 'queue' => 'developer' },
+              { 'type' => 'rspec', 'files' => %w(d), 'queue' => 'developer' },
             ].each { |partition| should include(partition) }
           }
         end
@@ -201,9 +246,9 @@ describe Partitioner do
 
           it {
             [
-              { 'type' => 'rspec', 'files' => %w(b) },
-              { 'type' => 'rspec', 'files' => %w(c) },
-              { 'type' => 'rspec', 'files' => %w(d a) },
+              { 'type' => 'rspec', 'files' => %w(b), 'queue' => 'developer' },
+              { 'type' => 'rspec', 'files' => %w(c), 'queue' => 'developer' },
+              { 'type' => 'rspec', 'files' => %w(d a), 'queue' => 'developer' },
             ].each { |partition| should include(partition) }
           }
         end
@@ -220,9 +265,9 @@ describe Partitioner do
 
           it {
             [
-              { 'type' => 'rspec', 'files' => %w(a b) },
-              { 'type' => 'rspec', 'files' => %w(c) },
-              { 'type' => 'rspec', 'files' => %w(d) },
+              { 'type' => 'rspec', 'files' => %w(a b), 'queue' => 'developer' },
+              { 'type' => 'rspec', 'files' => %w(c), 'queue' => 'developer' },
+              { 'type' => 'rspec', 'files' => %w(d), 'queue' => 'developer' },
             ].each { |partition| should include(partition) }
           }
         end
@@ -232,10 +277,10 @@ describe Partitioner do
 
           it {
             [
-              { 'type' => 'rspec', 'files' => %w(a) },
-              { 'type' => 'rspec', 'files' => %w(b) },
-              { 'type' => 'rspec', 'files' => %w(c) },
-              { 'type' => 'rspec', 'files' => %w(d) },
+              { 'type' => 'rspec', 'files' => %w(a), 'queue' => 'developer' },
+              { 'type' => 'rspec', 'files' => %w(b), 'queue' => 'developer' },
+              { 'type' => 'rspec', 'files' => %w(c), 'queue' => 'developer' },
+              { 'type' => 'rspec', 'files' => %w(d), 'queue' => 'developer' },
             ].each { |partition| should include(partition) }
           }
         end

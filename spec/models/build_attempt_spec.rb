@@ -46,15 +46,15 @@ describe BuildAttempt do
         end
 
         context "non-automerged builds" do
-          let(:build) { FactoryGirl.create(:build, :auto_merge => false, :queue => "developer") }
+          let(:build) { FactoryGirl.create(:build, :auto_merge => false) }
           it "does not attempt to re-run when it #{state}" do
             build_part.should_not_receive(:rebuild!)
             build_attempt.finish!(state)
           end
         end
 
-        context "non-automerged ci builds" do
-          let(:build) { FactoryGirl.create(:build, :auto_merge => false, :queue => "ci") }
+        context "non-automerged main builds" do
+          let(:build) { FactoryGirl.create(:main_project_build, :auto_merge => false) }
           it "reattempts to re-run when it #{state}" do
             build_part.should_receive(:rebuild!)
             build_attempt.finish!(state)

@@ -270,8 +270,7 @@ RESPONSE
   describe "auto merge" do
     render_views
     let(:project) { FactoryGirl.create(:project) }
-    let(:build) { FactoryGirl.create(:build, :project => project, :queue => queue) }
-    let(:queue) { :developer }
+    let(:build) { FactoryGirl.create(:build, :project => project) }
     before do
       @action = :show
       @params = {:id => build.id, :project_id => project.name}
@@ -286,7 +285,7 @@ RESPONSE
     end
 
     context "for auto merge enabled builds" do
-      let(:build) { FactoryGirl.create(:build, :project => project, :queue => queue, :auto_merge => true) }
+      let(:build) { FactoryGirl.create(:build, :project => project, :auto_merge => true) }
       it "renders the enable auto merge checkbox" do
         get @action, @params
         doc = Nokogiri::HTML(response.body)
@@ -296,8 +295,9 @@ RESPONSE
       end
     end
 
-    context "for ci builds" do
-      let(:queue) { :ci }
+    context "for master builds" do
+      let(:repository) { FactoryGirl.create(:repository, :url => "git@github.com:org/test-repo.git") }
+      let(:project) { FactoryGirl.create(:project, :repository => repository, :name => repository.repository_name) }
 
       it "renders the auto merge checkbox disabled" do
         get @action, @params

@@ -3,7 +3,7 @@ require 'spec_helper'
 describe MavenPartitioner do
   let(:repository) { FactoryGirl.create(:repository, :url => "git@git.example.com:square/java.git") }
   let(:project) { FactoryGirl.create(:project, :repository => repository, :name => repository.repository_name) }
-  let(:build) { FactoryGirl.create(:build, :queue => :developer, :project => project, :branch => "master") }
+  let(:build) { FactoryGirl.create(:build, :project => project, :branch => "master") }
 
   subject { MavenPartitioner.new(build) }
 
@@ -122,7 +122,7 @@ describe MavenPartitioner do
     end
 
     context "on a branch" do
-      let(:build) { FactoryGirl.create(:build, :queue => :developer, :branch => "branch-of-master") }
+      let(:build) { FactoryGirl.create(:build, :branch => "branch-of-master") }
 
       it "should not be the main build" do
         build.project.should_not be_main
