@@ -5,6 +5,7 @@ class Project < ActiveRecord::Base
       return last_build if last_build && !last_build.completed?
       build = find_or_initialize_by_ref(sha, :state => :partitioning, :queue => :ci, :branch => 'master')
       build.save!
+      build
     end
 
     def find_existing_build_or_initialize(ref, options)
@@ -20,6 +21,20 @@ class Project < ActiveRecord::Base
   belongs_to :repository
 
   validates_uniqueness_of :name
+
+  def ensure_master_build_exists(sha)
+    builds.create_new_ci_build_for(sha)
+  end
+
+  def ensure_developer_build_exists(branch, sha)
+    build = builds.find_existing_build_or_initialize(sha,
+      :state  => :partitioning,
+      :queue  => :developer,
+      :branch => branch
+    )
+    build.save!
+    build
+  end
 
   # The fuzzy_limit is used to set a upper bound on the amount of time that the
   # sql query will take

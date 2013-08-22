@@ -1,3 +1,5 @@
+# TODO: This controller is Github specific. Rename accordingly. See
+# RepositoriesController#build_ref for a standard way.
 class PullRequestsController < ApplicationController
   skip_before_filter :verify_authenticity_token, :only => [:build]
 
