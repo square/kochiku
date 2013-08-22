@@ -40,9 +40,10 @@ module ApplicationHelper
   end
 
   def show_link_to_commit(build)
-    "#{build.repository.base_html_url}/commit/#{build.ref}"
+    "#{build.repository.remote_server.href_for_commit(build.ref)}"
   end
 
+  # TODO: Extract these links into RemoteServer
   def show_link_to_branch(build)
     "#{build.repository.base_html_url}/tree/#{build.branch}"
   end

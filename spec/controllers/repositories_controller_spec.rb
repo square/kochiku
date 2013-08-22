@@ -92,7 +92,7 @@ describe RepositoriesController do
       expect(build.branch).to eq("master")
       expect(build.ref).to eq("abc123")
       expect(build.queue).to eq(:ci)
-      expect(build.project.name).to eq("kochiku")
+      expect(build.project.name).to eq("test-repo")
     end
 
     it "creates a PR build" do
@@ -106,7 +106,7 @@ describe RepositoriesController do
       expect(build.branch).to eq("blah")
       expect(build.ref).to eq("abc123")
       expect(build.queue).to eq(:developer)
-      expect(build.project.name).to eq("kochiku-pull_requests")
+      expect(build.project.name).to eq("test-repo-pull_requests")
     end
   end
 end

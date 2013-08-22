@@ -63,6 +63,10 @@ module RemoteServer
       "https://#{params[:host]}/api/v3/repos/#{params[:username]}/#{params[:repository]}"
     end
 
+    def href_for_commit(sha)
+      "#{base_html_url}/commit/#{build.ref}"
+    end
+
     def base_html_url
       params = repo.project_params
 
