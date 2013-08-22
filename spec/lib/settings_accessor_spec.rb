@@ -22,11 +22,19 @@ describe SettingsAccessor do
     settings = SettingsAccessor.new(<<-YAML)
     stash:
       username: robot
-      password_file: secret-file
+      password_file: /secrets/stash
       host: example.com
     YAML
     expect(settings.stash_username).to eq("robot")
-    expect(settings.stash_password_file).to eq("secret-file")
+    expect(settings.stash_password_file).to eq('/secrets/stash')
     expect(settings.stash_host).to eq("example.com")
+  end
+
+  it 'respects relative paths for stash password file' do
+    settings = SettingsAccessor.new(<<-YAML)
+    stash:
+      password_file: secrets/stash
+    YAML
+    expect(settings.stash_password_file).to match(%r{/.*/secrets/stash\Z})
   end
 end

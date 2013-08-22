@@ -43,7 +43,12 @@ class SettingsAccessor
   end
 
   def stash_password_file
-    stash[:password_file]
+    file = Pathname.new(stash[:password_file])
+    if file.relative?
+      File.join(File.expand_path('../..', __FILE__), file)
+    else
+      file
+    end.to_s
   end
 
   def smtp_server

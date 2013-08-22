@@ -85,7 +85,7 @@ module RemoteServer
     def self.setup_auth!(req)
       req.basic_auth \
         Settings.stash_username,
-        File.read(Settings.stash_password_file)
+        File.read(Settings.stash_password_file).chomp
     end
 
     def self.get(uri)
