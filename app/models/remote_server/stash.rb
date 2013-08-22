@@ -89,12 +89,14 @@ module RemoteServer
     end
 
     def self.get(uri)
+      Rails.logger.info("Stash POST: #{uri}")
       get = Net::HTTP::Get.new(uri)
       setup_auth! get
       make_request(get, URI(uri))
     end
 
     def self.post(uri, body)
+      Rails.logger.info("Stash POST: #{uri}, #{body}")
       post = Net::HTTP::Post.new(uri, {'Content-Type' =>'application/json'})
       setup_auth! post
       post.body = body.to_json
