@@ -5,11 +5,11 @@ module RemoteServer
     attr_reader :repo
 
     def self.match?(url)
-      url.include?('stash.squareup.com')
+      Settings.stash_host && url.include?(Settings.stash_host)
     end
 
     def self.convert_to_ssh_url(params)
-      "git@#{params[:host]}:7999/#{params[:username].downcase}/#{params[:repository]}.git"
+      "git@#{params[:host]}:#{params[:port]}/#{params[:username].downcase}/#{params[:repository]}.git"
     end
 
     def initialize(repo)
@@ -30,7 +30,8 @@ module RemoteServer
     def update_commit_status!(build)
       build_url = Rails.application.routes.url_helpers.project_build_url(build.project, build)
 
-      StashRequest.post "https://stash.squareup.com/rest/build-status/1.0/commits/#{build.ref}", {
+      # TODO: Tie host to build/repository.
+      StashRequest.post "https://#{Settings.stash_host}/rest/build-status/1.0/commits/#{build.ref}", {
         state:       stash_status_for(build),
         key:         'kochiku',
         name:        "kochiku-#{build.id}",
@@ -77,17 +78,21 @@ module RemoteServer
   class StashRequest
     # TODO: Configure OAuth
 
-    PASSWORD = File.read('robot-password').chomp rescue nil
+    def self.setup_auth!(req)
+      req.basic_auth \
+        Settings.stash_username,
+        File.read(Settings.stash_password_file)
+    end
 
     def self.get(uri)
       get = Net::HTTP::Get.new(uri)
-      get.basic_auth 'robot', PASSWORD
+      setup_auth! get
       make_request(get, URI(uri))
     end
 
     def self.post(uri, body)
       post = Net::HTTP::Post.new(uri, {'Content-Type' =>'application/json'})
-      post.basic_auth 'robot', PASSWORD
+      setup_auth! post
       post.body = body.to_json
       make_request(post, URI(uri))
     end

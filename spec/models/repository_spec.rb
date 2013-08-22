@@ -90,6 +90,18 @@ describe Repository do
         repo.repository_name.should == "host-tools"
       end
     end
+
+    context '.project_params' do
+      it 'parses out pertinent information' do
+        repo = Repository.new(:url => "ssh://git@stash.squareup.com:7999/pe/host-tools.git")
+        expect(repo.project_params).to eq(
+          host:       'stash.squareup.com',
+          port:       7999,
+          username:   'pe',
+          repository: 'host-tools'
+        )
+      end
+    end
   end
 
   context "#repo_cache_name" do
