@@ -33,6 +33,7 @@ class Project < ActiveRecord::Base
       :branch => branch
     )
     build.save!
+    build
   end
 
   # The fuzzy_limit is used to set a upper bound on the amount of time that the

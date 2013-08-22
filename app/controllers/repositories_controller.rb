@@ -55,6 +55,7 @@ class RepositoriesController < ApplicationController
     end
 
     render json: {
+      id:        build.id,
       build_url: project_build_url(project, build)
     }
   end
