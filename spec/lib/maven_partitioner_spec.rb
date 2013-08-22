@@ -13,9 +13,9 @@ describe MavenPartitioner do
       modules = ["a", "b", "b/1", "b/2", "b/1/2", "c/1"]
       partitions = subject.group_modules(modules)
       partitions.size.should == 3
-      partitions.should include({"type" => "maven", "files" => ["a"], "upload_artifacts" => false})
-      partitions.should include({"type" => "maven", "files" => ["b", "b/1", "b/2", "b/1/2"], "upload_artifacts" => false})
-      partitions.should include({"type" => "maven", "files" => ["c/1"], "upload_artifacts" => false})
+      partitions.should include({"type" => "maven", "files" => ["a"]})
+      partitions.should include({"type" => "maven", "files" => ["b", "b/1", "b/2", "b/1/2"]})
+      partitions.should include({"type" => "maven", "files" => ["c/1"]})
     end
   end
 
@@ -42,11 +42,11 @@ describe MavenPartitioner do
 
         partitions = subject.incremental_partitions
         partitions.size.should == 5
-        partitions.should include({"type" => "maven", "files" => ["all-java"], "upload_artifacts" => false})
-        partitions.should include({"type" => "maven", "files" => ["module-one"], "upload_artifacts" => false})
-        partitions.should include({"type" => "maven", "files" => ["module-two", "module-two/integration"], "upload_artifacts" => false})
-        partitions.should include({"type" => "maven", "files" => ["module-three"], "upload_artifacts" => false})
-        partitions.should include({"type" => "maven", "files" => ["module-four"], "upload_artifacts" => true})
+        partitions.should include({"type" => "maven", "files" => ["all-java"]})
+        partitions.should include({"type" => "maven", "files" => ["module-one"]})
+        partitions.should include({"type" => "maven", "files" => ["module-two", "module-two/integration"]})
+        partitions.should include({"type" => "maven", "files" => ["module-three"]})
+        partitions.should include({"type" => "maven", "files" => ["module-four"]})
       end
 
       it "should build everything if one of the files does not map to a module" do
@@ -76,9 +76,9 @@ describe MavenPartitioner do
 
         partitions = subject.incremental_partitions
         partitions.size.should == 3
-        partitions.should include({"type" => "maven", "files" => ["all-java"], "upload_artifacts" => false})
-        partitions.should include({"type" => "maven", "files" => ["all-protos"], "upload_artifacts" => false})
-        partitions.should include({"type" => "maven", "files" => ["module-two"], "upload_artifacts" => false})
+        partitions.should include({"type" => "maven", "files" => ["all-java"]})
+        partitions.should include({"type" => "maven", "files" => ["all-protos"]})
+        partitions.should include({"type" => "maven", "files" => ["module-two"]})
       end
 
       it "should not build everything if the file change is from the .rig or .hoist directory or the toplevel pom.xml" do
@@ -97,8 +97,8 @@ describe MavenPartitioner do
 
         partitions = subject.incremental_partitions
         partitions.size.should == 2
-        partitions.should include({"type" => "maven", "files" => ["all-java"], "upload_artifacts" => false})
-        partitions.should include({"type" => "maven", "files" => ["module-two"], "upload_artifacts" => false})
+        partitions.should include({"type" => "maven", "files" => ["all-java"]})
+        partitions.should include({"type" => "maven", "files" => ["module-two"]})
       end
 
       it "should not fail if a file is reference in a top level module that is not in the top level pom" do
@@ -117,7 +117,7 @@ describe MavenPartitioner do
 
         partitions = subject.incremental_partitions
         partitions.size.should == 1
-        partitions.should include({"type" => "maven", "files" => ["all-java"], "upload_artifacts" => false})
+        partitions.should include({"type" => "maven", "files" => ["all-java"]})
       end
     end
 
@@ -145,8 +145,8 @@ describe MavenPartitioner do
 
         partitions = subject.incremental_partitions
         partitions.size.should == 2
-        partitions.should include({"type" => "maven", "files" => ["module-three"], "upload_artifacts" => false})
-        partitions.should include({"type" => "maven", "files" => ["module-four"], "upload_artifacts" => false})
+        partitions.should include({"type" => "maven", "files" => ["module-three"]})
+        partitions.should include({"type" => "maven", "files" => ["module-four"]})
       end
 
       it "should build everything if one of the files does not map to a module" do

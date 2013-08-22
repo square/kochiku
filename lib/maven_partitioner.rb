@@ -27,14 +27,9 @@ class MavenPartitioner
   end
 
   def partition_info(mvn_modules)
-    upload_artifacts = @build.project.main? &&
-        @build.repository.url.end_with?("square/java.git") &&
-        mvn_modules.any? { |module_name| deployable_modules_map[module_name] }
-
     {
       'type' => 'maven',
-      'files' => mvn_modules,
-      'upload_artifacts' => upload_artifacts
+      'files' => mvn_modules
     }
   end
 

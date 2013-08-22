@@ -332,7 +332,7 @@ describe Partitioner do
         File.stub(:read).with("module-one/pom.xml").and_return(module_one_pom)
         File.stub(:read).with("all-java/pom.xml").and_return("")
 
-        subject.should == [{"type" => "maven", "files" => ["all-java"], "upload_artifacts" => false}]
+        subject.should == [{"type" => "maven", "files" => ["all-java"]}]
 
         build.reload
         build.maven_modules.should == ["module-one"]
