@@ -89,7 +89,7 @@ module RemoteServer
     end
 
     def self.get(uri)
-      Rails.logger.info("Stash POST: #{uri}")
+      Rails.logger.info("Stash GET: #{uri}")
       get = Net::HTTP::Get.new(uri)
       setup_auth! get
       make_request(get, URI(uri))
