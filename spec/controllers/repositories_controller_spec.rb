@@ -5,16 +5,16 @@ describe RepositoriesController do
   describe "post /repositories" do
     it "creates a repository" do
       expect{
-        post :create, :repository => {:url => "git@git.squareup.com:square/kochiku.git", :test_command => "script/something"}
+        post :create, :repository => {:url => "git@git.example.com:square/kochiku.git", :test_command => "script/something"}
         response.should be_redirect
       }.to change(Repository, :count).by(1)
-      Repository.last.url.should == "git@git.squareup.com:square/kochiku.git"
+      Repository.last.url.should == "git@git.example.com:square/kochiku.git"
       Repository.last.test_command.should == "script/something"
     end
 
     it "creates a ci project" do
       expect{
-        post :create, :repository => {:url => "git@git.squareup.com:square/kochiku.git", :test_command => "script/something"}
+        post :create, :repository => {:url => "git@git.example.com:square/kochiku.git", :test_command => "script/something"}
         response.should be_redirect
       }.to change(Project, :count).by(2)
       Repository.last.projects.size.should == 2
@@ -36,19 +36,19 @@ describe RepositoriesController do
   end
 
   describe "put /repositories/:id" do
-    let!(:repository) { FactoryGirl.create(:repository, :url => "git@git.squareup.com:square/kochiku.git", :test_command => "script/something")}
+    let!(:repository) { FactoryGirl.create(:repository, :url => "git@git.example.com:square/kochiku.git", :test_command => "script/something")}
     it "creates a repository" do
       expect{
-        put :update, :id => repository.id, :repository => {:url => "git@git.squareup.com:square/kochiku-worker.git", :test_command => "script/something-else"}
+        put :update, :id => repository.id, :repository => {:url => "git@git.example.com:square/kochiku-worker.git", :test_command => "script/something-else"}
         response.should be_redirect
       }.to_not change(Repository, :count).by(1)
-      Repository.last.url.should == "git@git.squareup.com:square/kochiku-worker.git"
+      Repository.last.url.should == "git@git.example.com:square/kochiku-worker.git"
       Repository.last.test_command.should == "script/something-else"
     end
   end
 
   describe "delete /repositories/:id" do
-    let!(:repository) { FactoryGirl.create(:repository, :url => "git@git.squareup.com:square/kochiku.git", :test_command => "script/something")}
+    let!(:repository) { FactoryGirl.create(:repository, :url => "git@git.example.com:square/kochiku.git", :test_command => "script/something")}
     it "responds with success" do
       expect {
         get :destroy, :id => repository.id

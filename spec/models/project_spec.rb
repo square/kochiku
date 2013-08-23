@@ -43,7 +43,7 @@ describe Project do
   end
 
   describe "#main?" do
-    let(:repository) { FactoryGirl.create(:repository, :url => "git@git.squareup.com:square/kochiku.git") }
+    let(:repository) { FactoryGirl.create(:repository, :url => "git@git.example.com:square/kochiku.git") }
     it "returns true when the projects name is the same as the repo" do
       project = FactoryGirl.create(:project, :name => "kochiku", :repository => repository)
       project.main?.should be_true

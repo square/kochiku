@@ -244,7 +244,7 @@ describe Partitioner do
 
     context 'when there is pom.xml' do
       let(:pom_xml_exists) { true }
-      let(:repository) { FactoryGirl.create(:repository, :url => "git@git.squareup.com:square/java.git") }
+      let(:repository) { FactoryGirl.create(:repository, :url => "git@git.example.com:square/java.git") }
       let(:project) { FactoryGirl.create(:project, :repository => repository) }
       let(:build) { FactoryGirl.create(:build, :project => project) }
 

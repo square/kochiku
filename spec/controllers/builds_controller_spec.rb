@@ -164,11 +164,11 @@ describe BuildsController do
         build_ref_info = <<RESPONSE
 {
   "ref": "refs/heads/#{branch}",
-  "url": "https://git.squareup.com/api/v3/repos/square/web/git/refs/heads/#{branch}",
+  "url": "https://git.example.com/api/v3/repos/square/web/git/refs/heads/#{branch}",
   "object": {
     "sha": "#{branch_head_sha}",
     "type": "commit",
-    "url": "https://git.squareup.com/api/v3/repos/square/web/git/commits/#{branch_head_sha}"
+    "url": "https://git.example.com/api/v3/repos/square/web/git/commits/#{branch_head_sha}"
   }
 }
 RESPONSE
