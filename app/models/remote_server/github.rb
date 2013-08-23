@@ -8,10 +8,6 @@ module RemoteServer
   class Github
     attr_reader :repo
 
-    def self.match?(url)
-      url.include?('git.squareup.com') || url.include?('github.com')
-    end
-
     def self.convert_to_ssh_url(params)
       "git@#{params[:host]}:#{params[:username]}/#{params[:repository]}.git"
     end

@@ -2,11 +2,7 @@ module RemoteServer
 
   # All integration with Stash must go via this class.
   class Stash
-    attr_reader :repo
-
-    def self.match?(url)
-      Settings.stash_host && url.include?(Settings.stash_host)
-    end
+    attr_reader :repo, :stash_request
 
     def self.convert_to_ssh_url(params)
       "git@#{params[:host]}:#{params[:port]}/#{params[:username].downcase}/#{params[:repository]}.git"
@@ -14,12 +10,14 @@ module RemoteServer
 
     def initialize(repo)
       @repo = repo
+      @settings = Settings.git_server(repo)
+      @stash_request = StashRequest.new(@settings)
     end
 
     def sha_for_branch(branch)
       return branch if branch =~ /\A[0-9a-f]{40}\Z/
 
-      response_body = StashRequest.get(base_api_url + "/branches?filterText=#{branch}")
+      response_body = @stash_request.get(base_api_url + "/branches?filterText=#{branch}")
       response = JSON.parse(response_body)
       sha = nil
       branch_data = response["values"].find {|x| x['displayId'] == branch }
@@ -31,7 +29,7 @@ module RemoteServer
       build_url = Rails.application.routes.url_helpers.project_build_url(build.project, build)
 
       # TODO: Tie host to build/repository.
-      StashRequest.post "https://#{Settings.stash_host}/rest/build-status/1.0/commits/#{build.ref}", {
+      @stash_request.post "https://#{@settings.host}/rest/build-status/1.0/commits/#{build.ref}", {
         state:       stash_status_for(build),
         key:         'kochiku',
         name:        "kochiku-#{build.id}",
@@ -80,22 +78,26 @@ module RemoteServer
   end
 
   class StashRequest
-    # TODO: Configure OAuth
-
-    def self.setup_auth!(req)
-      req.basic_auth \
-        Settings.stash_username,
-        File.read(Settings.stash_password_file).chomp
+    def initialize(settings)
+      @settings = settings
     end
 
-    def self.get(uri)
+    # TODO: Configure OAuth
+
+    def setup_auth!(req)
+      req.basic_auth \
+        @settings.username,
+        File.read(@settings.password_file).chomp
+    end
+
+    def get(uri)
       Rails.logger.info("Stash GET: #{uri}")
       get = Net::HTTP::Get.new(uri)
       setup_auth! get
       make_request(get, URI(uri))
     end
 
-    def self.post(uri, body)
+    def post(uri, body)
       Rails.logger.info("Stash POST: #{uri}, #{body}")
       post = Net::HTTP::Post.new(uri, {'Content-Type' =>'application/json'})
       setup_auth! post
@@ -103,7 +105,7 @@ module RemoteServer
       make_request(post, URI(uri))
     end
 
-    def self.make_request(method, uri, args = [])
+    def make_request(method, uri, args = [])
       body = nil
       Net::HTTP.start(uri.host, uri.port, :use_ssl => true) do |http|
         response = http.request(method, *args)

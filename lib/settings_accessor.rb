@@ -1,5 +1,6 @@
 require 'yaml'
 require 'active_support/core_ext/hash/indifferent_access'
+require 'server_settings'
 
 class SettingsAccessor
   def initialize(yaml)
@@ -30,33 +31,26 @@ class SettingsAccessor
     "#{kochiku_protocol}://#{kochiku_host}"
   end
 
-  def stash
-    @hash.fetch(:stash, {})
+  def git_servers
+    @git_servers ||= begin
+      raw_servers = @hash[:git_servers]
+      if raw_servers
+        raw_servers.each_with_object({}) do |(host, settings_for_server), result|
+          result[host] = ServerSettings.new(settings_for_server, host)
+        end
+      else
+        {}
+      end
+    end
   end
 
-  def stash_host
-    stash[:host]
-  end
-
-  def stash_username
-    stash[:username]
-  end
-
-  def stash_password_file
-    file = Pathname.new(stash[:password_file])
-    if file.relative?
-      File.join(File.expand_path('../..', __FILE__), file)
-    else
-      file
-    end.to_s
+  def git_server(url)
+    matching_host = git_servers.keys.detect { |host| url.include?(host) }
+    matching_host ? git_servers[matching_host] : nil
   end
 
   def smtp_server
     @hash[:smtp_server]
-  end
-
-  def git_mirror
-    @hash[:git_mirror]
   end
 
   def git_pair_email_prefix
