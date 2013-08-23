@@ -25,6 +25,7 @@ class GithubRequest
   private
 
   def self.make_request(method, uri, args)
+    Rails.logger.info("Github request: #{method}, #{uri}")
     body = nil
     Net::HTTP.start(uri.host, uri.port, :use_ssl => uri.scheme == 'https') do |http|
       response = http.send(method, uri.path, *args)

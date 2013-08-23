@@ -35,6 +35,7 @@ module RemoteServer
     end
 
     def promote_branch!(branch, ref)
+      Rails.logger.info("Github#promote_branch: #{branch}, #{ref}")
       begin
         GithubRequest.post(
           URI("#{base_api_url}/git/refs"),

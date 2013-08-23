@@ -61,7 +61,7 @@ module RemoteServer
     end
 
     def href_for_commit(sha)
-      "#{base_html_url}/commits/#{build.ref}"
+      "#{base_html_url}/commits/#{sha}"
     end
 
     private

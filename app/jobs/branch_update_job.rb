@@ -7,6 +7,7 @@ class BranchUpdateJob < JobBase
   @queue = :high
 
   def initialize(build_id, promotion_ref)
+    Rails.logger.info("BranchUpdateJob: #{build_id}, #{promotion_ref}")
     @build_id = build_id
     @promotion_ref = promotion_ref
   end
