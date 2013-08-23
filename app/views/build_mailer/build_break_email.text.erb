@@ -8,10 +8,6 @@ Failed build parts:
   Or go directly to <%= failed_build_stdout(failed_build_part) %>
 <% end %>
 
-<% @java_email_and_files.each do |email, files| %>
-  <%= email %> was emailed because of changes to <%= files.join(", ") %>
-<% end %>
-
 --------------------------------------------------------------------------------
 Changes since last success
 --------------------------------------------------------------------------------

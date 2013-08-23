@@ -45,18 +45,6 @@ class BuildAttempt < ActiveRecord::Base
 
     build = build_part.build_instance
 
-    # Normally we would promote a ref after all the parts succeed, but in the case of maven
-    # projects each individual part corresponds to a distinct promotable project. We want
-    # to promote this even if another part fails since there are a lot of projects and
-    # one is usually broken!
-    if build.project.main? && build_part.successful?
-      build_part.paths.each do |path|
-        if promotion_ref = build.deployable_branch(path)
-          BranchUpdateJob.enqueue(build.id, promotion_ref)
-        end
-      end
-    end
-
     previous_state, new_state = build.update_state_from_parts!
     Rails.logger.info("Build #{build.id} state is now #{build.state}")
     if previous_state != new_state

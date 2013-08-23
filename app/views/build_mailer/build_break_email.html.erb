@@ -16,17 +16,6 @@ Failed build parts:
   <% end %>
 </ul>
 <br>
-<% @java_email_and_files.each do |email, files| %>
-  <%= email %> was emailed because of changes to:
-  <ul>
-    <% files.each do |file| %>
-    <li>
-      <%= file %>
-    </li>
-    <% end %>
-  </ul>
-<% end %>
-<br>
 
 <h2>Changes since last success</h2>
 <% @git_changes.each do |git_change| %>

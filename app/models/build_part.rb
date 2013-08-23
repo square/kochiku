@@ -16,34 +16,15 @@ class BuildPart < ActiveRecord::Base
     build_attempts.select { |bp| BuildAttempt::COMPLETED_BUILD_STATES.include?(bp.state) }.last
   end
 
-  def self.most_recent_results_for(maven_modules)
-    yaml_paths = maven_modules.map { |mvn_module| YAML.dump(Array(mvn_module)) }
-    paths_to_ids = BuildPart.where(paths: yaml_paths).group(:paths).maximum(:id)
-    BuildPart.find(paths_to_ids.values)
-  end
-
   def create_and_enqueue_new_build_attempt!
     build_attempt = build_attempts.create!(:state => :runnable)
     build_instance.running!
 
-    # TODO: hopefully this is only temporary while we work to make these tests less flaky
-    # franklin should only be in this list until we get chromedriver installed on EC2
-    # esperanto needs riak which is only on the macbuilds at the moment
-    if (kind == "maven" && (paths.include?("franklin") ||
-        paths.include?("esperanto") ||
-        paths.include?("esperanto/riak") ||
-        paths.include?("sake/rpc") ||
-        paths.include?("clustering/zookeeper") ||
-        paths.include?("openpgp") ||
-        paths.include?("searle")))
-      BuildAttemptJob.enqueue_on("ci-osx", job_args(build_attempt))
+    # REMOVE this if block after queue_override is moved to kochiku.yml -CH & RO
+    if build_instance.repository.queue_override.present?
+      BuildAttemptJob.enqueue_on(build_instance.repository.ci_queue_name, job_args(build_attempt))
     else
-      # REMOVE this if block after queue_override is moved to kochiku.yml -CH & RO
-      if build_instance.repository.queue_override.present?
-        BuildAttemptJob.enqueue_on(build_instance.repository.ci_queue_name, job_args(build_attempt))
-      else
-        BuildAttemptJob.enqueue_on(queue.to_s, job_args(build_attempt))
-      end
+      BuildAttemptJob.enqueue_on(queue.to_s, job_args(build_attempt))
     end
 
     build_attempt

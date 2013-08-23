@@ -1,5 +1,3 @@
-require 'maven_partitioner'
-
 class Partitioner
   KOCHIKU_YML_LOC_1 = 'config/kochiku.yml'
   KOCHIKU_YML_LOC_2 = 'config/ci/kochiku.yml'
@@ -12,11 +10,6 @@ class Partitioner
       else
         build_partitions(build)
       end
-    elsif File.exist?(MavenPartitioner::POM_XML)
-      partitioner = MavenPartitioner.new(build)
-      build.update_attributes!(:deployable_map => partitioner.deployable_modules_map,
-                               :maven_modules => partitioner.maven_modules)
-      partitioner.incremental_partitions
     else
       [{'type' => 'spec', 'files' => ['no-manifest'], 'queue' => queue_for_build(build), 'retry_count' => 0}]
     end

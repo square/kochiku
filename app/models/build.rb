@@ -36,8 +36,6 @@ class Build < ActiveRecord::Base
   IN_PROGRESS_STATES = [:waiting_for_sync, :partitioning, :runnable, :running, :doomed]
   STATES = IN_PROGRESS_STATES + TERMINAL_STATES
   symbolize :state, :in => STATES
-  serialize :deployable_map, Hash
-  serialize :maven_modules, Array
 
   validates_presence_of :project_id
   validates_presence_of :ref
@@ -55,20 +53,12 @@ class Build < ActiveRecord::Base
     command
   end
 
-  def deployable_branch(module_name)
-    (deployable_map || {})[module_name]
-  end
-
   def previous_successful_build
     Build.successful_for_project(project_id).order("id DESC").where("id < ?", self.id).first
   end
 
   def enqueue_partitioning_job
-    if repository.url == "git@git.squareup.com:square/java.git"
-      Resque.enqueue_to("java-partition", BuildPartitioningJob, self.id)
-    else
-      Resque.enqueue(BuildPartitioningJob, self.id)
-    end
+    Resque.enqueue(BuildPartitioningJob, self.id)
   end
 
   def partition(parts)
@@ -140,10 +130,6 @@ class Build < ActiveRecord::Base
 
   def auto_merge_enabled?
     !project.main? && self.auto_merge
-  end
-
-  def maven?
-    project.name == 'java'
   end
 
   def auto_merge!

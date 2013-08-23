@@ -68,15 +68,7 @@ class Project < ActiveRecord::Base
     last_completed_build.try(:elapsed_time)
   end
 
-  def nexus_url
-    "https://nexus.corp.squareup.com/content/repositories/app-releases"
-  end
-
-  def nexus_repo_id
-    "app-releases"
-  end
-
-    private
+  private
 
   def execute(sql)
     self.class.connection.execute(sql)

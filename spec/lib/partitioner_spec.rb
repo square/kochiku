@@ -6,7 +6,6 @@ describe Partitioner do
 
   before do
     YAML.stub(:load_file).with(Partitioner::KOCHIKU_YML_LOC_2).and_return(kochiku_yml)
-    File.stub(:exist?).with(MavenPartitioner::POM_XML).and_return(pom_xml_exists)
     File.stub(:exist?).with(Partitioner::KOCHIKU_YML_LOC_1).and_return(false) # always use loc_2 in the specs
     File.stub(:exist?).with(Partitioner::KOCHIKU_YML_LOC_2).and_return(kochiku_yml_exists)
   end
@@ -313,59 +312,6 @@ describe Partitioner do
             ].each { |partition| should include(partition) }
           }
         end
-      end
-    end
-
-    context 'when there is pom.xml' do
-      let(:pom_xml_exists) { true }
-      let(:repository) { FactoryGirl.create(:repository, :url => "git@git.example.com:square/java.git") }
-      let(:project) { FactoryGirl.create(:project, :repository => repository) }
-      let(:build) { FactoryGirl.create(:build, :project => project) }
-
-      let(:top_level_pom) {
-        <<-POM
-<project>
-  <modules>
-    <module>module-one</module>
-  </modules>
-</project>
-        POM
-      }
-
-      let(:module_one_pom) {
-        <<-POM
-<project>
-  <properties>
-    <deployableBranch>one-branch</deployableBranch>
-  </properties>
-
-  <groupId>com.squareup</groupId>
-  <artifactId>module-core</artifactId>
-
-  <dependencies>
-    <dependency>
-      <groupId>com.squareup</groupId>
-      <artifactId>module-extras</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>junit</groupId>
-      <artifactId>junit</artifactId>
-    </dependency>
-  </dependencies>
-</project>
-        POM
-      }
-
-      it "should call the maven partitioner" do
-        File.stub(:read).with(MavenPartitioner::POM_XML).and_return(top_level_pom)
-        File.stub(:read).with("module-one/pom.xml").and_return(module_one_pom)
-        File.stub(:read).with("all-java/pom.xml").and_return("")
-
-        subject.should == [{"type" => "maven", "files" => ["all-java"], "queue"=>"developer", "retry_count" => 2}]
-
-        build.reload
-        build.maven_modules.should == ["module-one"]
-        build.deployable_map.should == {"module-one" => "one-branch"}
       end
     end
   end

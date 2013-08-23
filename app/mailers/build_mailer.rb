@@ -14,14 +14,8 @@ class BuildMailer < ActionMailer::Base
 
   def build_break_email(build)
     @build = build
-    @java_email_and_files = {}
     if @build.project.main?
-      if @build.repository.url.end_with?("square/java.git")
-        @java_email_and_files = MavenPartitioner.new(@build).emails_for_commits_causing_failures
-        @emails = @java_email_and_files.keys
-      else
-        @emails = GitBlame.emails_since_last_green(@build)
-      end
+      @emails = GitBlame.emails_since_last_green(@build)
       @git_changes = GitBlame.changes_since_last_green(@build)
     else
       @emails = GitBlame.emails_in_branch(@build)
