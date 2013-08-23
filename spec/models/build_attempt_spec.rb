@@ -14,7 +14,7 @@ describe BuildAttempt do
     let(:project) { FactoryGirl.create(:project, :branch => "master", :repository => repository) }
     let(:build) { FactoryGirl.create(:build, :state => :runnable, :project => project, :auto_merge => true) }
     #let(:build) { FactoryGirl.create(:build, :auto_merge => true) }
-    let(:build_part) { FactoryGirl.create(:build_part, :build_instance => build, :kind => "cucumber") }
+    let(:build_part) { FactoryGirl.create(:build_part, :build_instance => build, retry_count: 2) }
     let!(:build_attempt) { FactoryGirl.create(:build_attempt, :state => :running, :build_part => build_part) }
 
     context "build auto-retries" do
@@ -66,14 +66,6 @@ describe BuildAttempt do
         it "does not reattempt an automerge cuke that #{state}" do
           build_part.should_not_receive(:rebuild!)
           build_attempt.finish!(state)
-        end
-      end
-
-      context "for a maven build of sake/rpc" do
-        let(:build_part) { FactoryGirl.create(:build_part, :build_instance => build, :kind => "maven", :paths => ["sake/rpc"]) }
-        it "should rebuild" do
-          build_part.should_receive(:rebuild!)
-          build_attempt.finish!(:failed)
         end
       end
     end

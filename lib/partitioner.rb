@@ -72,6 +72,7 @@ class Partitioner
     type = subset.fetch('type', 'test')
     workers = subset.fetch('workers', 1)
     manifest = subset['manifest']
+    retry_count = subset['retry_count'] || 0
     append_type_to_queue = subset.fetch('append_type_to_queue', false)
     queue_override = subset.fetch('queue_override', nil)
     if queue_override
@@ -98,7 +99,7 @@ class Partitioner
     files -= balanced_partitions.flatten
 
     (Strategies.send(strategy, files, workers) + balanced_partitions).map do |files|
-      part = {'type' => type, 'files' => files.compact, 'queue' => queue}
+      part = {'type' => type, 'files' => files.compact, 'queue' => queue, 'retry_count' => retry_count}
       if subset['options']
         part['options'] = subset['options']
       end

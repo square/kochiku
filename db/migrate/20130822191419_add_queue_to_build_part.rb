@@ -2,7 +2,7 @@ class AddQueueToBuildPart < ActiveRecord::Migration
   def up
     add_column :build_parts, :queue, :string
 
-    execute("UPDATE build_parts,builds SET build_parts.queue = builds.queue WHERE builds.id = build_parts.id")
+    execute("UPDATE build_parts,builds SET build_parts.queue = builds.queue WHERE builds.id = build_parts.build_id")
 
     remove_column :builds, :queue
     remove_column :repositories, :use_spec_and_ci_queues

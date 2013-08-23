@@ -75,7 +75,11 @@ class Build < ActiveRecord::Base
     transaction do
       update_attributes!(:state => :runnable)
       parts.each do |part|
-        build_parts.create!(:kind => part['type'], :paths => part['files'], :queue => part['queue'], :options => part['options'])
+        build_parts.create!(:kind => part['type'],
+                            :paths => part['files'],
+                            :queue => part['queue'],
+                            :retry_count => part['retry_count'],
+                            :options => part['options'])
       end
     end
 

@@ -215,4 +215,55 @@ describe BuildPart do
       it { should have(1).testcase }
     end
   end
+
+  describe "#should_reattempt?" do
+    let(:build_part) { FactoryGirl.create(:build_part, retry_count: 1, build_instance: build) }
+
+    context "for a main-branch build" do
+      let(:project) { FactoryGirl.create(:main_project, repository: repository) }
+
+      it "might reattempt" do
+        expect(build_part.should_reattempt?).to be_true
+      end
+    end
+
+    context "for an automerge branch build" do
+      let(:build) { FactoryGirl.create(:build, project: project, auto_merge: true) }
+
+      it "might reattempt" do
+        expect(build_part.should_reattempt?).to be_true
+      end
+    end
+
+    context "for a non-automerge branch build" do
+      it "will not reattempt" do
+        expect(build_part.should_reattempt?).to be_false
+      end
+    end
+
+    context "when we have already hit the retry count" do
+      let(:project) { FactoryGirl.create(:main_project, repository: repository) }
+
+      before do
+        FactoryGirl.create(:build_attempt, build_part: build_part, state: :failed)
+        FactoryGirl.create(:build_attempt, build_part: build_part, state: :failed)
+      end
+
+      it "will not reattempt" do
+        expect(build_part.should_reattempt?).to be_false
+      end
+    end
+
+    context "when we are just one away from the retry count" do
+      let(:project) { FactoryGirl.create(:main_project, repository: repository) }
+
+      before do
+        FactoryGirl.create(:build_attempt, build_part: build_part, state: :failed)
+      end
+
+      it "will reattempt" do
+        expect(build_part.should_reattempt?).to be_true
+      end
+    end
+  end
 end

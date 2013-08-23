@@ -29,7 +29,8 @@ class MavenPartitioner
   def partition_info(mvn_modules)
     {
       'type' => 'maven',
-      'files' => mvn_modules
+      'files' => mvn_modules,
+      'retry_count' => 2
     }
   end
 

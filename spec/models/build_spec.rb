@@ -61,6 +61,18 @@ describe Build do
       build_part.options.should == {"ruby" => "ree", "language" => 'ruby'}
     end
 
+    it "should set the queue" do
+      build.partition([{"type" => "cucumber", "files" => ['a'], 'queue' => 'developer'}])
+      build_part = build.build_parts.first
+      build_part.queue.should == :developer
+    end
+
+    it "should set the retry_count" do
+      build.partition([{"type" => "cucumber", "files" => ['a'], 'queue' => 'developer', 'retry_count' => 3}])
+      build_part = build.build_parts.first
+      build_part.retry_count.should == 3
+    end
+
     it "should create build attempts for each build part" do
       build.partition(parts)
       build.build_parts.all {|bp| bp.build_attempts.should have(1).item }
@@ -102,7 +114,8 @@ describe Build do
   end
 
   describe "#update_state_from_parts!" do
-    let(:parts) { [{'type' => 'cucumber', 'files' => ['a'], 'queue' => 'ci'}, {'type' => 'rspec', 'files' => ['b'], 'queue' => 'ci'}] }
+    let(:parts) { [{'type' => 'cucumber', 'files' => ['a'], 'queue' => 'ci', 'retry_count' => 0},
+                   {'type' => 'rspec', 'files' => ['b'], 'queue' => 'ci', 'retry_count' => 0}] }
     before do
       stub_request(:post, /https:\/\/git\.squareup\.com\/api\/v3\/repos\/square\/kochiku\/statuses\//)
       build.stub(:running!)

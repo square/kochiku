@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20130822231850) do
+ActiveRecord::Schema.define(:version => 20130823210844) do
 
   create_table "build_artifacts", :force => true do |t|
     t.integer  "build_attempt_id"
@@ -38,10 +38,11 @@ ActiveRecord::Schema.define(:version => 20130822231850) do
     t.integer  "build_id"
     t.string   "kind"
     t.text     "paths"
-    t.datetime "created_at", :null => false
-    t.datetime "updated_at", :null => false
+    t.datetime "created_at",                 :null => false
+    t.datetime "updated_at",                 :null => false
     t.text     "options"
     t.string   "queue"
+    t.integer  "retry_count", :default => 0
   end
 
   add_index "build_parts", ["build_id"], :name => "index_build_parts_on_build_id"

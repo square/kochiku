@@ -123,9 +123,8 @@ class BuildPart < ActiveRecord::Base
   end
 
   def should_reattempt?
-    build_attempts.unsuccessful.count < 3 &&
-        (build_instance.auto_merge? || build_instance.project.main?) &&
-        (kind == "cucumber" || kind == "maven" )
+    (build_attempts.unsuccessful.count - 1) < retry_count &&
+        (build_instance.auto_merge? || build_instance.project.main?)
   end
 
   def last_stdout_artifact
