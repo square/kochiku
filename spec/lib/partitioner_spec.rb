@@ -152,7 +152,7 @@ describe Partitioner do
 
     context 'when there is not a kochiku.yml' do
       let(:kochiku_yml_exists) { false }
-      it { should == [{"type" => "spec", "files" => ['no-manifest']}] }
+      it { should == [{"type" => "spec", "files" => ['no-manifest'], 'queue' => 'developer', 'retry_count' => 0}] }
     end
 
     context 'when there is a kochiku.yml' do

@@ -18,7 +18,7 @@ class Partitioner
                                :maven_modules => partitioner.maven_modules)
       partitioner.incremental_partitions
     else
-      [{'type' => 'spec', 'files' => ['no-manifest']}]
+      [{'type' => 'spec', 'files' => ['no-manifest'], 'queue' => queue_for_build(build), 'retry_count' => 0}]
     end
   end
 
@@ -75,7 +75,7 @@ class Partitioner
     retry_count = subset['retry_count'] || 0
 
     append_type_to_queue = subset.fetch('append_type_to_queue', false)
-    queue = build.project.main? ? 'ci' : 'developer'
+    queue = queue_for_build(build)
     queue += "-#{type}" if append_type_to_queue
 
     queue_override = subset.fetch('queue_override', nil)
@@ -104,6 +104,10 @@ class Partitioner
       end
       part
     end.select { |p| p['files'].present? }
+  end
+
+  def queue_for_build(build)
+    build.project.main? ? 'ci' : 'developer'
   end
 
   def time_greedy_partitions_for(file_to_times_hash)
