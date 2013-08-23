@@ -20,12 +20,7 @@ class BuildPart < ActiveRecord::Base
     build_attempt = build_attempts.create!(:state => :runnable)
     build_instance.running!
 
-    # REMOVE this if block after queue_override is moved to kochiku.yml -CH & RO
-    if build_instance.repository.queue_override.present?
-      BuildAttemptJob.enqueue_on(build_instance.repository.ci_queue_name, job_args(build_attempt))
-    else
-      BuildAttemptJob.enqueue_on(queue.to_s, job_args(build_attempt))
-    end
+    BuildAttemptJob.enqueue_on(queue.to_s, job_args(build_attempt))
 
     build_attempt
   end

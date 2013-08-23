@@ -80,11 +80,6 @@ class Repository < ActiveRecord::Base
     on_success_note.to_s.strip.present?
   end
 
-  # REMOVE ME AFTER queue_override is moved to kochiku.yml -CH & RO
-  def ci_queue_name
-    queue_override.presence || "ci"
-  end
-
   def project_params
     Repository.project_params(url)
   end
