@@ -83,7 +83,7 @@ describe ProjectsController do
     end
 
     context "with a java project" do
-      let(:repository) { FactoryGirl.create(:repository, :url => "git@git.squareup.com:square/java.git") }
+      let(:repository) { FactoryGirl.create(:repository, :url => "git@git.example.com:square/java.git") }
 
       context "with a in-progress build" do
         let!(:build) { FactoryGirl.create(:build, :state => :running, :project => project) }

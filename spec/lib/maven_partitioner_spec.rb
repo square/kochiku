@@ -1,7 +1,7 @@
 require 'spec_helper'
 
 describe MavenPartitioner do
-  let(:repository) { FactoryGirl.create(:repository, :url => "git@git.squareup.com:square/java.git") }
+  let(:repository) { FactoryGirl.create(:repository, :url => "git@git.example.com:square/java.git") }
   let(:project) { FactoryGirl.create(:project, :repository => repository, :name => repository.repository_name) }
   let(:build) { FactoryGirl.create(:build, :queue => :developer, :project => project, :branch => "master") }
 

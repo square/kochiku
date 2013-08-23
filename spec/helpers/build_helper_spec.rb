@@ -5,7 +5,7 @@ describe BuildHelper do
   include Haml::Helpers
   let(:build) { FactoryGirl.create(:build, :project => project) }
   let(:project) { FactoryGirl.create(:project, :repository => repository) }
-  let(:repository) { FactoryGirl.create(:repository, :url => "git@git.squareup.com:square/web.git")}
+  let(:repository) { FactoryGirl.create(:repository, :url => "git@git.example.com:square/web.git")}
 
   context "with a ruby build" do
     let!(:build_part) { FactoryGirl.create(:build_part, :build_instance => build, :options => options) }
