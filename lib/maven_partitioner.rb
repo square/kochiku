@@ -27,9 +27,11 @@ class MavenPartitioner
   end
 
   def partition_info(mvn_modules)
+    queue = @build.project.main? ? 'ci' : 'developer'
     {
       'type' => 'maven',
       'files' => mvn_modules,
+      'queue' => queue,
       'retry_count' => 2
     }
   end

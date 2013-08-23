@@ -13,9 +13,9 @@ describe MavenPartitioner do
       modules = ["a", "b", "b/1", "b/2", "b/1/2", "c/1"]
       partitions = subject.group_modules(modules)
       partitions.size.should == 3
-      partitions.should include({"type" => "maven", "files" => ["a"], "retry_count" => 2})
-      partitions.should include({"type" => "maven", "files" => ["b", "b/1", "b/2", "b/1/2"], "retry_count" => 2})
-      partitions.should include({"type" => "maven", "files" => ["c/1"], "retry_count" => 2})
+      partitions.should include({"type" => "maven", "files" => ["a"], "queue" => "ci", "retry_count" => 2})
+      partitions.should include({"type" => "maven", "files" => ["b", "b/1", "b/2", "b/1/2"], "queue" => "ci", "retry_count" => 2})
+      partitions.should include({"type" => "maven", "files" => ["c/1"], "queue" => "ci", "retry_count" => 2})
     end
   end
 
@@ -42,11 +42,11 @@ describe MavenPartitioner do
 
         partitions = subject.incremental_partitions
         partitions.size.should == 5
-        partitions.should include({"type" => "maven", "files" => ["all-java"], "retry_count" => 2})
-        partitions.should include({"type" => "maven", "files" => ["module-one"], "retry_count" => 2})
-        partitions.should include({"type" => "maven", "files" => ["module-two", "module-two/integration"], "retry_count" => 2})
-        partitions.should include({"type" => "maven", "files" => ["module-three"], "retry_count" => 2})
-        partitions.should include({"type" => "maven", "files" => ["module-four"], "retry_count" => 2})
+        partitions.should include({"type" => "maven", "files" => ["all-java"], "queue" => "ci", "retry_count" => 2})
+        partitions.should include({"type" => "maven", "files" => ["module-one"], "queue" => "ci", "retry_count" => 2})
+        partitions.should include({"type" => "maven", "files" => ["module-two", "module-two/integration"], "queue" => "ci", "retry_count" => 2})
+        partitions.should include({"type" => "maven", "files" => ["module-three"], "queue" => "ci", "retry_count" => 2})
+        partitions.should include({"type" => "maven", "files" => ["module-four"], "queue" => "ci", "retry_count" => 2})
       end
 
       it "should build everything if one of the files does not map to a module" do
@@ -76,9 +76,9 @@ describe MavenPartitioner do
 
         partitions = subject.incremental_partitions
         partitions.size.should == 3
-        partitions.should include({"type" => "maven", "files" => ["all-java"], "retry_count" => 2})
-        partitions.should include({"type" => "maven", "files" => ["all-protos"], "retry_count" => 2})
-        partitions.should include({"type" => "maven", "files" => ["module-two"], "retry_count" => 2})
+        partitions.should include({"type" => "maven", "files" => ["all-java"], "queue" => "ci", "retry_count" => 2})
+        partitions.should include({"type" => "maven", "files" => ["all-protos"], "queue" => "ci", "retry_count" => 2})
+        partitions.should include({"type" => "maven", "files" => ["module-two"], "queue" => "ci", "retry_count" => 2})
       end
 
       it "should not build everything if the file change is from the .rig or .hoist directory or the toplevel pom.xml" do
@@ -97,8 +97,8 @@ describe MavenPartitioner do
 
         partitions = subject.incremental_partitions
         partitions.size.should == 2
-        partitions.should include({"type" => "maven", "files" => ["all-java"], "retry_count" => 2})
-        partitions.should include({"type" => "maven", "files" => ["module-two"], "retry_count" => 2})
+        partitions.should include({"type" => "maven", "files" => ["all-java"], "queue" => "ci", "retry_count" => 2})
+        partitions.should include({"type" => "maven", "files" => ["module-two"], "queue" => "ci", "retry_count" => 2})
       end
 
       it "should not fail if a file is reference in a top level module that is not in the top level pom" do
@@ -117,7 +117,7 @@ describe MavenPartitioner do
 
         partitions = subject.incremental_partitions
         partitions.size.should == 1
-        partitions.should include({"type" => "maven", "files" => ["all-java"], "retry_count" => 2})
+        partitions.should include({"type" => "maven", "files" => ["all-java"], "queue" => "ci", "retry_count" => 2})
       end
     end
 
@@ -145,8 +145,8 @@ describe MavenPartitioner do
 
         partitions = subject.incremental_partitions
         partitions.size.should == 2
-        partitions.should include({"type" => "maven", "files" => ["module-three"], "retry_count" => 2})
-        partitions.should include({"type" => "maven", "files" => ["module-four"], "retry_count" => 2})
+        partitions.should include({"type" => "maven", "files" => ["module-three"], "queue" => "developer", "retry_count" => 2})
+        partitions.should include({"type" => "maven", "files" => ["module-four"], "queue" => "developer", "retry_count" => 2})
       end
 
       it "should build everything if one of the files does not map to a module" do
@@ -157,10 +157,10 @@ describe MavenPartitioner do
                                                    "module-two" => ["module-three"].to_set
                                                  })
 
-        subject.should_receive(:partitions).and_return([{"type" => "maven", "files" => "ALL"}])
+        subject.should_receive(:partitions).and_return([{"type" => "maven", "files" => "ALL", "queue"=>"developer", "retry_count" => 2}])
 
         partitions = subject.incremental_partitions
-        partitions.should == [{"type" => "maven", "files" => "ALL"}]
+        partitions.should == [{"type" => "maven", "files" => "ALL", "queue"=>"developer", "retry_count" => 2}]
       end
 
       it "should not fail if a file is reference in a top level module that is not in the top level pom" do
