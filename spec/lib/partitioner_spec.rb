@@ -5,9 +5,10 @@ describe Partitioner do
   let(:partitioner) { Partitioner.new }
 
   before do
-    YAML.stub(:load_file).with(Partitioner::KOCHIKU_YML).and_return(kochiku_yml)
+    YAML.stub(:load_file).with(Partitioner::KOCHIKU_YML_LOC_2).and_return(kochiku_yml)
     File.stub(:exist?).with(MavenPartitioner::POM_XML).and_return(pom_xml_exists)
-    File.stub(:exist?).with(Partitioner::KOCHIKU_YML).and_return(kochiku_yml_exists)
+    File.stub(:exist?).with(Partitioner::KOCHIKU_YML_LOC_1).and_return(false) # always use loc_2 in the specs
+    File.stub(:exist?).with(Partitioner::KOCHIKU_YML_LOC_2).and_return(kochiku_yml_exists)
   end
 
   let(:kochiku_yml) {

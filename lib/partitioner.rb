@@ -1,10 +1,11 @@
 require 'maven_partitioner'
 
 class Partitioner
-  KOCHIKU_YML = 'config/ci/kochiku.yml'
+  KOCHIKU_YML_LOC_1 = 'config/kochiku.yml'
+  KOCHIKU_YML_LOC_2 = 'config/ci/kochiku.yml'
 
   def partitions(build)
-    if File.exist?(KOCHIKU_YML)
+    if kochiku_yml_location
       # Handle old kochiku.yml
       if kochiku_yml.is_a?(Array)
         kochiku_yml.map { |subset| partitions_for(subset) }.flatten
@@ -24,7 +25,17 @@ class Partitioner
   private
 
   def kochiku_yml
-    @kochiku_yml ||= YAML.load_file(KOCHIKU_YML)
+    @kochiku_yml ||= YAML.load_file(kochiku_yml_location)
+  end
+
+  # Returns location of the kochiku.yml file within the repository. Returns nil
+  # if the file is not present.
+  def kochiku_yml_location
+    if File.exist?(KOCHIKU_YML_LOC_1)
+      KOCHIKU_YML_LOC_1
+    elsif File.exist?(KOCHIKU_YML_LOC_2)
+      KOCHIKU_YML_LOC_2
+    end
   end
 
   def max_build_time
