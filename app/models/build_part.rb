@@ -38,6 +38,7 @@ class BuildPart < ActiveRecord::Base
         paths.include?("searle")))
       BuildAttemptJob.enqueue_on("ci-osx", job_args(build_attempt))
     else
+      # REMOVE this if block after queue_override is moved to kochiku.yml -CH & RO
       if build_instance.repository.queue_override
         BuildAttemptJob.enqueue_on(build_instance.repository.ci_queue_name, job_args(build_attempt))
       else

@@ -73,8 +73,13 @@ class Partitioner
     workers = subset.fetch('workers', 1)
     manifest = subset['manifest']
     append_type_to_queue = subset.fetch('append_type_to_queue', false)
-    queue = build.project.main? ? 'ci' : 'developer'
-    queue += "-#{type}" if append_type_to_queue
+    queue_override = subset.fetch('queue_override', nil)
+    if queue_override
+      queue = queue_override
+    else
+      queue = build.project.main? ? 'ci' : 'developer'
+      queue += "-#{type}" if append_type_to_queue
+    end
 
     strategy = subset.fetch('balance', 'alphabetically')
     strategy = 'alphabetically' unless Strategies.respond_to?(strategy)

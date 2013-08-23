@@ -44,6 +44,7 @@ describe Partitioner do
   context "with a ruby-based kochiku.yml" do
     let(:kochiku_yml_exists) { true }
     let(:append_type_to_queue) { nil }
+    let(:queue_override) { nil }
     let(:kochiku_yml) do
       {
         "ruby" => ["ree-1.8.7-2011.12"],
@@ -55,7 +56,8 @@ describe Partitioner do
             'workers' => 3,
             'balance' => rspec_balance,
             'manifest' => rspec_manifest,
-            'append_type_to_queue' => append_type_to_queue
+            'append_type_to_queue' => append_type_to_queue,
+            'queue_override' => queue_override
           }
         ]
       }
@@ -102,6 +104,22 @@ describe Partitioner do
         it "should append the type" do
           partitions = partitioner.partitions(build)
           partitions.first["queue"].should == "developer-rspec"
+        end
+      end
+    end
+
+    context "with queue_override" do
+      let(:queue_override) { "override" }
+      it "should override the queue on the build part" do
+        partitions = partitioner.partitions(build)
+        partitions.first["queue"].should == "override"
+      end
+
+      context "with append_type_to_queue true" do
+        let(:append_type_to_queue) { true }
+        it "should override the queue on the build part" do
+          partitions = partitioner.partitions(build)
+          partitions.first["queue"].should == "override"
         end
       end
     end
