@@ -18,23 +18,71 @@ describe SettingsAccessor do
     end
   end
 
-  it 'loads stash settings' do
+  it "can list git servers" do
     settings = SettingsAccessor.new(<<-YAML)
-    stash:
-      username: robot
-      password_file: /secrets/stash
-      host: example.com
+    git_servers:
+      stash.example.com:
+        type: stash
+        username: robot
+        password_file: /secrets/stash
+      github.com:
+        type: github
+      github-enterprise.example.com:
+        type: github
+        mirror: 'git://git-mirror.example.com/'
     YAML
-    expect(settings.stash_username).to eq("robot")
-    expect(settings.stash_password_file).to eq('/secrets/stash')
-    expect(settings.stash_host).to eq("example.com")
+    expect(settings.git_servers.keys).
+      to match_array(%w{stash.example.com github.com github-enterprise.example.com})
+    expect(settings.git_servers['stash.example.com'].type). to eq('stash')
+    expect(settings.git_servers['stash.example.com'].username). to eq('robot')
+    expect(settings.git_servers['stash.example.com'].password_file). to eq('/secrets/stash')
+
+    expect(settings.git_servers['github-enterprise.example.com'].mirror).
+      to eq('git://git-mirror.example.com/')
+  end
+
+  it "can look up git servers" do
+    settings = SettingsAccessor.new(<<-YAML)
+    git_servers:
+      stash.example.com:
+        type: stash
+      github.com:
+        type: github
+    YAML
+    expect(settings.git_server('git@stash.example.com:square/kochiku.git').type).to eq('stash')
+    expect(settings.git_server('https://github.com/square/kochiku.git').type).to eq('github')
+    expect(settings.git_server('https://foobar.com/square/kochiku.git')).to eq(nil)
+  end
+
+  it "can also give me the host which matched" do
+    settings = SettingsAccessor.new(<<-YAML)
+    git_servers:
+      github.com:
+        type: github
+    YAML
+    expect(settings.git_server('https://github.com/square/kochiku.git').host).to eq('github.com')
+  end
+
+  it "still works if git_servers is not in the config file" do
+    settings = SettingsAccessor.new("another_setting:\n")
+    expect(settings.git_server('https://github.com/square/kochiku.git')).to eq(nil)
+  end
+
+  it "still works if a host is listed without any data" do
+    settings = SettingsAccessor.new(<<-YAML)
+    git_servers:
+      git.example.com:
+    YAML
+    expect(settings.git_server('git@git.example.com:square/kochiku.git').type).to eq(nil)
   end
 
   it 'respects relative paths for stash password file' do
     settings = SettingsAccessor.new(<<-YAML)
-    stash:
-      password_file: secrets/stash
+    git_servers:
+      stash.example.com:
+        password_file: secrets/stash
     YAML
-    expect(settings.stash_password_file).to match(%r{/.*/secrets/stash\Z})
+    expect(settings.git_servers['stash.example.com'].password_file).
+      to match(%r{/.*/secrets/stash\Z})
   end
 end

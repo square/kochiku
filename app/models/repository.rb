@@ -24,8 +24,9 @@ class Repository < ActiveRecord::Base
 
   # Where to fetch from (git mirror if defined, otherwise the regular git url)
   def url_for_fetching
-    if Settings.git_mirror.present?
-      url.gsub(%r{(git@|https://).*?(:|/)}, Settings.git_mirror)
+    server = Settings.git_server(url)
+    if server.mirror.present?
+      url.gsub(%r{(git@|https://).*?(:|/)}, server.mirror)
     else
       url
     end
@@ -50,14 +51,18 @@ class Repository < ActiveRecord::Base
   end
 
   def self.remote_server(url)
-    server = [
-      RemoteServer::Stash,
-      RemoteServer::Github
-    ].find {|x| x.match?(url) }
+    server = Settings.git_server(url)
 
     raise UnknownServer, url unless server
 
-    server
+    case server.type
+      when 'stash'
+        RemoteServer::Stash
+      when 'github'
+        RemoteServer::Github
+      else
+        raise "unknown server type #{type}"
+    end
   end
 
   # This is ugly. Is there a better way?

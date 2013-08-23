@@ -60,20 +60,39 @@ describe BuildPart do
   describe "#job_args" do
     let(:repository) { FactoryGirl.create(:repository, :url => "git@git.example.com:org/test-repo.git") }
 
-    it "should substitute the git mirror if it is specified" do
-      Settings.stub(:git_mirror).and_return("git://git-mirror.example.com/")
+    context "with a git mirror specified" do
+      before do
+        settings = SettingsAccessor.new(<<-YAML)
+        git_servers:
+          git.example.com:
+            type: github
+            mirror: "git://git-mirror.example.com/"
+        YAML
+        stub_const "Settings", settings
+      end
 
-      build_attempt = build_part.build_attempts.create!(:state => :runnable)
-      args = build_part.job_args(build_attempt)
-      args["repo_url"].should == "git://git-mirror.example.com/org/test-repo.git"
+      it "should substitute the mirror" do
+        build_attempt = build_part.build_attempts.create!(:state => :runnable)
+        args = build_part.job_args(build_attempt)
+        args["repo_url"].should == "git://git-mirror.example.com/org/test-repo.git"
+      end
     end
 
-    it "should return the original git url if there is no git_mirror" do
-      Settings.stub(:git_mirror).and_return(nil)
+    context "with no git mirror specified" do
+      before do
+        settings = SettingsAccessor.new(<<-YAML)
+        git_servers:
+          git.example.com:
+            type: github
+        YAML
+        stub_const "Settings", settings
+      end
 
-      build_attempt = build_part.build_attempts.create!(:state => :runnable)
-      args = build_part.job_args(build_attempt)
-      args["repo_url"].should == repository.url
+      it "should return the original git url" do
+        build_attempt = build_part.build_attempts.create!(:state => :runnable)
+        args = build_part.job_args(build_attempt)
+        args["repo_url"].should == repository.url
+      end
     end
   end
 

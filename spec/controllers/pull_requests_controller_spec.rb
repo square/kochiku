@@ -1,7 +1,16 @@
 require 'spec_helper'
 
 describe PullRequestsController do
-  let!(:repository) { FactoryGirl.create(:repository, :url => "git@git.squareup.com:square/web.git", :run_ci => true) }
+  before do
+    settings = SettingsAccessor.new(<<-YAML)
+    git_servers:
+      git.example.com:
+        type: github
+    YAML
+    stub_const "Settings", settings
+  end
+
+  let!(:repository) { FactoryGirl.create(:repository, :url => "git@git.example.com:square/web.git", :run_ci => true) }
 
   describe "#build" do
     describe "post /pull-request-builder" do
@@ -200,7 +209,7 @@ describe PullRequestsController do
         "title" => "this is a pull request",
       },
       "repository" => {
-        "ssh_url" => "git@git.squareup.com:square/web.git",
+        "ssh_url" => "git@git.example.com:square/web.git",
       },
       "action" => "synchronize",
     }.deep_merge(options).to_json
@@ -210,7 +219,7 @@ describe PullRequestsController do
     {
       "after" => "SOME-SHA1",
       "repository" => {
-        "url" => "https://git.squareup.com/square/web",
+        "url" => "https://git.example.com/square/web",
       },
       "ref" => "refs/heads/master",
     }.deep_merge(options).to_json

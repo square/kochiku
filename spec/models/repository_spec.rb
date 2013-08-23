@@ -1,6 +1,17 @@
 require 'spec_helper'
 
 describe Repository do
+  before do
+    settings = SettingsAccessor.new(<<-YAML)
+    git_servers:
+      stash.example.com:
+        type: stash
+      git.example.com:
+        type: github
+    YAML
+    stub_const "Settings", settings
+  end
+
   describe '#main_project' do
     let(:repository) { project.repository }
     let(:project) { FactoryGirl.create :project }
@@ -52,33 +63,33 @@ describe Repository do
 
   context "#base_api_url" do
     it "handles ssh urls" do
-      repo = Repository.new(:url => "git@git.squareup.com:square/kochiku.git")
-      repo.base_api_url.should == "https://git.squareup.com/api/v3/repos/square/kochiku"
+      repo = Repository.new(:url => "git@git.example.com:square/kochiku.git")
+      repo.base_api_url.should == "https://git.example.com/api/v3/repos/square/kochiku"
     end
   end
 
   context "#base_html_url" do
     it "handles ssh urls" do
-      repo = Repository.new(:url => "git@git.squareup.com:square/kochiku.git")
-      repo.base_html_url.should == "https://git.squareup.com/square/kochiku"
+      repo = Repository.new(:url => "git@git.example.com:square/kochiku.git")
+      repo.base_html_url.should == "https://git.example.com/square/kochiku"
     end
     it "handles http urls" do
-      repo = Repository.new(:url => "http://git.squareup.com/square/kochiku.git")
-      repo.base_html_url.should == "https://git.squareup.com/square/kochiku"
+      repo = Repository.new(:url => "http://git.example.com/square/kochiku.git")
+      repo.base_html_url.should == "https://git.example.com/square/kochiku"
     end
     it "handles https urls" do
-      repo = Repository.new(:url => "https://git.squareup.com/square/kochiku.git")
-      repo.base_html_url.should == "https://git.squareup.com/square/kochiku"
+      repo = Repository.new(:url => "https://git.example.com/square/kochiku.git")
+      repo.base_html_url.should == "https://git.example.com/square/kochiku"
     end
     it "handles git read only urls" do
-      repo = Repository.new(:url => "git://git.squareup.com/square/kochiku.git")
-      repo.base_html_url.should == "https://git.squareup.com/square/kochiku"
+      repo = Repository.new(:url => "git://git.example.com/square/kochiku.git")
+      repo.base_html_url.should == "https://git.example.com/square/kochiku"
     end
   end
 
   context "#repository_name" do
     it "returns the repositories name" do
-      repo = Repository.new(:url => "git://git.squareup.com/square/kochiku-name.git")
+      repo = Repository.new(:url => "git://git.example.com/square/kochiku-name.git")
       repo.repository_name.should == "kochiku-name"
     end
   end
@@ -86,16 +97,16 @@ describe Repository do
   context "with stash repository" do
     context "#repository_name" do
       it "returns the repositories name" do
-        repo = Repository.new(:url => "ssh://git@stash.squareup.com:7999/pe/host-tools.git")
+        repo = Repository.new(:url => "ssh://git@stash.example.com:7999/pe/host-tools.git")
         repo.repository_name.should == "host-tools"
       end
     end
 
     context '.project_params' do
       it 'parses out pertinent information' do
-        repo = Repository.new(:url => "ssh://git@stash.squareup.com:7999/pe/host-tools.git")
+        repo = Repository.new(:url => "ssh://git@stash.example.com:7999/pe/host-tools.git")
         expect(repo.project_params).to eq(
-          host:       'stash.squareup.com',
+          host:       'stash.example.com',
           port:       7999,
           username:   'pe',
           repository: 'host-tools'
@@ -111,7 +122,7 @@ describe Repository do
     end
 
     it "returns the cache from the settings or the default from the repo name" do
-      repository = Repository.new(:url => "https://git.squareup.com/square/kochiku")
+      repository = Repository.new(:url => "https://git.example.com/square/kochiku")
       repository.repo_cache_name.should == "kochiku-cache"
     end
   end

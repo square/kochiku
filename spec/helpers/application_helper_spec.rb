@@ -4,7 +4,16 @@ describe ApplicationHelper do
   include ActionView::Helpers
   include Haml::Helpers
   let(:project) { FactoryGirl.create(:project, :repository => repository)}
-  let(:repository) { FactoryGirl.create(:repository, :url => "git@git.squareup.com:square/web.git")}
+  let(:repository) { FactoryGirl.create(:repository, :url => "git@git.example.com:square/web.git")}
+
+  before do
+    settings = SettingsAccessor.new(<<-YAML)
+    git_servers:
+      git.example.com:
+        type: github
+    YAML
+    stub_const "Settings", settings
+  end
 
   before do
     @build = Build.new(:ref => "SHA1FORCOMMIT", :project => project, :branch => "nomnomnom")
@@ -41,25 +50,25 @@ describe ApplicationHelper do
 
   describe "#show_link_to_commit" do
     it "should create a url to github based on config" do
-      show_link_to_commit(@build).should == 'https://git.squareup.com/square/web/commit/SHA1FORCOMMIT'
+      show_link_to_commit(@build).should == 'https://git.example.com/square/web/commit/SHA1FORCOMMIT'
     end
   end
 
   describe "#show_link_to_branch" do
     it "should create a url to github based on config" do
-      show_link_to_branch(@build).should == 'https://git.squareup.com/square/web/tree/nomnomnom'
+      show_link_to_branch(@build).should == 'https://git.example.com/square/web/tree/nomnomnom'
     end
   end
 
   describe "#show_link_to_compare" do
     it "creates a url to github showing the diff between 2 SHAs" do
-      show_link_to_compare(@build, 'SHA1FORCOMMIT', 'SHA2FORCOMMIT').should == 'https://git.squareup.com/square/web/compare/SHA1FORCOMMIT...SHA2FORCOMMIT#files_bucket'
+      show_link_to_compare(@build, 'SHA1FORCOMMIT', 'SHA2FORCOMMIT').should == 'https://git.example.com/square/web/compare/SHA1FORCOMMIT...SHA2FORCOMMIT#files_bucket'
     end
   end
 
   describe "#show_link_to_create_pull_request" do
     it "creates a url to github for a pull request" do
-      show_link_to_create_pull_request(@build).should == 'https://git.squareup.com/square/web/pull/new/master...SHA1FORCOMMIT'
+      show_link_to_create_pull_request(@build).should == 'https://git.example.com/square/web/pull/new/master...SHA1FORCOMMIT'
     end
   end
 end

@@ -64,7 +64,7 @@ end
 
 feature "requesting a developer build" do
   before :each do
-    repository = FactoryGirl.create(:repository, :url => "git@git.squareup.com:square/kochiku.git")
+    repository = FactoryGirl.create(:repository, :url => "git@github.com:square/kochiku.git")
     @project = FactoryGirl.create(:project, :name => "kochiku-developer", :repository => repository)
 
     @branch = "test/branch"
@@ -73,15 +73,15 @@ feature "requesting a developer build" do
     build_ref_info = <<RESPONSE
 {
   "ref": "refs/heads/#{@branch}",
-  "url": "https://git.squareup.com/api/v3/repos/square/web/git/refs/heads/#{@branch}",
+  "url": "https://github.com/api/v3/repos/square/kochiku/git/refs/heads/#{@branch}",
   "object": {
     "sha": "#{@branch_head_sha}",
     "type": "commit",
-    "url": "https://git.squareup.com/api/v3/repos/square/web/git/commits/#{@branch_head_sha}"
+    "url": "https://github.com/api/v3/repos/square/kochiku/git/commits/#{@branch_head_sha}"
   }
 }
 RESPONSE
-    stub_request(:get, "https://git.squareup.com/api/v3/repos/square/kochiku/git/refs/heads/#{@branch}").to_return(:status => 200, :body => build_ref_info)
+    stub_request(:get, "https://github.com/api/v3/repos/square/kochiku/git/refs/heads/#{@branch}").to_return(:status => 200, :body => build_ref_info)
   end
   
   it "creates a new build if a branch is given" do

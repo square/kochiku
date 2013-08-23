@@ -14,10 +14,6 @@ use_https: false
 # Host name where Kochiku is serving web pages.
 kochiku_host: 'kochiku.example.com'
 
-# If you would like Kochiku to clone and fetch repositories from a git mirror
-# uncomment this setting and fill in the url to your mirror.
-# git_mirror: 'git://git-mirror.example.com/'
-
 # If you commit with hitch/git-pair, etc, set this in order to send email to each person in the pair.
 # For example, github+joe+bob@example.com will turn into emails to joe@example.com and bob@example.com
 # if git_pair_email_prefix is set to 'github'.
@@ -28,8 +24,20 @@ git_pair_email_prefix: 'github'
 # config/environments/production.rb).
 smtp_server: 'localhost'
 
-# Optional settings for Atlassian Stash integration.
-# stash:
-#   host: stash.example.com
-#   username: kochiku-robot
-#   password: config/secrets/kochiku-robot-password
+# List your git servers (at least for now, they need to be either github, github enterprise, or
+# Atlassian Stash for things like constructing URLs to pages on those servers. Would be nice to
+# just turn off the fancy features for a vanilla git server instead, but that isn't yet possible).
+git_servers:
+  github.com:
+    type: github
+
+# If you would like Kochiku to clone and fetch repositories from a git mirror
+# define the repository and fill in the url to your mirror.
+#  git.example.com:
+#    mirror: 'git://git-mirror.example.com/'
+
+# Example of Atlassian Stash integration.
+#  stash.example.com:
+#    type: stash
+#    username: kochiku-robot
+#    password_file: config/secrets/kochiku-robot-password
