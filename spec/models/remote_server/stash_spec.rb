@@ -14,7 +14,8 @@ describe RemoteServer do
     allow(File).to receive(:read).with("/password").and_return("stashpassword")
   end
 
-  let(:stash) { RemoteServer::Stash.new('git@stash.example.com/foo/bar.git') }
+  let(:repository) { FactoryGirl.create(:repository, url: 'git@stash.example.com/foo/bar.git')}
+  let(:stash) { RemoteServer::Stash.new(repository) }
   let(:stash_request) { stash.stash_request }
 
   describe RemoteServer::StashRequest do
