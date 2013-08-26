@@ -10,7 +10,7 @@ module RemoteServer
 
     def initialize(repo)
       @repo = repo
-      @settings = Settings.git_server(repo)
+      @settings = Settings.git_server(repo.url)
       @stash_request = StashRequest.new(@settings)
     end
 
