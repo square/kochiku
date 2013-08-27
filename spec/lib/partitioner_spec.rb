@@ -40,6 +40,30 @@ describe Partitioner do
   let(:rspec_time_manifest) { nil }
   let(:cuke_time_manifest) { nil }
 
+  context "with a kochiku.yml that does not use Ruby" do
+    let(:kochiku_yml_exists) { true }
+    let(:kochiku_yml) do
+      {
+        "targets" => [
+          {
+            'type' => 'other',
+            'glob' => 'spec/**/*_spec.rb',
+            'workers' => 1,
+          }
+        ]
+      }
+    end
+
+    it "should not include a ruby version" do
+      partitions = partitioner.partitions(build)
+      partitions.size.should be(1)
+      partitions.first["type"].should == "other"
+      partitions.first["files"].should_not be_empty
+      partitions.first["options"].should_not have_key("ruby")
+    end
+  end
+
+
   context "with a ruby-based kochiku.yml" do
     let(:kochiku_yml_exists) { true }
     let(:append_type_to_queue) { nil }

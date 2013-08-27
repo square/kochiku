@@ -45,18 +45,25 @@ class Partitioner
   end
 
   def build_partitions(build)
-    kochiku_yml['ruby'].flat_map do |ruby|
-      kochiku_yml['targets'].flat_map do |subset|
-        partitions_for(
-          build,
-          subset.merge(
-            'options' => {
-              'language' => kochiku_yml['language'],
-              'ruby' => ruby,
-            }
-          )
-        )
+    if kochiku_yml['ruby']
+      kochiku_yml['ruby'].flat_map do |ruby|
+        build_targets(build, ruby)
       end
+    else
+      build_targets(build)
+    end
+  end
+
+  def build_targets(build, ruby_version=nil)
+    options = {}
+    options['language'] = kochiku_yml['language'] if kochiku_yml['language']
+    options['ruby'] = ruby_version if ruby_version
+
+    kochiku_yml['targets'].flat_map do |subset|
+      partitions_for(
+        build,
+        subset.merge('options' => options)
+      )
     end
   end
 
