@@ -1,60 +1,44 @@
 Kochiku
 =======
 
-Kochiku is "Build" in Japanese (according to google translate).
+Kochiku means "Build" in Japanese (sort of). Kochiku runs your automated tests.
 
-Kochiku consists of two pieces. There is a master process and a number of slave
-workers. The slave workers check out a copy of your project into a directory
-and run a subset of the tests inside of it. They then report status, any build
-artifacts (logs, etc) and statistical information back to the master server.
-
-
-Master
-------
-
-Responsibilities:
-
- - Is alerted about git changes
- - Reads the build.yml from the checked out project
- - divides build into parts
- - puts the parts on a resque queue
-
-### Models
- - Build: a sha to build
- - Build parts: A build has many of these, each one corresponds to the atomic unit of your tests
- - Build attempts: Each build part can have many build attempts. This records state so we can retry parts.
- - Build artifacts: Each attempt has artifacts (only log files right now) that are associated with that run.
-
-![Entity Relationship Diagram](erd.png "ERD")
-
-Worker
-------
-
-The worker is in [its own GitHub repository][kochiku-worker].
-
-### BuildPartitioningJob
-Fills the queue with build part jobs. Enqueued by the master.
-
-### BuildPartJob
-Runs the tests for a particular part of the build. Updates status.
-
-### BuildStateUpdateJob
-Promotes a tag if the build is successful.
+Kochiku consists of three pieces. A web server, background jobs which partition a build into many parts, and workers
+that execute the individual build parts. Typically the first two run on a single machine, and there are many
+machines running workers.
 
 
-Getting Started
----------------
+Who Should Use Kochiku
+----------------------
 
-    # create database
-    rake db:setup
 
-    # start server
-    rails server
+Documentation
+-------------
 
-    # run a partition worker
-    QUEUE=high,partition rake resque:work
+Most of the documentation is kept on the [wiki](https://github.com/square/kochiku/wiki).
 
-Make sure to also clone the [kochiku-worker] repository if you need to run
-build jobs.
+Running Kochiku in development
+------------------------------
 
-[kochiku-worker]: https://github.com/square/kochiku-worker
+It is not necessary to have a farm of workers in order to develop Kochiku. Just run the Kochiku web server
+locally.
+
+```sh
+# create the database and seed it with dummy data
+rake db:setup
+
+# start server
+rails server
+
+# optionally spin up a partition worker
+QUEUES=high,partition rake resque:work
+```
+
+Sometimes, you'll also want to run build jobs; if so also clone the [kochiku-worker][gh-kw] repository.
+
+Contributing
+------------
+
+See [CONTRIBUTING](CONTRIBUTING.md).
+
+[gh-kw]: https://github.com/square/kochiku-worker
