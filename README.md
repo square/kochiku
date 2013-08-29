@@ -1,44 +1,25 @@
-Kochiku
-=======
+Kochiku - Distributed tests made easy
+=====================================
 
-Kochiku means "Build" in Japanese (sort of). Kochiku runs your automated tests.
+Kochiku is a distributed platform for test automation. It has three main components:
 
-Kochiku consists of three pieces. A web server, background jobs which partition a build into many parts, and workers
-that execute the individual build parts. Typically the first two run on a single machine, and there are many
-machines running workers.
+- A **web server**, which lets you inspect builds and manage repositories
+- **Background jobs** that divide builds into distributable parts
+- **Workers** that run individual parts of a build
 
+A single machine typically runs the web server and background jobs, whereas many machines run workers.
 
-Who Should Use Kochiku
-----------------------
+Use Kochiku to distribute large test suites quickly and easily.
 
+### Git integration
 
-Documentation
--------------
+Kochiku currently integrates with git repositories stored in Github (including Github Enterprise) or Atlassian Stash. This lets Kochiku automatically run test suites for pull requests and commits to the master branch. Kochiku can also build any git revision on request.
 
-Most of the documentation is kept on the [wiki](https://github.com/square/kochiku/wiki).
+Support for headless git servers is coming soon.
 
-Running Kochiku in development
-------------------------------
-
-It is not necessary to have a farm of workers in order to develop Kochiku. Just run the Kochiku web server
-locally.
-
-```sh
-# create the database and seed it with dummy data
-rake db:setup
-
-# start server
-rails server
-
-# optionally spin up a partition worker
-QUEUES=high,partition rake resque:work
-```
-
-Sometimes, you'll also want to run build jobs; if so also clone the [kochiku-worker][gh-kw] repository.
-
-Contributing
-------------
-
-See [CONTRIBUTING](CONTRIBUTING.md).
-
-[gh-kw]: https://github.com/square/kochiku-worker
+## User Guide
+- [Installation & Deployment](https://github.com/square/kochiku/wiki/Installation-&-Deployment)
+- [Adding a repository](https://github.com/square/kochiku/wiki/How-to-add-a-repository-to-Kochiku)
+- [Initiating a build](https://github.com/square/kochiku/wiki/How-to-initiate-a-build-on-Kochiku)
+- [Additional documentation](https://github.com/square/kochiku/wiki/_pages)
+- [Contributing to Kochiku](CONTRIBUTING.md)
