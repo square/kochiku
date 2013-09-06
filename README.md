@@ -9,7 +9,7 @@ Kochiku is a distributed platform for test automation. It has three main compone
 
 A single machine typically runs the web server and background jobs, whereas many machines run workers.
 
-Use Kochiku to distribute large test suites quickly and easily.
+Use Kochiku to distribute large test suites quickly and easily. It's language agnostic; Use it for Ruby, Rails, Node.js, Ember, Java, C, C++ or anything else that runs in a unix environment.
 
 ### Git integration
 
