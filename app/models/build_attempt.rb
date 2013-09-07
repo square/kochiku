@@ -9,7 +9,7 @@ class BuildAttempt < ActiveRecord::Base
 
   symbolize :state, :in => STATES, :scopes => true
 
-  scope :unsuccessful, :conditions => {:state => FAILED_BUILD_STATES}
+  scope :unsuccessful, -> { where(state: FAILED_BUILD_STATES) }
 
   def elapsed_time
     if finished_at && started_at
