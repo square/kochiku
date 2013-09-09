@@ -1,7 +1,7 @@
 class Project < ActiveRecord::Base
   has_many :builds, :dependent => :destroy, :inverse_of => :project do
     def create_new_build_for(sha)
-      last_build = to_a.last
+      last_build = last
       return last_build if last_build && !last_build.completed?
       build = where(ref: sha).first_or_initialize(state: :partitioning, branch: 'master')
       build.save!
