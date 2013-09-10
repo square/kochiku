@@ -4,6 +4,18 @@ require 'rexml/document'
 describe ProjectsController do
   render_views
 
+  describe "#index" do
+    let(:a) { FactoryGirl.create(:project, name: 'aster') }
+    let(:b) { FactoryGirl.create(:project, name: 'buckeye') }
+    let(:c) { FactoryGirl.create(:project, name: 'creosote') }
+
+    it "shows projects in order" do
+      b; a; c
+      get :index
+      assigns(:projects).map(&:name).should == %w{aster buckeye creosote}
+    end
+  end
+
   describe "#ci_projects" do
     let(:repository) { FactoryGirl.create(:repository) }
     let!(:ci_project) { FactoryGirl.create(:project, :name => repository.repository_name) }
