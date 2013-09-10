@@ -44,7 +44,7 @@ class Build < ActiveRecord::Base
 
   after_create :enqueue_partitioning_job
 
-  scope :completed, {:conditions => {:state => TERMINAL_STATES}}
+  scope :completed, -> { where(state: TERMINAL_STATES) }
   scope :successful_for_project, lambda { |project_id| where(:project_id => project_id, :state => :succeeded) }
 
   def test_command(run_list)
@@ -138,7 +138,9 @@ class Build < ActiveRecord::Base
 
   def promote!
     BuildStrategy.promote_build(ref, repository)
-    if repository.has_on_success_script? && !promoted? && Build.update_all({:promoted => true}, {:id => self.id, :promoted => nil}) == 1
+    if repository.has_on_success_script? &&
+        !promoted? &&
+        Build.where(id: self.id, promoted: nil).update_all(promoted: true) == 1
       output = BuildStrategy.run_success_script(repository, ref, branch)
       script_log = FilelessIO.new(output)
       script_log.original_filename = "on_success_script.log"
@@ -159,10 +161,9 @@ class Build < ActiveRecord::Base
     update_attributes!(:state => :aborted)
 
     all_build_part_ids = build_parts.select('id').collect(&:id)
-    BuildAttempt.update_all(
-        {:state => :aborted, :updated_at => Time.now},
-        {:state => :runnable, :build_part_id => all_build_part_ids}
-    )
+    BuildAttempt.
+        where(state: :runnable, build_part_id: all_build_part_ids).
+        update_all(state: :aborted, updated_at: Time.now)
   end
 
   def to_color
@@ -195,7 +196,7 @@ class Build < ActiveRecord::Base
     return if (project.main? && !previous_successful_build) || !repository.send_build_failure_email?
 
     if completed? && failed? && !build_failure_email_sent?
-      if Build.update_all({:build_failure_email_sent => true}, {:id => self.id, :build_failure_email_sent => nil}) == 1
+      if Build.where(id: self.id, build_failure_email_sent: nil).update_all(build_failure_email_sent: true) == 1
         BuildMailer.build_break_email(self).deliver
       end
     end

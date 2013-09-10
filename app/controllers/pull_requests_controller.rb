@@ -19,7 +19,7 @@ class PullRequestsController < ApplicationController
     end
     repository = Repository.find_by_url(ssh_url)
     return unless repository
-    project = repository.projects.find_or_create_by_name(repository.repository_name)
+    project = repository.projects.where(name: repository.repository_name).first_or_create
     if payload["ref"] == "refs/heads/master" && repository.run_ci?
       sha = payload["after"]
       project.builds.create_new_build_for(sha)
@@ -28,7 +28,7 @@ class PullRequestsController < ApplicationController
 
   def handle_pull_request
     repository = Repository.find_by_url(payload['repository']['ssh_url'])
-    project = repository.projects.find_or_create_by_name(repository.repository_name + "-pull_requests")
+    project = repository.projects.where(name: repository.repository_name + "-pull_requests").first_or_create
     if active_pull_request? && (build_requested_for_pull_request? || repository.build_pull_requests)
       sha = payload["pull_request"]["head"]["sha"]
       branch = payload["pull_request"]["head"]["ref"]
