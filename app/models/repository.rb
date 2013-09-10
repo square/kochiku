@@ -9,8 +9,11 @@ class Repository < ActiveRecord::Base
   }
   has_many :projects, :dependent => :destroy
   validates_presence_of :url
+  validates_uniqueness_of :repository_name
   validates_numericality_of :timeout, :only_integer => true
   validates_inclusion_of :timeout, :in => 0..1440
+
+  before_validation :set_repository_name
 
   def remote_server
     self.class.remote_server(url).new(self)
@@ -32,8 +35,8 @@ class Repository < ActiveRecord::Base
     end
   end
 
-  def repository_name
-    project_params[:repository]
+  def set_repository_name
+    self.repository_name ||= project_params[:repository]
   end
 
   def repo_cache_name
