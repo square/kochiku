@@ -57,6 +57,7 @@ GEM
     cocaine (0.5.1)
       climate_control (>= 0.0.3, < 1.0)
     coderay (1.0.9)
+    colorize (0.5.8)
     compass (0.12.2)
       chunky_png (~> 1.2)
       fssm (>= 0.2.7)
@@ -244,6 +245,7 @@ DEPENDENCIES
   carrierwave
   chunky_png
   cocaine
+  colorize
   compass
   compass-rails
   factory_girl_rails

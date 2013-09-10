@@ -24,6 +24,8 @@ gem 'httparty'
 gem 'bullet'
 gem 'pry-rails'
 
+gem 'colorize'
+
 group :assets do
   gem 'compass-rails'
   gem 'jquery-rails'

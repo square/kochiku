@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20130823234546) do
+ActiveRecord::Schema.define(:version => 20130910190203) do
 
   create_table "build_artifacts", :force => true do |t|
     t.integer  "build_attempt_id"
@@ -92,6 +92,7 @@ ActiveRecord::Schema.define(:version => 20130823234546) do
     t.string   "on_success_script"
     t.integer  "timeout",                     :default => 40
     t.string   "on_success_note"
+    t.string   "repository_name"
   end
 
   add_index "repositories", ["url"], :name => "index_repositories_on_url"
