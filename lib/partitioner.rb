@@ -81,8 +81,8 @@ class Partitioner
     queue_override = subset.fetch('queue_override', nil)
     queue = queue_override if queue_override.present?
 
-    strategy = subset.fetch('balance', 'alphabetically')
-    strategy = 'alphabetically' unless Strategies.respond_to?(strategy)
+    strategy = subset.fetch('balance', 'round_robin')
+    strategy = 'round_robin' unless Strategies.respond_to?(strategy) # override if specified strategy is invalid
 
     files = Array(load_manifest(manifest)) | Dir[*glob]
 
