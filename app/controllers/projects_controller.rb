@@ -1,6 +1,6 @@
 class ProjectsController < ApplicationController
   def index
-    @projects = Project.find_all_by_name('web') | Project.all(:order => "name ASC")
+    @projects = Project.order("name ASC")
   end
 
   def ci_projects
