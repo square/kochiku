@@ -43,4 +43,4 @@
   = f.submit @repository.new_record? ? "Create" : "Update"
 
 - unless @repository.new_record?
-  = button_to "Delete", @repository, :method => :delete, :form_class => "delete-form", :class => "danger-button", :confirm => "This is a permanent destructive action, are you sure?"
+  = button_to "Delete", @repository, method: :delete, form_class: "delete-form", class: "danger-button", data: {confirm: "This is a permanent destructive action, are you sure?"}
