@@ -2,9 +2,9 @@ class Repository < ActiveRecord::Base
   UnknownServer = Class.new(RuntimeError)
 
   URL_PARSERS = {
-    "git@" => /@(.*):(.*)\/(.*)\.git/,
-    "git:" => /:\/\/(.*)\/(.*)\/(.*)\.git/,
-    "http" => /https?:\/\/(.*)\/(.*)\/([^.]*)\.?/,
+    "git@" => %r{@(.*):(.*)/(.*)\.git},
+    "git:" => %r{://(.*)/(.*)/(.*)\.git},
+    "http" => %r{https?://(.*)/(.*)/([^.]*)\.?},
     'ssh:' => %r{ssh://git@(.*):(\d+)/(.*)/([^.]+)\.git}
   }
   has_many :projects, :dependent => :destroy
@@ -90,9 +90,12 @@ class Repository < ActiveRecord::Base
   private
 
   def self.project_params(url)
-    # TODO: Move these parsers to RemoteServer classes.
+    # TODO: Move these parsers to RemoteServer classes. Or at least be more lenient about
+    # the format.
     parser = URL_PARSERS[url.slice(0,4)]
     match = url.match(parser)
+
+    raise "don't yet understand git URL #{url}" unless match
 
     if match.length > 4
       {
