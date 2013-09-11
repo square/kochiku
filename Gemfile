@@ -37,7 +37,7 @@ gem 'httparty'
 gem 'bullet'
 gem 'pry-rails'
 
-gem 'colorize'
+gem 'colorize', require: false
 
 group :test, :development do
   gem 'rspec-rails'
