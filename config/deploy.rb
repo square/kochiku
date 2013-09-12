@@ -46,17 +46,16 @@ namespace :deploy do
   task :restart_workers, :roles => :worker do
     # the trailing semicolons are required because this is passed to the shell as a single string
     run <<-CMD
-      resque1_pid=$(cat #{shared_path}/pids/resque1.pid);
-      resque2_pid=$(cat #{shared_path}/pids/resque2.pid);
-      resque3_pid=$(cat #{shared_path}/pids/resque3.pid);
-      resque4_pid=$(cat #{shared_path}/pids/resque4.pid);
-      resque_scheduler_pid=$(cat #{shared_path}/pids/resque-scheduler.pid);
+      resque1_pid=$(cat #{shared_path}/pids/resque1.pid||echo undefined);
+      resque2_pid=$(cat #{shared_path}/pids/resque2.pid||echo undefined);
+      resque3_pid=$(cat #{shared_path}/pids/resque3.pid||echo undefined);
+      resque4_pid=$(cat #{shared_path}/pids/resque4.pid||echo undefined);
+      resque_scheduler_pid=$(cat #{shared_path}/pids/resque-scheduler.pid||echo undefined);
       kill -QUIT $resque1_pid;
       kill -QUIT $resque2_pid;
       kill -QUIT $resque3_pid;
       kill -QUIT $resque4_pid;
       kill -QUIT $resque_scheduler_pid;
-
       while ps x | egrep -q "^($resque1_pid|$resque2_pid|$resque3_pid|$resque4_pid|$resque_scheduler_pid)"; do
         echo "Waiting for Resque workers to stop on $HOSTNAME...";
         sleep 5;
