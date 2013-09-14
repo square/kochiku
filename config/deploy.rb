@@ -81,7 +81,7 @@ end
 namespace :kochiku do
   task :setup, :roles => [:app, :worker] do
     run "gem install bundler -v '~> 1.3' --conservative"
-    run "mkdir -p #{shared_path}/{build-partition,log_files}"
+    run "mkdir -p #{shared_path}/build-partition #{shared_path}/log_files"
   end
 
   task :symlinks, :roles => [:app, :worker] do
