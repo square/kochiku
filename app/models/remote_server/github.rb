@@ -57,7 +57,11 @@ module RemoteServer
     def base_api_url
       params = repo.project_params
 
-      "https://#{params[:host]}/api/v3/repos/#{params[:username]}/#{params[:repository]}"
+      if repo.url =~ /github\.com/
+        "https://api.#{params[:host]}/repos/#{params[:username]}/#{params[:repository]}"
+      else # github enterprise
+        "https://#{params[:host]}/api/v3/repos/#{params[:username]}/#{params[:repository]}"
+      end
     end
 
     def href_for_commit(sha)

@@ -71,17 +71,17 @@ feature "requesting a developer build" do
     build_ref_info = <<RESPONSE
 {
   "ref": "refs/heads/#{@branch}",
-  "url": "https://github.com/api/v3/repos/square/kochiku/git/refs/heads/#{@branch}",
+  "url": "#{repository.base_api_url}/git/refs/heads/#{@branch}",
   "object": {
     "sha": "#{@branch_head_sha}",
     "type": "commit",
-    "url": "https://github.com/api/v3/repos/square/kochiku/git/commits/#{@branch_head_sha}"
+    "url": "#{repository.base_api_url}/git/commits/#{@branch_head_sha}"
   }
 }
 RESPONSE
-    stub_request(:get, "https://github.com/api/v3/repos/square/kochiku/git/refs/heads/#{@branch}").to_return(:status => 200, :body => build_ref_info)
+    stub_request(:get, "#{repository.base_api_url}/git/refs/heads/#{@branch}").to_return(:status => 200, :body => build_ref_info)
   end
-  
+
   it "creates a new build if a branch is given" do
     visit(project_path(@project))
     fill_in("build_branch", :with => @branch)

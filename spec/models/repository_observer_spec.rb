@@ -5,15 +5,22 @@ describe RepositoryObserver do
   let(:repository) { FactoryGirl.create(:repository, :url => "git@git.example.com:square/web.git") }
 
   before do
+    settings = SettingsAccessor.new(<<-YAML)
+    git_servers:
+      git.example.com:
+        type: github
+    YAML
+    stub_const "Settings", settings
+
     subject.stub(:should_contact_github?).and_return(true)
   end
 
   it "creates the hook if enabled" do
-    stub_request(:get, "https://git.example.com/api/v3/repos/square/web/hooks").with do |request|
+    stub_request(:get, "#{repository.base_api_url}/hooks").with do |request|
       request.headers["Authorization"].should == "token #{GithubRequest::OAUTH_TOKEN}"
       true
     end.to_return(:body => '[]')
-    stub_request(:post, "https://git.example.com/api/v3/repos/square/web/hooks").with do |request|
+    stub_request(:post, "#{repository.base_api_url}/hooks").with do |request|
       request.headers["Authorization"].should == "token #{GithubRequest::OAUTH_TOKEN}"
       body = JSON.parse(request.body)
       body["name"].should == "web"
