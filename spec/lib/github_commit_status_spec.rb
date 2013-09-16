@@ -53,7 +53,7 @@ describe GithubCommitStatus do
   it "uses a repos github url" do
     project.update_attributes!(:repository => FactoryGirl.create(:repository, :url => "git@github.com:square/kochiku-worker.git"))
     build.update_attributes!(:state => :failed)
-    stub_request(:post, "https://github.com/api/v3/repos/square/kochiku-worker/statuses/#{build.ref}").with do |request|
+    stub_request(:post, "https://api.github.com/repos/square/kochiku-worker/statuses/#{build.ref}").with do |request|
       body = JSON.parse(request.body)
       body["state"].should == "failure"
       true
