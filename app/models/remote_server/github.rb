@@ -57,7 +57,7 @@ module RemoteServer
     def base_api_url
       params = repo.project_params
 
-      "https://#{params[:host]}/api/v3/repos/#{params[:username]}/#{params[:repository]}"
+      "https://api.#{params[:host]}/repos/#{params[:username]}/#{params[:repository]}"
     end
 
     def href_for_commit(sha)
