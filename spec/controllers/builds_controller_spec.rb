@@ -186,7 +186,7 @@ RESPONSE
       end
 
       context "and project is main project" do
-        let(:repo) { FactoryGirl.create(:repository) }
+        let(:repo) { FactoryGirl.create(:repository, url: 'git@github.com:square/test-repo.git') }
         let(:project) { FactoryGirl.create(:project, :name => repo.repository_name, :repository => repo) }
 
         before do
@@ -211,14 +211,15 @@ RESPONSE
         }.to_not change { Build.count }
       end
 
-      it "doesn't create a build if the ref already exists" do
-        project = FactoryGirl.create(:project)
-        FactoryGirl.create(:build, :state => :succeeded, :project => project, :branch => branch, :ref => branch_head_sha)
+      context "ref already exits" do
+        let!(:build) { FactoryGirl.create(:build, :state => :succeeded, :project => project, :branch => branch, :ref => branch_head_sha) }
 
-        expect do
-          post @action, {:project_id => project.to_param, :build => {:branch => branch}}
-        end.to_not change { Build.count }
-        flash[:error].should be_nil
+        it "doesn't create a build" do
+          expect do
+            post @action, {:project_id => project.to_param, :build => {:branch => branch}}
+          end.to_not change { Build.count }
+          flash[:error].should be_nil
+        end
       end
 
       context "when github returns a 404" do

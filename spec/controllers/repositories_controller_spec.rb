@@ -20,6 +20,18 @@ describe RepositoriesController do
       Repository.last.projects.size.should == 2
       Repository.last.projects.map(&:name).sort.should == ["kochiku", "kochiku-pull_requests"]
     end
+
+    context "with repository name" do
+      it "creates a project with the specified name" do
+        expect{
+          post :create, :repository => {url: "git@git.example.com:square/kochiku.git",
+              test_command: "script/something", repository_name: "a-project-name"}
+          response.should be_redirect
+        }.to change(Project, :count).by(2)
+        Repository.last.projects.size.should == 2
+        Repository.last.projects.map(&:name).sort.should == ["a-project-name", "a-project-name-pull_requests"]
+      end
+    end
   end
 
   describe "get /repositories/:id/projects" do
@@ -91,7 +103,7 @@ describe RepositoriesController do
 
       expect(build.branch).to eq("master")
       expect(build.ref).to eq("abc123")
-      expect(build.project.name).to eq("test-repo")
+      expect(build.project.name).to eq(repository.repository_name)
     end
 
     it "creates a PR build" do
@@ -104,7 +116,7 @@ describe RepositoriesController do
 
       expect(build.branch).to eq("blah")
       expect(build.ref).to eq("abc123")
-      expect(build.project.name).to eq("test-repo-pull_requests")
+      expect(build.project.name).to eq("#{repository.repository_name}-pull_requests")
     end
   end
 end

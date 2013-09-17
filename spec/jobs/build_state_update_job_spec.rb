@@ -1,7 +1,7 @@
 require 'spec_helper'
 
 describe BuildStateUpdateJob do
-  let(:repository) { FactoryGirl.create(:repository)}
+  let(:repository) { FactoryGirl.create(:repository, url: 'git@github.com:square/test-repo.git') }
   let(:project) { FactoryGirl.create(:big_rails_project, :repository => repository, :name => name) }
   let(:build) { FactoryGirl.create(:build, :state => :runnable, :project => project) }
   let(:name) { repository.repository_name + "_pull_requests" }

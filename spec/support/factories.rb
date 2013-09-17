@@ -42,7 +42,7 @@ FactoryGirl.define do
   end
 
   factory :repository do
-    url "git@github.com:square/test-repo.git"  # this repo does not exist on purpose
+    sequence(:url) { |n| "git@github.com:square/test-repo#{n}.git" } # these repos do not exist on purpose
     test_command "script/ci worker"
     on_green_update 'last-green-build'
   end
