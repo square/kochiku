@@ -1,7 +1,16 @@
 require 'spec_helper'
 
 describe GitRepo do
-  let(:repository) { FactoryGirl.create(:repository) }
+  before do
+    settings = SettingsAccessor.new(<<-YAML)
+    git_servers:
+      git.example.com:
+        type: github
+    YAML
+    stub_const "Settings", settings
+  end
+
+  let(:repository) { FactoryGirl.create(:repository, url: 'git@git.example.com:square/web.git') }
   let(:repo_uri) { repository.base_api_url }
   let(:branch) { "test/branch" }
   let(:branch_head_sha) { "4b41fe773057b2f1e2063eb94814d32699a34541" }
@@ -23,13 +32,19 @@ RESPONSE
   end
 
   describe "#sha_for_branch" do
-    it "returns nil for non-existant repo" do
-      bad_repo = FactoryGirl.create(:repository)
-      bad_repo_uri = bad_repo.base_api_url
-      bad_repo_response = '{ "message": "Not Found" }'
-      stub_request(:get, "#{bad_repo_uri}/git/refs/heads/#{branch}").to_return(:status => 200, :body => bad_repo_response)
+    let(:subject) { GitRepo.sha_for_branch(repository, branch) }
 
-      GitRepo.sha_for_branch(bad_repo, branch).should be_nil
+    context "with a non-existant repo" do
+      let(:repository) { FactoryGirl.create(:repository, url: 'git@git.example.com:square/non-existent-repo.git') }
+
+      before do
+        bad_repo_response = '{ "message": "Not Found" }'
+        stub_request(:get, "#{repo_uri}/git/refs/heads/#{branch}").to_return(:status => 200, :body => bad_repo_response)
+      end
+
+      it "returns nil for non-existant repo" do
+        subject.should be_nil
+      end
     end
 
     it "returns nil with non-existant branch" do

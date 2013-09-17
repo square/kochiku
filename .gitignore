@@ -14,3 +14,8 @@ vendor/ruby
 # application settings
 /config/application.yml
 robot-password
+
+#intellij
+.idea/*
+*.iml
+

@@ -63,48 +63,73 @@ describe Repository do
 
   context "#base_api_url" do
     it "handles ssh urls" do
-      repo = Repository.new(:url => "git@git.example.com:square/kochiku.git")
+      repo = Repository.new(url: "git@git.example.com:square/kochiku.git")
       repo.base_api_url.should == "https://git.example.com/api/v3/repos/square/kochiku"
     end
   end
 
   context "#base_html_url" do
     it "handles ssh urls" do
-      repo = Repository.new(:url => "git@git.example.com:square/kochiku.git")
+      repo = Repository.new(url: "git@git.example.com:square/kochiku.git")
       repo.base_html_url.should == "https://git.example.com/square/kochiku"
     end
     it "handles http urls" do
-      repo = Repository.new(:url => "http://git.example.com/square/kochiku.git")
+      repo = Repository.new(url: "http://git.example.com/square/kochiku.git")
       repo.base_html_url.should == "https://git.example.com/square/kochiku"
     end
     it "handles https urls" do
-      repo = Repository.new(:url => "https://git.example.com/square/kochiku.git")
+      repo = Repository.new(url: "https://git.example.com/square/kochiku.git")
       repo.base_html_url.should == "https://git.example.com/square/kochiku"
     end
     it "handles git read only urls" do
-      repo = Repository.new(:url => "git://git.example.com/square/kochiku.git")
+      repo = Repository.new(url: "git://git.example.com/square/kochiku.git")
       repo.base_html_url.should == "https://git.example.com/square/kochiku"
     end
   end
 
   context "#repository_name" do
-    it "returns the repositories name" do
-      repo = Repository.new(:url => "git://git.example.com/square/kochiku-name.git")
-      repo.repository_name.should == "kochiku-name"
+    context "respository_name is set" do
+      it "returns the value" do
+        repo = Repository.new(url: "git://git.example.com/square/kochiku-name.git",
+            repository_name: "another_project")
+        repo.save
+        repo.reload
+        repo.repository_name.should == "another_project"
+      end
+    end
+
+    context "repository_name is not set when saving" do
+      it "sets the repository name based on the " do
+        repo = Repository.new(url: "git://git.example.com/square/kochiku-name.git")
+        repo.save
+        repo.reload
+        repo.repository_name.should == "kochiku-name"
+      end
+
+      context "when that name already exists" do
+        let!(:existing_repo) { FactoryGirl.create(:repository, repository_name: 'my-repo') }
+
+        it "does not validate" do
+          repo = FactoryGirl.build(:repository, repository_name: 'my-repo')
+          expect(repo).to_not be_valid
+        end
+      end
     end
   end
 
   context "with stash repository" do
     context "#repository_name" do
       it "returns the repositories name" do
-        repo = Repository.new(:url => "ssh://git@stash.example.com:7999/pe/host-tools.git")
+        repo = Repository.new(url: "ssh://git@stash.example.com:7999/pe/host-tools.git")
+        repo.valid?
         repo.repository_name.should == "host-tools"
       end
     end
 
     context '.project_params' do
       it 'parses out pertinent information' do
-        repo = Repository.new(:url => "ssh://git@stash.example.com:7999/pe/host-tools.git")
+        repo = Repository.new(url: "ssh://git@stash.example.com:7999/pe/host-tools.git")
+        repo.valid?
         expect(repo.project_params).to eq(
           host:       'stash.example.com',
           port:       7999,
@@ -122,7 +147,8 @@ describe Repository do
     end
 
     it "returns the cache from the settings or the default from the repo name" do
-      repository = Repository.new(:url => "https://git.example.com/square/kochiku")
+      repository = Repository.new(url: "https://git.example.com/square/kochiku")
+      repository.valid?
       repository.repo_cache_name.should == "kochiku-cache"
     end
   end
