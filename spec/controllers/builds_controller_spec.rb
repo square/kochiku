@@ -164,11 +164,11 @@ describe BuildsController do
         build_ref_info = <<RESPONSE
 {
   "ref": "refs/heads/#{branch}",
-  "url": "https://git.example.com/api/v3/repos/square/web/git/refs/heads/#{branch}",
+  "url": "#{project.repository.base_api_url}/git/refs/heads/#{branch}",
   "object": {
     "sha": "#{branch_head_sha}",
     "type": "commit",
-    "url": "https://git.example.com/api/v3/repos/square/web/git/commits/#{branch_head_sha}"
+    "url": "#{project.repository.base_api_url}/git/commits/#{branch_head_sha}"
   }
 }
 RESPONSE
@@ -213,7 +213,7 @@ RESPONSE
 
       it "doesn't create a build if the ref already exists" do
         project = FactoryGirl.create(:project)
-        build = FactoryGirl.create(:build, :state => :succeeded, :project => project, :branch => branch, :ref => branch_head_sha)
+        FactoryGirl.create(:build, :state => :succeeded, :project => project, :branch => branch, :ref => branch_head_sha)
 
         expect do
           post @action, {:project_id => project.to_param, :build => {:branch => branch}}
@@ -223,7 +223,7 @@ RESPONSE
 
       context "when github returns a 404" do
         it "throws not found exception" do
-          stub_request(:get, "https://github.com/api/v3/repos/square/#{project.repository.repository_name}/git/refs/heads/#{branch}").to_return(:status => 200, :body => '{"message": "Not Found"}')
+          stub_request(:get, "https://api.github.com/repos/square/#{project.repository.repository_name}/git/refs/heads/#{branch}").to_return(:status => 200, :body => '{"message": "Not Found"}')
           expect do
             post @action, {:project_id => project.to_param, :build => {:branch => branch}}
           end.to_not change { Build.count }
