@@ -1,4 +1,5 @@
 = form_for @repository, :url => @url do |f|
+  = f.error_messages
   %div
     %label{:for => "url"} Repository URL:
     = f.text_field :url, {:placeholder => '', :autocapitalize => 'off', :autocorrect => 'off', :spellcheck => 'false'}

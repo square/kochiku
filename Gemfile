@@ -1,7 +1,8 @@
 source 'https://rubygems.org'
 
-gem 'rails', '3.2.14'
+gem 'rails', '~> 3.2.14'
 gem 'passenger', '4.0.10', group: :production
+gem 'dynamic_form'
 
 gem 'carrierwave'
 gem 'mysql2'

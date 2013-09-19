@@ -32,6 +32,17 @@ describe RepositoriesController do
         Repository.last.projects.map(&:name).sort.should == ["a-project-name", "a-project-name-pull_requests"]
       end
     end
+
+    context "with validation errors" do
+      let(:params) { { url: '' } }
+
+      it "re-renders form with errors" do
+        post :create, repository: params
+        response.should be_success
+        expect(assigns[:repository].errors.full_messages.join(',')).
+          to include("Url can't be blank")
+      end
+    end
   end
 
   describe "get /repositories/:id/projects" do
@@ -56,6 +67,17 @@ describe RepositoriesController do
       }.to_not change(Repository, :count).by(1)
       Repository.last.url.should == "git@git.example.com:square/kochiku-worker.git"
       Repository.last.test_command.should == "script/something-else"
+      expect(response).to be_redirect
+    end
+
+    context "with invalid data" do
+      let(:repository) { FactoryGirl.create(:repository)}
+      let(:params) { { timeout: 'abc' } }
+
+      it "re-renders the edit page" do
+        put :update, id: repository.id, repository: params
+        expect(response).to be_success
+      end
     end
   end
 
