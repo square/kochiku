@@ -2,11 +2,14 @@ class RepositoriesController < ApplicationController
   skip_before_filter :verify_authenticity_token, :only => [:build_ref]
 
   def create
-    repository = Repository.where(url: params[:repository][:url]).first_or_initialize
-    repository.update_attributes!(params[:repository])
-    repository.projects.find_or_create_by_name("#{repository.repository_name}-pull_requests")
-    project = repository.projects.find_or_create_by_name(repository.repository_name)
-    redirect_to project_url(project)
+    @repository = Repository.where(url: params[:repository][:url]).first_or_initialize
+    if @repository.update_attributes(params[:repository])
+      @repository.projects.find_or_create_by_name("#{@repository.repository_name}-pull_requests")
+      project = @repository.projects.find_or_create_by_name(@repository.repository_name)
+      redirect_to project_url(project)
+    else
+      render template: 'repositories/new'
+    end
   end
 
   def projects
@@ -24,9 +27,12 @@ class RepositoriesController < ApplicationController
   end
 
   def update
-    repository = Repository.find(params[:id])
-    repository.update_attributes!(params[:repository])
-    redirect_to edit_repository_url(repository)
+    @repository = Repository.find(params[:id])
+    if @repository.update_attributes(params[:repository])
+      redirect_to edit_repository_url(@repository)
+    else
+      render template: 'repositories/edit'
+    end
   end
 
   def edit

@@ -115,6 +115,15 @@ describe Repository do
         end
       end
     end
+
+    context "without url" do
+      let(:repository) { Repository.new(url: '') }
+
+      it "gives validation error without blowing up" do
+        expect(repository).to_not be_valid
+        expect(repository).to have(1).errors_on (:url)
+      end
+    end
   end
 
   context "with stash repository" do

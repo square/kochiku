@@ -69,6 +69,7 @@ GEM
     daemon_controller (1.1.5)
     daemons (1.1.9)
     diff-lcs (1.2.4)
+    dynamic_form (1.1.4)
     erubis (2.7.0)
     eventmachine (1.0.3)
     execjs (1.4.0)
@@ -91,7 +92,7 @@ GEM
     httparty (0.11.0)
       multi_json (~> 1.0)
       multi_xml (>= 0.5.2)
-    i18n (0.6.4)
+    i18n (0.6.5)
     journey (1.0.4)
     jquery-rails (3.0.4)
       railties (>= 3.0, < 5.0)
@@ -103,10 +104,10 @@ GEM
       mime-types (~> 1.16)
       treetop (~> 1.4.8)
     method_source (0.8.2)
-    mime-types (1.23)
+    mime-types (1.25)
     mini_portile (0.5.1)
     mono_logger (1.1.0)
-    multi_json (1.7.8)
+    multi_json (1.8.0)
     multi_xml (0.5.5)
     mysql2 (0.3.13)
     net-scp (1.1.2)
@@ -218,7 +219,7 @@ GEM
       rack (>= 1.0.0)
     thor (0.18.1)
     tilt (1.4.1)
-    treetop (1.4.14)
+    treetop (1.4.15)
       polyglot
       polyglot (>= 0.3.1)
     tzinfo (0.3.37)
@@ -248,6 +249,7 @@ DEPENDENCIES
   colorize
   compass
   compass-rails
+  dynamic_form
   factory_girl_rails
   haml-rails
   httparty
@@ -259,7 +261,7 @@ DEPENDENCIES
   passenger (= 4.0.10)
   pry-rails
   quiet_assets
-  rails (= 3.2.14)
+  rails (~> 3.2.14)
   rails-erd
   resque
   resque-retry

@@ -90,6 +90,8 @@ class Repository < ActiveRecord::Base
   private
 
   def self.project_params(url)
+    return {} unless url.present?
+
     # TODO: Move these parsers to RemoteServer classes. Or at least be more lenient about
     # the format.
     parser = URL_PARSERS[url.slice(0,4)]
