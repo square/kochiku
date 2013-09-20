@@ -38,9 +38,10 @@ describe RepositoriesController do
 
       it "re-renders form with errors" do
         post :create, repository: params
-        response.should be_success
+        expect(response).to be_success
         expect(assigns[:repository].errors.full_messages.join(',')).
           to include("Url can't be blank")
+        expect(response).to render_template('new')
       end
     end
   end
@@ -77,6 +78,7 @@ describe RepositoriesController do
       it "re-renders the edit page" do
         put :update, id: repository.id, repository: params
         expect(response).to be_success
+        expect(response).to render_template('edit')
       end
     end
   end
