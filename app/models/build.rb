@@ -26,6 +26,9 @@ class Build < ActiveRecord::Base
     def failed_or_errored
       not_passed_and_last_attempt_in_state(:failed, :errored)
     end
+    def failed_errored_or_aborted
+      not_passed_and_last_attempt_in_state(:failed, :errored, :aborted)
+    end
     def errored
       not_passed_and_last_attempt_in_state(:errored)
     end

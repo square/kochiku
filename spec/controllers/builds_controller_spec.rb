@@ -312,7 +312,7 @@ RESPONSE
 
   describe "#rebuild_failed_parts" do
     let(:build) { FactoryGirl.create(:build) }
-    let(:parts) { (1..3).map { FactoryGirl.create(:build_part, :build_instance => build) } }
+    let(:parts) { (1..4).map { FactoryGirl.create(:build_part, :build_instance => build) } }
 
     subject { post :rebuild_failed_parts, :project_id => build.project.to_param, :id => build.id }
 
@@ -322,19 +322,21 @@ RESPONSE
         @attempt_2 = FactoryGirl.create(:build_attempt, :build_part => parts[1], :state => :failed)
         @attempt_3 = FactoryGirl.create(:build_attempt, :build_part => parts[1], :state => :errored)
         @attempt_4 = FactoryGirl.create(:build_attempt, :build_part => parts[2], :state => :passed)
+        @attempt_5 = FactoryGirl.create(:build_attempt, :build_part => parts[3], :state => :aborted)
       end
 
       it "rebuilds all failed attempts" do
-        build.build_parts.failed_or_errored.count.should == 2
+        build.build_parts.failed_errored_or_aborted.count.should == 3
         subject
         build.reload.build_parts.failed.count.should be_zero
-        build.build_attempts.count.should == 6
+        build.build_attempts.count.should == 5 + 3
       end
 
       it "only enqueues one build attempt for each failed build part" do
         subject
         parts[0].reload.build_attempts.count.should == 2
         parts[1].reload.build_attempts.count.should == 3
+        parts[3].reload.build_attempts.count.should == 2
 
         expect {
           # repost to test idempotency
