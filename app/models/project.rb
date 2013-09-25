@@ -8,9 +8,9 @@ class Project < ActiveRecord::Base
       build
     end
 
-    def find_existing_build_or_initialize(ref, options)
+    def find_existing_build_or_initialize(ref, initialization_values)
       existing_build = Build.joins(:project).where("projects.repository_id = ? AND builds.ref = ?", proxy_association.owner.repository_id, ref).readonly(false).first
-      existing_build || build(options.merge(:ref => ref))
+      existing_build || build(initialization_values.merge(:ref => ref))
     end
   end
   belongs_to :repository
