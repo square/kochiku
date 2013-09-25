@@ -119,6 +119,10 @@ class Build < ActiveRecord::Base
     FAILED_STATES.include?(state)
   end
 
+  def aborted?
+    state == :aborted
+  end
+
   def promotable?
     succeeded? && project.main?
   end

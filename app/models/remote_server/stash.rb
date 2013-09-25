@@ -69,7 +69,7 @@ module RemoteServer
     def stash_status_for(build)
       if build.succeeded?
         'SUCCESSFUL'
-      elsif build.failed?
+      elsif build.failed? || build.aborted?
         'FAILED'
       else
         'INPROGRESS'
