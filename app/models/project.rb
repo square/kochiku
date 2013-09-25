@@ -9,8 +9,7 @@ class Project < ActiveRecord::Base
     end
 
     def find_existing_build_or_initialize(ref, options)
-      # Always create another build for CI purposes - it would be nice to not do this but we need to link builds to achieve this.
-      existing_build = Build.first(:joins => :project, :conditions => ["projects.repository_id = ? AND builds.ref = ?", proxy_association.owner.repository_id, ref], :readonly => false)
+      existing_build = Build.joins(:project).where("projects.repository_id = ? AND builds.ref = ?", proxy_association.owner.repository_id, ref).readonly(false).first
       existing_build || build(options.merge(:ref => ref))
     end
   end
