@@ -38,8 +38,8 @@ class Project < ActiveRecord::Base
       if key = value.shift
         result[key] << value
       else # unfortunate, but flot dislikes missing data
-        result.keys.each do |key|
-          result[key] << value
+        result.keys.each do |k|
+          result[k] << value
         end
       end
     end

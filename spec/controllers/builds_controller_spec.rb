@@ -347,8 +347,8 @@ RESPONSE
 
     context "an successful prior build attempt should not be rebuilt" do
       it "does something" do
-        attempt_1 = FactoryGirl.create(:build_attempt, :build_part => parts[1], :state => :passed)
-        attempt_2 = FactoryGirl.create(:build_attempt, :build_part => parts[1], :state => :failed)
+        FactoryGirl.create(:build_attempt, :build_part => parts[1], :state => :passed) # attempt 1
+        FactoryGirl.create(:build_attempt, :build_part => parts[1], :state => :failed) # attempt 2
 
         expect { subject }.to_not change(BuildAttempt, :count)
       end
