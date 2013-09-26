@@ -42,7 +42,7 @@
   - if @build.is_running?
     %span.info
       = button_to "Abort Build", abort_project_build_path(@build.project, @build), :method => "put", :class => "abort-build"
-  - if @build.failed?
+  - if @build.failed? || @build.aborted?
     %span.info
       = button_to "Rebuild failed parts", rebuild_failed_parts_project_build_path(@project, @build), :method => :post, :form_class => "rebuild-parts"
 
