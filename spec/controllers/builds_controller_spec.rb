@@ -190,11 +190,12 @@ RESPONSE
         let(:project) { FactoryGirl.create(:project, :name => repo.repository_name, :repository => repo) }
 
         before do
-          GitRepo.stub(:sha_for_branch).and_return("deadbeef")
+          project.should be_main
         end
 
         it "creates the build for main project if no branch is given" do
-          project.should be_main
+          GitRepo.stub(:sha_for_branch).and_return("deadbeef")
+
           expect {
             post @action, {:project_id => project.to_param}
           }.to change { Build.count }.by(1)
@@ -202,6 +203,17 @@ RESPONSE
           build.project.should == project
           build.branch.should == "master"
           build.ref.should == "deadbeef"
+        end
+
+        it "does not create a new build if the latest commit already has a build" do
+          FactoryGirl.create(:build, :state => :errored, :project => project, :branch => "master", :ref => branch_head_sha)
+          GitRepo.stub(:sha_for_branch).and_return(branch_head_sha)
+
+          expect do
+            post @action, {:project_id => project.to_param}
+          end.to_not change { Build.count }
+          flash[:error].should be_nil
+          flash[:warn].should be_present
         end
       end
 
@@ -219,6 +231,7 @@ RESPONSE
             post @action, {:project_id => project.to_param, :build => {:branch => branch}}
           end.to_not change { Build.count }
           flash[:error].should be_nil
+          flash[:warn].should be_present
         end
       end
 

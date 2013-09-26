@@ -31,6 +31,9 @@
           - if flash[:error].present?
             .flash.error
               = flash[:error]
+          - if flash[:warn].present?
+            .flash.warn
+              = flash[:warn]
           - if flash[:message].present?
             .flash.message
               = flash[:message]
