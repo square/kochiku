@@ -190,11 +190,12 @@ RESPONSE
         let(:project) { FactoryGirl.create(:project, :name => repo.repository_name, :repository => repo) }
 
         before do
-          GitRepo.stub(:sha_for_branch).and_return("deadbeef")
+          project.should be_main
         end
 
         it "creates the build for main project if no branch is given" do
-          project.should be_main
+          GitRepo.stub(:sha_for_branch).and_return("deadbeef")
+
           expect {
             post @action, {:project_id => project.to_param}
           }.to change { Build.count }.by(1)
@@ -202,6 +203,17 @@ RESPONSE
           build.project.should == project
           build.branch.should == "master"
           build.ref.should == "deadbeef"
+        end
+
+        it "does not create a new build if the latest commit already has a build" do
+          FactoryGirl.create(:build, :state => :errored, :project => project, :branch => "master", :ref => branch_head_sha)
+          GitRepo.stub(:sha_for_branch).and_return(branch_head_sha)
+
+          expect do
+            post @action, {:project_id => project.to_param}
+          end.to_not change { Build.count }
+          flash[:error].should be_nil
+          flash[:warn].should be_present
         end
       end
 
@@ -219,6 +231,7 @@ RESPONSE
             post @action, {:project_id => project.to_param, :build => {:branch => branch}}
           end.to_not change { Build.count }
           flash[:error].should be_nil
+          flash[:warn].should be_present
         end
       end
 
@@ -312,7 +325,7 @@ RESPONSE
 
   describe "#rebuild_failed_parts" do
     let(:build) { FactoryGirl.create(:build) }
-    let(:parts) { (1..3).map { FactoryGirl.create(:build_part, :build_instance => build) } }
+    let(:parts) { (1..4).map { FactoryGirl.create(:build_part, :build_instance => build) } }
 
     subject { post :rebuild_failed_parts, :project_id => build.project.to_param, :id => build.id }
 
@@ -322,19 +335,21 @@ RESPONSE
         @attempt_2 = FactoryGirl.create(:build_attempt, :build_part => parts[1], :state => :failed)
         @attempt_3 = FactoryGirl.create(:build_attempt, :build_part => parts[1], :state => :errored)
         @attempt_4 = FactoryGirl.create(:build_attempt, :build_part => parts[2], :state => :passed)
+        @attempt_5 = FactoryGirl.create(:build_attempt, :build_part => parts[3], :state => :aborted)
       end
 
       it "rebuilds all failed attempts" do
-        build.build_parts.failed_or_errored.count.should == 2
+        build.build_parts.failed_errored_or_aborted.count.should == 3
         subject
         build.reload.build_parts.failed.count.should be_zero
-        build.build_attempts.count.should == 6
+        build.build_attempts.count.should == 5 + 3
       end
 
       it "only enqueues one build attempt for each failed build part" do
         subject
         parts[0].reload.build_attempts.count.should == 2
         parts[1].reload.build_attempts.count.should == 3
+        parts[3].reload.build_attempts.count.should == 2
 
         expect {
           # repost to test idempotency
@@ -345,8 +360,8 @@ RESPONSE
 
     context "an successful prior build attempt should not be rebuilt" do
       it "does something" do
-        attempt_1 = FactoryGirl.create(:build_attempt, :build_part => parts[1], :state => :passed)
-        attempt_2 = FactoryGirl.create(:build_attempt, :build_part => parts[1], :state => :failed)
+        FactoryGirl.create(:build_attempt, :build_part => parts[1], :state => :passed) # attempt 1
+        FactoryGirl.create(:build_attempt, :build_part => parts[1], :state => :failed) # attempt 2
 
         expect { subject }.to_not change(BuildAttempt, :count)
       end

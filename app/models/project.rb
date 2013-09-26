@@ -8,10 +8,9 @@ class Project < ActiveRecord::Base
       build
     end
 
-    def find_existing_build_or_initialize(ref, options)
-      # Always create another build for CI purposes - it would be nice to not do this but we need to link builds to achieve this.
-      existing_build = Build.first(:joins => :project, :conditions => ["projects.repository_id = ? AND builds.ref = ?", proxy_association.owner.repository_id, ref], :readonly => false)
-      existing_build || build(options.merge(:ref => ref))
+    def find_existing_build_or_initialize(ref, initialization_values)
+      existing_build = Build.joins(:project).where("projects.repository_id = ? AND builds.ref = ?", proxy_association.owner.repository_id, ref).readonly(false).first
+      existing_build || build(initialization_values.merge(:ref => ref))
     end
   end
   belongs_to :repository
@@ -39,8 +38,8 @@ class Project < ActiveRecord::Base
       if key = value.shift
         result[key] << value
       else # unfortunate, but flot dislikes missing data
-        result.keys.each do |key|
-          result[key] << value
+        result.keys.each do |k|
+          result[k] << value
         end
       end
     end

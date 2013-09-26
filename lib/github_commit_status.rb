@@ -10,7 +10,7 @@ class GithubCommitStatus
   def update_commit_status!
     if @build.succeeded?
       mark_as("success", "Build passed!")
-    elsif @build.failed?
+    elsif @build.failed? || @build.aborted?
       mark_as("failure", "Build failed")
     else
       mark_as("pending", "Build is running")

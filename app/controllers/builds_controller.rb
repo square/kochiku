@@ -30,7 +30,7 @@ class BuildsController < ApplicationController
 
   def rebuild_failed_parts
     @build = @project.builds.find(params[:id], :include => {:build_parts => :build_attempts})
-    @build.build_parts.failed_or_errored.each do |part|
+    @build.build_parts.failed_errored_or_aborted.each do |part|
       # There is an exceptional case in Kochiku where a build part's prior attempt may have
       # passed but the latest attempt failed. We do not want to rebuild those parts.
       part.rebuild! if part.unsuccessful?
@@ -40,7 +40,7 @@ class BuildsController < ApplicationController
     redirect_to [@project, @build]
   end
 
-  # Used to request a developer build through the Web UI
+  # Used to request a build through the Web UI
   def request_build
     build = nil
 
@@ -52,7 +52,7 @@ class BuildsController < ApplicationController
       else
         sha = GitRepo.sha_for_branch(@project.repository, params[:build][:branch])
         if sha.nil?
-          flash[:error] = "Error adding build! branch not found on remote server."
+          flash[:error] = "Error adding build! branch #{params[:build][:branch]} not found on remote server."
         else
           build = project_build(params[:build][:branch], sha)
         end
@@ -60,10 +60,22 @@ class BuildsController < ApplicationController
     end
 
     if build
-      if build.save
-        flash[:message] = "Build added!"
+      if build.new_record?
+        if build.save
+          flash[:message] = "Build added!"
+          redirect_to project_build_path(params[:project_id], build)
+          return
+        else
+          flash[:error] = "Error adding build! #{build.errors.full_messages.to_sentence}"
+        end
+      elsif @project.main?
+        # did not find a newer revision on the main branch
+        flash[:warn] = "Did not find a new commit on the master branch to build"
       else
-        flash[:error] = "Error adding build! #{build.errors.full_messages.to_sentence}"
+        # did not find a new unbuilt commit. redirect to most recent build
+        flash[:warn] = "#{build.ref[0...8]} is the most recent commit on #{params[:build][:branch]}"
+        redirect_to project_build_path(params[:project_id], build)
+        return
       end
     end
 
