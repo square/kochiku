@@ -1,9 +1,12 @@
 require 'job_base'
 
+# Keep this interface so we can easily enqueue new jobs.
+# The job is handled by kochiku-worker
 class BuildAttemptJob < JobBase
-  def initialize(build_attempt_id, build_kind, build_ref, test_files)
-    # Keep this interface so we can easily enqueue new jobs.
-    # The job is handled by kochiku-worker
+  class WrongBuildAttemptJobClassError < StandardError; end
+
+  def initialize(build_options)
+    raise WrongBuildAttemptJobClassError, "BuildAttemptJob was processed by the BuildAttemptJob shim in Kochiku instead of real class in Kochiku-worker."
   end
 
   def perform
