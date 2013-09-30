@@ -9,7 +9,7 @@ kochiku_notifications_email_address: 'joshughes@paypal.com'
 domain_name: 'paypal.com'
 
 # Set to true if Kochiku is served over https
-use_https: true
+use_https: false
 
 # Host name where Kochiku is serving web pages.
 kochiku_host: 'kochiku-server-41925.phx-os1.stratus.dev.ebay.com'
