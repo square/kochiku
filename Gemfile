@@ -48,6 +48,7 @@ group :development do
   gem 'quiet_assets'
   gem 'rvm-capistrano', require: false
   gem 'capistrano-unicorn', :require => false
+  gem "capistrano-resque", "~> 0.1.0"
   gem 'thin'
   gem 'rails-erd'
 end
