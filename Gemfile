@@ -27,6 +27,7 @@ gem 'pry-rails'
 
 gem 'colorize'
 gem 'execjs'
+gem "therubyracer", :require => 'v8'
 
 group :assets do
   gem 'compass-rails'
