@@ -27,7 +27,8 @@ gem 'pry-rails'
 
 gem 'colorize'
 gem 'execjs'
-gem "therubyracer", :require => 'v8'
+gem 'therubyracer', :require => 'v8'
+gem 'unicorn'
 
 group :assets do
   gem 'compass-rails'
@@ -46,6 +47,7 @@ group :development do
   gem 'capistrano', require: false
   gem 'quiet_assets'
   gem 'rvm-capistrano', require: false
+  gem 'capistrano-unicorn', :require => false
   gem 'thin'
   gem 'rails-erd'
 end
