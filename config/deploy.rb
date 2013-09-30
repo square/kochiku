@@ -23,10 +23,10 @@ before "deploy:finalize_update", "deploy:overwrite_database_yml"
 after "deploy:update_code",    "deploy:migrate"
 after "deploy:restart",        "deploy:cleanup"
 after 'deploy:restart',        'unicorn:restart' 
+after 'depliy:start',          'unicorn:start'
 
 namespace :deploy do
   task :start, :roles => :app do
-    unicorn.start
     run "touch #{current_release}/tmp/restart.txt"
   end
 
@@ -37,7 +37,6 @@ namespace :deploy do
   desc "Restart the web application server and all of the build workers"
   task :restart do
     restart_app
-    unicorn.restart
     restart_workers
   end
 
