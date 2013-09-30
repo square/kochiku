@@ -26,6 +26,7 @@ gem 'bullet'
 gem 'pry-rails'
 
 gem 'colorize'
+gem 'execjs'
 
 group :assets do
   gem 'compass-rails'

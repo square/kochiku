@@ -250,6 +250,7 @@ DEPENDENCIES
   compass
   compass-rails
   dynamic_form
+  execjs
   factory_girl_rails
   haml-rails
   httparty
