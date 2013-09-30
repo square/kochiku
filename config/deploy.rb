@@ -1,5 +1,6 @@
 require 'capistrano/version'
 require 'bundler/capistrano' # adds bundle:install step to deploy pipeline
+require 'capistrano-unicorn'
 
 default_run_options[:env] = {'PATH' => '/usr/local/bin:$PATH'}
 
