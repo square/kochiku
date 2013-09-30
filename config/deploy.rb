@@ -1,7 +1,7 @@
 require 'capistrano/version'
 require 'bundler/capistrano' # adds bundle:install step to deploy pipeline
 require 'capistrano-unicorn'
-require "capistrano-resque"
+
 
 default_run_options[:env] = {'PATH' => '/usr/local/bin:$PATH'}
 
@@ -19,10 +19,7 @@ set :use_sudo, false
 
 set :rails_env, "production"
 
-role :resque_worker, "kochiku"
-role :resque_scheduler, "kochiku"
 
-set :workers, { "*" => 2 }
 
 after "deploy:setup",          "kochiku:setup"
 after "deploy:create_symlink", "kochiku:symlinks"
@@ -30,9 +27,9 @@ before "deploy:finalize_update", "deploy:overwrite_database_yml"
 after "deploy:update_code",    "deploy:migrate"
 after "deploy:restart",        "deploy:cleanup"
 after 'deploy:restart',        'unicorn:restart' 
-after "deploy:restart",        "resque:restart"
+
 after 'depliy:start',          'unicorn:start'
-after "deploy:start",          "resque:start"
+
 
 namespace :deploy do
   task :start, :roles => :app do
