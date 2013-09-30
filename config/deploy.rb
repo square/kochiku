@@ -1,9 +1,10 @@
+require 'capistrano/version'
 require 'bundler/capistrano' # adds bundle:install step to deploy pipeline
 
 default_run_options[:env] = {'PATH' => '/usr/local/bin:$PATH'}
 
 set :application, "Kochiku"
-set :repository,  "https://github.com/square/kochiku.git"
+set :repository,  "https://github.com/where/kochiku.git"
 set :branch, "master"
 set :scm, :git
 set :scm_command, 'git'
