@@ -34,6 +34,7 @@ module Secrets
   end
 
   def laptop_path
+    raise "Trying to use dev secrets"
     Rails.root.join(*%w(config dev_secrets))
   end
 
