@@ -58,4 +58,14 @@ RESPONSE
       GitRepo.sha_for_branch(repository, branch).should == branch_head_sha
     end
   end
+
+  describe "#synchronize_with_remote" do
+    it "should throw an exception after the third fetch attempt" do
+      fetch_double = double('git fetch')
+      fetch_double.should_receive(:run).exactly(3).times.and_raise(Cocaine::ExitStatusError)
+      Cocaine::CommandLine.stub(:new).with('git fetch', anything) { fetch_double }
+      GitRepo.should_receive(:sleep).exactly(2).times
+      expect { GitRepo.send(:synchronize_with_remote, "master") }.to raise_error(Cocaine::ExitStatusError)
+    end
+  end
 end

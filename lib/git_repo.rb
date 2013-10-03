@@ -90,12 +90,15 @@ class GitRepo
       # Undo this for now, partition does not seem as stable with this enabled.
       #Cocaine::CommandLine.new("git fetch", "--quiet --prune --no-tags #{name} #{refspec}").run
       Cocaine::CommandLine.new("git fetch", "--quiet --prune --no-tags #{name}").run
-    rescue Cocaine::ExitStatusError
+    rescue Cocaine::ExitStatusError => e
       # likely caused by another 'git fetch' that is currently in progress. Wait a few seconds and try again
       tries = (tries || 0) + 1
-      if tries < 2
-        sleep 15
+      if tries < 3
+        Rails.logger.warn(e)
+        sleep(15 * tries)
         retry
+      else
+        raise e
       end
     end
   end
