@@ -194,6 +194,14 @@ describe PullRequestsController do
             response.should be_success
           }.to_not change(Build, :count)
         end
+
+        it "it should not error if the repository url in the request is not found" do
+          expect {
+            post :build, 'payload' => pull_request_payload(
+                "repository" => { "ssh_url" => "git@none.git" })
+            response.should be_success
+          }.to_not change(Build, :count)
+        end
       end
     end
   end
