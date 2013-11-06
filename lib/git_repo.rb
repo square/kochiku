@@ -20,14 +20,28 @@ class GitRepo
           run! "git checkout --quiet #{sha}"
 
           run! "git submodule --quiet init"
-          # redirect the submodules to the cached_repo
-          submodules = `git config --get-regexp "^submodule\\..*\\.url$"`
-          submodules.each_line do |config_line|
-            submodule_path = config_line.match(/submodule\.(.*?)\.url/)[1]
-            `git config --replace-all submodule.#{submodule_path}.url "#{cached_repo_path}/#{submodule_path}"`
-          end
 
-          run! "git submodule --quiet update"
+          submodules = `git config --get-regexp "^submodule\\..*\\.url$"`
+
+          unless submodules.empty?
+            cached_submodules = nil
+            inside_repo(repository, sync: false) do
+              cached_submodules = `git config --get-regexp "^submodule\\..*\\.url$"`
+            end
+
+            # Redirect the submodules to the cached_repo
+            # If the submodule was added after the initial clone of the cache
+            # repo then it will not be present in the cached_repo and we fall
+            # back to cloning it for each build.
+            submodules.each_line do |config_line|
+              if cached_submodules.include?(config_line)
+                submodule_path = config_line.match(/submodule\.(.*?)\.url/)[1]
+                `git config --replace-all submodule.#{submodule_path}.url "#{cached_repo_path}/#{submodule_path}"`
+              end
+            end
+
+            run! "git submodule --quiet update"
+          end
 
           yield dir
         end
@@ -38,7 +52,7 @@ class GitRepo
       repo.remote_server.sha_for_branch(branch)
     end
 
-    def inside_repo(repository)
+    def inside_repo(repository, sync: true)
       cached_repo_path = File.join(WORKING_DIR, repository.repo_cache_name)
 
       if !File.directory?(cached_repo_path)
@@ -46,7 +60,7 @@ class GitRepo
       end
 
       Dir.chdir(cached_repo_path) do
-        synchronize_with_remote('origin')
+        synchronize_with_remote('origin') if sync
 
         yield
       end
