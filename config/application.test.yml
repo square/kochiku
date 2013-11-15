@@ -1,0 +1,39 @@
+# Email address to use in the 'from' field for emails sent by Kochiku.
+sender_email_address: 'kochiku@example.com'
+
+# Email address where kochiku should send problems with the build system (for example, errors),
+# as distinct from failures in a particular test (which go to the people who committed code).
+kochiku_notifications_email_address: 'kochiku-notifications@example.com'
+
+# Domain name to use in constructing generic addresses. For example noreply@example.com in git commits.
+domain_name: 'example.com'
+
+# Set to true if Kochiku is served over https
+use_https: false
+
+# Host name where Kochiku is serving web pages.
+kochiku_host: 'kochiku.example.com'
+
+# If you commit with hitch/git-pair, etc, set this in order to send email to each person in the pair.
+# For example, github+joe+bob@example.com will turn into emails to joe@example.com and bob@example.com
+# if git_pair_email_prefix is set to 'github'.
+git_pair_email_prefix: 'github'
+
+# Mail server which will accept mail on port 25 (standard SMTP port). If you need to use another port,
+# or other settings, you currently need to edit the kochiku source (config.action_mailer settings in
+# config/environments/production.rb).
+smtp_server: 'localhost'
+
+# List your git servers (at least for now, they need to be either github, github enterprise, or
+# Atlassian Stash for things like constructing URLs to pages on those servers. Would be nice to
+# just turn off the fancy features for a vanilla git server instead, but that isn't yet possible).
+# possible values for type are: github or stash
+git_servers:
+  github.com:
+    type: github
+  git.example.com:
+    type: github
+  git.squareup.com:
+    type: github
+  stash.example.com:
+    type: stash

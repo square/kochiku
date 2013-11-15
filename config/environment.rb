@@ -4,7 +4,11 @@ require File.expand_path('../application', __FILE__)
 # Load application settings for Kochiku
 require File.expand_path('../../lib/settings_accessor', __FILE__)
 
-CONF_FILE = File.expand_path('../application.yml', __FILE__)
+CONF_FILE = if Rails.env.test?
+  File.expand_path('../application.test.yml', __FILE__)
+else
+  File.expand_path('../application.yml', __FILE__)
+end
 
 if !File.exist?(CONF_FILE)
   raise "#{CONF_FILE} is required to start Kochiku"

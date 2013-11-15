@@ -4,6 +4,8 @@ describe PullRequestsController do
   before do
     settings = SettingsAccessor.new(<<-YAML)
     git_servers:
+      github.com:
+        type: github
       git.example.com:
         type: github
     YAML

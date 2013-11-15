@@ -47,13 +47,13 @@ describe BuildPart do
   end
 
   describe "#job_args" do
-    let(:repository) { FactoryGirl.create(:repository, :url => "git@git.example.com:org/test-repo.git") }
+    let(:repository) { FactoryGirl.create(:repository, :url => "git@github.com:org/test-repo.git") }
 
     context "with a git mirror specified" do
       before do
         settings = SettingsAccessor.new(<<-YAML)
         git_servers:
-          git.example.com:
+          github.com:
             type: github
             mirror: "git://git-mirror.example.com/"
         YAML
@@ -71,7 +71,7 @@ describe BuildPart do
       before do
         settings = SettingsAccessor.new(<<-YAML)
         git_servers:
-          git.example.com:
+          github.com:
             type: github
         YAML
         stub_const "Settings", settings

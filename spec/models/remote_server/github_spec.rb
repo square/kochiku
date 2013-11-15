@@ -48,4 +48,12 @@ describe RemoteServer::Github do
       end
     end
   end
+
+  describe '.project_params' do
+    it 'raises UnknownUrl for invalid urls' do
+      expect { described_class.project_params \
+        "https://github.com/blah"
+      }.to raise_error(UnknownUrl)
+    end
+  end
 end
