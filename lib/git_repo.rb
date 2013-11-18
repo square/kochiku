@@ -92,16 +92,16 @@ class GitRepo
     end
 
     def clone_repo(repo, cached_repo_path)
-      # Note: the -c option is not available on git 1.7.x
+      # Note: the --config option was added in git 1.7.7
       Cocaine::CommandLine.new(
           "git clone",
-          "--recursive -c remote.origin.pushurl=#{repo.url} #{repo.url_for_fetching} #{cached_repo_path}").
+          "--recursive --config remote.origin.pushurl=#{repo.url} #{repo.url_for_fetching} #{cached_repo_path}").
           run
     end
 
     def synchronize_with_remote(name, branch = nil)
-      refspec = branch.to_s.empty? ? "" : "+#{branch}"
       # Undo this for now, partition does not seem as stable with this enabled.
+      #refspec = branch.to_s.empty? ? "" : "+#{branch}"
       #Cocaine::CommandLine.new("git fetch", "--quiet --prune --no-tags #{name} #{refspec}").run
       Cocaine::CommandLine.new("git fetch", "--quiet --prune --no-tags #{name}").run
     rescue Cocaine::ExitStatusError => e
