@@ -68,4 +68,50 @@ RESPONSE
       expect { GitRepo.send(:synchronize_with_remote, "master") }.to raise_error(Cocaine::ExitStatusError)
     end
   end
+
+  describe '#inside_repo' do
+    before do
+      FileUtils.rm_rf GitRepo::WORKING_DIR
+      FileUtils.mkdir GitRepo::WORKING_DIR
+    end
+
+    it 'does not use a cached copy if remote URL has changed' do
+      Dir.mktmpdir do |old_remote|
+        Dir.mktmpdir do |new_remote|
+
+          Dir.chdir(old_remote) do
+            `git init`
+            FileUtils.touch("TESTFILE")
+            `git add -A`
+            `git commit -m "Initial commit"`
+          end
+
+          repository = double('Repository',
+            repo_cache_name:  'test-repo',
+            url:              old_remote,
+            url_for_fetching: old_remote
+          )
+          # Clone the repo first time, prime the cache.
+          GitRepo.inside_repo(repository) {}
+
+          `git clone #{old_remote} #{new_remote}`
+
+          repository = double('Repository',
+            repo_cache_name:  'test-repo',
+            url:              new_remote,
+            url_for_fetching: new_remote
+          )
+
+          actual_remote = nil
+
+          # Same repository, different URL.
+          GitRepo.inside_repo(repository) do
+            actual_remote = `git config --get remote.origin.url`.chomp
+          end
+
+          actual_remote.should eq(new_remote)
+        end
+      end
+    end
+  end
 end
