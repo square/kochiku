@@ -13,6 +13,7 @@ class GitBlame
 
     def changes_since_last_green(build)
       output = GitRepo.inside_repo(build.repository) do
+        # TODO: Push this down into GitRepo and integration test it.
         Cocaine::CommandLine.new("git log --no-merges --format='::!::%H|%an <%ae>|%ad|%B::!::' '#{build.previous_successful_build.try(:ref)}...#{build.ref}'").run
       end
       parse_git_changes(output)
@@ -20,6 +21,7 @@ class GitBlame
 
     def changes_in_branch(build)
       output = GitRepo.inside_repo(build.repository) do
+        # TODO: Push this down into GitRepo and integration test it.
         Cocaine::CommandLine.new("git log --no-merges --format='::!::%H|%an <%ae>|%ad|%B::!::' 'origin/master..origin/#{build.branch}'").run
       end
       parse_git_changes(output)
@@ -27,6 +29,7 @@ class GitBlame
 
     def files_changed_since_last_green(build, options = {})
       output = GitRepo.inside_repo(build.repository) do
+        # TODO: Push this down into GitRepo and integration test it.
         Cocaine::CommandLine.new("git log --no-merges --format='::!::%an:%ae::!::' --name-only '#{build.previous_successful_build.try(:ref)}...#{build.ref}'").run
       end
       parse_git_files_changes(output, options)
@@ -34,6 +37,7 @@ class GitBlame
 
     def files_changed_in_branch(build, options = {})
       output = GitRepo.inside_repo(build.repository) do
+        # TODO: Push this down into GitRepo and integration test it.
         Cocaine::CommandLine.new("git log --no-merges --format='::!::%an:%ae::!::' --name-only 'origin/master..origin/#{build.branch}'").run
       end
       parse_git_files_changes(output, options)

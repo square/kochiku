@@ -79,17 +79,21 @@ class GitRepo
       end
 
       Dir.chdir(cached_repo_path) do
-        remote_url = Cocaine::CommandLine.new("git config --get remote.origin.url").run.chomp
-        if remote_url != repository.url
-          Rails.logger.info "#{remote_url.inspect} does not match #{repository.url.inspect}."
-          raise RemoteDoesNotMatch
-        end
+        verify_remote_url! repository
       end
 
       cached_repo_path
     rescue RemoteDoesNotMatch
       FileUtils.rm_rf(cached_repo_path)
       retry
+    end
+
+    def verify_remote_url!(repository)
+      remote_url = Cocaine::CommandLine.new("git config --get remote.origin.url").run.chomp
+      if remote_url != repository.url
+        Rails.logger.info "#{remote_url.inspect} does not match #{repository.url.inspect}."
+        raise RemoteDoesNotMatch
+      end
     end
 
     def synchronize_cache_repo(cached_repo_path, branch)
