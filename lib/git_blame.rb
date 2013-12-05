@@ -17,8 +17,10 @@ class GitBlame
         current_ref = build.ref
         walker = Rugged::Walker.new(repo)
         walker.sorting(Rugged::SORT_REVERSE)
-        walker.push(last_green_ref)
-        walker.hide(last_green_ref)
+        if last_green_ref
+          walker.push(last_green_ref)
+          walker.hide(last_green_ref)
+        end
         walker.push(current_ref)
         walker.map do |commit|
           author = commit.author

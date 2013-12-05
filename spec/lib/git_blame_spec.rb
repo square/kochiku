@@ -88,7 +88,15 @@ describe GitBlame do
       GitRepo.stub(:inside_repo).and_yield(repo)
     end
 
-    it "should parse the git log message and return a hash of information" do
+    context "with no prior green build" do
+      let!(:last_successful_build) { nil }
+      it "returns all the commits" do
+        git_changes = subject
+        git_changes.size.should == 3
+      end
+    end
+
+    it "parses the git log message and return a hash of information" do
       git_changes = subject
       git_changes.size.should == 2
       git_changes.first[:hash].should_not == head
