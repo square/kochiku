@@ -88,7 +88,7 @@ RESPONSE
 
           repository = double('Repository',
             repo_cache_name:  'test-repo',
-            url:              old_remote,
+            url:              'push-url',
             url_for_fetching: old_remote
           )
           # Clone the repo first time, prime the cache.
@@ -98,7 +98,7 @@ RESPONSE
 
           repository = double('Repository',
             repo_cache_name:  'test-repo',
-            url:              new_remote,
+            url:              'push-url',
             url_for_fetching: new_remote
           )
 

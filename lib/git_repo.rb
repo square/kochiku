@@ -84,10 +84,12 @@ class GitRepo
     end
 
     def valid_remote_url?(repository, cached_repo_path)
+      expected_url = repository.url_for_fetching
+
       Dir.chdir(cached_repo_path) do
         remote_url = Cocaine::CommandLine.new("git config --get remote.origin.url").run.chomp
-        if remote_url != repository.url
-          Rails.logger.info "#{remote_url.inspect} does not match #{repository.url.inspect}."
+        if remote_url != expected_url
+          Rails.logger.info "#{remote_url.inspect} does not match #{expected_url.inspect}."
           return false
         end
       end
