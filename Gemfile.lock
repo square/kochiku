@@ -1,3 +1,11 @@
+GIT
+  remote: git://github.com/libgit2/rugged.git
+  revision: 5f0f3fad0e8af98a10812673e8316b78e5075437
+  branch: development
+  submodules: true
+  specs:
+    rugged (0.19.0)
+
 GEM
   remote: https://rubygems.org/
   specs:
@@ -268,6 +276,7 @@ DEPENDENCIES
   resque
   resque-retry
   rspec-rails
+  rugged!
   rvm-capistrano
   sass
   sass-rails

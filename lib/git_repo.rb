@@ -61,7 +61,7 @@ class GitRepo
       Dir.chdir(cached_repo_path) do
         synchronize_with_remote('origin') if sync
 
-        yield
+        yield Rugged::Repository.new(cached_repo_path)
       end
     end
 

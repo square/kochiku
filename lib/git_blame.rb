@@ -12,11 +12,19 @@ class GitBlame
     end
 
     def changes_since_last_green(build)
-      output = GitRepo.inside_repo(build.repository) do
-        # TODO: Push this down into GitRepo and integration test it.
-        Cocaine::CommandLine.new("git log --no-merges --format='::!::%H|%an <%ae>|%ad|%B::!::' '#{build.previous_successful_build.try(:ref)}...#{build.ref}'").run
+      GitRepo.inside_repo(build.repository) do |repo|
+        last_green_ref = build.previous_successful_build.try(:ref)
+        current_ref = build.ref
+        walker = Rugged::Walker.new(repo)
+        walker.sorting(Rugged::SORT_REVERSE)
+        walker.push(last_green_ref)
+        walker.hide(last_green_ref)
+        walker.push(current_ref)
+        walker.map do |commit|
+          author = commit.author
+          {hash: commit.oid, author: "#{author[:name]} <#{author[:email]}>", date: commit.time, message: commit.message.gsub("\n", " ")}
+        end
       end
-      parse_git_changes(output)
     end
 
     def changes_in_branch(build)
