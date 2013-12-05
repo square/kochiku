@@ -3,7 +3,6 @@ require 'fileutils'
 
 class GitRepo
   class RefNotFoundError < StandardError; end
-  class RemoteDoesNotMatch < StandardError; end
 
   WORKING_DIR = Rails.root.join('tmp', 'build-partition')
 
@@ -76,24 +75,23 @@ class GitRepo
 
       if !File.directory?(cached_repo_path)
         clone_repo(repository, cached_repo_path)
-      end
-
-      Dir.chdir(cached_repo_path) do
-        verify_remote_url! repository
+      elsif !valid_remote_url?(repository, cached_repo_path)
+        FileUtils.rm_rf(cached_repo_path)
+        clone_repo(repository, cached_repo_path)
       end
 
       cached_repo_path
-    rescue RemoteDoesNotMatch
-      FileUtils.rm_rf(cached_repo_path)
-      retry
     end
 
-    def verify_remote_url!(repository)
-      remote_url = Cocaine::CommandLine.new("git config --get remote.origin.url").run.chomp
-      if remote_url != repository.url
-        Rails.logger.info "#{remote_url.inspect} does not match #{repository.url.inspect}."
-        raise RemoteDoesNotMatch
+    def valid_remote_url?(repository, cached_repo_path)
+      Dir.chdir(cached_repo_path) do
+        remote_url = Cocaine::CommandLine.new("git config --get remote.origin.url").run.chomp
+        if remote_url != repository.url
+          Rails.logger.info "#{remote_url.inspect} does not match #{repository.url.inspect}."
+          return false
+        end
       end
+      true
     end
 
     def synchronize_cache_repo(cached_repo_path, branch)
