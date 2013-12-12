@@ -34,5 +34,13 @@ Kochiku::Application.routes.draw do
   match '/build_attempts/:id/start' => "build_attempts#start", :via => :post
   match '/build_attempts/:id/finish' => "build_attempts#finish", :via => :post, :as => :finish_build_attempt
   match '/pull-request-builder' => "pull_requests#build", :via => :post, :as => :pull_request_build
+
+  scope 'api/v:api_version', :format => 'json' do
+    resources :projects, :only => [:index, :new, :show] do
+      resources :builds, :only => [:create, :show] do
+        resources :build_parts, :as => 'parts', :path => 'parts', :only => [:show]
+      end
+    end
+  end
 end
 # TODO routing specs
