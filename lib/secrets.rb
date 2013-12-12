@@ -17,7 +17,7 @@ module Secrets
       if hash.is_a?(Hash) && hash.has_key?(key)
         hash.fetch(key)
       else
-        raise "Path does not exist: #{path} #{file.inspect}"
+        raise "Path does not exist: #{path}"
       end
     end
   end
