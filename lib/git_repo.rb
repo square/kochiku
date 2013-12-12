@@ -3,12 +3,14 @@ require 'fileutils'
 
 class GitRepo
   class RefNotFoundError < StandardError; end
+
   WORKING_DIR = Rails.root.join('tmp', 'build-partition')
 
   class << self
     def inside_copy(repository, sha, branch = "master")
-      cached_repo_path = File.join(WORKING_DIR, repository.repo_cache_name)
-      synchronize_cache_repo(repository, branch)
+      cached_repo_path = cached_repo_for(repository)
+
+      synchronize_cache_repo(cached_repo_path, branch)
 
       Dir.mktmpdir(nil, WORKING_DIR) do |dir|
         # clone local repo (fast!)
@@ -20,14 +22,28 @@ class GitRepo
           run! "git checkout --quiet #{sha}"
 
           run! "git submodule --quiet init"
-          # redirect the submodules to the cached_repo
-          submodules = `git config --get-regexp "^submodule\\..*\\.url$"`
-          submodules.each_line do |config_line|
-            submodule_path = config_line.match(/submodule\.(.*?)\.url/)[1]
-            `git config --replace-all submodule.#{submodule_path}.url "#{cached_repo_path}/#{submodule_path}"`
-          end
 
-          run! "git submodule --quiet update"
+          submodules = `git config --get-regexp "^submodule\\..*\\.url$"`
+
+          unless submodules.empty?
+            cached_submodules = nil
+            inside_repo(repository, sync: false) do
+              cached_submodules = `git config --get-regexp "^submodule\\..*\\.url$"`
+            end
+
+            # Redirect the submodules to the cached_repo
+            # If the submodule was added after the initial clone of the cache
+            # repo then it will not be present in the cached_repo and we fall
+            # back to cloning it for each build.
+            submodules.each_line do |config_line|
+              if cached_submodules.include?(config_line)
+                submodule_path = config_line.match(/submodule\.(.*?)\.url/)[1]
+                `git config --replace-all submodule.#{submodule_path}.url "#{cached_repo_path}/#{submodule_path}"`
+              end
+            end
+
+            run! "git submodule --quiet update"
+          end
 
           yield dir
         end
@@ -38,15 +54,11 @@ class GitRepo
       repo.remote_server.sha_for_branch(branch)
     end
 
-    def inside_repo(repository)
-      cached_repo_path = File.join(WORKING_DIR, repository.repo_cache_name)
-
-      if !File.directory?(cached_repo_path)
-        clone_repo(repository, cached_repo_path)
-      end
+    def inside_repo(repository, sync: true)
+      cached_repo_path = cached_repo_for(repository)
 
       Dir.chdir(cached_repo_path) do
-        synchronize_with_remote('origin')
+        synchronize_with_remote('origin') if sync
 
         yield
       end
@@ -58,12 +70,33 @@ class GitRepo
 
     private
 
-    def synchronize_cache_repo(repository, branch)
+    def cached_repo_for(repository)
       cached_repo_path = File.join(WORKING_DIR, repository.repo_cache_name)
 
       if !File.directory?(cached_repo_path)
         clone_repo(repository, cached_repo_path)
+      elsif !valid_remote_url?(repository, cached_repo_path)
+        FileUtils.rm_rf(cached_repo_path)
+        clone_repo(repository, cached_repo_path)
       end
+
+      cached_repo_path
+    end
+
+    def valid_remote_url?(repository, cached_repo_path)
+      expected_url = repository.url_for_fetching
+
+      Dir.chdir(cached_repo_path) do
+        remote_url = Cocaine::CommandLine.new("git config --get remote.origin.url").run.chomp
+        if remote_url != expected_url
+          Rails.logger.info "#{remote_url.inspect} does not match #{expected_url.inspect}."
+          return false
+        end
+      end
+      true
+    end
+
+    def synchronize_cache_repo(cached_repo_path, branch)
       Dir.chdir(cached_repo_path) do
         # update the cached repo
         synchronize_with_remote('origin', branch)
@@ -78,24 +111,27 @@ class GitRepo
     end
 
     def clone_repo(repo, cached_repo_path)
-      # Note: the -c option is not available on git 1.7.x
+      # Note: the --config option was added in git 1.7.7
       Cocaine::CommandLine.new(
           "git clone",
-          "--recursive -c remote.origin.pushurl=#{repo.url} #{repo.url_for_fetching} #{cached_repo_path}").
+          "--recursive --config remote.origin.pushurl=#{repo.url} #{repo.url_for_fetching} #{cached_repo_path}").
           run
     end
 
     def synchronize_with_remote(name, branch = nil)
-      refspec = branch.to_s.empty? ? "" : "+#{branch}"
       # Undo this for now, partition does not seem as stable with this enabled.
+      #refspec = branch.to_s.empty? ? "" : "+#{branch}"
       #Cocaine::CommandLine.new("git fetch", "--quiet --prune --no-tags #{name} #{refspec}").run
       Cocaine::CommandLine.new("git fetch", "--quiet --prune --no-tags #{name}").run
-    rescue Cocaine::ExitStatusError
+    rescue Cocaine::ExitStatusError => e
       # likely caused by another 'git fetch' that is currently in progress. Wait a few seconds and try again
       tries = (tries || 0) + 1
-      if tries < 2
-        sleep 15
+      if tries < 3
+        Rails.logger.warn(e)
+        sleep(15 * tries)
         retry
+      else
+        raise e
       end
     end
   end

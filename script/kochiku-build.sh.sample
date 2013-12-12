@@ -27,11 +27,12 @@ if project_index = ARGV.index("--project")
   ARGV.slice!(project_index, 2)
 end
 # If a ref is given as an argument, use that. Otherwise use the current commit
-commit_ish = "HEAD"
-branch = `git status -sb`.split("\n").first.gsub("## ", "")
 if ARGV[0]
   commit_ish = Shellwords.escape(ARGV[0])
   branch = ""
+else
+  commit_ish = "HEAD"
+  branch = `git rev-parse --abbrev-ref HEAD`.strip
 end
 
 ref = `git rev-parse #{commit_ish}`.strip
@@ -46,7 +47,7 @@ if ($? == 0 && git_branch_contains.empty?) || $? != 0
   exit(1)
 end
 
-repo_url = `git remote -v`.split("\n").map {|r| r.split(/\s/) }.detect {|r| r.first.downcase == "origin" && r.last.include?("fetch") }[1]
+repo_url = `git config --get remote.origin.url`.strip
 
 project = repo_url.split("/").last.split(".").first
 uri = URI.parse("#{KOCHIKU_HOST}/projects/#{hostname}-#{project}/builds")

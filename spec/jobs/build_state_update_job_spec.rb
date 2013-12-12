@@ -10,7 +10,10 @@ describe BuildStateUpdateJob do
   before do
     build.build_parts.create!(:kind => :spec, :paths => ["foo", "bar"], :queue => :ci)
     build.build_parts.create!(:kind => :cucumber, :paths => ["baz"], :queue => :ci)
+    # TODO: This is terrible, need to fold this feedback back into the design.
+    # We are stubbing methods that are not called from the class under test.
     GitRepo.stub(:run!)
+    GitRepo.stub(:valid_remote_url?).and_return(true)
     GitRepo.stub(:synchronize_with_remote).and_return(true)
     GitRepo.stub(:sha_for_branch).and_return(current_repo_master)
     BuildStrategy.stub(:promote_build)

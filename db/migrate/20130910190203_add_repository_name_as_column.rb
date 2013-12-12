@@ -8,6 +8,9 @@ class AddRepositoryNameAsColumn < ActiveRecord::Migration
       'ssh:' => %r{ssh://git@(.*):(\d+)/(.*)/([^.]+)\.git}
   }
 
+  class Repository < ActiveRecord::Base
+  end
+
   def project_params(url)
     # TODO: Move these parsers to RemoteServer classes.
     parser = URL_PARSERS[url.slice(0,4)]
