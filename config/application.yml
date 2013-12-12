@@ -29,8 +29,8 @@ smtp_server: 'localhost'
 # just turn off the fancy features for a vanilla git server instead, but that isn't yet possible).
 # possible values for type are: github or stash
 git_servers:
-  github.com:
-    type: github
+  github.paypal.com:
+    type: github enterprise
 
 # If you would like Kochiku to clone and fetch repositories from a git mirror
 # define the repository and fill in the url to your mirror.
