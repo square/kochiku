@@ -1,9 +1,12 @@
+require 'capistrano/version'
 require 'bundler/capistrano' # adds bundle:install step to deploy pipeline
+require 'capistrano-unicorn'
+
 
 default_run_options[:env] = {'PATH' => '/usr/local/bin:$PATH'}
 
 set :application, "Kochiku"
-set :repository,  "https://github.com/square/kochiku.git"
+set :repository,  "https://github.com/where/kochiku.git"
 set :branch, "master"
 set :scm, :git
 set :scm_command, 'git'
@@ -16,11 +19,17 @@ set :use_sudo, false
 
 set :rails_env, "production"
 
+
+
 after "deploy:setup",          "kochiku:setup"
 after "deploy:create_symlink", "kochiku:symlinks"
 before "deploy:finalize_update", "deploy:overwrite_database_yml"
 after "deploy:update_code",    "deploy:migrate"
 after "deploy:restart",        "deploy:cleanup"
+after 'deploy:restart',        'unicorn:restart' 
+
+after 'depliy:start',          'unicorn:start'
+
 
 namespace :deploy do
   task :start, :roles => :app do
