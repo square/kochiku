@@ -41,8 +41,6 @@ GEM
       net-sftp (>= 2.0.0)
       net-ssh (>= 2.0.14)
       net-ssh-gateway (>= 1.1.0)
-    capistrano-unicorn (0.1.10)
-      capistrano
     capybara (2.1.0)
       mime-types (>= 1.16)
       nokogiri (>= 1.3.3)
@@ -99,15 +97,9 @@ GEM
     jquery-rails (3.0.4)
       railties (>= 3.0, < 5.0)
       thor (>= 0.14, < 2.0)
-<<<<<<< HEAD
-    json (1.8.0)
-    kgio (2.7.4)
-=======
     json (1.8.1)
->>>>>>> 69b639cfc12786f525763405de4b652f805101cf
     launchy (2.3.0)
       addressable (~> 2.3)
-    libv8 (3.11.8.13)
     mail (2.5.4)
       mime-types (~> 1.16)
       treetop (~> 1.4.8)
@@ -169,22 +161,13 @@ GEM
       rake (>= 0.8.7)
       rdoc (~> 3.4)
       thor (>= 0.14.6, < 2.0)
-    raindrops (0.8.0)
     rake (10.1.0)
     rdoc (3.12.2)
       json (~> 1.4)
-<<<<<<< HEAD
-    redis (3.0.4)
-    redis-namespace (1.3.1)
-      redis (~> 3.0.0)
-    ref (1.0.2)
-    resque (1.24.1)
-=======
     redis (3.0.6)
     redis-namespace (1.3.2)
       redis (~> 3.0.4)
     resque (1.25.1)
->>>>>>> 69b639cfc12786f525763405de4b652f805101cf
       mono_logger (~> 1.0)
       multi_json (~> 1.0)
       redis-namespace (~> 1.2)
@@ -209,21 +192,12 @@ GEM
       rspec-expectations (~> 2.14.0)
       rspec-mocks (~> 2.14.0)
     ruby-graphviz (1.0.9)
-<<<<<<< HEAD
-    rufus-scheduler (2.0.23)
-      tzinfo (>= 0.3.23)
-    rvm-capistrano (1.5.0)
-      capistrano (>= 2.15.4)
-    safe_yaml (0.9.4)
-    sass (3.2.10)
-=======
     rufus-scheduler (2.0.24)
       tzinfo (>= 0.3.22)
     rvm-capistrano (1.5.1)
       capistrano (~> 2.15.4)
     safe_yaml (0.9.7)
     sass (3.2.12)
->>>>>>> 69b639cfc12786f525763405de4b652f805101cf
     sass-rails (3.2.6)
       railties (~> 3.2.0)
       sass (>= 3.1.10)
@@ -238,18 +212,10 @@ GEM
       multi_json (~> 1.0)
       rack (~> 1.0)
       tilt (~> 1.1, != 1.3.0)
-<<<<<<< HEAD
-    symbolize (4.3.4)
-    therubyracer (0.11.4)
-      libv8 (~> 3.11.8.12)
-      ref
-    thin (1.5.1)
-=======
     symbolize (4.4.1)
       activemodel (>= 3.2, < 5)
       activesupport (>= 3.2, < 5)
     thin (1.6.1)
->>>>>>> 69b639cfc12786f525763405de4b652f805101cf
       daemons (>= 1.0.9)
       eventmachine (>= 1.0.0)
       rack (>= 1.0.0)
@@ -261,17 +227,8 @@ GEM
     tzinfo (0.3.38)
     uglifier (2.3.1)
       execjs (>= 0.3.0)
-<<<<<<< HEAD
-      multi_json (~> 1.0, >= 1.0.2)
-    unicorn (4.6.2)
-      kgio (~> 2.6)
-      rack
-      raindrops (~> 0.7)
-    uniform_notifier (1.2.0)
-=======
       json (>= 1.8.0)
     uniform_notifier (1.4.0)
->>>>>>> 69b639cfc12786f525763405de4b652f805101cf
     vegas (0.1.11)
       rack (>= 1.0.0)
     webmock (1.15.2)
@@ -287,7 +244,6 @@ DEPENDENCIES
   awesome_print
   bullet
   capistrano
-  capistrano-unicorn
   capybara
   carrierwave
   chunky_png
@@ -296,7 +252,6 @@ DEPENDENCIES
   compass
   compass-rails
   dynamic_form
-  execjs
   factory_girl_rails
   haml-rails
   httparty
@@ -317,8 +272,6 @@ DEPENDENCIES
   sass
   sass-rails
   symbolize
-  therubyracer
   thin
   uglifier
-  unicorn
   webmock
