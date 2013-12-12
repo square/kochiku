@@ -23,6 +23,8 @@ module Secrets
   end
 
   def file_hash(file)
+    puts "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
+    puts file.inspect
     path = [server_path, laptop_path].map do |p|
       File.join(p, file)
     end.detect { |f| File.exists?(f) }
@@ -34,11 +36,12 @@ module Secrets
   end
 
   def laptop_path
-    raise "Trying to use dev secrets"
     Rails.root.join(*%w(config dev_secrets))
   end
 
   def server_path
+    puts "Hello World"
+    puts File.join("/app/kochiku/secrets")
     File.join("/app/kochiku/secrets")
   end
 
