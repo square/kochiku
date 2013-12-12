@@ -30,7 +30,7 @@ smtp_server: 'localhost'
 # possible values for type are: github or stash
 git_servers:
   github.paypal.com:
-    type: github enterprise
+    type: github
 
 # If you would like Kochiku to clone and fetch repositories from a git mirror
 # define the repository and fill in the url to your mirror.
