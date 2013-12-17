@@ -96,7 +96,7 @@ class Build < ActiveRecord::Base
         :failed
       else
         failed.empty? ? :running : :doomed
-    end
+      end
 
     previous_state = self.state
     update_attributes!(:state => state)
