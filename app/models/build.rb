@@ -39,6 +39,7 @@ class Build < ActiveRecord::Base
   IN_PROGRESS_STATES = [:waiting_for_sync, :partitioning, :runnable, :running, :doomed]
   STATES = IN_PROGRESS_STATES + TERMINAL_STATES
   symbolize :state, :in => STATES
+  serialize :error_details, Hash
 
   validates_presence_of :project_id
   validates_presence_of :ref
@@ -95,7 +96,8 @@ class Build < ActiveRecord::Base
         :failed
       else
         failed.empty? ? :running : :doomed
-      end
+    end
+
     previous_state = self.state
     update_attributes!(:state => state)
     [previous_state, state]

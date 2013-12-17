@@ -24,7 +24,10 @@ class BuildPartitioningJob < JobBase
     if self.class.retry_exception?(e) && !self.class.retry_limit_reached?
       @build.update_attributes!(:state => :waiting_for_sync)
     else
-      @build.update_attributes!(:state => :errored)
+      @build.update_attributes!(
+          :state => :errored,
+          :error_details => { :message => e.to_s, :backtrace => e.backtrace.join("\n") }
+      )
     end
     super
   end

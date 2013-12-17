@@ -39,12 +39,16 @@ describe BuildPartitioningJob do
       end
     end
 
-    context "when a no retryable error occurs" do
-      before { GitRepo.stub(:inside_copy).and_raise(NameError) }
+    context "when a none-retryable error occurs" do
+      error_message = "A name error occurred"
+      before { GitRepo.stub(:inside_copy).and_raise(NameError.new(error_message)) }
 
       it "should re-raise the error and set the build state to errored" do
         expect { subject }.to raise_error(NameError)
-        build.reload.state.should == :errored
+        build.reload
+        build.state.should == :errored
+        build.error_details[:message].should == error_message
+        build.error_details[:backtrace].should_not be_blank
       end
     end
 
