@@ -46,7 +46,7 @@
     %span.info
       = button_to "Rebuild failed parts", rebuild_failed_parts_project_build_path(@project, @build), :method => :post, :form_class => "rebuild-parts"
 
-- if !@build.error_details.empty?
+- if @build.error_details.present?
   .build-error
     %h2 Build error
     %pre= [@build.error_details[:message], @build.error_details[:backtrace]].join("\n")
