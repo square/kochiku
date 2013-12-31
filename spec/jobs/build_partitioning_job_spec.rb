@@ -39,7 +39,7 @@ describe BuildPartitioningJob do
       end
     end
 
-    context "when a none-retryable error occurs" do
+    context "when a non-retryable error occurs" do
       error_message = "A name error occurred"
       before { GitRepo.stub(:inside_copy).and_raise(NameError.new(error_message)) }
 
