@@ -46,7 +46,7 @@ class Build < ActiveRecord::Base
   validates_uniqueness_of :ref, :scope => :project_id
   mount_uploader :on_success_script_log_file, OnSuccessUploader
 
-  after_create :enqueue_partitioning_job
+  after_commit :enqueue_partitioning_job, :on => :create
 
   scope :completed, -> { where(state: TERMINAL_STATES) }
   scope :successful_for_project, lambda { |project_id| where(:project_id => project_id, :state => :succeeded) }
