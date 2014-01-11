@@ -69,25 +69,53 @@ describe GitBlame do
   end
 
   describe "#changes_since_last_green" do
+    let!(:last_successful_build) { FactoryGirl.create(:build, state: :succeeded, project: project, ref: first_commit) }
+    let(:build) { FactoryGirl.create(:build, project: project, ref: head) }
+    let(:head) { repo.last_commit.oid }
+    let(:first_commit) { repo.last_commit.parents.first.parents.first.oid }
+    let(:commiter) { {email: "bilbo@theshire.com", name: 'Bilbo', time: Time.now} }
+    let(:repo) do
+      repo = fixture_repo
+      3.times { |i| commit_to(repo, commiter, commit_message.call(i)) }
+      repo
+    end
+    let!(:frozen_time) { freeze_time! }
     subject { GitBlame.changes_since_last_green(build) }
+    let(:commit_message) { Proc.new {|i| "Making commit number #{i+1} to the repo!" }}
 
     before do
       GitBlame.unstub(:changes_since_last_green)
+      GitRepo.stub(:inside_repo).and_yield(repo)
     end
 
-    it "should parse the git log message and return a hash of information" do
-      GitRepo.stub(:inside_repo).and_return("::!::817b88be7488cab5e4f9d9975222db80d8bceb3b|User One <github+uo@squareup.com>|Fri Oct 19 17:43:47 2012 -0700|this is my commit message::!::")
-      git_changes = subject
-      git_changes.first[:hash].should == "817b88be7488cab5e4f9d9975222db80d8bceb3b"
-      git_changes.first[:author].should == "User One <github+uo@squareup.com>"
-      git_changes.first[:date].should == "Fri Oct 19 17:43:47 2012 -0700"
-      git_changes.first[:message].should == "this is my commit message"
+    context "with no prior green build" do
+      let!(:last_successful_build) { nil }
+      it "returns all the commits" do
+        git_changes = subject
+        git_changes.size.should == 3
+      end
     end
 
-    it "should strip new lines in the commit message" do
-      GitRepo.stub(:inside_repo).and_return("::!::817b88|User One|Fri Oct 19|this is my commit message\nanother line::!::")
+    it "parses the git log message and return a hash of information" do
       git_changes = subject
-      git_changes.first[:message].should == "this is my commit message another line"
+      git_changes.size.should == 2
+      git_changes.first[:hash].should_not == head
+      git_changes.first[:hash].should_not == first_commit
+      git_changes.first[:message].should == "Making commit number 2 to the repo!"
+
+      git_changes.last[:hash].should == head
+      git_changes.last[:author].should == "Bilbo <bilbo@theshire.com>"
+      git_changes.last[:date].to_i.should == frozen_time.to_i
+      git_changes.last[:message].should == "Making commit number 3 to the repo!"
+    end
+
+    context "with new lines in the commit message" do
+      let(:commit_message) { Proc.new {|i| "Making commit number #{i+1} to the\nrepo!" }}
+
+      it "strips the new lines in the commit message" do
+        git_changes = subject
+        git_changes.last[:message].should == "Making commit number 3 to the repo!"
+      end
     end
   end
 

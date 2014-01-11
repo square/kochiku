@@ -24,7 +24,7 @@ gem 'httparty'
 
 gem 'bullet'
 gem 'pry-rails'
-
+gem 'rugged', git: 'git://github.com/libgit2/rugged.git', branch: 'development', submodules: true
 gem 'colorize'
 
 group :assets do
