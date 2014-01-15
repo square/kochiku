@@ -9,7 +9,7 @@ Kochiku::Application.routes.draw do
   resources :repositories do
     member do
       get :projects
-      post "build-ref", :action => 'build_ref'
+      post "build-ref", :action => 'build_ref', :as => 'build_ref'
     end
   end
 
