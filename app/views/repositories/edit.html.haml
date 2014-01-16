@@ -1,1 +1,12 @@
 = render 'form', :url => repository_url(@repository)
+
+%br
+%h3 Web Hooks
+%p
+  %strong Build SHA
+  %br
+  = link_to build_ref_repository_url(@repository, ref: 'master', sha: 'abc123')
+  %br
+  %em.hint
+    POST to this URL from your source control system to trigger a build
+    of the given branch/SHA.
