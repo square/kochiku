@@ -1,3 +1,11 @@
+GIT
+  remote: git://github.com/teeparham/resque-retry.git
+  revision: 615d418f927deef951782273ee45b0a22a2e53a4
+  specs:
+    resque-retry (1.0.0)
+      resque (>= 1.25.1)
+      resque-scheduler (>= 1.9.9)
+
 GEM
   remote: https://rubygems.org/
   specs:
@@ -175,10 +183,7 @@ GEM
       redis-namespace (~> 1.2)
       sinatra (>= 0.9.2)
       vegas (~> 0.1.2)
-    resque-retry (1.0.0)
-      resque (>= 1.10.0)
-      resque-scheduler (>= 1.9.9)
-    resque-scheduler (2.3.0)
+    resque-scheduler (2.3.1)
       redis (>= 3.0.0)
       resque (~> 1.25)
       rufus-scheduler (~> 2.0)
@@ -271,7 +276,7 @@ DEPENDENCIES
   rails (~> 3.2.14)
   rails-erd
   resque
-  resque-retry
+  resque-retry!
   rspec-rails
   rvm-capistrano
   sass
