@@ -3,7 +3,7 @@ class RepositoriesController < ApplicationController
 
   def create
     @repository = Repository.where(url: params[:repository][:url]).first_or_initialize
-    if @repository.update_attributes(params[:repository])
+    if @repository.update_attributes(repository_params)
       @repository.projects.find_or_create_by_name("#{@repository.repository_name}-pull_requests")
       project = @repository.projects.find_or_create_by_name(@repository.repository_name)
       redirect_to project_url(project)
@@ -28,7 +28,7 @@ class RepositoriesController < ApplicationController
 
   def update
     @repository = Repository.find(params[:id])
-    if @repository.update_attributes(params[:repository])
+    if @repository.update_attributes(repository_params)
       redirect_to edit_repository_url(@repository)
     else
       render template: 'repositories/edit'
@@ -64,5 +64,15 @@ class RepositoriesController < ApplicationController
       id:        build.id,
       build_url: project_build_url(project, build)
     }
+  end
+
+  private
+
+  def repository_params
+    params.require(:repository).
+      permit(:url, :repository_name, :test_command, :command_flag, :timeout,
+             :build_pull_requests, :run_ci, :on_green_update,
+             :use_branches_on_green, :on_success_note, :on_success_script,
+             :send_build_failure_email)
   end
 end
