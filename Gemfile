@@ -1,6 +1,6 @@
 source 'https://rubygems.org'
 
-gem 'rails', '~> 3.2.14'
+gem 'rails', '~> 4.0.2'
 gem 'passenger', '4.0.10', group: :production
 gem 'dynamic_form'
 
@@ -30,16 +30,14 @@ gem 'pry-rails'
 
 gem 'colorize'
 
-group :assets do
-  gem 'compass-rails'
-  gem 'jquery-rails'
-  gem 'sass-rails'
-  gem 'uglifier'
+gem 'compass-rails'
+gem 'jquery-rails'
+gem 'sass-rails'
+gem 'uglifier'
 
-  # therubyracer is a JS runtime required by execjs, which is in turn required
-  # by uglifier. therubyracer is not the fastest option but it is the most portable.
-  gem 'therubyracer'
-end
+# therubyracer is a JS runtime required by execjs, which is in turn required
+# by uglifier. therubyracer is not the fastest option but it is the most portable.
+gem 'therubyracer'
 
 group :test, :development do
   gem 'rspec-rails'
