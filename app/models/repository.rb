@@ -30,7 +30,9 @@ class Repository < ActiveRecord::Base
   end
 
   def set_repository_name
-    self.repository_name ||= project_params[:repository]
+    if self.repository_name.blank?
+      self.repository_name = project_params[:repository]
+    end
   end
 
   def repo_cache_name
