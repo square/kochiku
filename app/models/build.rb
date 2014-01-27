@@ -130,7 +130,7 @@ class Build < ActiveRecord::Base
   end
 
   def auto_mergable?
-    succeeded? && auto_merge_enabled?
+    succeeded? && auto_merge_enabled? && !repository.automerge_disabled?
   end
 
   def auto_merge_togglable?

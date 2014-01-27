@@ -315,6 +315,17 @@ describe Build do
       build.state = :succeeded
       build.auto_mergable?.should be_false
     end
+
+    context "when automerge is disabled on the repository" do
+      before do
+        build.repository.update_attributes(:automerge_disabled => true)
+      end
+
+      it "is false even if it is a passed build" do
+        build.state = :succeeded
+        build.auto_mergable?.should be_false
+      end
+    end
   end
 
   describe "#auto_merge_enabled?" do
