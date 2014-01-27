@@ -12,6 +12,11 @@
       = f.text_field :branch, {placeholder: 'Branch to build', class: 'sha', autocapitalize: 'off', autocorrect: 'off', spellcheck: 'false'}
     = f.submit "Build", {class: 'build-button'}
 
+- rate = error_free_pass_rate(@builds)
+#performance{ class: pass_rate_css_class(rate) }
+  %span.number= rate
+  %span.label pass rate
+
 %h2.subheader
   - unless @build.project.main?
     - if main_project = @build.project.repository.main_project
