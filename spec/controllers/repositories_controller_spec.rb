@@ -117,26 +117,52 @@ describe RepositoriesController do
   describe 'post /build-ref' do
     let(:repository) { FactoryGirl.create(:repository) }
 
-    it "creates a master build" do
+    it "creates a master build with query string parameters" do
       post :build_ref, id: repository.to_param, ref: 'master', sha: 'abc123'
       response.should be_success
       json  = JSON.parse(response.body)
       build = Build.find(json['id'])
 
-      expect(json['build_url']).not_to eq(nil)
+      expect(json['build_url']).not_to be_nil
 
       expect(build.branch).to eq("master")
       expect(build.ref).to eq("abc123")
       expect(build.project.name).to eq(repository.repository_name)
     end
 
-    it "creates a PR build" do
+    it "creates a master build with payload" do
+      post :build_ref, id: repository.to_param, refChanges: {refId: 'refs/head/master', toHash: 'abc123'}
+      response.should be_success
+      json  = JSON.parse(response.body)
+      build = Build.find(json['id'])
+
+      expect(json['build_url']).not_to be_nil
+
+      expect(build.branch).to eq("master")
+      expect(build.ref).to eq("abc123")
+      expect(build.project.name).to eq(repository.repository_name)
+    end
+
+    it "creates a PR build with query string parameters" do
       post :build_ref, id: repository.to_param, ref: 'blah', sha: 'abc123'
       response.should be_success
       json  = JSON.parse(response.body)
       build = Build.find(json['id'])
 
-      expect(json['build_url']).not_to eq(nil)
+      expect(json['build_url']).not_to be_nil
+
+      expect(build.branch).to eq("blah")
+      expect(build.ref).to eq("abc123")
+      expect(build.project.name).to eq("#{repository.repository_name}-pull_requests")
+    end
+
+    it "creates a PR build with payload" do
+      post :build_ref, id: repository.to_param, refChanges: {refId: 'refs/head/blah', toHash: 'abc123'}
+      response.should be_success
+      json  = JSON.parse(response.body)
+      build = Build.find(json['id'])
+
+      expect(json['build_url']).not_to be_nil
 
       expect(build.branch).to eq("blah")
       expect(build.ref).to eq("abc123")

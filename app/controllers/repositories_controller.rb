@@ -46,8 +46,10 @@ class RepositoriesController < ApplicationController
   def build_ref
     repository = Repository.find(params[:id])
 
-    ref = params[:ref]
-    sha = params[:sha]
+    # accept POSTs with payload (supports a popular webhooks plugin) or with
+    # query string parameters (easy)
+    ref = params.has_key?(:refChanges) ? params[:refChanges][:refId].split('/')[-1] : params[:ref]
+    sha = params.has_key?(:refChanges) ? params[:refChanges][:toHash] : sha = params[:sha]
 
     project_name = repository.repository_name
     project_name += '-pull_requests' unless ref == 'master'
