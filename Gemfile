@@ -32,6 +32,10 @@ group :assets do
   gem 'jquery-rails'
   gem 'sass-rails'
   gem 'uglifier'
+
+  # therubyracer is a JS runtime required by execjs, which is in turn required
+  # by uglifier. therubyracer is not the fastest option but it is the most portable.
+  gem 'therubyracer'
 end
 
 group :test, :development do
