@@ -48,8 +48,13 @@ class RepositoriesController < ApplicationController
 
     # accept POSTs with payload (supports a popular webhooks plugin) or with
     # query string parameters (easy)
-    ref = params.has_key?(:refChanges) ? params[:refChanges][:refId].split('/')[-1] : params[:ref]
-    sha = params.has_key?(:refChanges) ? params[:refChanges][:toHash] : sha = params[:sha]
+    if params[:refChanges]
+      ref = params[:refChanges][:refId].split('/')[-1]
+      sha = params[:refChanges][:toHash]
+    else
+      ref = params[:ref]
+      sha = params[:sha]
+    end
 
     project_name = repository.repository_name
     project_name += '-pull_requests' unless ref == 'master'
