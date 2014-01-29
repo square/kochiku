@@ -22,6 +22,9 @@
   %div
     %label{:for => "run_ci"} Build on push:
     = f.check_box :run_ci, {:id => "run_ci"}
+  %div
+    %label{:for => "allows_kochiku_merges"} Allow developers to request branches be merged into master on success:
+    = f.check_box :allows_kochiku_merges, {:id => "allows_kochiku_merges"}
 
   %fieldset
     %legend On a green build

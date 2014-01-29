@@ -130,7 +130,7 @@ class Build < ActiveRecord::Base
   end
 
   def auto_mergable?
-    succeeded? && auto_merge_enabled?
+    succeeded? && auto_merge_enabled? && repository.allows_kochiku_merges?
   end
 
   def auto_merge_togglable?

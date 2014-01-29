@@ -315,6 +315,17 @@ describe Build do
       build.state = :succeeded
       build.auto_mergable?.should be_false
     end
+
+    context "when allows_kochiku_merges has been disabled on the repository" do
+      before do
+        build.repository.update_attributes(:allows_kochiku_merges => false)
+      end
+
+      it "is false even if it is a passed build" do
+        build.state = :succeeded
+        build.auto_mergable?.should be_false
+      end
+    end
   end
 
   describe "#auto_merge_enabled?" do
