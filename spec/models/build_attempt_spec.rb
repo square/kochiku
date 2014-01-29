@@ -12,14 +12,13 @@ describe BuildAttempt do
   describe "finish!" do
     let(:repository) { FactoryGirl.create(:repository, :timeout => 20) }
     let(:project) { FactoryGirl.create(:project, :branch => "master", :repository => repository) }
-    let(:build) { FactoryGirl.create(:build, :state => :runnable, :project => project, :auto_merge => true) }
-    #let(:build) { FactoryGirl.create(:build, :auto_merge => true) }
+    let(:build) { FactoryGirl.create(:build, :state => :runnable, :project => project, :merge_on_success => true) }
     let(:build_part) { FactoryGirl.create(:build_part, :build_instance => build, retry_count: 2) }
     let!(:build_attempt) { FactoryGirl.create(:build_attempt, :state => :running, :build_part => build_part) }
 
     context "build auto-retries" do
       [:failed, :errored].each do |state|
-        it "reattempts an automerge cuke that #{state}" do
+        it "reattempts an mergeable cuke that #{state}" do
           build_part.should_receive(:rebuild!)
           build_attempt.finish!(state)
         end
@@ -45,16 +44,16 @@ describe BuildAttempt do
           end
         end
 
-        context "non-automerged builds" do
-          let(:build) { FactoryGirl.create(:build, :auto_merge => false) }
+        context "non-mergeable builds" do
+          let(:build) { FactoryGirl.create(:build, :merge_on_success => false) }
           it "does not attempt to re-run when it #{state}" do
             build_part.should_not_receive(:rebuild!)
             build_attempt.finish!(state)
           end
         end
 
-        context "non-automerged main builds" do
-          let(:build) { FactoryGirl.create(:main_project_build, :auto_merge => false) }
+        context "non-mergeable main builds" do
+          let(:build) { FactoryGirl.create(:main_project_build, :merge_on_success => false) }
           it "reattempts to re-run when it #{state}" do
             build_part.should_receive(:rebuild!)
             build_attempt.finish!(state)
@@ -63,7 +62,7 @@ describe BuildAttempt do
       end
 
       [:runnable, :running, :passed, :aborted].each do |state|
-        it "does not reattempt an automerge cuke that #{state}" do
+        it "does not reattempt an mergeable cuke that #{state}" do
           build_part.should_not_receive(:rebuild!)
           build_attempt.finish!(state)
         end

@@ -22,9 +22,9 @@
 
   .actions
     - if @build.repository.allows_kochiku_merges?
-      %form{action: toggle_auto_merge_project_build_path(@build.project, @build), method: :post}
+      %form{action: toggle_merge_on_success_project_build_path(@build.project, @build), method: :post}
         %label
-          = check_box_tag :auto_merge, true, @build.auto_merge_enabled?, disabled: !@build.auto_merge_togglable?, onchange: 'this.form.submit()'
+          = check_box_tag :merge_on_success, true, @build.merge_on_success_enabled?, disabled: !eligible_for_merge_on_success?(@build), onchange: 'this.form.submit()'
           Merge on Success
 
     %label

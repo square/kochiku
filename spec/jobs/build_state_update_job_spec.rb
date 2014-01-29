@@ -134,8 +134,8 @@ describe BuildStateUpdateJob do
         end
       end
 
-      it "should automerge the build" do
-        build.update_attributes(:auto_merge => true)
+      it "kochiku should merge the branch if eligible" do
+        build.update_attributes(:merge_on_success => true)
         BuildStrategy.should_receive(:merge_ref).with(build)
         BuildStateUpdateJob.perform(build.id)
       end

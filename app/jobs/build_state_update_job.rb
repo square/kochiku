@@ -30,13 +30,13 @@ class BuildStateUpdateJob < JobBase
       GitRepo.inside_repo(build.repository) do
         build.promote!
       end
-    elsif build.auto_merge_enabled?
-      if build.auto_mergable?
+    elsif build.merge_on_success_enabled?
+      if build.mergable_by_kochiku?
         GitRepo.inside_repo(build.repository) do
-          build.auto_merge!
+          build.merge_to_master!
         end
       else
-        Rails.logger.info("Build #{build.id} is auto_merge enabled but cannot be auto merged.")
+        Rails.logger.info("Build #{build.id} has merge_on_success enabled but cannot be merged.")
       end
     end
 
