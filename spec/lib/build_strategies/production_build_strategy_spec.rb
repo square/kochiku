@@ -19,16 +19,16 @@ describe BuildStrategy do
       end
 
       it "should merge to master" do
-        merger = GitAutomerge.new
-        GitAutomerge.should_receive(:new).and_return(merger)
-        merger.should_receive(:automerge).with(build)
+        merger = GitMergeExecutor.new
+        GitMergeExecutor.should_receive(:new).and_return(merger)
+        merger.should_receive(:merge).with(build)
         BuildStrategy.merge_ref(build).should_not be_nil
       end
 
       it "should handle merge failure" do
-        merger = GitAutomerge.new
-        GitAutomerge.should_receive(:new).and_return(merger)
-        merger.should_receive(:automerge).with(build).and_raise(GitAutomerge::UnableToMergeError.new)
+        merger = GitMergeExecutor.new
+        GitMergeExecutor.should_receive(:new).and_return(merger)
+        merger.should_receive(:merge).with(build).and_raise(GitMergeExecutor::UnableToMergeError)
 
         BuildStrategy.merge_ref(build).should_not be_nil
       end

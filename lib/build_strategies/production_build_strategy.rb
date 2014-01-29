@@ -1,6 +1,6 @@
 require 'open3'
 require 'git_blame'
-require 'git_automerge'
+require 'git_merge_executor'
 
 class BuildStrategy
   class << self
@@ -46,10 +46,10 @@ class BuildStrategy
     def merge_ref(build)
       begin
         emails = GitBlame.emails_in_branch(build)
-        merger = GitAutomerge.new
-        log = merger.automerge(build)
+        merger = GitMergeExecutor.new
+        log = merger.merge(build)
         MergeMailer.merge_successful(build, emails, log).deliver
-      rescue GitAutomerge::UnableToMergeError => ex
+      rescue GitMergeExecutor::UnableToMergeError => ex
         MergeMailer.merge_failed(build, emails, ex.message).deliver
       end
     end
