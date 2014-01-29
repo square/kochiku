@@ -48,9 +48,9 @@ class BuildStrategy
         emails = GitBlame.emails_in_branch(build)
         merger = GitAutomerge.new
         log = merger.automerge(build)
-        AutoMergeMailer.merge_successful(build, emails, log).deliver
+        MergeMailer.merge_successful(build, emails, log).deliver
       rescue GitAutomerge::UnableToMergeError => ex
-        AutoMergeMailer.merge_failed(build, emails, ex.message).deliver
+        MergeMailer.merge_failed(build, emails, ex.message).deliver
       end
     end
 
