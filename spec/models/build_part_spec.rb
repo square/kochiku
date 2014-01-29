@@ -227,15 +227,17 @@ describe BuildPart do
       end
     end
 
-    context "for an automerge branch build" do
-      let(:build) { FactoryGirl.create(:build, project: project, auto_merge: true) }
+    context "for a merge_on_success branch build" do
+      let(:build) { FactoryGirl.create(:build, project: project, merge_on_success: true) }
 
       it "might reattempt" do
         expect(build_part.should_reattempt?).to be_true
       end
     end
 
-    context "for a non-automerge branch build" do
+    context "for a non merge_on_success branch build" do
+      before { build.merge_on_success.should be_false }
+      
       it "will not reattempt" do
         expect(build_part.should_reattempt?).to be_false
       end

@@ -42,4 +42,8 @@ module BuildHelper
     end
     total.to_f / build_parts.length
   end
+
+  def eligible_for_merge_on_success?(build)
+    !build.succeeded? && !build.project.main? && build.repository.allows_kochiku_merges?
+  end
 end

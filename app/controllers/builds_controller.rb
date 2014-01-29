@@ -1,7 +1,7 @@
 require 'git_repo'
 
 class BuildsController < ApplicationController
-  before_filter :load_project, :only => [:show, :abort, :build_status, :toggle_auto_merge, :rebuild_failed_parts, :request_build]
+  before_filter :load_project, :only => [:show, :abort, :build_status, :toggle_merge_on_success, :rebuild_failed_parts, :request_build]
   skip_before_filter :verify_authenticity_token, :only => [:create]
 
   def show
@@ -88,9 +88,9 @@ class BuildsController < ApplicationController
     redirect_to project_build_path(@project, @build)
   end
 
-  def toggle_auto_merge
+  def toggle_merge_on_success
     @build = @project.builds.find(params[:id])
-    @build.update_attributes!(:auto_merge => params[:auto_merge])
+    @build.update_attributes!(:merge_on_success => params[:merge_on_success])
     redirect_to project_build_path(@project, @build)
   end
 
@@ -134,11 +134,15 @@ class BuildsController < ApplicationController
   end
 
   def project_build(branch, ref)
-    auto_merge = params[:auto_merge] || false
+    merge_on_success = params[:merge_on_success] || false
     if @project.main?
       ref = GitRepo.sha_for_branch(@project.repository, "master")
       branch = "master"
     end
-    @project.builds.find_existing_build_or_initialize(ref, :state => :partitioning, :auto_merge => auto_merge, :branch => branch)
+    @project.builds.find_existing_build_or_initialize(
+      ref,
+      :state => :partitioning,
+      :merge_on_success => merge_on_success,
+      :branch => branch)
   end
 end

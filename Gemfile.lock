@@ -100,6 +100,7 @@ GEM
     json (1.8.1)
     launchy (2.3.0)
       addressable (~> 2.3)
+    libv8 (3.16.14.3)
     mail (2.5.4)
       mime-types (~> 1.16)
       treetop (~> 1.4.8)
@@ -167,6 +168,7 @@ GEM
     redis (3.0.6)
     redis-namespace (1.3.2)
       redis (~> 3.0.4)
+    ref (1.0.5)
     resque (1.25.1)
       mono_logger (~> 1.0)
       multi_json (~> 1.0)
@@ -215,6 +217,9 @@ GEM
     symbolize (4.4.1)
       activemodel (>= 3.2, < 5)
       activesupport (>= 3.2, < 5)
+    therubyracer (0.12.0)
+      libv8 (~> 3.16.14.0)
+      ref
     thin (1.6.1)
       daemons (>= 1.0.9)
       eventmachine (>= 1.0.0)
@@ -272,6 +277,7 @@ DEPENDENCIES
   sass
   sass-rails
   symbolize
+  therubyracer
   thin
   uglifier
   webmock

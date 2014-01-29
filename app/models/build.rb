@@ -129,19 +129,15 @@ class Build < ActiveRecord::Base
     succeeded? && project.main?
   end
 
-  def auto_mergable?
-    succeeded? && auto_merge_enabled?
+  def mergable_by_kochiku?
+    succeeded? && merge_on_success_enabled? && repository.allows_kochiku_merges?
   end
 
-  def auto_merge_togglable?
-    !succeeded? && !project.main?
+  def merge_on_success_enabled?
+    !project.main? && self.merge_on_success
   end
 
-  def auto_merge_enabled?
-    !project.main? && self.auto_merge
-  end
-
-  def auto_merge!
+  def merge_to_master!
     BuildStrategy.merge_ref(self)
   end
 

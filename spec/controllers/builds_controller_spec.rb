@@ -98,19 +98,19 @@ describe BuildsController do
         Repository.last.url.should == repo.url
       end
 
-      it "sets automerge when param given" do
-        post @action, @params.merge(:project_id => project_param, :build => build_info, :auto_merge => "1")
-        Build.last.auto_merge.should == true
+      it "sets merge_on_success when param given" do
+        post @action, @params.merge(:project_id => project_param, :build => build_info, :merge_on_success => "1")
+        Build.last.merge_on_success.should == true
+      end
+
+      it "defaults merge_on_success to false when param not given" do
+        post @action, @params.merge(:project_id => project_param, :build => build_info)
+        Build.last.merge_on_success.should == false
       end
 
       it "sets branch when param given" do
         post @action, @params.merge(:project_id => project_param, :build => build_info.merge(:branch => "sticky-buddy"))
         Build.last.branch.should == "sticky-buddy"
-      end
-
-      it "defaults to false automerge when param not given" do
-        post @action, @params.merge(:project_id => project_param, :build => build_info)
-        Build.last.auto_merge.should == false
       end
 
       it "should create a new build" do
@@ -262,26 +262,26 @@ RESPONSE
     end
   end
 
-  describe "#toggle_auto_merge" do
+  describe "#toggle_merge_on_success" do
     before do
-      @build = FactoryGirl.create(:build, :auto_merge => true)
+      @build = FactoryGirl.create(:build, :merge_on_success => true)
     end
 
-    it "aborts the auto_merge" do
-      post :toggle_auto_merge, :id => @build.id, :project_id => @build.project.name, :auto_merge => false
+    it "aborts merge_on_success" do
+      post :toggle_merge_on_success, :id => @build.id, :project_id => @build.project.name, :merge_on_success => false
       response.should redirect_to(project_build_path(@build.project, @build))
-      @build.reload.auto_merge.should be_false
+      @build.reload.merge_on_success.should be_false
     end
 
-    it "enables the auto_merge" do
-      @build.update_attributes(:auto_merge => false)
-      post :toggle_auto_merge, :id => @build.id, :project_id => @build.project.name, :auto_merge => true
+    it "enables merge_on_success" do
+      @build.update_attributes(:merge_on_success => false)
+      post :toggle_merge_on_success, :id => @build.id, :project_id => @build.project.name, :merge_on_success => true
       response.should redirect_to(project_build_path(@build.project, @build))
-      @build.reload.auto_merge.should be_true
+      @build.reload.merge_on_success.should be_true
     end
   end
 
-  describe "auto merge" do
+  describe "merge_on_success checkbox" do
     render_views
     let(:project) { FactoryGirl.create(:project) }
     let(:build) { FactoryGirl.create(:build, :project => project) }
@@ -290,20 +290,20 @@ RESPONSE
       @params = {:id => build.id, :project_id => project.name}
     end
 
-    it "renders the enable auto merge checkbox" do
+    it "renders the merge_on_success checkbox" do
       get @action, @params
       doc = Nokogiri::HTML(response.body)
-      elements = doc.css("input[name=auto_merge]")
+      elements = doc.css("input[name=merge_on_success]")
       elements.size.should == 1
       elements.first['checked'].should be_blank
     end
 
-    context "for auto merge enabled builds" do
-      let(:build) { FactoryGirl.create(:build, :project => project, :auto_merge => true) }
-      it "renders the enable auto merge checkbox" do
+    context "for builds with merge_on_success enabled" do
+      let(:build) { FactoryGirl.create(:build, :project => project, :merge_on_success => true) }
+      it "renders the merge_on_success checkbox" do
         get @action, @params
         doc = Nokogiri::HTML(response.body)
-        elements = doc.css("input[name=auto_merge]")
+        elements = doc.css("input[name=merge_on_success]")
         elements.size.should == 1
         elements.first['checked'].should be_present
       end
@@ -313,10 +313,10 @@ RESPONSE
       let(:repository) { FactoryGirl.create(:repository, :url => "git@github.com:org/test-repo.git") }
       let(:project) { FactoryGirl.create(:project, :repository => repository, :name => repository.repository_name) }
 
-      it "renders the auto merge checkbox disabled" do
+      it "renders the merge_on_success checkbox disabled" do
         get @action, @params
         doc = Nokogiri::HTML(response.body)
-        elements = doc.css("input[name=auto_merge]")
+        elements = doc.css("input[name=merge_on_success]")
         elements.size.should == 1
         elements.first['disabled'].should be_present
       end

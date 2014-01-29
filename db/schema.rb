@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20131217022000) do
+ActiveRecord::Schema.define(:version => 20140128180258) do
 
   create_table "build_artifacts", :force => true do |t|
     t.integer  "build_attempt_id"
@@ -54,7 +54,7 @@ ActiveRecord::Schema.define(:version => 20131217022000) do
     t.datetime "created_at",                 :null => false
     t.datetime "updated_at",                 :null => false
     t.integer  "project_id"
-    t.boolean  "auto_merge"
+    t.boolean  "merge_on_success"
     t.string   "branch"
     t.string   "target_name"
     t.boolean  "build_failure_email_sent"
@@ -94,6 +94,7 @@ ActiveRecord::Schema.define(:version => 20131217022000) do
     t.integer  "timeout",                     :default => 40
     t.string   "on_success_note"
     t.string   "repository_name"
+    t.boolean  "allows_kochiku_merges",       :default => true
   end
 
   add_index "repositories", ["url"], :name => "index_repositories_on_url"

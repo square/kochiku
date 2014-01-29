@@ -45,5 +45,6 @@ FactoryGirl.define do
     sequence(:url) { |n| "git@github.com:square/test-repo#{n}.git" } # these repos do not exist on purpose
     test_command "script/ci worker"
     on_green_update 'last-green-build'
+    allows_kochiku_merges true
   end
 end
