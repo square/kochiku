@@ -291,49 +291,71 @@ describe Build do
     end
   end
 
-  describe "#auto_mergable?" do
-    context "with auto merge enabled" do
+  describe "#mergable_by_kochiku??" do
+    before do
+      build.project.main?.should be_false
+      build.repository.allows_kochiku_merges.should be_true
+    end
+
+    context "when merge_on_success_enabled? is true" do
       before do
-        build.stub(auto_merge_enabled?: true)
+        build.update_attributes!(merge_on_success: true)
+        build.merge_on_success_enabled?.should be_true
       end
 
       it "is true if it is a passed build" do
         build.state = :succeeded
-        build.auto_mergable?.should be_true
+        build.mergable_by_kochiku?.should be_true
       end
 
       it "is false if it is a failed build" do
         (Build::TERMINAL_STATES - [:succeeded]).each do |failed_state|
           build.state = failed_state
-          build.auto_mergable?.should be_false
+          build.mergable_by_kochiku?.should be_false
         end
       end
     end
 
-    it "is false if it is a passed build with auto merge disabled" do
-      build.stub(auto_merge_enabled?: false)
-      build.state = :succeeded
-      build.auto_mergable?.should be_false
+    context "with merge_on_success disabled" do
+      it "should never be true" do
+        build.merge_on_success = false
+        build.state = :succeeded
+
+        build.mergable_by_kochiku?.should be_false
+      end
+    end
+
+    context "when allows_kochiku_merges has been disabled on the repository" do
+      before do
+        build.repository.update_attributes(:allows_kochiku_merges => false)
+      end
+
+      it "should never be true" do
+        build.merge_on_success = true
+        build.state = :succeeded
+
+        build.mergable_by_kochiku?.should be_false
+      end
     end
   end
 
-  describe "#auto_merge_enabled?" do
-    it "is true if it is a developer build with auto_merge" do
-      build.auto_merge = true
-      build.auto_merge_enabled?.should be_true
+  describe "#merge_on_success_enabled?" do
+    it "is true if it is a developer build with merge_on_success enabled" do
+      build.merge_on_success = true
+      build.merge_on_success_enabled?.should be_true
     end
 
-    it "is false if it is a developer build without auto_merge" do
-      build.auto_merge = false
-      build.auto_merge_enabled?.should be_false
+    it "is false if it is a developer build with merge_on_success disabled" do
+      build.merge_on_success = false
+      build.merge_on_success_enabled?.should be_false
     end
 
     context "for a build on the main project" do
       let(:build) { FactoryGirl.create(:main_project_build) }
 
       it "is false if it is a main build" do
-        build.auto_merge = true
-        build.auto_merge_enabled?.should be_false
+        build.merge_on_success = true
+        build.merge_on_success_enabled?.should be_false
       end
     end
   end

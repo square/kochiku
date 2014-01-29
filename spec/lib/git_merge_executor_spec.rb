@@ -1,12 +1,13 @@
 require 'spec_helper'
+require 'git_merge_executor'
 
-describe GitAutomerge do
-  describe "#automerge" do
+describe GitMergeExecutor do
+  describe "#merge" do
     let(:project) { FactoryGirl.create(:big_rails_project) }
     let(:build) { FactoryGirl.create(:build, :project => project) }
-    let(:merger) { GitAutomerge.new }
+    let(:merger) { described_class.new }
 
-    subject { merger.automerge(build) }
+    subject { merger.merge(build) }
 
     before(:each) { @stubber = CommandStubber.new }
 
@@ -22,7 +23,7 @@ describe GitAutomerge do
       before(:each) { @stubber.stub_capture2e_failure("git merge") }
 
       it "should raise an exception" do
-        expect { subject }.to raise_error(GitAutomerge::UnableToMergeError)
+        expect { subject }.to raise_error(described_class::UnableToMergeError)
       end
     end
 
@@ -30,7 +31,7 @@ describe GitAutomerge do
       before(:each) { @stubber.stub_capture2e_failure("git push") }
 
       it "should raise an exception" do
-        expect { subject }.to raise_error(GitAutomerge::UnableToMergeError)
+        expect { subject }.to raise_error(described_class::UnableToMergeError)
         @stubber.check_cmd_executed("git pull --rebase")
         @stubber.check_cmd_executed("git push origin master")
       end

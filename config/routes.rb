@@ -19,7 +19,7 @@ Kochiku::Application.routes.draw do
 
     resources :builds, :only => [:create, :show] do
       post 'request', :action => "request_build", :on => :collection
-      post 'toggle-auto-merge', :action => "toggle_auto_merge", :on => :member, :as => :toggle_auto_merge
+      post 'toggle-merge-on-success', :action => "toggle_merge_on_success", :on => :member, :as => :toggle_merge_on_success
       put 'abort', :action => "abort", :on => :member
       get 'status', :action => "build_status", :on => :member, :defaults => { :format => 'json' }
       post 'rebuild-failed-parts', :action => "rebuild_failed_parts", :on => :member, :as => :rebuild_failed_parts
