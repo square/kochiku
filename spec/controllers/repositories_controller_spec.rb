@@ -121,9 +121,10 @@ describe RepositoriesController do
       post :build_ref, id: repository.to_param, ref: 'master', sha: 'abc123'
       response.should be_success
       json  = JSON.parse(response.body)
-      build = Build.find(json['id'])
+      build_hash = json['builds'][0]
+      build = Build.find(build_hash['id'])
 
-      expect(json['build_url']).not_to be_nil
+      expect(build_hash['build_url']).not_to be_nil
 
       expect(build.branch).to eq("master")
       expect(build.ref).to eq("abc123")
@@ -131,12 +132,13 @@ describe RepositoriesController do
     end
 
     it "creates a master build with payload" do
-      post :build_ref, id: repository.to_param, refChanges: {refId: 'refs/head/master', toHash: 'abc123'}
+      post :build_ref, id: repository.to_param, refChanges: [{refId: 'refs/head/master', toHash: 'abc123'}]
       response.should be_success
       json  = JSON.parse(response.body)
-      build = Build.find(json['id'])
+      build_hash = json['builds'][0]
+      build = Build.find(build_hash['id'])
 
-      expect(json['build_url']).not_to be_nil
+      expect(build_hash['build_url']).not_to be_nil
 
       expect(build.branch).to eq("master")
       expect(build.ref).to eq("abc123")
@@ -147,9 +149,11 @@ describe RepositoriesController do
       post :build_ref, id: repository.to_param, ref: 'blah', sha: 'abc123'
       response.should be_success
       json  = JSON.parse(response.body)
-      build = Build.find(json['id'])
 
-      expect(json['build_url']).not_to be_nil
+      build_hash = json['builds'][0]
+      build = Build.find(build_hash['id'])
+
+      expect(build_hash['build_url']).not_to be_nil
 
       expect(build.branch).to eq("blah")
       expect(build.ref).to eq("abc123")
@@ -157,12 +161,13 @@ describe RepositoriesController do
     end
 
     it "creates a PR build with payload" do
-      post :build_ref, id: repository.to_param, refChanges: {refId: 'refs/head/blah', toHash: 'abc123'}
+      post :build_ref, id: repository.to_param, refChanges: [{refId: 'refs/head/blah', toHash: 'abc123'}]
       response.should be_success
-      json  = JSON.parse(response.body)
-      build = Build.find(json['id'])
+      json       = JSON.parse(response.body)
+      build_hash = json['builds'][0]
+      build      = Build.find(build_hash['id'])
 
-      expect(json['build_url']).not_to be_nil
+      expect(build_hash['build_url']).not_to be_nil
 
       expect(build.branch).to eq("blah")
       expect(build.ref).to eq("abc123")

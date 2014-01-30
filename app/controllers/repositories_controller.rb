@@ -48,14 +48,30 @@ class RepositoriesController < ApplicationController
 
     # accept POSTs with payload (supports a popular webhooks plugin) or with
     # query string parameters (easy)
-    if params[:refChanges]
-      ref = params[:refChanges][:refId].split('/')[-1]
-      sha = params[:refChanges][:toHash]
+    changes = if params[:refChanges]
+      params[:refChanges].map do |change|
+        [
+          change[:refId].split('/')[-1],
+          change[:toHash]
+        ]
+      end
     else
-      ref = params[:ref]
-      sha = params[:sha]
+      [params.values_at(:ref, :sha)]
     end
 
+    result = changes.map do |ref, sha|
+      ensure_build(repository, ref, sha)
+    end
+
+    render json: {
+      builds: result.map {|project, build| {
+        id:        build.id,
+        build_url: project_build_url(project, build)
+      }}
+    }
+  end
+
+  def ensure_build(repository, ref, sha)
     project_name = repository.repository_name
     project_name += '-pull_requests' unless ref == 'master'
 
@@ -67,9 +83,6 @@ class RepositoriesController < ApplicationController
       project.ensure_developer_build_exists(ref, sha)
     end
 
-    render json: {
-      id:        build.id,
-      build_url: project_build_url(project, build)
-    }
+    [project, build]
   end
 end
