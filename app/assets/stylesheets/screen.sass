@@ -192,6 +192,20 @@ form label
   form
     display: inline-block
 
+#performance
+  font-size: 1.1em
+  float: right
+  width: 300px
+  text-align: right
+  &.high
+    color: $color-passed
+  &.medium
+    color: $color-errored
+  &.low
+    color: $color-failed
+  .label
+    cursor: help
+
 #plot
   margin-bottom: 2em
   min-width: 1000px
