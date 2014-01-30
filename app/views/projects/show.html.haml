@@ -13,7 +13,7 @@
     = f.submit "Build", {class: 'build-button'}
 
 - rate = error_free_pass_rate(@builds)
-#performance{ class: pass_rate_css_class(rate) }
+#performance{ title: "Percentage of builds with all parts succeeding on the first try", class: pass_rate_css_class(rate) }
   %span.number= rate
   %span.label pass rate
 
