@@ -1,3 +1,4 @@
+# TODO: Combine this controller with PullRequestsController#build
 class RepositoriesController < ApplicationController
   skip_before_filter :verify_authenticity_token, :only => [:build_ref]
 
@@ -46,8 +47,10 @@ class RepositoriesController < ApplicationController
   def build_ref
     repository = Repository.find(params[:id])
 
-    # accept POSTs with payload (supports a popular webhooks plugin) or with
-    # query string parameters (easy)
+    # refChanges is provided by the standard Stash webhooks plugin
+    # https://marketplace.atlassian.com/plugins/com.atlassian.stash.plugin.stash-web-post-receive-hooks-plugin
+    # Query string parameters are provided for easy integrations, since it the
+    # simplest to implement.
     changes = if params[:refChanges]
       params[:refChanges].map do |change|
         [
