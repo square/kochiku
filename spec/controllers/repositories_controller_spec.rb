@@ -116,31 +116,43 @@ describe RepositoriesController do
 
   describe 'post /build-ref' do
     let(:repository) { FactoryGirl.create(:repository) }
+    let(:repo_name) { repository.repository_name }
 
-    it "creates a master build" do
+    it "creates a master build with query string parameters" do
       post :build_ref, id: repository.to_param, ref: 'master', sha: 'abc123'
-      response.should be_success
-      json  = JSON.parse(response.body)
-      build = Build.find(json['id'])
 
-      expect(json['build_url']).not_to eq(nil)
-
-      expect(build.branch).to eq("master")
-      expect(build.ref).to eq("abc123")
-      expect(build.project.name).to eq(repository.repository_name)
+      verify_response_creates_build response, 'master', 'abc123', repo_name
     end
 
-    it "creates a PR build" do
+    it "creates a master build with payload" do
+      post :build_ref, id: repository.to_param, refChanges: [{refId: 'refs/head/master', toHash: 'abc123'}]
+
+      verify_response_creates_build response, 'master', 'abc123', repo_name
+    end
+
+    it "creates a PR build with query string parameters" do
       post :build_ref, id: repository.to_param, ref: 'blah', sha: 'abc123'
+
+      verify_response_creates_build response, 'blah', 'abc123', repo_name + "-pull_requests"
+    end
+
+    it "creates a PR build with payload" do
+      post :build_ref, id: repository.to_param, refChanges: [{refId: 'refs/head/blah', toHash: 'abc123'}]
+
+      verify_response_creates_build response, 'blah', 'abc123', repo_name + "-pull_requests"
+    end
+
+    def verify_response_creates_build(response, branch, ref, repo_name)
       response.should be_success
-      json  = JSON.parse(response.body)
-      build = Build.find(json['id'])
+      json       = JSON.parse(response.body)
+      build_hash = json['builds'][0]
+      build      = Build.find(build_hash['id'])
 
-      expect(json['build_url']).not_to eq(nil)
+      expect(build_hash['build_url']).not_to be_nil
 
-      expect(build.branch).to eq("blah")
-      expect(build.ref).to eq("abc123")
-      expect(build.project.name).to eq("#{repository.repository_name}-pull_requests")
+      expect(build.branch).to eq(branch)
+      expect(build.ref).to eq(ref)
+      expect(build.project.name).to eq(repo_name)
     end
   end
 end

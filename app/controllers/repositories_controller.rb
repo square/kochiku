@@ -1,3 +1,4 @@
+# TODO: Combine this controller with PullRequestsController#build
 class RepositoriesController < ApplicationController
   skip_before_filter :verify_authenticity_token, :only => [:build_ref]
 
@@ -46,9 +47,34 @@ class RepositoriesController < ApplicationController
   def build_ref
     repository = Repository.find(params[:id])
 
-    ref = params[:ref]
-    sha = params[:sha]
+    # refChanges is provided by the standard Stash webhooks plugin
+    # https://marketplace.atlassian.com/plugins/com.atlassian.stash.plugin.stash-web-post-receive-hooks-plugin
+    # Query string parameters are provided for easy integrations, since it the
+    # simplest to implement.
+    changes = if params[:refChanges]
+      params[:refChanges].map do |change|
+        [
+          change[:refId].split('/')[-1],
+          change[:toHash]
+        ]
+      end
+    else
+      [params.values_at(:ref, :sha)]
+    end
 
+    result = changes.map do |ref, sha|
+      ensure_build(repository, ref, sha)
+    end
+
+    render json: {
+      builds: result.map {|project, build| {
+        id:        build.id,
+        build_url: project_build_url(project, build)
+      }}
+    }
+  end
+
+  def ensure_build(repository, ref, sha)
     project_name = repository.repository_name
     project_name += '-pull_requests' unless ref == 'master'
 
@@ -60,9 +86,6 @@ class RepositoriesController < ApplicationController
       project.ensure_developer_build_exists(ref, sha)
     end
 
-    render json: {
-      id:        build.id,
-      build_url: project_build_url(project, build)
-    }
+    [project, build]
   end
 end
