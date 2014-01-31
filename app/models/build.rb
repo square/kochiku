@@ -165,7 +165,7 @@ class Build < ActiveRecord::Base
   def abort!
     update_attributes!(:state => :aborted)
 
-    all_build_part_ids = build_parts.select('id').collect(&:id)
+    all_build_part_ids = build_parts.select([:id, :build_id]).collect(&:id)
     BuildAttempt.
         where(state: :runnable, build_part_id: all_build_part_ids).
         update_all(state: :aborted, updated_at: Time.now)
