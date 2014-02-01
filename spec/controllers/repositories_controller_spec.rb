@@ -2,14 +2,15 @@ require 'spec_helper'
 
 describe RepositoriesController do
   render_views
-  describe "post /repositories" do
-    it "creates a repository" do
+  describe "create action" do
+    it "should perform a basic create" do
       expect{
         post :create, :repository => {:url => "git@git.example.com:square/kochiku.git", :test_command => "script/something"}
         response.should be_redirect
       }.to change(Repository, :count).by(1)
-      Repository.last.url.should == "git@git.example.com:square/kochiku.git"
-      Repository.last.test_command.should == "script/something"
+      repository = Repository.where(url: "git@git.example.com:square/kochiku.git").first
+      repository.should be_present
+      repository.test_command.should == "script/something"
     end
 
     it "creates a ci project" do
@@ -17,8 +18,9 @@ describe RepositoriesController do
         post :create, :repository => {:url => "git@git.example.com:square/kochiku.git", :test_command => "script/something"}
         response.should be_redirect
       }.to change(Project, :count).by(2)
-      Repository.last.projects.size.should == 2
-      Repository.last.projects.map(&:name).sort.should == ["kochiku", "kochiku-pull_requests"]
+      repository = Repository.where(url: "git@git.example.com:square/kochiku.git").first
+      repository.projects.size.should == 2
+      repository.projects.map(&:name).sort.should == ["kochiku", "kochiku-pull_requests"]
     end
 
     context "with repository name" do
@@ -28,8 +30,9 @@ describe RepositoriesController do
               test_command: "script/something", repository_name: "a-project-name"}
           response.should be_redirect
         }.to change(Project, :count).by(2)
-        Repository.last.projects.size.should == 2
-        Repository.last.projects.map(&:name).sort.should == ["a-project-name", "a-project-name-pull_requests"]
+        repository = Repository.where(url: "git@git.example.com:square/kochiku.git").first
+        repository.projects.size.should == 2
+        repository.projects.map(&:name).sort.should == ["a-project-name", "a-project-name-pull_requests"]
       end
     end
 
@@ -59,26 +62,72 @@ describe RepositoriesController do
     end
   end
 
-  describe "put /repositories/:id" do
+  describe "update" do
     let!(:repository) { FactoryGirl.create(:repository, :url => "git@git.example.com:square/kochiku.git", :test_command => "script/something")}
-    it "creates a repository" do
+
+    it "updates existing repository" do
       expect{
-        put :update, :id => repository.id, :repository => {:url => "git@git.example.com:square/kochiku-worker.git", :test_command => "script/something-else"}
+        patch :update, :id => repository.id, :repository => {:url => "git@git.example.com:square/kochiku-worker.git", :test_command => "script/something-else"}
         response.should be_redirect
-      }.to_not change(Repository, :count).by(1)
-      Repository.last.url.should == "git@git.example.com:square/kochiku-worker.git"
-      Repository.last.test_command.should == "script/something-else"
+      }.to_not change(Repository, :count)
+      repository.reload
+      repository.url.should == "git@git.example.com:square/kochiku-worker.git"
+      repository.test_command.should == "script/something-else"
       expect(response).to be_redirect
     end
 
     context "with invalid data" do
-      let(:repository) { FactoryGirl.create(:repository)}
       let(:params) { { timeout: 'abc' } }
 
       it "re-renders the edit page" do
-        put :update, id: repository.id, repository: params
+        patch :update, id: repository.id, repository: params
         expect(response).to be_success
         expect(response).to render_template('edit')
+      end
+    end
+
+    # boolean attributes
+    [
+      :run_ci,
+      :use_branches_on_green,
+      :build_pull_requests,
+      :send_build_failure_email,
+      :allows_kochiku_merges
+    ].each do |attribute|
+      it "should successfully update the #{attribute} attribute" do
+        start_value = repository.send(attribute)
+        inverse_value_as_str = start_value ? "0" : "1"
+        patch :update, id: repository.id, repository: { attribute => inverse_value_as_str }
+        repository.reload
+        repository.send(attribute).should == !start_value
+      end
+    end
+
+    # integer attributes
+    [:timeout].each do |attribute|
+      it "should successfully update the #{attribute} attribute" do
+        new_value = rand(1440) # max imposed by repository validation
+        patch :update, id: repository.id, repository: { attribute => new_value }
+        repository.reload
+        repository.send(attribute).should == new_value
+      end
+    end
+
+    # string attributes
+    [
+      :url,
+      :test_command,
+      :on_green_update,
+      :command_flag,
+      :on_success_script,
+      :on_success_note,
+      :repository_name
+    ].each do |attribute|
+      it "should successfully update the #{attribute} attribute" do
+        new_value = "Keytar Intelligentsia artisan typewriter 3 wolf moon"
+        patch :update, id: repository.id, repository: { attribute => new_value }
+        repository.reload
+        repository.send(attribute).should == new_value
       end
     end
   end
