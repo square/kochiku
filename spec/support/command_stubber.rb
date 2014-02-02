@@ -1,4 +1,6 @@
 class CommandStubber
+  include RSpec::Mocks::ExampleMethods
+
   attr_accessor :executed_commands, :fake_command_output
 
   def initialize
@@ -10,10 +12,10 @@ class CommandStubber
   end
 
   def create_stubbed_process_status(exitstatus=0)
-    obj = Object.new
-    obj.stub(:exitstatus).and_return(exitstatus)
-    obj.stub(:success?).and_return(exitstatus == 0)
-    obj
+    double(
+      exitstatus: exitstatus,
+      success?: exitstatus == 0
+    )
   end
 
   def stub_capture2e_failure(fail_on_cmd)
