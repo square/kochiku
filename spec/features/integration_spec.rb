@@ -12,34 +12,34 @@ feature "viewing an in process build" do
 
     visit('/')
 
-    page.should have_content(project.name)
-    first(".ci-build-info .state").should have_content("Runnable")
+    expect(page).to have_content(project.name)
+    expect(first(".ci-build-info .state")).to have_content("Runnable")
 
     click_link(project.name)
-    page.should have_content(build.ref[0, 5])
+    expect(page).to have_content(build.ref[0, 5])
     click_link(build.ref[0, 5])
 
     within("table.build-summary") do
-      find("td:nth-child(1)").should have_content(build_part.id)
-      find("td:nth-child(2)").should have_content("Runnable")
-      find("td:nth-child(4)").should have_content("Test")
+      expect(find("td:nth-child(1)")).to have_content(build_part.id)
+      expect(find("td:nth-child(2)")).to have_content("Runnable")
+      expect(find("td:nth-child(4)")).to have_content("Test")
       click_link("#{build_part.id}")
     end
 
-    find(".subheader").should have_content("#{build.ref[0, 7]} – Part #{build_part.id}")
+    expect(find(".subheader")).to have_content("#{build.ref[0, 7]} – Part #{build_part.id}")
 
-    all(".build-part-info tbody tr").size.should == 1
+    expect(all(".build-part-info tbody tr").size).to eq(1)
   end
 
   it "should return to the home page when the logo is clicked" do
     # visit a deep page
     visit project_build_part_path(project, build, build_part)
-    page.should have_content("Runnable on ci queue")
+    expect(page).to have_content("Runnable on ci queue")
 
     click_link("Home")
 
-    current_path.should == root_path
-    page.should have_content(project.name)
+    expect(current_path).to eq(root_path)
+    expect(page).to have_content(project.name)
   end
 end
 
@@ -52,10 +52,10 @@ feature "a failed build" do
   it "can be rebuilt" do
     build_part_page = project_build_part_path(@build_part.project, @build_part.build_instance, @build_part)
     visit(build_part_page)
-    all(".build-part-info tbody tr").size.should == 1
+    expect(all(".build-part-info tbody tr").size).to eq(1)
     click_link("Rebuild")
     visit(build_part_page)
-    all(".build-part-info tbody tr").size.should == 2
+    expect(all(".build-part-info tbody tr").size).to eq(2)
   end
 end
 
@@ -86,13 +86,13 @@ RESPONSE
     visit(project_path(@project))
     fill_in("build_branch", :with => @branch)
     click_button('Build')
-    page.should have_content(@branch_head_sha[0..4])
-    find(".flash.message").should have_content("Build added!")
+    expect(page).to have_content(@branch_head_sha[0..4])
+    expect(find(".flash.message")).to have_content("Build added!")
   end
 
   it "shows an error if no sha is given" do
     visit(project_path(@project))
     click_button('Build')
-    find(".flash.error").should have_content("Error adding build!")
+    expect(find(".flash.error")).to have_content("Error adding build!")
   end
 end

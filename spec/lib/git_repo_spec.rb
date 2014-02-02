@@ -43,7 +43,7 @@ RESPONSE
       end
 
       it "returns nil for non-existant repo" do
-        subject.should be_nil
+        expect(subject).to be_nil
       end
     end
 
@@ -51,20 +51,20 @@ RESPONSE
       branch = "nonexistant-branch"
       stub_request(:get, "#{repo_uri}/git/refs/heads/#{branch}").to_return(:status => 200, :body => '{ "message": "Not Found" }')
 
-      GitRepo.sha_for_branch(repository, branch).should be_nil
+      expect(GitRepo.sha_for_branch(repository, branch)).to be_nil
     end
 
     it "returns the HEAD SHA for the branch" do
-      GitRepo.sha_for_branch(repository, branch).should == branch_head_sha
+      expect(GitRepo.sha_for_branch(repository, branch)).to eq(branch_head_sha)
     end
   end
 
   describe "#synchronize_with_remote" do
     it "should throw an exception after the third fetch attempt" do
       fetch_double = double('git fetch')
-      fetch_double.should_receive(:run).exactly(3).times.and_raise(Cocaine::ExitStatusError)
-      Cocaine::CommandLine.stub(:new).with('git fetch', anything) { fetch_double }
-      GitRepo.should_receive(:sleep).exactly(2).times
+      expect(fetch_double).to receive(:run).exactly(3).times.and_raise(Cocaine::ExitStatusError)
+      allow(Cocaine::CommandLine).to receive(:new).with('git fetch', anything) { fetch_double }
+      expect(GitRepo).to receive(:sleep).exactly(2).times
       expect { GitRepo.send(:synchronize_with_remote, "master") }.to raise_error(Cocaine::ExitStatusError)
     end
   end
@@ -109,7 +109,7 @@ RESPONSE
             actual_remote = `git config --get remote.origin.url`.chomp
           end
 
-          actual_remote.should eq(new_remote)
+          expect(actual_remote).to eq(new_remote)
         end
       end
     end

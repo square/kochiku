@@ -12,7 +12,7 @@ describe ProjectsController do
     it "shows projects in order" do
       b; a; c
       get :index
-      assigns(:projects).map(&:name).should == %w{aster buckeye creosote}
+      expect(assigns(:projects).map(&:name)).to eq(%w{aster buckeye creosote})
     end
   end
 
@@ -23,10 +23,10 @@ describe ProjectsController do
 
     it "only shows the ci project" do
       get :ci_projects
-      response.should be_success
+      expect(response).to be_success
       doc = Nokogiri::HTML(response.body)
       elements = doc.css(".projects .ci-build-info")
-      elements.size.should == 1
+      expect(elements.size).to eq(1)
     end
   end
 
@@ -41,9 +41,9 @@ describe ProjectsController do
       get :show, :id => project.to_param, :format => :rss
       doc = REXML::Document.new(response.body)
       items = doc.elements.to_a("//channel/item")
-      items.length.should == Build.count
-      items.first.elements.to_a("title").first.text.should == "Build Number #{build2.id} failed"
-      items.last.elements.to_a("title").first.text.should == "Build Number #{build1.id} success"
+      expect(items.length).to eq(Build.count)
+      expect(items.first.elements.to_a("title").first.text).to eq("Build Number #{build2.id} failed")
+      expect(items.last.elements.to_a("title").first.text).to eq("Build Number #{build1.id} success")
     end
   end
 
@@ -53,16 +53,16 @@ describe ProjectsController do
     let(:project) { FactoryGirl.create(:project, :repository => repository, :name => repository.repository_name) }
 
     context "when a project has no builds" do
-      before { project.builds.should be_empty }
+      before { expect(project.builds).to be_empty }
 
       it "should return 'Unknown' for activity" do
         get :status_report, :format => :xml
-        response.should be_success
+        expect(response).to be_success
 
         doc = Nokogiri::XML(response.body)
         element = doc.at_xpath("/Projects/Project[@name='#{project.name}']")
 
-        element['activity'].should == 'Unknown'
+        expect(element['activity']).to eq('Unknown')
       end
     end
 
@@ -71,12 +71,12 @@ describe ProjectsController do
 
       it "should return 'Building' for activity" do
         get :status_report, :format => :xml
-        response.should be_success
+        expect(response).to be_success
 
         doc = Nokogiri::XML(response.body)
         element = doc.at_xpath("/Projects/Project[@name='#{project.name}']")
 
-        element['activity'].should == 'Building'
+        expect(element['activity']).to eq('Building')
       end
     end
 
@@ -85,12 +85,12 @@ describe ProjectsController do
 
       it "should return 'CheckingModifications' for activity" do
         get :status_report, :format => :xml
-        response.should be_success
+        expect(response).to be_success
 
         doc = Nokogiri::XML(response.body)
         element = doc.at_xpath("/Projects/Project[@name='#{project.name}']")
 
-        element['activity'].should == 'CheckingModifications'
+        expect(element['activity']).to eq('CheckingModifications')
       end
     end
   end

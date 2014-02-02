@@ -39,7 +39,7 @@ describe 'stash integration test' do
 
       stash.update_commit_status!(build)
 
-      WebMock.should have_requested(:post, "https://stashuser:stashpassword@stash.example.com/rest/build-status/1.0/commits/#{build.ref}")
+      expect(WebMock).to have_requested(:post, "https://stashuser:stashpassword@stash.example.com/rest/build-status/1.0/commits/#{build.ref}")
     end
   end
 end

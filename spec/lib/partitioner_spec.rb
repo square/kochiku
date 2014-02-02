@@ -5,9 +5,9 @@ describe Partitioner do
   let(:partitioner) { Partitioner.new }
 
   before do
-    YAML.stub(:load_file).with(Partitioner::KOCHIKU_YML_LOC_2).and_return(kochiku_yml)
-    File.stub(:exist?).with(Partitioner::KOCHIKU_YML_LOC_1).and_return(false) # always use loc_2 in the specs
-    File.stub(:exist?).with(Partitioner::KOCHIKU_YML_LOC_2).and_return(kochiku_yml_exists)
+    allow(YAML).to receive(:load_file).with(Partitioner::KOCHIKU_YML_LOC_2).and_return(kochiku_yml)
+    allow(File).to receive(:exist?).with(Partitioner::KOCHIKU_YML_LOC_1).and_return(false) # always use loc_2 in the specs
+    allow(File).to receive(:exist?).with(Partitioner::KOCHIKU_YML_LOC_2).and_return(kochiku_yml_exists)
   end
 
   let(:kochiku_yml) {
@@ -56,10 +56,10 @@ describe Partitioner do
 
     it "should not include a ruby version" do
       partitions = partitioner.partitions(build)
-      partitions.size.should be(1)
-      partitions.first["type"].should == "other"
-      partitions.first["files"].should_not be_empty
-      partitions.first["options"].should_not have_key("ruby")
+      expect(partitions.size).to be(1)
+      expect(partitions.first["type"]).to eq("other")
+      expect(partitions.first["files"]).not_to be_empty
+      expect(partitions.first["options"]).not_to have_key("ruby")
     end
   end
 
@@ -90,12 +90,12 @@ describe Partitioner do
 
     it "parses options from kochiku yml" do
       partitions = partitioner.partitions(build)
-      partitions.first["options"]["language"].should == "ruby"
-      partitions.first["options"]["ruby"].should == "ree-1.8.7-2011.12"
-      partitions.first["type"].should == "rspec"
-      partitions.first["files"].should_not be_empty
-      partitions.first["queue"].should == "developer"
-      partitions.first["retry_count"].should == 0
+      expect(partitions.first["options"]["language"]).to eq("ruby")
+      expect(partitions.first["options"]["ruby"]).to eq("ree-1.8.7-2011.12")
+      expect(partitions.first["type"]).to eq("rspec")
+      expect(partitions.first["files"]).not_to be_empty
+      expect(partitions.first["queue"]).to eq("developer")
+      expect(partitions.first["retry_count"]).to eq(0)
     end
 
     context "with a master build" do
@@ -104,7 +104,7 @@ describe Partitioner do
       it "should use the ci queue" do
         expect(build.project).to be_main
         partitions = partitioner.partitions(build)
-        partitions.first["queue"].should == "ci"
+        expect(partitions.first["queue"]).to eq("ci")
       end
 
       context "when append_type_to_queue is in kochiku.yml" do
@@ -112,7 +112,7 @@ describe Partitioner do
 
         it "should append the type" do
           partitions = partitioner.partitions(build)
-          partitions.first["queue"].should == "ci-rspec"
+          expect(partitions.first["queue"]).to eq("ci-rspec")
         end
       end
     end
@@ -121,7 +121,7 @@ describe Partitioner do
       it "should use the developer queue" do
         expect(build.project).to_not be_main
         partitions = partitioner.partitions(build)
-        partitions.first["queue"].should == "developer"
+        expect(partitions.first["queue"]).to eq("developer")
       end
 
       context "when append_type_to_queue is in kochiku.yml" do
@@ -129,7 +129,7 @@ describe Partitioner do
 
         it "should append the type" do
           partitions = partitioner.partitions(build)
-          partitions.first["queue"].should == "developer-rspec"
+          expect(partitions.first["queue"]).to eq("developer-rspec")
         end
       end
     end
@@ -138,14 +138,14 @@ describe Partitioner do
       let(:queue_override) { "override" }
       it "should override the queue on the build part" do
         partitions = partitioner.partitions(build)
-        partitions.first["queue"].should == "override"
+        expect(partitions.first["queue"]).to eq("override")
       end
 
       context "with append_type_to_queue true" do
         let(:append_type_to_queue) { true }
         it "should override the queue on the build part" do
           partitions = partitioner.partitions(build)
-          partitions.first["queue"].should == "override"
+          expect(partitions.first["queue"]).to eq("override")
         end
       end
     end
@@ -154,7 +154,7 @@ describe Partitioner do
       let(:retry_count) { 2 }
       it "should set the retry count" do
         partitions = partitioner.partitions(build)
-        partitions.first["retry_count"].should == 2
+        expect(partitions.first["retry_count"]).to eq(2)
       end
     end
   end
@@ -164,9 +164,9 @@ describe Partitioner do
 
     it "should return a single partiion" do
       partitions = partitioner.partitions(build)
-      partitions.size.should == 1
-      partitions.first["type"].should == "spec"
-      partitions.first["files"].should_not be_empty
+      expect(partitions.size).to eq(1)
+      expect(partitions.first["type"]).to eq("spec")
+      expect(partitions.first["files"]).not_to be_empty
     end
   end
 
@@ -181,7 +181,7 @@ describe Partitioner do
     context 'when there is a kochiku.yml' do
       let(:kochiku_yml_exists) { true }
 
-      before { Dir.stub(:[]).and_return(matches) }
+      before { allow(Dir).to receive(:[]).and_return(matches) }
 
       context 'when there are no files matching the glob' do
         let(:matches) { [] }
@@ -214,7 +214,7 @@ describe Partitioner do
           }
 
           context 'and a manifest file is specified' do
-            before { YAML.stub(:load_file).with(rspec_manifest).and_return(%w(c b a)) }
+            before { allow(YAML).to receive(:load_file).with(rspec_manifest).and_return(%w(c b a)) }
             let(:rspec_manifest) { 'manifest.yml' }
             let(:matches) { %w(a b c d) }
 
@@ -228,7 +228,7 @@ describe Partitioner do
           end
 
           context 'and time manifest files are specified' do
-            before do YAML.stub(:load_file).with(rspec_time_manifest).and_return(
+            before do allow(YAML).to receive(:load_file).with(rspec_time_manifest).and_return(
                 {
                   'a' => [2],
                   'b' => [5, 8],
@@ -238,7 +238,7 @@ describe Partitioner do
               )
             end
 
-            before do YAML.stub(:load_file).with(cuke_time_manifest).and_return(
+            before do allow(YAML).to receive(:load_file).with(cuke_time_manifest).and_return(
               {
                 'f' => [2],
                 'g' => [5, 8],
@@ -271,10 +271,10 @@ describe Partitioner do
           let(:rspec_balance) { 'size' }
 
           before do
-            File.stub(:size).with('a').and_return(1)
-            File.stub(:size).with('b').and_return(1000)
-            File.stub(:size).with('c').and_return(100)
-            File.stub(:size).with('d').and_return(10)
+            allow(File).to receive(:size).with('a').and_return(1)
+            allow(File).to receive(:size).with('b').and_return(1000)
+            allow(File).to receive(:size).with('c').and_return(100)
+            allow(File).to receive(:size).with('d').and_return(10)
           end
 
           it {
@@ -290,10 +290,10 @@ describe Partitioner do
           let(:rspec_balance) { 'size_greedy_partitioning' }
 
           before do
-            File.stub(:size).with('a').and_return(1)
-            File.stub(:size).with('b').and_return(1000)
-            File.stub(:size).with('c').and_return(100)
-            File.stub(:size).with('d').and_return(10)
+            allow(File).to receive(:size).with('a').and_return(1)
+            allow(File).to receive(:size).with('b').and_return(1000)
+            allow(File).to receive(:size).with('c').and_return(100)
+            allow(File).to receive(:size).with('d').and_return(10)
           end
 
           it {
@@ -309,10 +309,10 @@ describe Partitioner do
           let(:rspec_balance) { 'size_average_partitioning' }
 
           before do
-            File.stub(:size).with('a').and_return(1)
-            File.stub(:size).with('b').and_return(1000)
-            File.stub(:size).with('c').and_return(100)
-            File.stub(:size).with('d').and_return(10)
+            allow(File).to receive(:size).with('a').and_return(1)
+            allow(File).to receive(:size).with('b').and_return(1000)
+            allow(File).to receive(:size).with('c').and_return(100)
+            allow(File).to receive(:size).with('d').and_return(10)
           end
 
           it {

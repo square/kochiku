@@ -5,8 +5,8 @@ describe BuildMailer do
 
   describe "#error_email" do
     before do
-      Settings.stub(:sender_email_address).and_return('kochiku@example.com')
-      Settings.stub(:kochiku_notifications_email_address).and_return('notify@example.com')
+      allow(Settings).to receive(:sender_email_address).and_return('kochiku@example.com')
+      allow(Settings).to receive(:kochiku_notifications_email_address).and_return('notify@example.com')
     end
 
     it "sends the email" do
@@ -14,16 +14,16 @@ describe BuildMailer do
 
       email = BuildMailer.error_email(build_attempt, "error text")
 
-      email.to.should include('notify@example.com')
+      expect(email.to).to include('notify@example.com')
 
       expect(email.from).to eq(['kochiku@example.com'])
 
-      email.html_part.body.should include("test-builder")
-      email.text_part.body.should include("test-builder")
-      email.html_part.body.should include("http://")
-      email.text_part.body.should include("http://")
-      email.html_part.body.should include("error text")
-      email.text_part.body.should include("error text")
+      expect(email.html_part.body).to include("test-builder")
+      expect(email.text_part.body).to include("test-builder")
+      expect(email.html_part.body).to include("http://")
+      expect(email.text_part.body).to include("http://")
+      expect(email.html_part.body).to include("error text")
+      expect(email.text_part.body).to include("error text")
     end
   end
 
@@ -32,24 +32,24 @@ describe BuildMailer do
       let(:build) { FactoryGirl.create(:main_project_build) }
 
       before do
-        GitBlame.stub(:changes_since_last_green).and_return([{:hash => "sha", :author => "Joe", :date => "some day", :message => "always be shipping it"}])
-        GitBlame.stub(:emails_since_last_green).and_return(["foo@example.com"])
+        allow(GitBlame).to receive(:changes_since_last_green).and_return([{:hash => "sha", :author => "Joe", :date => "some day", :message => "always be shipping it"}])
+        allow(GitBlame).to receive(:emails_since_last_green).and_return(["foo@example.com"])
       end
 
       it "sends the email" do
-        build.project.should be_main
+        expect(build.project).to be_main
 
         build_part = build.build_parts.create!(:paths => ["a", "b"], :kind => "cucumber", :queue => :ci)
         build_part.build_attempts.create!(:state => :failed, :builder => "test-builder")
 
         email = BuildMailer.build_break_email(build)
 
-        email.to.should == ["foo@example.com"]
+        expect(email.to).to eq(["foo@example.com"])
 
-        email.html_part.body.should include(build_part.project.name)
-        email.text_part.body.should include(build_part.project.name)
-        email.html_part.body.should include("http://")
-        email.text_part.body.should include("http://")
+        expect(email.html_part.body).to include(build_part.project.name)
+        expect(email.text_part.body).to include(build_part.project.name)
+        expect(email.html_part.body).to include("http://")
+        expect(email.text_part.body).to include("http://")
       end
     end
 
@@ -57,8 +57,8 @@ describe BuildMailer do
       let(:build) { FactoryGirl.create(:build, :branch => "branch-of-master") }
 
       before do
-        GitBlame.stub(:changes_in_branch).and_return([{:hash => "sha", :author => "Joe", :date => "some day", :message => "always be shipping it"}])
-        GitBlame.stub(:emails_in_branch).and_return(["foo@example.com"])
+        allow(GitBlame).to receive(:changes_in_branch).and_return([{:hash => "sha", :author => "Joe", :date => "some day", :message => "always be shipping it"}])
+        allow(GitBlame).to receive(:emails_in_branch).and_return(["foo@example.com"])
       end
 
       it "sends the email" do
@@ -67,12 +67,12 @@ describe BuildMailer do
 
         email = BuildMailer.build_break_email(build)
 
-        email.to.should == ["foo@example.com"]
+        expect(email.to).to eq(["foo@example.com"])
 
-        email.html_part.body.should include(build_part.project.name)
-        email.text_part.body.should include(build_part.project.name)
-        email.html_part.body.should include("http://")
-        email.text_part.body.should include("http://")
+        expect(email.html_part.body).to include(build_part.project.name)
+        expect(email.text_part.body).to include(build_part.project.name)
+        expect(email.html_part.body).to include("http://")
+        expect(email.text_part.body).to include("http://")
       end
     end
   end

@@ -12,20 +12,20 @@ describe RepositoryObserver do
     YAML
     stub_const "Settings", settings
 
-    subject.stub(:should_contact_github?).and_return(true)
+    allow(subject).to receive(:should_contact_github?).and_return(true)
   end
 
   it "creates the hook if enabled" do
     stub_request(:get, "#{repository.base_api_url}/hooks").with do |request|
-      request.headers["Authorization"].should == "token #{GithubRequest::OAUTH_TOKEN}"
+      expect(request.headers["Authorization"]).to eq("token #{GithubRequest::OAUTH_TOKEN}")
       true
     end.to_return(:body => '[]')
     stub_request(:post, "#{repository.base_api_url}/hooks").with do |request|
-      request.headers["Authorization"].should == "token #{GithubRequest::OAUTH_TOKEN}"
+      expect(request.headers["Authorization"]).to eq("token #{GithubRequest::OAUTH_TOKEN}")
       body = JSON.parse(request.body)
-      body["name"].should == "web"
-      body["events"].should == ['pull_request']
-      body["active"].should == true
+      expect(body["name"]).to eq("web")
+      expect(body["events"]).to eq(['pull_request'])
+      expect(body["active"]).to eq(true)
       true
     end.to_return(:body => '[]')
     repository.build_pull_requests = true

@@ -12,19 +12,19 @@ describe BuildStateUpdateJob do
     build.build_parts.create!(:kind => :cucumber, :paths => ["baz"], :queue => :ci)
     # TODO: This is terrible, need to fold this feedback back into the design.
     # We are stubbing methods that are not called from the class under test.
-    GitRepo.stub(:run!)
-    GitRepo.stub(:valid_remote_url?).and_return(true)
-    GitRepo.stub(:synchronize_with_remote).and_return(true)
-    GitRepo.stub(:sha_for_branch).and_return(current_repo_master)
-    BuildStrategy.stub(:promote_build)
-    BuildStrategy.stub(:run_success_script)
+    allow(GitRepo).to receive(:run!)
+    allow(GitRepo).to receive(:valid_remote_url?).and_return(true)
+    allow(GitRepo).to receive(:synchronize_with_remote).and_return(true)
+    allow(GitRepo).to receive(:sha_for_branch).and_return(current_repo_master)
+    allow(BuildStrategy).to receive(:promote_build)
+    allow(BuildStrategy).to receive(:run_success_script)
     stub_request(:post, %r{#{repository.base_api_url}/statuses})
   end
 
   shared_examples "a non promotable state" do
     it "should not promote the build" do
       BuildStateUpdateJob.perform(build.id)
-      BuildStrategy.should_not_receive(:promote_build)
+      expect(BuildStrategy).not_to receive(:promote_build)
     end
   end
 
@@ -32,7 +32,7 @@ describe BuildStateUpdateJob do
     it "updates github when a build passes" do
       states = []
       stub_request(:post, "#{repository.base_api_url}/statuses/#{build.ref}").with do |request|
-        request.headers["Authorization"].should == "token #{GithubRequest::OAUTH_TOKEN}"
+        expect(request.headers["Authorization"]).to eq("token #{GithubRequest::OAUTH_TOKEN}")
         body = JSON.parse(request.body)
         states << body["state"]
         true
@@ -46,7 +46,7 @@ describe BuildStateUpdateJob do
       end
 
       BuildStateUpdateJob.perform(build.id)
-      states.should == ["pending", "success"]
+      expect(states).to eq(["pending", "success"])
     end
 
 
@@ -73,7 +73,7 @@ describe BuildStateUpdateJob do
             it "builds when there is a new sha to build" do
               expect { subject }.to change(project.builds, :count).by(1)
               build = project.builds.last
-              build.ref.should == "new-sha"
+              expect(build.ref).to eq("new-sha")
             end
 
             # TODO: this shouldn't be under the "when all parts have passed" context
@@ -86,7 +86,7 @@ describe BuildStateUpdateJob do
               build.build_parts.first.create_and_enqueue_new_build_attempt!
               expect { subject }.to change(project.builds, :count).by(1)
               build = project.builds.last
-              build.ref.should == "new-sha"
+              expect(build.ref).to eq("new-sha")
             end
 
             it "does not kick off a new build if one is already running" do
@@ -97,7 +97,7 @@ describe BuildStateUpdateJob do
             it "does not roll back a builds state" do
               new_build = project.builds.create!(:ref => current_repo_master, :state => :failed, :branch => 'master')
               expect { subject }.to_not change(project.builds, :count)
-              new_build.reload.state.should == :failed
+              expect(new_build.reload.state).to eq(:failed)
             end
 
           end
@@ -114,8 +114,8 @@ describe BuildStateUpdateJob do
         let(:project) { FactoryGirl.create(:project, :repository => repository, :name => repository.repository_name) }
 
         it "should promote the build" do
-          BuildStrategy.should_receive(:promote_build).with(build.ref, build.repository)
-          BuildStrategy.should_not_receive(:run_success_script)
+          expect(BuildStrategy).to receive(:promote_build).with(build.ref, build.repository)
+          expect(BuildStrategy).not_to receive(:run_success_script)
           BuildStateUpdateJob.perform(build.id)
         end
 
@@ -125,18 +125,18 @@ describe BuildStateUpdateJob do
           end
 
           it "promote the build only once" do
-            BuildStrategy.should_receive(:run_success_script).once.with(build.repository, build.ref, build.branch).and_return("this is a log file\n\n")
+            expect(BuildStrategy).to receive(:run_success_script).once.with(build.repository, build.ref, build.branch).and_return("this is a log file\n\n")
             2.times {
               BuildStateUpdateJob.perform(build.id)
             }
-            build.reload.on_success_script_log_file.read.should == "this is a log file\n\n"
+            expect(build.reload.on_success_script_log_file.read).to eq("this is a log file\n\n")
           end
         end
       end
 
       it "kochiku should merge the branch if eligible" do
         build.update_attributes(:merge_on_success => true)
-        BuildStrategy.should_receive(:merge_ref).with(build)
+        expect(BuildStrategy).to receive(:merge_ref).with(build)
         BuildStateUpdateJob.perform(build.id)
       end
     end

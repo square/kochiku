@@ -23,33 +23,33 @@ describe PullRequestsController do
           project.update_attributes!(:name => "web-something")
           expect {
             post :build, 'payload' => push_payload
-            response.should be_success
+            expect(response).to be_success
           }.to change(Project, :count).by(1)
-          Project.last.repository.should == repository
-          Project.last.name.should == "web"
+          expect(Project.last.repository).to eq(repository)
+          expect(Project.last.name).to eq("web")
         end
 
         it "does not duplicate the default project" do
           expect {
             post :build, 'payload' => push_payload
-            response.should be_success
+            expect(response).to be_success
           }.to_not change(Project, :count)
         end
 
         it "creates a build" do
           expect {
             post :build, 'payload' => push_payload
-            response.should be_success
+            expect(response).to be_success
           }.to change(Build, :count).by(1)
           build = Build.last
-          build.branch.should == "master"
-          build.ref.should == "SOME-SHA1"
+          expect(build.branch).to eq("master")
+          expect(build.ref).to eq("SOME-SHA1")
         end
 
         it "does not a build for not master" do
           expect {
             post :build, 'payload' => push_payload("ref" => "refs/heads/some-branch")
-            response.should be_success
+            expect(response).to be_success
           }.to_not change(Build, :count)
         end
 
@@ -57,18 +57,18 @@ describe PullRequestsController do
           repository.update_attributes!(:run_ci => false)
           expect {
             post :build, 'payload' => push_payload
-            response.should be_success
+            expect(response).to be_success
           }.to_not change(Build, :count)
         end
 
         it "does not build if there is an active ci build" do
           project.builds.create!(:ref => "sha", :state => :succeeded, :branch => 'master')
           frozen_time = 3.seconds.from_now
-          Time.stub(:now).and_return(frozen_time)
+          allow(Time).to receive(:now).and_return(frozen_time)
           project.builds.create!(:ref => "sha2", :state => :partitioning, :branch => 'master')
           expect {
             post :build, 'payload' => push_payload
-            response.should be_success
+            expect(response).to be_success
           }.to_not change(Build, :count)
         end
 
@@ -76,25 +76,25 @@ describe PullRequestsController do
           project.builds.create!(:ref => "sha", :state => :succeeded, :branch => 'master')
           expect {
             post :build, 'payload' => push_payload
-            response.should be_success
+            expect(response).to be_success
           }.to change(Build, :count).by(1)
         end
 
         it "builds if there is completed ci build after a build that is still building" do
           project.builds.create!(:ref => "sha", :state => :partitioning, :branch => 'master')
           frozen_time = 3.seconds.from_now
-          Time.stub(:now).and_return(frozen_time)
+          allow(Time).to receive(:now).and_return(frozen_time)
           project.builds.create!(:ref => "sha2", :state => :succeeded, :branch => 'master')
           expect {
             post :build, 'payload' => push_payload
-            response.should be_success
+            expect(response).to be_success
           }.to change(Build, :count).by(1)
         end
 
         it "it should not error if the repository url in the request is not found" do
           expect {
             post :build, 'payload' => push_payload("repository" => {"url" => "git@does:not/exist.git"})
-            response.should be_success
+            expect(response).to be_success
           }.to_not change(Build, :count)
         end
       end
@@ -103,20 +103,20 @@ describe PullRequestsController do
         it "creates the pull request project" do
           expect {
             post :build, 'payload' => pull_request_payload
-            response.should be_success
+            expect(response).to be_success
           }.to change(Project, :count).by(1)
-          Project.last.repository.should == repository
-          Project.last.name.should == "web-pull_requests"
+          expect(Project.last.repository).to eq(repository)
+          expect(Project.last.name).to eq("web-pull_requests")
         end
 
         it "creates a build for a pull request" do
           expect {
             post :build, 'payload' => pull_request_payload
-            response.should be_success
+            expect(response).to be_success
           }.to change(Build, :count).by(1)
           build = Build.last
-          build.branch.should == "branch-name"
-          build.ref.should == "Some-sha"
+          expect(build.branch).to eq("branch-name")
+          expect(build.ref).to eq("Some-sha")
         end
 
         it "will enqueue a build if autobuild pull requests is enabled" do
@@ -128,7 +128,7 @@ describe PullRequestsController do
           })
           expect {
             post :build, 'payload' => github_payload
-            response.should be_success
+            expect(response).to be_success
           }.to change(Build, :count).by(1)
         end
 
@@ -147,7 +147,7 @@ describe PullRequestsController do
             build = FactoryGirl.create(:build, :project => project, :ref => "de8251ff97ee194a289832576287d6f8ad74e3d0")
             expect {
               post :build, 'payload' => @github_payload
-              response.should be_success
+              expect(response).to be_success
             }.to_not change(Build, :count)
           end
 
@@ -156,7 +156,7 @@ describe PullRequestsController do
             build = FactoryGirl.create(:build, :project => project, :ref => "de8251ff97ee194a289832576287d6f8ad74e3d0")
             expect {
               post :build, 'payload' => @github_payload
-              response.should be_success
+              expect(response).to be_success
             }.to change(Build, :count)
           end
         end
@@ -167,33 +167,33 @@ describe PullRequestsController do
           it "does not create a pull request if not requested" do
             expect {
               post :build, 'payload' => pull_request_payload({"pull_request" => {"body" => "don't build it"}})
-              response.should be_success
+              expect(response).to be_success
             }.to_not change(project.builds, :count).by(1)
           end
           it "ignores !buildme casing" do
             expect {
               post :build, 'payload' => pull_request_payload({"pull_request" => {"body" => "!BuIlDMe"}})
-              response.should be_success
+              expect(response).to be_success
             }.to change(project.builds, :count).by(1)
           end
 
           it "does not build a closed pull request" do
             expect {
               post :build, 'payload' => pull_request_payload({"action" => "closed"})
-              response.should be_success
+              expect(response).to be_success
             }.to_not change(project.builds, :count).by(1)
           end
 
           it "does not blow up if action is missing" do
             post :build, 'payload' => pull_request_payload({"action" => nil})
-            response.should be_success
+            expect(response).to be_success
           end
         end
 
         it "does not blow up if pull_request is missing" do
           expect {
             post :build, 'payload' => pull_request_payload({"pull_request" => nil})
-            response.should be_success
+            expect(response).to be_success
           }.to_not change(Build, :count)
         end
 
@@ -201,7 +201,7 @@ describe PullRequestsController do
           expect {
             pr_payload = pull_request_payload("repository" => { "ssh_url" => "git@none.git" })
             post :build, 'payload' => pr_payload
-            response.should be_success
+            expect(response).to be_success
           }.to_not change(Build, :count)
         end
       end

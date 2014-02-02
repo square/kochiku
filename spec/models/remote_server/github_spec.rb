@@ -19,8 +19,8 @@ describe RemoteServer::Github do
     end
 
     it 'updates branch to the given ref when it already exists' do
-      GithubRequest
-        .should_receive(:post)
+      expect(GithubRequest)
+        .to receive(:post)
         .and_raise(GithubRequest::ResponseError)
       GithubRequest.should_receive(:patch).with do |uri, args|
         uri.to_s.should =~ /deployable-myapp\Z/ &&
@@ -36,7 +36,7 @@ describe RemoteServer::Github do
       it "should use the api subdomain" do
         repo = Repository.new(:url => "git@github.com:square/kochiku.git")
         enterprise = RemoteServer::Github.new(repo)
-        enterprise.base_api_url.should == "https://api.github.com/repos/square/kochiku"
+        expect(enterprise.base_api_url).to eq("https://api.github.com/repos/square/kochiku")
       end
     end
 
@@ -44,7 +44,7 @@ describe RemoteServer::Github do
       it "should use the api path prefix" do
         repo = Repository.new(:url => "git@git.example.com:square/kochiku.git")
         enterprise = RemoteServer::Github.new(repo)
-        enterprise.base_api_url.should == "https://git.example.com/api/v3/repos/square/kochiku"
+        expect(enterprise.base_api_url).to eq("https://git.example.com/api/v3/repos/square/kochiku")
       end
     end
   end

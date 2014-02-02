@@ -20,11 +20,11 @@ describe GithubCommitStatus do
   it "marks a build as pending" do
     build.update_attributes!(:state => :running)
     stub_request(:post, "https://git.example.com/api/v3/repos/square/web/statuses/#{build.ref}").with do |request|
-      request.headers["Authorization"].should == "token #{GithubRequest::OAUTH_TOKEN}"
+      expect(request.headers["Authorization"]).to eq("token #{GithubRequest::OAUTH_TOKEN}")
       body = JSON.parse(request.body)
-      body["state"].should == "pending"
-      body["description"].should_not be_blank
-      body["target_url"].should_not be_blank
+      expect(body["state"]).to eq("pending")
+      expect(body["description"]).not_to be_blank
+      expect(body["target_url"]).not_to be_blank
       true
     end.to_return(:body => commit_status_response)
     subject.update_commit_status!
@@ -34,7 +34,7 @@ describe GithubCommitStatus do
     build.update_attributes!(:state => :succeeded)
     stub_request(:post, "https://git.example.com/api/v3/repos/square/web/statuses/#{build.ref}").with do |request|
       body = JSON.parse(request.body)
-      body["state"].should == "success"
+      expect(body["state"]).to eq("success")
       true
     end.to_return(:body => commit_status_response)
     subject.update_commit_status!
@@ -44,7 +44,7 @@ describe GithubCommitStatus do
     build.update_attributes!(:state => :failed)
     stub_request(:post, "https://git.example.com/api/v3/repos/square/web/statuses/#{build.ref}").with do |request|
       body = JSON.parse(request.body)
-      body["state"].should == "failure"
+      expect(body["state"]).to eq("failure")
       true
     end.to_return(:body => commit_status_response)
     subject.update_commit_status!
@@ -55,7 +55,7 @@ describe GithubCommitStatus do
     build.update_attributes!(:state => :failed)
     stub_request(:post, "https://api.github.com/repos/square/kochiku-worker/statuses/#{build.ref}").with do |request|
       body = JSON.parse(request.body)
-      body["state"].should == "failure"
+      expect(body["state"]).to eq("failure")
       true
     end.to_return(:body => commit_status_response)
     subject.update_commit_status!

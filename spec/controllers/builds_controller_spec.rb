@@ -21,7 +21,7 @@ describe BuildsController do
 
         it "should create a new build" do
           post @action, @params.merge(:project_id => @project.to_param, :payload => @payload)
-          Build.where(:project_id => @project, :ref => @payload["after"]).exists?.should be_true
+          expect(Build.where(:project_id => @project, :ref => @payload["after"]).exists?).to be_true
         end
       end
 
@@ -35,7 +35,7 @@ describe BuildsController do
             post @action, @params.merge(:project_id => @project.to_param, :payload => @payload)
           }.to_not change(Build, :count)
 
-          response.should be_success
+          expect(response).to be_success
         end
       end
 
@@ -74,9 +74,9 @@ describe BuildsController do
           build = FactoryGirl.create(:build, :project => project, :ref => "30b111147d9a245468c6650f54de5c16584bc154")
           expect {
             post @action, @params.merge(:project_id => project_param, :build => build_info)
-            response.should be_success
+            expect(response).to be_success
           }.to_not change(Build, :count)
-          response.headers["Location"].should == project_build_url(project, build)
+          expect(response.headers["Location"]).to eq(project_build_url(project, build))
         end
 
         it "rebuilds if the sha is on a different repo" do
@@ -84,9 +84,9 @@ describe BuildsController do
           build = FactoryGirl.create(:build, :project => project, :ref => "30b111147d9a245468c6650f54de5c16584bc154")
           expect {
             post @action, @params.merge(:project_id => project_param, :build => build_info)
-            response.should be_success
+            expect(response).to be_success
           }.to change(Build, :count)
-          response.headers["Location"].should_not == project_build_url(project, build)
+          expect(response.headers["Location"]).not_to eq(project_build_url(project, build))
         end
       end
 
@@ -95,37 +95,37 @@ describe BuildsController do
         expect {
           post @action, @params.merge(:project_id => project_param, :build => build_info)
         }.to change(Repository, :count).by(1)
-        Repository.last.url.should == repo.url
+        expect(Repository.last.url).to eq(repo.url)
       end
 
       it "sets merge_on_success when param given" do
         post @action, @params.merge(:project_id => project_param, :build => build_info, :merge_on_success => "1")
-        Build.last.merge_on_success.should == true
+        expect(Build.last.merge_on_success).to eq(true)
       end
 
       it "defaults merge_on_success to false when param not given" do
         post @action, @params.merge(:project_id => project_param, :build => build_info)
-        Build.last.merge_on_success.should == false
+        expect(Build.last.merge_on_success).to eq(false)
       end
 
       it "sets branch when param given" do
         post @action, @params.merge(:project_id => project_param, :build => build_info.merge(:branch => "sticky-buddy"))
-        Build.last.branch.should == "sticky-buddy"
+        expect(Build.last.branch).to eq("sticky-buddy")
       end
 
       it "should create a new build" do
-        Build.exists?(:ref => build_info[:ref]).should be_false
+        expect(Build.exists?(:ref => build_info[:ref])).to be_false
         post @action, @params.merge(:project_id => project_param, :build => build_info)
-        Build.exists?(:project_id => assigns(:project), :ref => build_info[:ref]).should be_true
+        expect(Build.exists?(:project_id => assigns(:project), :ref => build_info[:ref])).to be_true
       end
 
       it "should return the build info page in the location header" do
         post @action, @params.merge(:project_id => project_param, :build => build_info)
 
         new_build = Build.where(:project_id => assigns(:project), :ref => build_info[:ref]).first
-        new_build.should be_present
+        expect(new_build).to be_present
 
-        response.location.should == project_build_url(project_param, new_build)
+        expect(response.location).to eq(project_build_url(project_param, new_build))
       end
 
       it "should find an existing build" do
@@ -136,7 +136,7 @@ describe BuildsController do
           post @action, @params.merge(:project_id => project_param, :build => build_info)
         }.to_not change { Build.count }
 
-        response.location.should == expected_url
+        expect(response.location).to eq(expected_url)
       end
     end
   end
@@ -180,9 +180,9 @@ RESPONSE
           post @action, {:project_id => project.to_param, :build => {:branch => branch}}
         }.to change { Build.count }.by(1)
         build = Build.last
-        build.project.should == project
-        build.branch.should == branch
-        build.ref.should == branch_head_sha
+        expect(build.project).to eq(project)
+        expect(build.branch).to eq(branch)
+        expect(build.ref).to eq(branch_head_sha)
       end
 
       context "and project is main project" do
@@ -190,30 +190,30 @@ RESPONSE
         let(:project) { FactoryGirl.create(:project, :name => repo.repository_name, :repository => repo) }
 
         before do
-          project.should be_main
+          expect(project).to be_main
         end
 
         it "creates the build for main project if no branch is given" do
-          GitRepo.stub(:sha_for_branch).and_return("deadbeef")
+          allow(GitRepo).to receive(:sha_for_branch).and_return("deadbeef")
 
           expect {
             post @action, {:project_id => project.to_param}
           }.to change { Build.count }.by(1)
           build = Build.last
-          build.project.should == project
-          build.branch.should == "master"
-          build.ref.should == "deadbeef"
+          expect(build.project).to eq(project)
+          expect(build.branch).to eq("master")
+          expect(build.ref).to eq("deadbeef")
         end
 
         it "does not create a new build if the latest commit already has a build" do
           FactoryGirl.create(:build, :state => :errored, :project => project, :branch => "master", :ref => branch_head_sha)
-          GitRepo.stub(:sha_for_branch).and_return(branch_head_sha)
+          allow(GitRepo).to receive(:sha_for_branch).and_return(branch_head_sha)
 
           expect do
             post @action, {:project_id => project.to_param}
           end.to_not change { Build.count }
-          flash[:error].should be_nil
-          flash[:warn].should be_present
+          expect(flash[:error]).to be_nil
+          expect(flash[:warn]).to be_present
         end
       end
 
@@ -230,8 +230,8 @@ RESPONSE
           expect do
             post @action, {:project_id => project.to_param, :build => {:branch => branch}}
           end.to_not change { Build.count }
-          flash[:error].should be_nil
-          flash[:warn].should be_present
+          expect(flash[:error]).to be_nil
+          expect(flash[:warn]).to be_present
         end
       end
 
@@ -253,12 +253,12 @@ RESPONSE
     end
 
     it "redirects back to the build page" do
-      response.should redirect_to(project_build_path(@build.project, @build))
+      expect(response).to redirect_to(project_build_path(@build.project, @build))
     end
 
     # spot-check that it does some abort action
     it "sets the build's state to aborted" do
-      @build.reload.state.should == :aborted
+      expect(@build.reload.state).to eq(:aborted)
     end
   end
 
@@ -269,15 +269,15 @@ RESPONSE
 
     it "aborts merge_on_success" do
       post :toggle_merge_on_success, :id => @build.id, :project_id => @build.project.name, :merge_on_success => false
-      response.should redirect_to(project_build_path(@build.project, @build))
-      @build.reload.merge_on_success.should be_false
+      expect(response).to redirect_to(project_build_path(@build.project, @build))
+      expect(@build.reload.merge_on_success).to be_false
     end
 
     it "enables merge_on_success" do
       @build.update_attributes(:merge_on_success => false)
       post :toggle_merge_on_success, :id => @build.id, :project_id => @build.project.name, :merge_on_success => true
-      response.should redirect_to(project_build_path(@build.project, @build))
-      @build.reload.merge_on_success.should be_true
+      expect(response).to redirect_to(project_build_path(@build.project, @build))
+      expect(@build.reload.merge_on_success).to be_true
     end
   end
 
@@ -294,8 +294,8 @@ RESPONSE
       get @action, @params
       doc = Nokogiri::HTML(response.body)
       elements = doc.css("input[name=merge_on_success]")
-      elements.size.should == 1
-      elements.first['checked'].should be_blank
+      expect(elements.size).to eq(1)
+      expect(elements.first['checked']).to be_blank
     end
 
     context "for builds with merge_on_success enabled" do
@@ -304,8 +304,8 @@ RESPONSE
         get @action, @params
         doc = Nokogiri::HTML(response.body)
         elements = doc.css("input[name=merge_on_success]")
-        elements.size.should == 1
-        elements.first['checked'].should be_present
+        expect(elements.size).to eq(1)
+        expect(elements.first['checked']).to be_present
       end
     end
 
@@ -317,8 +317,8 @@ RESPONSE
         get @action, @params
         doc = Nokogiri::HTML(response.body)
         elements = doc.css("input[name=merge_on_success]")
-        elements.size.should == 1
-        elements.first['disabled'].should be_present
+        expect(elements.size).to eq(1)
+        expect(elements.first['disabled']).to be_present
       end
     end
   end
@@ -339,17 +339,17 @@ RESPONSE
       end
 
       it "rebuilds all failed attempts" do
-        build.build_parts.failed_errored_or_aborted.count.should == 3
+        expect(build.build_parts.failed_errored_or_aborted.count).to eq(3)
         subject
-        build.reload.build_parts.failed.count.should be_zero
-        build.build_attempts.count.should == 5 + 3
+        expect(build.reload.build_parts.failed.count).to be_zero
+        expect(build.build_attempts.count).to eq(5 + 3)
       end
 
       it "only enqueues one build attempt for each failed build part" do
         subject
-        parts[0].reload.build_attempts.count.should == 2
-        parts[1].reload.build_attempts.count.should == 3
-        parts[3].reload.build_attempts.count.should == 2
+        expect(parts[0].reload.build_attempts.count).to eq(2)
+        expect(parts[1].reload.build_attempts.count).to eq(3)
+        expect(parts[3].reload.build_attempts.count).to eq(2)
 
         expect {
           # repost to test idempotency
