@@ -21,16 +21,15 @@ describe BuildPart do
 
     it "enqueues onto the queue specified in the build part" do
       build_part.update_attribute(:queue, 'queueX')
-      expect(BuildAttemptJob).to receive(:enqueue_on).once.with { |queue, arg_hash|
+      expect(BuildAttemptJob).to receive(:enqueue_on).once do |queue, arg_hash|
         expect(queue).to eq("queueX")
-        true
-      }
+      end
       build_part.create_and_enqueue_new_build_attempt!
     end
 
     it "should enqueue the build attempt for building" do
       build_part.update_attributes!(:options => {"ruby" => "ree"})
-      expect(BuildAttemptJob).to receive(:enqueue_on).once.with { |queue, arg_hash|
+      expect(BuildAttemptJob).to receive(:enqueue_on).once do |queue, arg_hash|
         expect(queue).to eq("ci")
         expect(arg_hash["build_attempt_id"]).not_to be_blank
         expect(arg_hash["build_ref"]).not_to be_blank
@@ -40,8 +39,7 @@ describe BuildPart do
         expect(arg_hash["test_command"]).not_to be_blank
         expect(arg_hash["repo_url"]).not_to be_blank
         expect(arg_hash["options"]).to eq({"ruby" => "ree"})
-        true
-      }
+      end
       build_part.create_and_enqueue_new_build_attempt!
     end
   end
@@ -237,7 +235,7 @@ describe BuildPart do
 
     context "for a non merge_on_success branch build" do
       before { expect(build.merge_on_success).to be_false }
-      
+
       it "will not reattempt" do
         expect(build_part.should_reattempt?).to be_false
       end

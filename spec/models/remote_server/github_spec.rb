@@ -6,15 +6,15 @@ describe RemoteServer::Github do
     let(:server) { described_class.new(repo) }
 
     it 'creates branch if it does not exist' do
-      expect(GithubRequest).to receive(:post).with { |uri, args|
-        args[:ref] == 'refs/heads/deployable-myapp' &&
-          args[:sha] == 'abc123'
-      }
-      expect(GithubRequest).to receive(:patch).with { |uri, args|
+      expect(GithubRequest).to receive(:post) do |uri, args|
+        expect(args[:ref]).to eq('refs/heads/deployable-myapp')
+        expect(args[:sha]).to eq('abc123')
+      end
+      expect(GithubRequest).to receive(:patch) do |uri, args|
         expect(uri.to_s).to match(/deployable-myapp\Z/)
         expect(args[:force]).to eq('true')
         expect(args[:sha]).to eq('abc123')
-      }
+      end
       server.promote_branch!('deployable-myapp', 'abc123')
     end
 
@@ -22,11 +22,11 @@ describe RemoteServer::Github do
       expect(GithubRequest)
         .to receive(:post)
         .and_raise(GithubRequest::ResponseError)
-      expect(GithubRequest).to receive(:patch).with { |uri, args|
+      expect(GithubRequest).to receive(:patch) do |uri, args|
         expect(uri.to_s).to match(/deployable-myapp\Z/)
         expect(args[:force]).to eq('true')
         expect(args[:sha]).to eq('abc123')
-      }
+      end
       server.promote_branch!('deployable-myapp', 'abc123')
     end
   end
