@@ -1,7 +1,7 @@
 source 'https://rubygems.org'
 
 gem 'rails', '~> 4.0.2'
-gem 'passenger', '4.0.10', group: :production
+gem 'passenger', '~> 4.0.10', group: :production
 gem 'dynamic_form'
 gem 'rails-observers'
 
