@@ -101,7 +101,7 @@ describe Repository do
     end
 
     context "repository_name is not set when saving" do
-      it "sets the repository name based on the " do
+      it "sets the repository name based on the repository url" do
         repo = Repository.new(url: "git://git.example.com/square/kochiku-name.git")
         repo.save
         repo.reload

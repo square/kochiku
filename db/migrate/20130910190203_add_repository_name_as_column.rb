@@ -1,3 +1,5 @@
+require 'colorize'
+
 class AddRepositoryNameAsColumn < ActiveRecord::Migration
   Rails.logger = Logger.new(STDOUT)
 
