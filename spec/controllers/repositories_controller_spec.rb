@@ -6,21 +6,21 @@ describe RepositoriesController do
     it "should perform a basic create" do
       expect{
         post :create, :repository => {:url => "git@git.example.com:square/kochiku.git", :test_command => "script/something"}
-        response.should be_redirect
+        expect(response).to be_redirect
       }.to change(Repository, :count).by(1)
       repository = Repository.where(url: "git@git.example.com:square/kochiku.git").first
-      repository.should be_present
-      repository.test_command.should == "script/something"
+      expect(repository).to be_present
+      expect(repository.test_command).to eq("script/something")
     end
 
     it "creates a ci project" do
       expect{
         post :create, :repository => {:url => "git@git.example.com:square/kochiku.git", :test_command => "script/something"}
-        response.should be_redirect
+        expect(response).to be_redirect
       }.to change(Project, :count).by(2)
       repository = Repository.where(url: "git@git.example.com:square/kochiku.git").first
-      repository.projects.size.should == 2
-      repository.projects.map(&:name).sort.should == ["kochiku", "kochiku-pull_requests"]
+      expect(repository.projects.size).to eq(2)
+      expect(repository.projects.map(&:name).sort).to eq(["kochiku", "kochiku-pull_requests"])
     end
 
     context "with repository name" do
@@ -28,11 +28,11 @@ describe RepositoriesController do
         expect{
           post :create, :repository => {url: "git@git.example.com:square/kochiku.git",
               test_command: "script/something", repository_name: "a-project-name"}
-          response.should be_redirect
+          expect(response).to be_redirect
         }.to change(Project, :count).by(2)
         repository = Repository.where(url: "git@git.example.com:square/kochiku.git").first
-        repository.projects.size.should == 2
-        repository.projects.map(&:name).sort.should == ["a-project-name", "a-project-name-pull_requests"]
+        expect(repository.projects.size).to eq(2)
+        expect(repository.projects.map(&:name).sort).to eq(["a-project-name", "a-project-name-pull_requests"])
       end
     end
 
@@ -55,10 +55,10 @@ describe RepositoriesController do
     let!(:project2) { FactoryGirl.create(:project)}
     it "shows only a repositories projects" do
       get :projects, :id => repository.id
-      response.should be_success
+      expect(response).to be_success
       doc = Nokogiri::HTML(response.body)
       elements = doc.css(".projects .build-info")
-      elements.size.should == 1
+      expect(elements.size).to eq(1)
     end
   end
 
@@ -68,11 +68,11 @@ describe RepositoriesController do
     it "updates existing repository" do
       expect{
         patch :update, :id => repository.id, :repository => {:url => "git@git.example.com:square/kochiku-worker.git", :test_command => "script/something-else"}
-        response.should be_redirect
+        expect(response).to be_redirect
       }.to_not change(Repository, :count)
       repository.reload
-      repository.url.should == "git@git.example.com:square/kochiku-worker.git"
-      repository.test_command.should == "script/something-else"
+      expect(repository.url).to eq("git@git.example.com:square/kochiku-worker.git")
+      expect(repository.test_command).to eq("script/something-else")
       expect(response).to be_redirect
     end
 
@@ -99,7 +99,7 @@ describe RepositoriesController do
         inverse_value_as_str = start_value ? "0" : "1"
         patch :update, id: repository.id, repository: { attribute => inverse_value_as_str }
         repository.reload
-        repository.send(attribute).should == !start_value
+        expect(repository.send(attribute)).to eq(!start_value)
       end
     end
 
@@ -109,7 +109,7 @@ describe RepositoriesController do
         new_value = rand(1440) # max imposed by repository validation
         patch :update, id: repository.id, repository: { attribute => new_value }
         repository.reload
-        repository.send(attribute).should == new_value
+        expect(repository.send(attribute)).to eq(new_value)
       end
     end
 
@@ -127,7 +127,7 @@ describe RepositoriesController do
         new_value = "Keytar Intelligentsia artisan typewriter 3 wolf moon"
         patch :update, id: repository.id, repository: { attribute => new_value }
         repository.reload
-        repository.send(attribute).should == new_value
+        expect(repository.send(attribute)).to eq(new_value)
       end
     end
   end
@@ -137,7 +137,7 @@ describe RepositoriesController do
     it "responds with success" do
       expect {
         get :destroy, :id => repository.id
-        response.should be_redirect
+        expect(response).to be_redirect
       }.to change(Repository, :count).by(-1)
     end
   end
@@ -145,21 +145,21 @@ describe RepositoriesController do
   describe "get /repositories" do
     it "responds with success" do
       get :index
-      response.should be_success
+      expect(response).to be_success
     end
   end
 
   describe "get /repositories/:id/edit" do
     it "responds with success" do
       get :edit, :id => FactoryGirl.create(:repository).id
-      response.should be_success
+      expect(response).to be_success
     end
   end
 
   describe "get /repositories/new" do
     it "responds with success" do
       get :new
-      response.should be_success
+      expect(response).to be_success
     end
   end
 
@@ -192,7 +192,7 @@ describe RepositoriesController do
     end
 
     def verify_response_creates_build(response, branch, ref, repo_name)
-      response.should be_success
+      expect(response).to be_success
       json       = JSON.parse(response.body)
       build_hash = json['builds'][0]
       build      = Build.find(build_hash['id'])

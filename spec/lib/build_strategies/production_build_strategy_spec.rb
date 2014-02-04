@@ -9,28 +9,28 @@ describe BuildStrategy do
   before(:each) do
     CommandStubber.new # ensure Open3 is stubbed
 
-    Rails.application.config.action_mailer.delivery_method.should == :test
+    expect(Rails.application.config.action_mailer.delivery_method).to eq(:test)
   end
 
   describe "#merge_ref" do
     context "when auto_merge is enabled" do
       before do
-        GitBlame.should_receive(:emails_in_branch).with(build).and_return("the-committers@example.com")
+        expect(GitBlame).to receive(:emails_in_branch).with(build).and_return("the-committers@example.com")
       end
 
       it "should merge to master" do
         merger = GitMergeExecutor.new
-        GitMergeExecutor.should_receive(:new).and_return(merger)
-        merger.should_receive(:merge).with(build)
-        BuildStrategy.merge_ref(build).should_not be_nil
+        expect(GitMergeExecutor).to receive(:new).and_return(merger)
+        expect(merger).to receive(:merge).with(build)
+        expect(BuildStrategy.merge_ref(build)).not_to be_nil
       end
 
       it "should handle merge failure" do
         merger = GitMergeExecutor.new
-        GitMergeExecutor.should_receive(:new).and_return(merger)
-        merger.should_receive(:merge).with(build).and_raise(GitMergeExecutor::UnableToMergeError)
+        expect(GitMergeExecutor).to receive(:new).and_return(merger)
+        expect(merger).to receive(:merge).with(build).and_raise(GitMergeExecutor::UnableToMergeError)
 
-        BuildStrategy.merge_ref(build).should_not be_nil
+        expect(BuildStrategy.merge_ref(build)).not_to be_nil
       end
     end
   end
@@ -41,12 +41,12 @@ describe BuildStrategy do
     context "when pushing to a ref that doesn't exist" do
       before(:each) {
         mock_git_command = double
-        mock_git_command.should_receive(:run).and_return ""
-        Cocaine::CommandLine.stub(:new).with("git show-ref", anything, anything).and_return mock_git_command
+        expect(mock_git_command).to receive(:run).and_return ""
+        allow(Cocaine::CommandLine).to receive(:new).with("git show-ref", anything, anything).and_return mock_git_command
       }
 
       it "fails gracefully if the ref is undefined" do
-        described_class.should_receive(:promote).with(:tag, project.repository.promotion_refs.first, build.ref)
+        expect(described_class).to receive(:promote).with(:tag, project.repository.promotion_refs.first, build.ref)
         subject
       end
     end
@@ -59,8 +59,8 @@ describe BuildStrategy do
 
     it "should promote a sha" do
       mock_git_command = double
-      mock_git_command.should_receive(:run).and_return ""
-      Cocaine::CommandLine.stub(:new).with(["git push", "origin abc123:refs/heads/last-green -f"]).and_return mock_git_command
+      expect(mock_git_command).to receive(:run).and_return ""
+      allow(Cocaine::CommandLine).to receive(:new).with(["git push", "origin abc123:refs/heads/last-green -f"]).and_return mock_git_command
 
       subject
     end

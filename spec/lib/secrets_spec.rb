@@ -3,7 +3,7 @@ require 'secrets'
 
 describe Secrets do
   it "loads the oauth token" do
-    Secrets.github_oauth.should_not be_nil
+    expect(Secrets.github_oauth).not_to be_nil
   end
 
   context 'missing path' do

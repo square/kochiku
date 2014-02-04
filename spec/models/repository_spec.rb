@@ -21,7 +21,7 @@ describe Repository do
 
     context 'without a main project' do
       it 'returns nil' do
-        subject.should be_nil
+        expect(subject).to be_nil
       end
     end
 
@@ -31,61 +31,61 @@ describe Repository do
       end
 
       it 'returns the main project' do
-        subject.should == main_project
+        expect(subject).to eq(main_project)
       end
     end
   end
 
   context "#interested_github_events" do
     it 'includes push if run_ci is enabled' do
-      Repository.new(:run_ci => true).interested_github_events.should == ['pull_request', 'push']
+      expect(Repository.new(:run_ci => true).interested_github_events).to eq(['pull_request', 'push'])
     end
     it 'does not include push if run_ci is enabled' do
-      Repository.new(:run_ci => false).interested_github_events.should == ['pull_request']
+      expect(Repository.new(:run_ci => false).interested_github_events).to eq(['pull_request'])
     end
   end
 
   context "#promotion_refs" do
     it "is an empty array when promotion_refs is a empty string" do
-      Repository.new(:on_green_update => "").promotion_refs.should == []
+      expect(Repository.new(:on_green_update => "").promotion_refs).to eq([])
     end
 
     it "is an empty array when promotion_refs is a blank string" do
-      Repository.new(:on_green_update => "   ").promotion_refs.should == []
+      expect(Repository.new(:on_green_update => "   ").promotion_refs).to eq([])
     end
 
     it "is an empty array when promotion_refs is comma" do
-      Repository.new(:on_green_update => "  , ").promotion_refs.should == []
+      expect(Repository.new(:on_green_update => "  , ").promotion_refs).to eq([])
     end
 
     it "splits on comma's" do
-      Repository.new(:on_green_update => "a,b,c").promotion_refs.should == ["a", "b", "c"]
+      expect(Repository.new(:on_green_update => "a,b,c").promotion_refs).to eq(["a", "b", "c"])
     end
   end
 
   context "#base_api_url" do
     it "handles ssh urls" do
       repo = Repository.new(url: "git@git.example.com:square/kochiku.git")
-      repo.base_api_url.should == "https://git.example.com/api/v3/repos/square/kochiku"
+      expect(repo.base_api_url).to eq("https://git.example.com/api/v3/repos/square/kochiku")
     end
   end
 
   context "#base_html_url" do
     it "handles ssh urls" do
       repo = Repository.new(url: "git@git.example.com:square/kochiku.git")
-      repo.base_html_url.should == "https://git.example.com/square/kochiku"
+      expect(repo.base_html_url).to eq("https://git.example.com/square/kochiku")
     end
     it "handles http urls" do
       repo = Repository.new(url: "http://git.example.com/square/kochiku.git")
-      repo.base_html_url.should == "https://git.example.com/square/kochiku"
+      expect(repo.base_html_url).to eq("https://git.example.com/square/kochiku")
     end
     it "handles https urls" do
       repo = Repository.new(url: "https://git.example.com/square/kochiku.git")
-      repo.base_html_url.should == "https://git.example.com/square/kochiku"
+      expect(repo.base_html_url).to eq("https://git.example.com/square/kochiku")
     end
     it "handles git read only urls" do
       repo = Repository.new(url: "git://git.example.com/square/kochiku.git")
-      repo.base_html_url.should == "https://git.example.com/square/kochiku"
+      expect(repo.base_html_url).to eq("https://git.example.com/square/kochiku")
     end
   end
 
@@ -96,7 +96,7 @@ describe Repository do
             repository_name: "another_project")
         repo.save
         repo.reload
-        repo.repository_name.should == "another_project"
+        expect(repo.repository_name).to eq("another_project")
       end
     end
 
@@ -105,7 +105,7 @@ describe Repository do
         repo = Repository.new(url: "git://git.example.com/square/kochiku-name.git")
         repo.save
         repo.reload
-        repo.repository_name.should == "kochiku-name"
+        expect(repo.repository_name).to eq("kochiku-name")
       end
 
       context "when that name already exists" do
@@ -139,7 +139,7 @@ describe Repository do
 
     context "#repository_name" do
       it "returns the repositories name" do
-        repo.repository_name.should == "myrepo"
+        expect(repo.repository_name).to eq("myrepo")
       end
     end
 
@@ -157,13 +157,13 @@ describe Repository do
   context "#repo_cache_name" do
     it "returns the cache from the settings or the default from the repo name" do
       repository = Repository.new(:repo_cache_dir => "foobar")
-      repository.repo_cache_name.should == "foobar"
+      expect(repository.repo_cache_name).to eq("foobar")
     end
 
     it "returns the cache from the settings or the default from the repo name" do
       repository = Repository.new(url: "https://git.example.com/square/kochiku")
       repository.valid?
-      repository.repo_cache_name.should == "kochiku-cache"
+      expect(repository.repo_cache_name).to eq("kochiku-cache")
     end
   end
 
@@ -173,11 +173,11 @@ describe Repository do
       repository.run_ci="1"
       repository.save
       repository.reload
-      repository.run_ci.should == true
+      expect(repository.run_ci).to eq(true)
       repository.run_ci="0"
       repository.save
       repository.reload
-      repository.run_ci.should == false
+      expect(repository.run_ci).to eq(false)
     end
   end
 
@@ -187,11 +187,11 @@ describe Repository do
       repository.build_pull_requests="1"
       repository.save
       repository.reload
-      repository.build_pull_requests.should == true
+      expect(repository.build_pull_requests).to eq(true)
       repository.build_pull_requests="0"
       repository.save
       repository.reload
-      repository.build_pull_requests.should == false
+      expect(repository.build_pull_requests).to eq(false)
     end
   end
 
@@ -201,11 +201,11 @@ describe Repository do
       repository.use_branches_on_green="1"
       repository.save
       repository.reload
-      repository.use_branches_on_green.should == true
+      expect(repository.use_branches_on_green).to eq(true)
       repository.use_branches_on_green="0"
       repository.save
       repository.reload
-      repository.use_branches_on_green.should == false
+      expect(repository.use_branches_on_green).to eq(false)
     end
   end
 
@@ -214,19 +214,19 @@ describe Repository do
     repository.on_green_update="1,2,3"
     repository.save
     repository.reload
-    repository.on_green_update.should == "1,2,3"
+    expect(repository.on_green_update).to eq("1,2,3")
   end
 
   context "has_on_success_script?" do
     it "is false if the script is blank" do
-      Repository.new(:on_success_script => "").has_on_success_script?.should be_false
-      Repository.new(:on_success_script => nil).has_on_success_script?.should be_false
-      Repository.new(:on_success_script => "  ").has_on_success_script?.should be_false
-      Repository.new(:on_success_script => " \n ").has_on_success_script?.should be_false
+      expect(Repository.new(:on_success_script => "").has_on_success_script?).to be_false
+      expect(Repository.new(:on_success_script => nil).has_on_success_script?).to be_false
+      expect(Repository.new(:on_success_script => "  ").has_on_success_script?).to be_false
+      expect(Repository.new(:on_success_script => " \n ").has_on_success_script?).to be_false
     end
 
     it "is true if there is a script" do
-      Repository.new(:on_success_script => "hi").has_on_success_script?.should be_true
+      expect(Repository.new(:on_success_script => "hi").has_on_success_script?).to be_true
     end
   end
 end

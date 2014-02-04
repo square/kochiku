@@ -16,6 +16,10 @@ Dir[Rails.root.join("spec/support/**/*.rb")].each {|f| require f}
 
 
 RSpec.configure do |config|
+  config.expect_with :rspec do |c|
+    c.syntax = :expect
+  end
+
   config.mock_with :rspec
 
   # Remove this line if you're not using ActiveRecord or ActiveRecord fixtures
@@ -31,14 +35,14 @@ RSpec.configure do |config|
 
   config.before :each do
     WebMock.disable_net_connect!
-    JobBase.stub(:enqueue_in)
+    allow(JobBase).to receive(:enqueue_in)
 
-    GitBlame.stub(:git_names_and_emails_since_last_green).and_return("")
-    GitBlame.stub(:git_names_and_emails_in_branch).and_return("")
-    GitBlame.stub(:changes_since_last_green).and_return([])
-    GitBlame.stub(:changes_in_branch).and_return([])
-    GitBlame.stub(:files_changed_since_last_green).and_return([])
-    GitBlame.stub(:files_changed_in_branch).and_return([])
+    allow(GitBlame).to receive(:git_names_and_emails_since_last_green).and_return("")
+    allow(GitBlame).to receive(:git_names_and_emails_in_branch).and_return("")
+    allow(GitBlame).to receive(:changes_since_last_green).and_return([])
+    allow(GitBlame).to receive(:changes_in_branch).and_return([])
+    allow(GitBlame).to receive(:files_changed_since_last_green).and_return([])
+    allow(GitBlame).to receive(:files_changed_in_branch).and_return([])
 
     ActionMailer::Base.deliveries.clear
   end

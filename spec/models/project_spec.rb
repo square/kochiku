@@ -33,12 +33,12 @@ describe Project do
     end
 
     it "gets the last builds duration" do
-      project.last_build_duration.should_not be_nil
+      expect(project.last_build_duration).not_to be_nil
     end
 
     it "gets the last successful builds duration" do
       FactoryGirl.create(:build, :project => project, :state => :runnable).reload
-      project.last_build_duration.should_not be_nil
+      expect(project.last_build_duration).not_to be_nil
     end
   end
 
@@ -46,11 +46,11 @@ describe Project do
     let(:repository) { FactoryGirl.create(:repository, :url => "git@git.example.com:square/kochiku.git") }
     it "returns true when the projects name is the same as the repo" do
       project = FactoryGirl.create(:project, :name => "kochiku", :repository => repository)
-      project.main?.should be_true
+      expect(project.main?).to be_true
     end
     it "returns false when the projects name different then the repo" do
       project = FactoryGirl.create(:project, :name => "web", :repository => repository)
-      project.main?.should be_false
+      expect(project.main?).to be_false
     end
   end
 

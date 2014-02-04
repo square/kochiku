@@ -14,34 +14,34 @@ describe BuildPart do
     end
 
     it "updates the build state to running" do
-      build.state.should_not == :running
+      expect(build.state).not_to eq(:running)
       build_part.create_and_enqueue_new_build_attempt!
-      build.state.should == :running
+      expect(build.state).to eq(:running)
     end
 
     it "enqueues onto the queue specified in the build part" do
       build_part.update_attribute(:queue, 'queueX')
-      BuildAttemptJob.should_receive(:enqueue_on).once.with do |queue, arg_hash|
-        queue.should == "queueX"
+      expect(BuildAttemptJob).to receive(:enqueue_on).once.with { |queue, arg_hash|
+        expect(queue).to eq("queueX")
         true
-      end
+      }
       build_part.create_and_enqueue_new_build_attempt!
     end
 
     it "should enqueue the build attempt for building" do
       build_part.update_attributes!(:options => {"ruby" => "ree"})
-      BuildAttemptJob.should_receive(:enqueue_on).once.with do |queue, arg_hash|
-        queue.should == "ci"
-        arg_hash["build_attempt_id"].should_not be_blank
-        arg_hash["build_ref"].should_not be_blank
-        arg_hash["build_kind"].should_not be_blank
-        arg_hash["test_files"].should_not be_blank
-        arg_hash["repo_name"].should_not be_blank
-        arg_hash["test_command"].should_not be_blank
-        arg_hash["repo_url"].should_not be_blank
-        arg_hash["options"].should == {"ruby" => "ree"}
+      expect(BuildAttemptJob).to receive(:enqueue_on).once.with { |queue, arg_hash|
+        expect(queue).to eq("ci")
+        expect(arg_hash["build_attempt_id"]).not_to be_blank
+        expect(arg_hash["build_ref"]).not_to be_blank
+        expect(arg_hash["build_kind"]).not_to be_blank
+        expect(arg_hash["test_files"]).not_to be_blank
+        expect(arg_hash["repo_name"]).not_to be_blank
+        expect(arg_hash["test_command"]).not_to be_blank
+        expect(arg_hash["repo_url"]).not_to be_blank
+        expect(arg_hash["options"]).to eq({"ruby" => "ree"})
         true
-      end
+      }
       build_part.create_and_enqueue_new_build_attempt!
     end
   end
@@ -63,7 +63,7 @@ describe BuildPart do
       it "should substitute the mirror" do
         build_attempt = build_part.build_attempts.create!(:state => :runnable)
         args = build_part.job_args(build_attempt)
-        args["repo_url"].should == "git://git-mirror.example.com/org/test-repo.git"
+        expect(args["repo_url"]).to eq("git://git-mirror.example.com/org/test-repo.git")
       end
     end
 
@@ -80,7 +80,7 @@ describe BuildPart do
       it "should return the original git url" do
         build_attempt = build_part.build_attempts.create!(:state => :runnable)
         args = build_part.job_args(build_attempt)
-        args["repo_url"].should == repository.url
+        expect(args["repo_url"]).to eq(repository.url)
       end
     end
   end
@@ -148,14 +148,14 @@ describe BuildPart do
   context "#is_for?" do
     it "is true for the same language" do
       build_part = BuildPart.new(:options => {"language" => "ruby"})
-      build_part.is_for?(:ruby).should be_true
-      build_part.is_for?("ruby").should be_true
-      build_part.is_for?("RuBy").should be_true
+      expect(build_part.is_for?(:ruby)).to be_true
+      expect(build_part.is_for?("ruby")).to be_true
+      expect(build_part.is_for?("RuBy")).to be_true
     end
 
     it "is false for the different languages" do
       build_part = BuildPart.new(:options => {"language" => "python"})
-      build_part.is_for?(:ruby).should be_false
+      expect(build_part.is_for?(:ruby)).to be_false
     end
   end
 
@@ -175,11 +175,11 @@ describe BuildPart do
       (BuildAttempt::STATES - BuildAttempt::COMPLETED_BUILD_STATES).each do |state|
         FactoryGirl.create(:build_attempt, :state => state)
       end
-      BuildPart.last.last_completed_attempt.should be_nil
+      expect(BuildPart.last.last_completed_attempt).to be_nil
     end
     it "does find a completed" do
       attempt = FactoryGirl.create(:build_attempt, :state => :passed)
-      BuildPart.last.last_completed_attempt.should == attempt
+      expect(BuildPart.last.last_completed_attempt).to eq(attempt)
     end
   end
 
@@ -236,7 +236,7 @@ describe BuildPart do
     end
 
     context "for a non merge_on_success branch build" do
-      before { build.merge_on_success.should be_false }
+      before { expect(build.merge_on_success).to be_false }
       
       it "will not reattempt" do
         expect(build_part.should_reattempt?).to be_false

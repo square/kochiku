@@ -12,74 +12,74 @@ describe Build do
     it "does not append a custom flag" do
       build.target_name = "foo"
       command = build.test_command(["foo"])
-      command.should_not include("-Dsquareup.fastTestsOnly")
+      expect(command).not_to include("-Dsquareup.fastTestsOnly")
     end
     it "a custom arg is appended" do
       build.target_name = nil
       command = build.test_command(["foo"])
-      command.should include("-Dsquareup.fastTestsOnly")
+      expect(command).to include("-Dsquareup.fastTestsOnly")
     end
   end
 
   describe "validations" do
     it "requires a ref to be set" do
       build.ref = nil
-      build.should_not be_valid
-      build.should have(1).error_on(:ref)
+      expect(build).not_to be_valid
+      expect(build).to have(1).error_on(:ref)
     end
 
     it "requires a project_id to be set" do
       build.project_id = nil
-      build.should_not be_valid
-      build.should have(1).error_on(:project_id)
+      expect(build).not_to be_valid
+      expect(build).to have(1).error_on(:project_id)
     end
 
     it "should force uniqueness on project_id and ref pairs" do
       build2 = FactoryGirl.build(:build, :project => project, :ref => build.ref)
-      build2.should_not be_valid
-      build2.should have(1).error_on(:ref)
+      expect(build2).not_to be_valid
+      expect(build2).to have(1).error_on(:ref)
     end
   end
 
   describe "#partition" do
     it "should create a BuildPart for each path" do
       build.partition(parts)
-      build.build_parts.map(&:kind).should =~ ['cucumber', 'rspec']
-      build.build_parts.map(&:queue).should =~ [:ci, :ci]
-      build.build_parts.find_by_kind('cucumber').paths.should =~ ['a', 'b']
+      expect(build.build_parts.map(&:kind)).to match_array(['cucumber', 'rspec'])
+      expect(build.build_parts.map(&:queue)).to match_array([:ci, :ci])
+      expect(build.build_parts.find_by_kind('cucumber').paths).to match_array(['a', 'b'])
     end
 
     it "should change state to running" do
       build.partition(parts)
-      build.state.should == :running
+      expect(build.state).to eq(:running)
     end
 
     it "creates parts with options" do
       build.partition([{"type" => "cucumber", "files" => ['a'], 'queue' => 'developer', 'options' => {"ruby" => "ree", "language" => 'ruby'}}])
       build_part = build.build_parts.first
       build_part.reload
-      build_part.options.should == {"ruby" => "ree", "language" => 'ruby'}
+      expect(build_part.options).to eq({"ruby" => "ree", "language" => 'ruby'})
     end
 
     it "should set the queue" do
       build.partition([{"type" => "cucumber", "files" => ['a'], 'queue' => 'developer'}])
       build_part = build.build_parts.first
-      build_part.queue.should == :developer
+      expect(build_part.queue).to eq(:developer)
     end
 
     it "should set the retry_count" do
       build.partition([{"type" => "cucumber", "files" => ['a'], 'queue' => 'developer', 'retry_count' => 3}])
       build_part = build.build_parts.first
-      build_part.retry_count.should == 3
+      expect(build_part.retry_count).to eq(3)
     end
 
     it "should create build attempts for each build part" do
       build.partition(parts)
-      build.build_parts.all? {|bp| bp.build_attempts.should have(1).item }
+      build.build_parts.all? {|bp| expect(bp.build_attempts).to have(1).item }
     end
 
     it "should enqueue build part jobs" do
-      BuildAttemptJob.should_receive(:enqueue_on).twice
+      expect(BuildAttemptJob).to receive(:enqueue_on).twice
       build.partition(parts)
     end
 
@@ -87,13 +87,13 @@ describe Build do
       # set parts to an illegal value
       parts = [{'type' => 'rspec', 'files' => [], 'queue' => 'ci'}]
 
-      build.build_parts.should be_empty
-      build.state.should == :partitioning
+      expect(build.build_parts).to be_empty
+      expect(build.state).to eq(:partitioning)
 
       expect { build.partition(parts) }.to raise_error
 
-      build.build_parts(true).should be_empty
-      build.state.should == :runnable
+      expect(build.build_parts(true)).to be_empty
+      expect(build.state).to eq(:runnable)
     end
   end
 
@@ -101,14 +101,14 @@ describe Build do
     Build::TERMINAL_STATES.each do |state|
       it "should be true for #{state}" do
         build.state = state
-        build.should be_completed
+        expect(build).to be_completed
       end
     end
 
     (Build::STATES - Build::TERMINAL_STATES).each do |state|
       it "should be false for #{state}" do
         build.state = state
-        build.should_not be_completed
+        expect(build).not_to be_completed
       end
     end
   end
@@ -118,16 +118,16 @@ describe Build do
                    {'type' => 'rspec', 'files' => ['b'], 'queue' => 'ci', 'retry_count' => 0}] }
     before do
       stub_request(:post, /https:\/\/git\.squareup\.com\/api\/v3\/repos\/square\/kochiku\/statuses\//)
-      build.stub(:running!)
+      allow(build).to receive(:running!)
       build.partition(parts)
-      build.state.should == :runnable
+      expect(build.state).to eq(:runnable)
     end
 
     it "should set a build state to running if it is successful so far, but still incomplete" do
       build.build_parts[0].last_attempt.finish!(:passed)
       build.update_state_from_parts!
 
-      build.state.should == :running
+      expect(build.state).to eq(:running)
     end
 
     it "should set build state to errored if any of its parts errored" do
@@ -135,7 +135,7 @@ describe Build do
       build.build_parts[1].last_attempt.finish!(:passed)
       build.update_state_from_parts!
 
-      build.state.should == :errored
+      expect(build.state).to eq(:errored)
     end
 
     it "should set build state to succeeded all of its parts passed" do
@@ -143,23 +143,23 @@ describe Build do
       build.build_parts[1].last_attempt.finish!(:passed)
       build.update_state_from_parts!
 
-      build.state.should == :succeeded
+      expect(build.state).to eq(:succeeded)
     end
 
     it "should set a build state to doomed if it has a failed part but is still has more parts to process" do
       build.build_parts[0].last_attempt.finish!(:failed)
       build.update_state_from_parts!
-      build.state.should == :doomed
+      expect(build.state).to eq(:doomed)
     end
 
     it "should change a doomed build to failed once it is complete" do
       build.build_parts[0].last_attempt.finish!(:failed)
       build.update_state_from_parts!
-      build.state.should == :doomed
+      expect(build.state).to eq(:doomed)
 
       build.build_parts[1].last_attempt.finish!(:passed)
       build.update_state_from_parts!
-      build.state.should == :failed
+      expect(build.state).to eq(:failed)
     end
 
     it "should set build_state to running when a failed attempt is retried" do
@@ -168,7 +168,7 @@ describe Build do
       build.build_parts[1].build_attempts.create!(:state => :running)
       build.update_state_from_parts!
 
-      build.state.should == :running
+      expect(build.state).to eq(:running)
     end
 
     it "should set build_state to doomed when an attempt is retried but other attempts are failed" do
@@ -177,7 +177,7 @@ describe Build do
       build.build_parts[1].build_attempts.create!(:state => :running)
       build.update_state_from_parts!
 
-      build.state.should == :doomed
+      expect(build.state).to eq(:doomed)
     end
 
     it "should ignore the old build_attempts" do
@@ -186,7 +186,7 @@ describe Build do
       build.build_parts[1].build_attempts.create!(:state => :passed)
       build.update_state_from_parts!
 
-      build.state.should == :succeeded
+      expect(build.state).to eq(:succeeded)
     end
 
     it "should not ignore old build_attempts that passed" do
@@ -195,17 +195,17 @@ describe Build do
       build.build_parts[1].build_attempts.create!(:state => :errored)
       build.update_state_from_parts!
 
-      build.state.should == :succeeded
+      expect(build.state).to eq(:succeeded)
     end
   end
 
   describe "#elapsed_time" do
     it "returns the difference between the build creation time and the last finished time" do
       build.partition(parts)
-      build.elapsed_time.should be_nil
+      expect(build.elapsed_time).to be_nil
       last_attempt = BuildAttempt.find(build.build_attempts.last.id)
       last_attempt.update_attributes(:finished_at => build.created_at + 10.minutes)
-      build.elapsed_time.should be_within(1.second).of(10.minutes)
+      expect(build.elapsed_time).to be_within(1.second).of(10.minutes)
     end
   end
 
@@ -223,8 +223,8 @@ describe Build do
       build_attempt_unstarted = FactoryGirl.create(:build_attempt, :build_part => build_part2, :state => :runnable)
       build.abort!
 
-      build_attempt_started.reload.state.should == :running
-      build_attempt_unstarted.reload.state.should == :aborted
+      expect(build_attempt_started.reload.state).to eq(:running)
+      expect(build_attempt_unstarted.reload.state).to eq(:aborted)
     end
   end
 
@@ -241,7 +241,7 @@ describe Build do
       let(:state) { :succeeded }
 
       it 'returns a green status png' do
-        png_color.should == green
+        expect(png_color).to eq(green)
       end
     end
 
@@ -250,7 +250,7 @@ describe Build do
         let(:state) { current_state }
 
         it 'returns a red status png' do
-          png_color.should == red
+          expect(png_color).to eq(red)
         end
       end
     end
@@ -260,7 +260,7 @@ describe Build do
         let(:state) { current_state }
 
         it 'returns a blue status png' do
-          png_color.should == blue
+          expect(png_color).to eq(blue)
         end
       end
     end
@@ -276,42 +276,42 @@ describe Build do
     }
 
     it "returns nil when there are no previous successful builds for the project" do
-      build.succeeded?.should be_false
+      expect(build.succeeded?).to be_false
       build2 = FactoryGirl.create(:build, :project => project)
 
-      build.previous_successful_build.should be_nil
-      build2.previous_successful_build.should be_nil
+      expect(build.previous_successful_build).to be_nil
+      expect(build2.previous_successful_build).to be_nil
     end
 
     it "returns the most recent build in state == :succeeded prior to this build" do
       stub_request(:post, /https:\/\/git\.squareup\.com\/api\/v3\/repos\/square\/kochiku\/statuses\//)
-      successful_build.succeeded?.should be_true
+      expect(successful_build.succeeded?).to be_true
       build2 = FactoryGirl.create(:build, :project => project)
-      build2.previous_successful_build.should == successful_build
+      expect(build2.previous_successful_build).to eq(successful_build)
     end
   end
 
   describe "#mergable_by_kochiku??" do
     before do
-      build.project.main?.should be_false
-      build.repository.allows_kochiku_merges.should be_true
+      expect(build.project.main?).to be_false
+      expect(build.repository.allows_kochiku_merges).to be_true
     end
 
     context "when merge_on_success_enabled? is true" do
       before do
         build.update_attributes!(merge_on_success: true)
-        build.merge_on_success_enabled?.should be_true
+        expect(build.merge_on_success_enabled?).to be_true
       end
 
       it "is true if it is a passed build" do
         build.state = :succeeded
-        build.mergable_by_kochiku?.should be_true
+        expect(build.mergable_by_kochiku?).to be_true
       end
 
       it "is false if it is a failed build" do
         (Build::TERMINAL_STATES - [:succeeded]).each do |failed_state|
           build.state = failed_state
-          build.mergable_by_kochiku?.should be_false
+          expect(build.mergable_by_kochiku?).to be_false
         end
       end
     end
@@ -321,7 +321,7 @@ describe Build do
         build.merge_on_success = false
         build.state = :succeeded
 
-        build.mergable_by_kochiku?.should be_false
+        expect(build.mergable_by_kochiku?).to be_false
       end
     end
 
@@ -334,7 +334,7 @@ describe Build do
         build.merge_on_success = true
         build.state = :succeeded
 
-        build.mergable_by_kochiku?.should be_false
+        expect(build.mergable_by_kochiku?).to be_false
       end
     end
   end
@@ -342,12 +342,12 @@ describe Build do
   describe "#merge_on_success_enabled?" do
     it "is true if it is a developer build with merge_on_success enabled" do
       build.merge_on_success = true
-      build.merge_on_success_enabled?.should be_true
+      expect(build.merge_on_success_enabled?).to be_true
     end
 
     it "is false if it is a developer build with merge_on_success disabled" do
       build.merge_on_success = false
-      build.merge_on_success_enabled?.should be_false
+      expect(build.merge_on_success_enabled?).to be_false
     end
 
     context "for a build on the main project" do
@@ -355,19 +355,19 @@ describe Build do
 
       it "is false if it is a main build" do
         build.merge_on_success = true
-        build.merge_on_success_enabled?.should be_false
+        expect(build.merge_on_success_enabled?).to be_false
       end
     end
   end
 
   describe "#branch_or_ref" do
     it "returns the ref when there is no branch" do
-      Build.new(:branch => nil, :ref => "ref").branch_or_ref.should == "ref"
-      Build.new(:branch => "", :ref => "ref").branch_or_ref.should == "ref"
+      expect(Build.new(:branch => nil, :ref => "ref").branch_or_ref).to eq("ref")
+      expect(Build.new(:branch => "", :ref => "ref").branch_or_ref).to eq("ref")
     end
 
     it "returns the ref when there is no branch" do
-      Build.new(:branch => "some-branch", :ref => "ref").branch_or_ref.should == "some-branch"
+      expect(Build.new(:branch => "some-branch", :ref => "ref").branch_or_ref).to eq("some-branch")
     end
   end
 
@@ -381,7 +381,7 @@ describe Build do
     let(:build_attempt) { build.build_parts.first.build_attempts.create!(:state => :failed) }
 
     it "should not send a failure email if the project has never had a successful build" do
-      BuildMailer.should_not_receive(:build_break_email)
+      expect(BuildMailer).not_to receive(:build_break_email)
       build.send_build_status_email!
     end
 
@@ -389,26 +389,26 @@ describe Build do
       let(:build) { FactoryGirl.create(:build, :state => :succeeded, :project => project); FactoryGirl.create(:build, :state => :runnable, :project => project) }
 
       it "should not send the email if the build is not completed" do
-        BuildMailer.should_not_receive(:build_break_email)
+        expect(BuildMailer).not_to receive(:build_break_email)
         build.send_build_status_email!
       end
 
       it "should not send the email if the build passed" do
         build.update_attribute(:state, :succeeded)
-        BuildMailer.should_not_receive(:build_break_email)
+        expect(BuildMailer).not_to receive(:build_break_email)
         build.send_build_status_email!
       end
 
       it "should only send the build failure email once" do
         build.update_attribute(:state, :failed)
-        BuildMailer.should_receive(:build_break_email).once.and_return(OpenStruct.new(:deliver => nil))
+        expect(BuildMailer).to receive(:build_break_email).once.and_return(OpenStruct.new(:deliver => nil))
         build.send_build_status_email!
         build.send_build_status_email!
       end
 
       it "should send a fail email when the build is finished" do
         build.update_attribute(:state, :failed)
-        BuildMailer.should_receive(:build_break_email).and_return(OpenStruct.new(:deliver => nil))
+        expect(BuildMailer).to receive(:build_break_email).and_return(OpenStruct.new(:deliver => nil))
         build.send_build_status_email!
       end
 
@@ -416,7 +416,7 @@ describe Build do
         build.update_attribute(:state, :failed)
         repository.update_attributes!(:send_build_failure_email => false)
         build.reload
-        BuildMailer.should_not_receive(:build_break_email)
+        expect(BuildMailer).not_to receive(:build_break_email)
         build.send_build_status_email!
       end
 
@@ -424,7 +424,7 @@ describe Build do
         let(:project) { FactoryGirl.create(:project, :branch => "other-branch")}
 
         it "should not send a failure email" do
-          BuildMailer.should_not_receive(:build_break_email)
+          expect(BuildMailer).not_to receive(:build_break_email)
           build.send_build_status_email!
         end
       end
