@@ -55,5 +55,13 @@ describe RemoteServer::Github do
         "https://github.com/blah"
       }.to raise_error(UnknownUrl)
     end
+
+    context 'with a nonsense URL' do
+      it 'raises' do
+        expect {
+          described_class.project_params "github.com/asdf"
+        }.to raise_error(UnknownUrl)
+      end
+    end
   end
 end
