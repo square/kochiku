@@ -20,6 +20,8 @@ module RemoteServer
 
     def self.project_params(url)
       parser = URL_PARSERS[url.slice(0,4)]
+      raise UnknownUrl, "Do not recognize #{url} as a github URL." unless parser
+
       match = url.match(parser)
 
       if match
@@ -29,7 +31,7 @@ module RemoteServer
           repository: match[3]
         }
       else
-        raise UnknownUrl, "Do not recognize #{url} as a github url."
+        raise UnknownUrl, "Do not recognize #{url} as a github URL."
       end
     end
 
