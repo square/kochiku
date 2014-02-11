@@ -174,7 +174,7 @@ describe RepositoriesController do
     end
 
     it "creates a master build with payload" do
-      post :build_ref, id: repository.to_param, refChanges: [{refId: 'refs/head/master', toHash: 'abc123'}]
+      post :build_ref, id: repository.to_param, refChanges: [{refId: 'refs/heads/master', toHash: 'abc123'}]
 
       verify_response_creates_build response, 'master', 'abc123', repo_name
     end
@@ -186,9 +186,15 @@ describe RepositoriesController do
     end
 
     it "creates a PR build with payload" do
-      post :build_ref, id: repository.to_param, refChanges: [{refId: 'refs/head/blah', toHash: 'abc123'}]
+      post :build_ref, id: repository.to_param, refChanges: [{refId: 'refs/heads/blah', toHash: 'abc123'}]
 
       verify_response_creates_build response, 'blah', 'abc123', repo_name + "-pull_requests"
+    end
+
+    it "creates a PR build with payload" do
+      post :build_ref, id: repository.to_param, refChanges: [{refId: 'refs/heads/blah/with/a/slash', toHash: 'abc123'}]
+
+      verify_response_creates_build response, 'blah/with/a/slash', 'abc123', repo_name + "-pull_requests"
     end
 
     def verify_response_creates_build(response, branch, ref, repo_name)
