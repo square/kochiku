@@ -94,7 +94,7 @@ ActiveRecord::Schema.define(version: 20140128180258) do
     t.integer  "timeout",                     default: 40
     t.string   "on_success_note"
     t.string   "repository_name"
-    t.boolean  "allows_kochiku_merges"
+    t.boolean  "allows_kochiku_merges",       default: true
   end
 
   add_index "repositories", ["url"], name: "index_repositories_on_url", using: :btree
