@@ -83,6 +83,7 @@ class RepositoriesController < ApplicationController
     build = if ref == 'master'
       project.ensure_master_build_exists(sha)
     else
+      project.abort_builds_for_branch(ref)
       project.ensure_developer_build_exists(ref, sha)
     end
 

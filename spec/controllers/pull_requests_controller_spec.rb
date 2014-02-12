@@ -80,7 +80,7 @@ describe PullRequestsController do
           }.to change(Build, :count).by(1)
         end
 
-        it "builds if there is completed ci build after a build that is still building" do
+        it "builds if there is a completed ci build after a build that is still building" do
           project.builds.create!(:ref => "sha", :state => :partitioning, :branch => 'master')
           frozen_time = 3.seconds.from_now
           allow(Time).to receive(:now).and_return(frozen_time)
@@ -170,6 +170,7 @@ describe PullRequestsController do
               expect(response).to be_success
             }.to_not change(project.builds, :count).by(1)
           end
+
           it "ignores !buildme casing" do
             expect {
               post :build, 'payload' => pull_request_payload({"pull_request" => {"body" => "!BuIlDMe"}})
@@ -187,6 +188,31 @@ describe PullRequestsController do
           it "does not blow up if action is missing" do
             post :build, 'payload' => pull_request_payload({"action" => nil})
             expect(response).to be_success
+          end
+
+          context "when there are other builds for the same branch" do
+            let(:branch_name) { "test-branch" }
+            let!(:build_one) { FactoryGirl.create(:build, :project => project, :branch => branch_name, :ref => "11deadbeef11") }
+            let!(:build_two) { FactoryGirl.create(:build, :project => project, :branch => branch_name, :ref => "22deadbeef22") }
+
+            before do
+              repository.build_pull_requests = "1"
+              repository.save!
+            end
+
+            it "aborts previous builds of the same branch" do
+              github_payload = pull_request_payload("pull_request" => {
+                  "head" => {"sha" => "Some-sha", "ref" => branch_name},
+                  "body" => "best pull request ever",
+              })
+
+              expect {
+                post :build, 'payload' => github_payload
+                expect(response).to be_success
+              }.to change(Build, :count)
+              expect(build_one.reload).to be_aborted
+              expect(build_two.reload).to be_aborted
+            end
           end
         end
 
