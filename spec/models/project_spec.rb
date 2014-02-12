@@ -23,7 +23,7 @@ describe Project do
     end
   end
 
-  describe '#abort_builds_for_branch' do
+  describe '#abort_in_progress_builds_for_branch' do
     let(:project) { FactoryGirl.create(:project) }
 
     it 'aborts non-finished builds for a branch' do
@@ -34,7 +34,7 @@ describe Project do
 
       expect(build2.state).to eq(:partitioning)
 
-      project.abort_builds_for_branch('mybranch')
+      project.abort_in_progress_builds_for_branch('mybranch')
 
       expect(build1.reload).to be_succeeded
       expect(build2.reload).to be_aborted

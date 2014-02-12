@@ -14,7 +14,10 @@ class Project < ActiveRecord::Base
     end
 
     def for_branch(branch)
-      Build.joins(:project).where("projects.repository_id = ? AND builds.branch = ?", proxy_association.owner.repository_id, branch).readonly(false).to_a
+      joins(:project).where(
+        "projects.repository_id" => proxy_association.owner.repository_id,
+        "builds.branch" => branch,
+        "builds.state" => Build::IN_PROGRESS_STATES)
     end
   end
   belongs_to :repository
@@ -31,9 +34,8 @@ class Project < ActiveRecord::Base
     build
   end
 
-  def abort_builds_for_branch(branch)
-    previous_builds = builds.for_branch(branch)
-    previous_builds.select{ |b| !b.completed? }.each(&:abort!)
+  def abort_in_progress_builds_for_branch(branch)
+    builds.for_branch(branch).readonly(false).each(&:abort!)
   end
 
   # The fuzzy_limit is used to set a upper bound on the amount of time that the
