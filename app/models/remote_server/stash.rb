@@ -11,7 +11,7 @@ module RemoteServer
 
     def self.project_params(url)
       parser = URL_PARSERS.detect { |regexp| url =~ regexp }
-      raise UnknownUrl, "Do not recognize #{url} as a stash url." unless parser
+      raise UnknownUrl, "Do not recognize #{url} as a Stash url." unless parser
 
       match = url.match(parser)
 
@@ -24,9 +24,10 @@ module RemoteServer
       params
     end
 
-    def self.convert_to_ssh_url(url)
+    # Prefer HTTPS format for Stash
+    def self.canonical_repository_url_for(url)
       params = project_params(url)
-      "git@#{params[:host]}:#{params[:port]}/#{params[:username].downcase}/#{params[:repository]}.git"
+      "https://#{params[:host]}/scm/#{params[:username]}/#{params[:repository]}.git"
     end
 
     def initialize(repo)

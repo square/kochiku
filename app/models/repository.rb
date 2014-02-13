@@ -64,9 +64,13 @@ class Repository < ActiveRecord::Base
     end
   end
 
-  # This is ugly. Is there a better way?
-  def self.convert_to_ssh_url(url)
-    remote_server_for(url).convert_to_ssh_url(url)
+  # Public: transforms the given url into the format Kochiku prefers for the
+  # RemoteServer hosting the repository.
+  #
+  # Returns: the url tranformed into the preferred format as a String.
+  def self.canonical_repository_url(url)
+    remote_server_class = remote_server_for(url)
+    remote_server_class.canonical_repository_url_for(url)
   end
 
   def has_on_success_script?

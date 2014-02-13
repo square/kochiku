@@ -229,4 +229,34 @@ describe Repository do
       expect(Repository.new(:on_success_script => "hi").has_on_success_script?).to be_true
     end
   end
+
+  describe '.canonical_repository_url' do
+
+    context 'a github url' do
+      it 'should return a ssh url when given a https url' do
+        result = Repository.canonical_repository_url("https://github.com/square/test-repo1.git")
+        expect(result).to eq("git@github.com:square/test-repo1.git")
+      end
+
+      it 'should do nothing when given a ssh url' do
+        ssh_url = "git@github.com:square/test-repo1.git"
+        result = Repository.canonical_repository_url(ssh_url)
+        expect(result).to eq(ssh_url)
+      end
+    end
+
+    context 'a stash url' do
+      it 'should return a https url when given a ssh url' do
+        result = Repository.canonical_repository_url("ssh://git@stash.example.com:7999/foo/bar.git")
+        expect(result).to eq("https://stash.example.com/scm/foo/bar.git")
+      end
+
+      it 'should do nothing when given a https url' do
+        https_url = "https://stash.example.com/scm/foo/bar.git"
+        result = Repository.canonical_repository_url(https_url)
+        expect(result).to eq(https_url)
+      end
+    end
+
+  end
 end

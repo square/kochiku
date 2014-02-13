@@ -14,7 +14,8 @@ module RemoteServer
       %r{https?://(?<host>.*)/(?<username>.*)/(?<project_name>[^.]*)\.?},  # https://
     ]
 
-    def self.convert_to_ssh_url(url)
+    # Prefer SSH format for Github
+    def self.canonical_repository_url_for(url)
       params = project_params(url)
       "git@#{params[:host]}:#{params[:username]}/#{params[:repository]}.git"
     end
