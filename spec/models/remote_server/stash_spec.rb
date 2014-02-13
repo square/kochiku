@@ -64,11 +64,15 @@ describe RemoteServer::Stash do
       }.to raise_error(UnknownUrl)
     end
 
-    it 'does not support ssh URLs' do
-      # It could support ssh URLs in the future if you wanted to implement it.
-      expect { described_class.project_params \
+    it 'parses ssh URLs' do
+      result = described_class.project_params \
         "ssh://git@stash.example.com:7999/myproject/myrepo.git"
-      }.to raise_error(UnknownUrl)
+
+      expect(result).to eq(
+        host:       'stash.example.com',
+        username:   'myproject',
+        repository: 'myrepo'
+      )
     end
   end
 end

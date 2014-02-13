@@ -4,8 +4,16 @@ module RemoteServer
   class Stash
     attr_reader :repo, :stash_request
 
+    URL_PARSERS = {
+      "ssh:" => %r{@(.*):\d+/(.*)/(.*)\.git},
+      "http" => %r{https://([^@]+)/scm/(.+)/(.+)\.git},
+    }
+
     def self.project_params(url)
-      match = url.match(%r{https://([^@]+)/scm/(.+)/(.+)\.git})
+      parser = URL_PARSERS[url.slice(0,4)]
+      raise UnknownUrl, "Do not recognize #{url} as a stash HTTPS url." unless parser
+
+      match = url.match(parser)
 
       if match
         {
