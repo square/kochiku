@@ -4,29 +4,28 @@ module RemoteServer
   class Stash
     attr_reader :repo, :stash_request
 
-    URL_PARSERS = {
-      "ssh:" => %r{@(.*):\d+/(.*)/(.*)\.git},
-      "http" => %r{https://([^@]+)/scm/(.+)/(.+)\.git},
-    }
+    URL_PARSERS = [
+      %r{@(?<host>.*):(?<port>\d+)/(?<username>.*)/(?<project_name>.*)\.git},  # ssh
+      %r{https://(?<host>[^@]+)/scm/(?<username>.+)/(?<project_name>.+)\.git}, # https
+    ]
 
     def self.project_params(url)
-      parser = URL_PARSERS[url.slice(0,4)]
-      raise UnknownUrl, "Do not recognize #{url} as a stash HTTPS url." unless parser
+      parser = URL_PARSERS.detect { |regexp| url =~ regexp }
+      raise UnknownUrl, "Do not recognize #{url} as a stash url." unless parser
 
       match = url.match(parser)
 
-      if match
-        {
-          host:       match[1],
-          username:   match[2],
-          repository: match[3],
-        }
-      else
-        raise UnknownUrl, "Do not recognize #{url} as a stash HTTPS url."
-      end
+      params = {
+        host:       match[:host],
+        username:   match[:username],
+        repository: match[:project_name],
+      }
+      params[:port] = match[:port] if match.names.include?('port')
+      params
     end
 
-    def self.convert_to_ssh_url(params)
+    def self.convert_to_ssh_url(url)
+      params = project_params(url)
       "git@#{params[:host]}:#{params[:port]}/#{params[:username].downcase}/#{params[:repository]}.git"
     end
 
