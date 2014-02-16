@@ -111,7 +111,8 @@ class BuildsController < ApplicationController
     elsif params['build']
       @project = Project.where(:name => params[:project_id]).first
       unless @project
-        repository = Repository.where(url: params[:repo_url]).first_or_create
+        normalized_url = Repository.canonical_repository_url(params[:repo_url])
+        repository = Repository.where(url: normalized_url).first_or_create!
         @project = repository.projects.create!(:name => params[:project_id])
       end
       project_build(params[:build][:branch], params[:build][:ref])

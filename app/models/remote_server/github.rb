@@ -8,31 +8,29 @@ module RemoteServer
   class Github
     attr_reader :repo
 
-    URL_PARSERS = {
-      "git@" => %r{@(.*):(.*)/(.*)\.git},
-      "git:" => %r{://(.*)/(.*)/(.*)\.git},
-      "http" => %r{https?://(.*)/(.*)/([^.]*)\.?},
-    }
+    URL_PARSERS = [
+      %r{@(?<host>.*):(?<username>.*)/(?<project_name>.*)\.git},           # git@
+      %r{://(?<host>.*)/(?<username>.*)/(?<project_name>.*)\.git},         # git://
+      %r{https?://(?<host>.*)/(?<username>.*)/(?<project_name>[^.]*)\.?},  # https://
+    ]
 
-    def self.convert_to_ssh_url(params)
+    # Prefer SSH format for Github
+    def self.canonical_repository_url_for(url)
+      params = project_params(url)
       "git@#{params[:host]}:#{params[:username]}/#{params[:repository]}.git"
     end
 
     def self.project_params(url)
-      parser = URL_PARSERS[url.slice(0,4)]
+      parser = URL_PARSERS.detect { |regexp| url =~ regexp }
       raise UnknownUrl, "Do not recognize #{url} as a github URL." unless parser
 
       match = url.match(parser)
 
-      if match
-        {
-          host:       match[1],
-          username:   match[2],
-          repository: match[3]
-        }
-      else
-        raise UnknownUrl, "Do not recognize #{url} as a github URL."
-      end
+      {
+        host:       match[:host],
+        username:   match[:username],
+        repository: match[:project_name]
+      }
     end
 
     def initialize(repo)
