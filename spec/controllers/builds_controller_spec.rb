@@ -138,6 +138,17 @@ describe BuildsController do
 
         expect(response.location).to eq(expected_url)
       end
+
+      it "should succeed if the repository url is in an alternate format" do
+        expect(repo).to_not be_new_record
+
+        post @action, @params.merge(:project_id => project_param, :build => build_info,
+                                    :repo_url => "https://github.com/square/#{repo.repository_name}.git")
+        expect(response).to be_success
+
+        project = Project.where(name: project_param).first
+        expect(project.repository).to eq(repo)
+      end
     end
   end
 

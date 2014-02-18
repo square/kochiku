@@ -12,7 +12,7 @@ class PullRequestsController < ApplicationController
 
   def handle_repo_push_request
     ssh_url = begin
-      Repository.convert_to_ssh_url(payload['repository']['url'])
+      Repository.canonical_repository_url(payload['repository']['url'])
     rescue Repository::UnknownServer
       nil
     end

@@ -71,7 +71,8 @@ describe RemoteServer::Stash do
       expect(result).to eq(
         host:       'stash.example.com',
         username:   'myproject',
-        repository: 'myrepo'
+        repository: 'myrepo',
+        port:       '7999'
       )
     end
   end

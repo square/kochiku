@@ -10,7 +10,7 @@ class Repository < ActiveRecord::Base
   before_validation :set_repository_name
 
   def remote_server
-    self.class.remote_server(url).new(self)
+    self.class.remote_server_for(url).new(self)
   end
 
   def main_project
@@ -49,7 +49,7 @@ class Repository < ActiveRecord::Base
     event_types
   end
 
-  def self.remote_server(url)
+  def self.remote_server_for(url)
     server = Settings.git_server(url)
 
     raise UnknownServer, url unless server
@@ -64,11 +64,13 @@ class Repository < ActiveRecord::Base
     end
   end
 
-  # This is ugly. Is there a better way?
-  def self.convert_to_ssh_url(url)
-    params = Repository.project_params(url)
-
-    remote_server(url).convert_to_ssh_url(params)
+  # Public: transforms the given url into the format Kochiku prefers for the
+  # RemoteServer hosting the repository.
+  #
+  # Returns: the url tranformed into the preferred format as a String.
+  def self.canonical_repository_url(url)
+    remote_server_class = remote_server_for(url)
+    remote_server_class.canonical_repository_url_for(url)
   end
 
   def has_on_success_script?
@@ -88,6 +90,6 @@ class Repository < ActiveRecord::Base
   def self.project_params(url)
     return {} unless url.present?
 
-    remote_server(url).project_params(url)
+    remote_server_for(url).project_params(url)
   end
 end
