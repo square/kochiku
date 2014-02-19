@@ -14,6 +14,9 @@ FIXTURE_PATH = Rails.root.join('spec', 'fixtures')
 # in spec/support/ and its subdirectories.
 Dir[Rails.root.join("spec/support/**/*.rb")].each {|f| require f}
 
+# Test decorators independent of ActionController
+# https://github.com/drapergem/draper#isolated-tests
+Draper::ViewContext.test_strategy :fast
 
 RSpec.configure do |config|
   config.expect_with :rspec do |c|

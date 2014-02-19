@@ -67,18 +67,6 @@ class Project < ActiveRecord::Base
     self.name == repository.repository_name
   end
 
-  def last_build_state
-    builds.last.try(:state) || :unknown
-  end
-
-  def last_completed_build
-    builds.completed.last
-  end
-
-  def last_build_duration
-    last_completed_build.try(:elapsed_time)
-  end
-
   private
 
   def execute(sql)

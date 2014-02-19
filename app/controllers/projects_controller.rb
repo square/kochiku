@@ -1,11 +1,12 @@
 class ProjectsController < ApplicationController
   def index
-    @projects = Project.order("name ASC")
+    @projects = Project.order("name ASC").decorate
   end
 
   def ci_projects
     @repositories = Repository.select(:repository_name)
-    @projects = Project.includes(:repository).where(:name => @repositories.map(&:repository_name))
+    @projects = Project.includes(:repository).
+      where(:name => @repositories.map(&:repository_name)).decorate
   end
 
   def show
@@ -26,6 +27,8 @@ class ProjectsController < ApplicationController
       # remove recent builds that are pending or in progress (cimonitor expects this)
       @builds = @builds.drop_while {|build| [:partitioning, :runnable, :running].include?(build.state) }
     end
+
+    @project = @project.decorate
 
     respond_to do |format|
       format.html
@@ -48,7 +51,7 @@ class ProjectsController < ApplicationController
   # This action returns the current build status for all of the main projects in the system
   def status_report
     @projects = Repository.all.map { |repo|
-      Project.where(:repository_id => repo.id, :name => repo.repository_name).first
+      Project.where(:repository_id => repo.id, :name => repo.repository_name).first.decorate
     }.compact
   end
 end

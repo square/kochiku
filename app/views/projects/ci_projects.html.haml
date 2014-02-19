@@ -4,12 +4,12 @@
 
 .projects.projects-grid
   - @projects.each do |project|
-    %div.ci-build-info{:class => "ci-#{project.last_build_state}" }
+    %div.ci-build-info{:class => "ci-#{project.most_recent_build_state}" }
       %div.project-name
         = link_to(project.name, project_path(project))
-      - if project.builds.last.try(:is_running?)
-        %div.state{:class => "build-#{project.last_build_state}" }
-          = project.last_build_state.to_s.capitalize
+      - if project.most_recent_build.try(:is_running?)
+        %div.state{:class => "build-#{project.most_recent_build_state}" }
+          = project.most_recent_build_state.to_s.capitalize
       %div.state
         =  project.last_completed_build && project.last_completed_build.finished_at ? "Last built #{time_ago_in_words(project.last_completed_build.finished_at)} ago" : "Never built"
       - if project.last_completed_build

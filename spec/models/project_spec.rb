@@ -62,25 +62,6 @@ describe Project do
     end
   end
 
-  describe "#last_build_duration" do
-    let(:project) { FactoryGirl.create(:project, :name => "kochiku") }
-    before do
-      build = FactoryGirl.create(:build, :project => project, :state => :succeeded)
-      build_part = FactoryGirl.create(:build_part, :build_instance => build)
-      build_attempt = FactoryGirl.create(:build_attempt, :build_part => build_part, :finished_at => 1.minute.from_now)
-      build.update_attributes(:state => :succeeded)
-    end
-
-    it "gets the last builds duration" do
-      expect(project.last_build_duration).not_to be_nil
-    end
-
-    it "gets the last successful builds duration" do
-      FactoryGirl.create(:build, :project => project, :state => :runnable).reload
-      expect(project.last_build_duration).not_to be_nil
-    end
-  end
-
   describe "#main?" do
     let(:repository) { FactoryGirl.create(:repository, :url => "git@git.example.com:square/kochiku.git") }
     it "returns true when the projects name is the same as the repo" do

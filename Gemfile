@@ -6,6 +6,7 @@ gem 'dynamic_form'
 gem 'rails-observers'
 
 gem 'carrierwave'
+gem 'draper', '~> 1.3'
 gem 'mysql2'
 gem 'symbolize'
 
