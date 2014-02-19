@@ -4,7 +4,7 @@ class ProjectsController < ApplicationController
   end
 
   def ci_projects
-    @repositories = Repository.all
+    @repositories = Repository.select(:repository_name)
     @projects = Project.includes(:repository).where(:name => @repositories.map(&:repository_name))
   end
 
