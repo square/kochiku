@@ -47,6 +47,12 @@ module RemoteServer
       sha
     end
 
+    def default_branch
+      response_body = @stash_request.get(base_api_url + "/branches/default")
+      response = JSON.parse(response_body)
+      response.values_at('displayId', 'latestChangeset')
+    end
+
     def update_commit_status!(build)
       build_url = Rails.application.routes.url_helpers.project_build_url(build.project, build)
 

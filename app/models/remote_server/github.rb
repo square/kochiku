@@ -47,6 +47,11 @@ module RemoteServer
       sha
     end
 
+    def sha_for_default
+      # TODO: Don't assume master is default
+      ['master', sha_for_branch('master')]
+    end
+
     def update_commit_status!(build)
       GithubCommitStatus.new(build).update_commit_status!
     end
