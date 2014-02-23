@@ -137,8 +137,7 @@ class BuildsController < ApplicationController
   def project_build(branch, ref)
     merge_on_success = params[:merge_on_success] || false
     if @project.main?
-      ref = GitRepo.sha_for_branch(@project.repository, "master")
-      branch = "master"
+      branch, ref = *GitRepo.default_branch_for(@project.repository)
     end
     @project.builds.find_existing_build_or_initialize(
       ref,
