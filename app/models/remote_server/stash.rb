@@ -1,3 +1,5 @@
+require 'cgi'
+
 module RemoteServer
 
   # All integration with Stash must go via this class.
@@ -39,12 +41,10 @@ module RemoteServer
     def sha_for_branch(branch)
       return branch if branch =~ /\A[0-9a-f]{40}\Z/
 
-      response_body = @stash_request.get(base_api_url + "/branches?filterText=#{branch}")
-      response = JSON.parse(response_body)
-      sha = nil
-      branch_data = response["values"].find {|x| x['displayId'] == branch }
-      sha = branch_data['latestChangeset'] if branch_data
-      sha
+      response_body = @stash_request.get(base_api_url +
+        "/commits?until=#{CGI.escape(branch)}&limit=1")
+      branch_data = response["values"][0] || {}
+      branch_data['id']
     end
 
     def update_commit_status!(build)
