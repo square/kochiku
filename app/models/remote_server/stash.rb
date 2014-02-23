@@ -43,6 +43,7 @@ module RemoteServer
 
       response_body = @stash_request.get(base_api_url +
         "/commits?until=#{CGI.escape(branch)}&limit=1")
+      response = JSON.parse(response_body)
       branch_data = response["values"][0] || {}
       branch_data['id']
     end
