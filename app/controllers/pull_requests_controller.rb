@@ -33,9 +33,7 @@ class PullRequestsController < ApplicationController
       sha = payload["pull_request"]["head"]["sha"]
       branch = payload["pull_request"]["head"]["ref"]
 
-      project.abort_in_progress_builds_for_branch(branch)
-      build = project.builds.find_existing_build_or_initialize(sha, :state => :partitioning, :branch => branch)
-      build.save!
+      project.ensure_branch_build_exists(branch, sha)
     end
   end
 

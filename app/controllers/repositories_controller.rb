@@ -74,17 +74,16 @@ class RepositoriesController < ApplicationController
     }
   end
 
-  def ensure_build(repository, ref, sha)
+  def ensure_build(repository, branch, sha)
     project_name = repository.repository_name
-    project_name += '-pull_requests' unless ref == 'master'
+    project_name += '-pull_requests' unless branch == 'master'
 
     project = repository.projects.where(name: project_name).first_or_create
 
-    build = if ref == 'master'
+    build = if branch == 'master'
       project.ensure_master_build_exists(sha)
     else
-      project.abort_in_progress_builds_for_branch(ref)
-      project.ensure_developer_build_exists(ref, sha)
+      project.ensure_branch_build_exists(branch, sha)
     end
 
     [project, build]
