@@ -12,13 +12,27 @@ describe Project do
     end
   end
 
-  describe '#ensure_developer_build_exists' do
+  describe '#ensure_branch_build_exists' do
     let(:project) { FactoryGirl.create(:project) }
 
     it 'creates a new build only if one does not exist' do
-      build1 = project.ensure_developer_build_exists('mybranch', 'abc123')
-      build2 = project.ensure_developer_build_exists('mybranch', 'abc123')
+      build1 = project.ensure_branch_build_exists('mybranch', 'abc123')
+      build2 = project.ensure_branch_build_exists('mybranch', 'abc123')
       expect(build1).not_to eq(nil)
+      expect(build1).to eq(build2)
+    end
+
+    it 'aborts previous builds if the current build is a new build' do
+      build1 = project.ensure_branch_build_exists('mybranch', 'abc123')
+      build2 = project.ensure_branch_build_exists('mybranch', 'def456')
+      expect(build1.reload).to be_aborted
+      expect(build2.reload).not_to be_aborted
+    end
+
+    it 'does abort build if the build is already running' do
+      build1 = project.ensure_branch_build_exists('mybranch', 'abc123')
+      build2 = project.ensure_branch_build_exists('mybranch', 'abc123')
+      expect(build1.reload).not_to be_aborted
       expect(build1).to eq(build2)
     end
   end
@@ -27,8 +41,8 @@ describe Project do
     let(:project) { FactoryGirl.create(:project) }
 
     it 'aborts non-finished builds for a branch' do
-      build1 = project.ensure_developer_build_exists('mybranch', 'abc123')
-      build2 = project.ensure_developer_build_exists('mybranch', 'efg456')
+      build1 = project.ensure_branch_build_exists('mybranch', 'abc123')
+      build2 = project.ensure_branch_build_exists('mybranch', 'efg456')
       build1.state = :succeeded
       build1.save!
 

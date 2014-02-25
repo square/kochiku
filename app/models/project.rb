@@ -28,8 +28,9 @@ class Project < ActiveRecord::Base
     builds.create_new_build_for(sha)
   end
 
-  def ensure_developer_build_exists(branch, sha)
+  def ensure_branch_build_exists(branch, sha)
     build = builds.find_existing_build_or_initialize(sha, :state  => :partitioning, :branch => branch)
+    abort_in_progress_builds_for_branch(branch) if build.new_record?
     build.save!
     build
   end
