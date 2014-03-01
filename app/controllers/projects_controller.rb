@@ -15,7 +15,7 @@ class ProjectsController < ApplicationController
     @current_build = @builds.last
 
     @build_parts = ActiveSupport::OrderedHash.new
-    @builds.reverse.each do |build|
+    @builds.reverse_each do |build|
       build.build_parts.each do |build_part|
         key = [build_part.paths.first, build_part.kind, build_part.options['ruby']]
         (@build_parts[key] ||= Hash.new)[build] = build_part
@@ -29,7 +29,7 @@ class ProjectsController < ApplicationController
 
     respond_to do |format|
       format.html
-      format.rss { @builds = @builds.reverse } # latest first
+      format.rss { @builds = @builds.reverse } # most recent first
     end
   end
 
