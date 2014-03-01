@@ -31,8 +31,12 @@ describe Project do
 
     it 'does abort build if the build is already running' do
       build1 = project.ensure_branch_build_exists('mybranch', 'abc123')
-      build2 = project.ensure_branch_build_exists('mybranch', 'abc123')
       expect(build1.reload).not_to be_aborted
+
+      build2 = project.ensure_branch_build_exists('mybranch', 'abc123')
+      expect(build2.reload).not_to be_aborted
+
+      expect(build1).not_to be_aborted
       expect(build1).to eq(build2)
     end
   end
@@ -43,15 +47,18 @@ describe Project do
     it 'aborts non-finished builds for a branch' do
       build1 = project.ensure_branch_build_exists('mybranch', 'abc123')
       build2 = project.ensure_branch_build_exists('mybranch', 'efg456')
+      build3 = project.ensure_branch_build_exists('mybranch', 'hij789')
       build1.state = :succeeded
       build1.save!
 
       expect(build2.state).to eq(:partitioning)
+      expect(build3.state).to eq(:partitioning)
 
-      project.abort_in_progress_builds_for_branch('mybranch')
+      project.abort_in_progress_builds_for_branch('mybranch', build3)
 
       expect(build1.reload).to be_succeeded
       expect(build2.reload).to be_aborted
+      expect(build3.reload.state).to eq(:partitioning)
     end
   end
 

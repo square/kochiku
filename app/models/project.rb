@@ -30,13 +30,13 @@ class Project < ActiveRecord::Base
 
   def ensure_branch_build_exists(branch, sha)
     build = builds.find_existing_build_or_initialize(sha, :state  => :partitioning, :branch => branch)
-    abort_in_progress_builds_for_branch(branch) if build.new_record?
+    abort_in_progress_builds_for_branch(branch, build)
     build.save!
     build
   end
 
-  def abort_in_progress_builds_for_branch(branch)
-    builds.for_branch(branch).readonly(false).each(&:abort!)
+  def abort_in_progress_builds_for_branch(branch, current_build)
+    builds.for_branch(branch).readonly(false).each { |build| build.abort! unless build == current_build }
   end
 
   # The fuzzy_limit is used to set a upper bound on the amount of time that the
