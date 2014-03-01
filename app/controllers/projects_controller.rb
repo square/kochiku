@@ -41,7 +41,7 @@ class ProjectsController < ApplicationController
 
     respond_to do |format|
       format.json do
-        render :json => @project.build_time_history
+        render :json => @project.decorate.build_time_history
       end
     end
   end
