@@ -72,7 +72,7 @@ describe GitBlame do
     subject { GitBlame.changes_since_last_green(build) }
 
     before do
-      GitBlame.unstub(:changes_since_last_green)
+      allow(GitBlame).to receive(:changes_since_last_green).and_call_original
     end
 
     it "should parse the git log message and return a hash of information" do
@@ -95,7 +95,7 @@ describe GitBlame do
     subject { GitBlame.changes_in_branch(build) }
 
     before do
-      GitBlame.unstub(:changes_in_branch)
+      allow(GitBlame).to receive(:changes_in_branch).and_call_original
     end
 
     it "should parse the git log message and return a hash of information" do
@@ -113,7 +113,7 @@ describe GitBlame do
     subject { GitBlame.files_changed_since_last_green(build, options) }
 
     before do
-      GitBlame.unstub(:files_changed_since_last_green)
+      allow(GitBlame).to receive(:files_changed_since_last_green).and_call_original
     end
 
     it "should parse the git log and return change file paths" do
@@ -148,7 +148,7 @@ describe GitBlame do
     subject { GitBlame.files_changed_in_branch(build, options) }
 
     before do
-      GitBlame.unstub(:files_changed_in_branch)
+      allow(GitBlame).to receive(:files_changed_in_branch).and_call_original
     end
 
     it "should parse the git log and return change file paths" do

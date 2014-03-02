@@ -276,7 +276,7 @@ describe Build do
     }
 
     it "returns nil when there are no previous successful builds for the project" do
-      expect(build.succeeded?).to be_false
+      expect(build.succeeded?).to be false
       build2 = FactoryGirl.create(:build, :project => project)
 
       expect(build.previous_successful_build).to be_nil
@@ -285,7 +285,7 @@ describe Build do
 
     it "returns the most recent build in state == :succeeded prior to this build" do
       stub_request(:post, /https:\/\/git\.squareup\.com\/api\/v3\/repos\/square\/kochiku\/statuses\//)
-      expect(successful_build.succeeded?).to be_true
+      expect(successful_build.succeeded?).to be true
       build2 = FactoryGirl.create(:build, :project => project)
       expect(build2.previous_successful_build).to eq(successful_build)
     end
@@ -293,25 +293,25 @@ describe Build do
 
   describe "#mergable_by_kochiku??" do
     before do
-      expect(build.project.main?).to be_false
-      expect(build.repository.allows_kochiku_merges).to be_true
+      expect(build.project.main?).to be false
+      expect(build.repository.allows_kochiku_merges).to be true
     end
 
     context "when merge_on_success_enabled? is true" do
       before do
         build.update_attributes!(merge_on_success: true)
-        expect(build.merge_on_success_enabled?).to be_true
+        expect(build.merge_on_success_enabled?).to be true
       end
 
       it "is true if it is a passed build" do
         build.state = :succeeded
-        expect(build.mergable_by_kochiku?).to be_true
+        expect(build.mergable_by_kochiku?).to be true
       end
 
       it "is false if it is a failed build" do
         (Build::TERMINAL_STATES - [:succeeded]).each do |failed_state|
           build.state = failed_state
-          expect(build.mergable_by_kochiku?).to be_false
+          expect(build.mergable_by_kochiku?).to be false
         end
       end
     end
@@ -321,7 +321,7 @@ describe Build do
         build.merge_on_success = false
         build.state = :succeeded
 
-        expect(build.mergable_by_kochiku?).to be_false
+        expect(build.mergable_by_kochiku?).to be false
       end
     end
 
@@ -334,7 +334,7 @@ describe Build do
         build.merge_on_success = true
         build.state = :succeeded
 
-        expect(build.mergable_by_kochiku?).to be_false
+        expect(build.mergable_by_kochiku?).to be false
       end
     end
   end
@@ -342,12 +342,12 @@ describe Build do
   describe "#merge_on_success_enabled?" do
     it "is true if it is a developer build with merge_on_success enabled" do
       build.merge_on_success = true
-      expect(build.merge_on_success_enabled?).to be_true
+      expect(build.merge_on_success_enabled?).to be true
     end
 
     it "is false if it is a developer build with merge_on_success disabled" do
       build.merge_on_success = false
-      expect(build.merge_on_success_enabled?).to be_false
+      expect(build.merge_on_success_enabled?).to be false
     end
 
     context "for a build on the main project" do
@@ -355,7 +355,7 @@ describe Build do
 
       it "is false if it is a main build" do
         build.merge_on_success = true
-        expect(build.merge_on_success_enabled?).to be_false
+        expect(build.merge_on_success_enabled?).to be false
       end
     end
   end

@@ -168,7 +168,7 @@ describe PullRequestsController do
             expect {
               post :build, 'payload' => pull_request_payload({"pull_request" => {"body" => "don't build it"}})
               expect(response).to be_success
-            }.to_not change(project.builds, :count).by(1)
+            }.to_not change(project.builds, :count)
           end
 
           it "ignores !buildme casing" do
@@ -182,7 +182,7 @@ describe PullRequestsController do
             expect {
               post :build, 'payload' => pull_request_payload({"action" => "closed"})
               expect(response).to be_success
-            }.to_not change(project.builds, :count).by(1)
+            }.to_not change(project.builds, :count)
           end
 
           it "does not blow up if action is missing" do

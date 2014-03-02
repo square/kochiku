@@ -21,7 +21,7 @@ describe BuildsController do
 
         it "should create a new build" do
           post @action, @params.merge(:project_id => @project.to_param, :payload => @payload)
-          expect(Build.where(:project_id => @project, :ref => @payload["after"]).exists?).to be_true
+          expect(Build.where(:project_id => @project, :ref => @payload["after"]).exists?).to be true
         end
       end
 
@@ -114,9 +114,9 @@ describe BuildsController do
       end
 
       it "should create a new build" do
-        expect(Build.exists?(:ref => build_info[:ref])).to be_false
+        expect(Build.exists?(:ref => build_info[:ref])).to be false
         post @action, @params.merge(:project_id => project_param, :build => build_info)
-        expect(Build.exists?(:project_id => assigns(:project), :ref => build_info[:ref])).to be_true
+        expect(Build.exists?(:project_id => assigns(:project), :ref => build_info[:ref])).to be true
       end
 
       it "should return the build info page in the location header" do
@@ -281,14 +281,14 @@ RESPONSE
     it "aborts merge_on_success" do
       post :toggle_merge_on_success, :id => @build.id, :project_id => @build.project.name, :merge_on_success => false
       expect(response).to redirect_to(project_build_path(@build.project, @build))
-      expect(@build.reload.merge_on_success).to be_false
+      expect(@build.reload.merge_on_success).to be false
     end
 
     it "enables merge_on_success" do
       @build.update_attributes(:merge_on_success => false)
       post :toggle_merge_on_success, :id => @build.id, :project_id => @build.project.name, :merge_on_success => true
       expect(response).to redirect_to(project_build_path(@build.project, @build))
-      expect(@build.reload.merge_on_success).to be_true
+      expect(@build.reload.merge_on_success).to be true
     end
   end
 

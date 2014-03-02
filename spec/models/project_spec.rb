@@ -66,11 +66,11 @@ describe Project do
     let(:repository) { FactoryGirl.create(:repository, :url => "git@git.example.com:square/kochiku.git") }
     it "returns true when the projects name is the same as the repo" do
       project = FactoryGirl.create(:project, :name => "kochiku", :repository => repository)
-      expect(project.main?).to be_true
+      expect(project.main?).to be true
     end
     it "returns false when the projects name different then the repo" do
       project = FactoryGirl.create(:project, :name => "web", :repository => repository)
-      expect(project.main?).to be_false
+      expect(project.main?).to be false
     end
   end
 

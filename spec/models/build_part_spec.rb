@@ -91,7 +91,7 @@ describe BuildPart do
         2.times { FactoryGirl.create(:build_attempt, :build_part => build_part, :state => :passed) }
       end
 
-      it { should be_false }
+      it { should be false }
     end
 
     context "with one successful attempt" do
@@ -100,7 +100,7 @@ describe BuildPart do
         FactoryGirl.create(:build_attempt, :build_part => build_part, :state => :passed)
       }
 
-      it { should be_false }
+      it { should be false }
     end
 
     context "with all unsuccessful attempts" do
@@ -108,7 +108,7 @@ describe BuildPart do
         2.times { FactoryGirl.create(:build_attempt, :build_part => build_part, :state => :failed) }
       end
 
-      it { should be_true }
+      it { should be true }
     end
   end
 
@@ -146,25 +146,25 @@ describe BuildPart do
   context "#is_for?" do
     it "is true for the same language" do
       build_part = BuildPart.new(:options => {"language" => "ruby"})
-      expect(build_part.is_for?(:ruby)).to be_true
-      expect(build_part.is_for?("ruby")).to be_true
-      expect(build_part.is_for?("RuBy")).to be_true
+      expect(build_part.is_for?(:ruby)).to be true
+      expect(build_part.is_for?("ruby")).to be true
+      expect(build_part.is_for?("RuBy")).to be true
     end
 
     it "is false for the different languages" do
       build_part = BuildPart.new(:options => {"language" => "python"})
-      expect(build_part.is_for?(:ruby)).to be_false
+      expect(build_part.is_for?(:ruby)).to be false
     end
   end
 
   describe "#is_running?" do
     subject { build_part.is_running? }
     context "when not finished" do
-      it { should be_true }
+      it { should be true }
     end
     context "when finished" do
       before { FactoryGirl.create(:build_attempt, :build_part => build_part, :state => :passed, :finished_at => Time.now) }
-      it { should be_false }
+      it { should be false }
     end
   end
 
@@ -221,7 +221,7 @@ describe BuildPart do
       let(:project) { FactoryGirl.create(:main_project, repository: repository) }
 
       it "might reattempt" do
-        expect(build_part.should_reattempt?).to be_true
+        expect(build_part.should_reattempt?).to be true
       end
     end
 
@@ -229,15 +229,15 @@ describe BuildPart do
       let(:build) { FactoryGirl.create(:build, project: project, merge_on_success: true) }
 
       it "might reattempt" do
-        expect(build_part.should_reattempt?).to be_true
+        expect(build_part.should_reattempt?).to be true
       end
     end
 
     context "for a non merge_on_success branch build" do
-      before { expect(build.merge_on_success).to be_false }
+      before { expect(build.merge_on_success).to be_falsey }
 
       it "will not reattempt" do
-        expect(build_part.should_reattempt?).to be_false
+        expect(build_part.should_reattempt?).to be false
       end
     end
 
@@ -250,7 +250,7 @@ describe BuildPart do
       end
 
       it "will not reattempt" do
-        expect(build_part.should_reattempt?).to be_false
+        expect(build_part.should_reattempt?).to be false
       end
     end
 
@@ -262,7 +262,7 @@ describe BuildPart do
       end
 
       it "will reattempt" do
-        expect(build_part.should_reattempt?).to be_true
+        expect(build_part.should_reattempt?).to be true
       end
     end
   end

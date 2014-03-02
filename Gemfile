@@ -41,7 +41,7 @@ gem 'pry-rails'
 gem 'colorize', require: false
 
 group :test, :development do
-  gem 'rspec-rails'
+  gem 'rspec-rails', '~> 3.0.0.beta'
   gem 'factory_girl_rails'
   gem 'launchy'
 end
@@ -56,5 +56,6 @@ end
 
 group :test do
   gem 'webmock', require: false
-  gem 'capybara'
+  # Track latest capybara to silence rspec 3 deprecation
+  gem 'capybara', :github => 'jnicklas/capybara'
 end
