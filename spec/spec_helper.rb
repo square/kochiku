@@ -24,9 +24,12 @@ RSpec.configure do |config|
     c.syntax = :expect
   end
 
-  config.mock_with :rspec
+  config.mock_with :rspec do |mocks|
+    # Cause any verifying double instantiation for a class that does not
+    # exist to raise, protecting against incorrectly spelt names.
+    mocks.verify_doubled_constant_names = true
+  end
 
-  # Remove this line if you're not using ActiveRecord or ActiveRecord fixtures
   config.fixture_path = FIXTURE_PATH
 
   # If you're not using ActiveRecord, or you'd prefer not to run each of your
