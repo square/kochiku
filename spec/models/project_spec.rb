@@ -62,44 +62,39 @@ describe Project do
     end
   end
 
-  describe "#last_build_duration" do
-    let(:project) { FactoryGirl.create(:project, :name => "kochiku") }
-    before do
-      build = FactoryGirl.create(:build, :project => project, :state => :succeeded)
-      build_part = FactoryGirl.create(:build_part, :build_instance => build)
-      build_attempt = FactoryGirl.create(:build_attempt, :build_part => build_part, :finished_at => 1.minute.from_now)
-      build.update_attributes(:state => :succeeded)
-    end
-
-    it "gets the last builds duration" do
-      expect(project.last_build_duration).not_to be_nil
-    end
-
-    it "gets the last successful builds duration" do
-      FactoryGirl.create(:build, :project => project, :state => :runnable).reload
-      expect(project.last_build_duration).not_to be_nil
-    end
-  end
-
   describe "#main?" do
     let(:repository) { FactoryGirl.create(:repository, :url => "git@git.example.com:square/kochiku.git") }
     it "returns true when the projects name is the same as the repo" do
       project = FactoryGirl.create(:project, :name => "kochiku", :repository => repository)
-      expect(project.main?).to be_true
+      expect(project.main?).to be true
     end
     it "returns false when the projects name different then the repo" do
       project = FactoryGirl.create(:project, :name => "web", :repository => repository)
-      expect(project.main?).to be_false
+      expect(project.main?).to be false
     end
   end
 
-  describe '#build_time_history' do
-    subject { project.build_time_history }
+  describe "#last_completed_build" do
+    let(:project) { FactoryGirl.create(:project) }
+    subject { project.last_completed_build }
+
+    it "should return the most recent build in a completed state" do
+      FactoryGirl.create(:build, :project => project, :state => :running)
+      FactoryGirl.create(:build, :project => project, :state => :succeeded)
+      expected = FactoryGirl.create(:build, :project => project, :state => :errored)
+      FactoryGirl.create(:build, :project => project, :state => :partitioning)
+
+      should == expected
+    end
+  end
+
+  describe '#timing_data_for_recent_builds' do
+    subject { project.timing_data_for_recent_builds.to_a }
 
     let(:project) { FactoryGirl.create(:project) }
 
     context 'when the project has never been built' do
-      it { should == {} }
+      it { should == [] }
     end
 
     context 'when the project has one build' do
@@ -112,14 +107,14 @@ describe Project do
 
         context 'when the part has zero attempts' do
           it 'still includes the build' do
-            should == {
-              'spec' => [[
-                           build.ref[0, 5],
-                           0, 0, 0,
-                           build.id,
-                           'succeeded',
-                           build.created_at.to_s
-                         ]]}
+            should == [[
+              'spec',
+              build.ref[0, 5],
+              0, 0, 0,
+              build.id,
+              'succeeded',
+              build.created_at.to_s
+            ]]
           end
         end
 
@@ -134,14 +129,14 @@ describe Project do
 
           it 'still includes the build' do
             build_attempt.finish!(:running)
-            should == {
-              'spec' => [[
-                           build.ref[0, 5],
-                           0, 0, 0,
-                           build.id,
-                           'running',
-                           build.created_at.to_s
-                         ]]}
+            should == [[
+              'spec',
+              build.ref[0, 5],
+              0, 0, 0,
+              build.id,
+              'running',
+              build.created_at.to_s
+            ]]
           end
         end
 
@@ -157,15 +152,15 @@ describe Project do
           end
 
           it 'shows error bars, ref, and build status' do
-            should == {
-              'spec' => [[
-                           build.ref[0, 5],
-                           (build_attempt.elapsed_time / 60).round,
-                           0, 0,
-                           build.id,
-                           'succeeded',
-                           build.created_at.to_s
-                         ]]}
+            should == [[
+              'spec',
+              build.ref[0, 5],
+              (build_attempt.elapsed_time / 60).round,
+              0, 0,
+              build.id,
+              'succeeded',
+              build.created_at.to_s
+            ]]
           end
         end
       end

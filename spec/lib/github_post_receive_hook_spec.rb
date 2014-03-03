@@ -63,7 +63,7 @@ describe GithubPostReceiveHook do
       true
     end.to_return(:body => github_hooks)
     subject.subscribe!
-    expect(called).to be_true
+    expect(called).to be true
   end
 
   def github_hooks

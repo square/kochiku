@@ -19,7 +19,7 @@ class CommandStubber
   end
 
   def stub_capture2e_failure(fail_on_cmd)
-    Open3.stub(:capture2e) do |*cmd|
+    allow(Open3).to receive(:capture2e) do |*cmd|
       @executed_commands << cmd
       exitstatus = 0
       if fail_on_cmd && cmd.any? { |a| a =~ /^#{fail_on_cmd}/ }

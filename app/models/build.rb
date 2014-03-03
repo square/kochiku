@@ -103,6 +103,9 @@ class Build < ActiveRecord::Base
     [previous_state, state]
   end
 
+  # As implemented, finished_at will return the wrong value if there is a
+  # unsuccessful attempt following a successful one. Left this way for
+  # performance and simplicity.
   def finished_at
     build_attempts.maximum(:finished_at)
   end

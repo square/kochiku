@@ -39,26 +39,6 @@ class Project < ActiveRecord::Base
     builds.for_branch(branch).readonly(false).each { |build| build.abort! unless build == current_build }
   end
 
-  # The fuzzy_limit is used to set a upper bound on the amount of time that the
-  # sql query will take
-  def build_time_history(fuzzy_limit=1000)
-    result = Hash.new { |hash, key| hash[key] = [] }
-
-    id_cutoff = builds.maximum(:id).to_i - fuzzy_limit
-
-    execute(build_time_history_sql(id_cutoff)).each do |value|
-      if key = value.shift
-        result[key] << value
-      else # unfortunate, but flot dislikes missing data
-        result.keys.each do |k|
-          result[k] << value
-        end
-      end
-    end
-
-    result
-  end
-
   def to_param
     self.name.downcase
   end
@@ -67,23 +47,23 @@ class Project < ActiveRecord::Base
     self.name == repository.repository_name
   end
 
-  def last_build_state
-    builds.last.try(:state) || :unknown
+  def most_recent_build
+    @most_recent_build ||= builds.last
   end
 
   def last_completed_build
-    builds.completed.last
+    @last_completed_build ||= builds.completed.last
   end
 
-  def last_build_duration
-    last_completed_build.try(:elapsed_time)
+  # The fuzzy_limit is used to set a upper bound on the amount of time that the
+  # sql query will take
+  def timing_data_for_recent_builds(fuzzy_limit=1000)
+    id_cutoff = builds.maximum(:id).to_i - fuzzy_limit
+
+    self.class.connection.execute(build_time_history_sql(id_cutoff))
   end
 
   private
-
-  def execute(sql)
-    self.class.connection.execute(sql)
-  end
 
   def build_time_history_sql(min_build_id)
     return <<-SQL

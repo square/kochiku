@@ -2,6 +2,7 @@
 ENV["RAILS_ENV"] ||= 'test'
 require File.expand_path("../../config/environment", __FILE__)
 require 'rspec/rails'
+require 'rspec/collection_matchers'
 require 'webmock/rspec'
 require 'nokogiri'
 require 'factory_girl'
@@ -14,15 +15,21 @@ FIXTURE_PATH = Rails.root.join('spec', 'fixtures')
 # in spec/support/ and its subdirectories.
 Dir[Rails.root.join("spec/support/**/*.rb")].each {|f| require f}
 
+# Test decorators independent of ActionController
+# https://github.com/drapergem/draper#isolated-tests
+Draper::ViewContext.test_strategy :fast
 
 RSpec.configure do |config|
   config.expect_with :rspec do |c|
     c.syntax = :expect
   end
 
-  config.mock_with :rspec
+  config.mock_with :rspec do |mocks|
+    # Cause any verifying double instantiation for a class that does not
+    # exist to raise, protecting against incorrectly spelt names.
+    mocks.verify_doubled_constant_names = true
+  end
 
-  # Remove this line if you're not using ActiveRecord or ActiveRecord fixtures
   config.fixture_path = FIXTURE_PATH
 
   # If you're not using ActiveRecord, or you'd prefer not to run each of your
