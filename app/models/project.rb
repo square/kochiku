@@ -47,6 +47,14 @@ class Project < ActiveRecord::Base
     self.name == repository.repository_name
   end
 
+  def most_recent_build
+    @most_recent_build ||= builds.last
+  end
+
+  def last_completed_build
+    @last_completed_build ||= builds.completed.last
+  end
+
   # The fuzzy_limit is used to set a upper bound on the amount of time that the
   # sql query will take
   def timing_data_for_recent_builds(fuzzy_limit=1000)

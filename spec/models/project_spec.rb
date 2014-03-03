@@ -74,6 +74,20 @@ describe Project do
     end
   end
 
+  describe "#last_completed_build" do
+    let(:project) { FactoryGirl.create(:project) }
+    subject { project.last_completed_build }
+
+    it "should return the most recent build in a completed state" do
+      FactoryGirl.create(:build, :project => project, :state => :running)
+      FactoryGirl.create(:build, :project => project, :state => :succeeded)
+      expected = FactoryGirl.create(:build, :project => project, :state => :errored)
+      FactoryGirl.create(:build, :project => project, :state => :partitioning)
+
+      should == expected
+    end
+  end
+
   describe '#timing_data_for_recent_builds' do
     subject { project.timing_data_for_recent_builds.to_a }
 

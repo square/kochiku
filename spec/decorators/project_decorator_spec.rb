@@ -8,11 +8,8 @@ describe ProjectDecorator do
 
     context "when at least one build is present" do
       before do
-        allow(project).to receive(:builds) {
-          [
-            instance_double("Build", state: :errored),
-            instance_double("Build", state: :running)
-          ]
+        allow(project).to receive(:most_recent_build) {
+          instance_double("Build", state: :running)
         }
       end
 
@@ -23,7 +20,7 @@ describe ProjectDecorator do
 
     context "there are no builds for the project" do
       before do
-        allow(project).to receive(:builds).and_return([])
+        allow(project).to receive(:most_recent_build).and_return(nil)
       end
 
       it "returns :unknown" do
@@ -38,21 +35,19 @@ describe ProjectDecorator do
 
     context "with a completed build" do
       before do
-        allow(project).to receive_message_chain(:builds, :completed) {
-          [
-            instance_double("Build", state: :succeeded, elapsed_time: 60)
-          ]
+        allow(project).to receive(:last_completed_build) {
+          instance_double("Build", state: :succeeded, elapsed_time: 60)
         }
       end
 
       it "gets the duration of the last completed build" do
-        expect(decorated_project.last_build_duration).to be_an(Integer)
+        expect(decorated_project.last_build_duration).to eq(60)
       end
     end
 
     context "without a completed build" do
       before do
-        allow(project).to receive_message_chain(:builds, :completed).and_return([])
+        allow(project).to receive(:last_completed_build).and_return(nil)
       end
 
       it "returns nil" do
