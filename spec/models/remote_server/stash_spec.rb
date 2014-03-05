@@ -66,6 +66,17 @@ describe RemoteServer::Stash do
 
     it 'parses ssh URLs' do
       result = described_class.project_params \
+        "git@stash.example.com:myproject/myrepo.git"
+
+      expect(result).to eq(
+        host:       'stash.example.com',
+        username:   'myproject',
+        repository: 'myrepo'
+      )
+    end
+
+    it 'parses ssh URLs prefixed with ssh://' do
+      result = described_class.project_params \
         "ssh://git@stash.example.com/myproject/myrepo.git"
 
       expect(result).to eq(
