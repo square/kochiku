@@ -1,75 +1,80 @@
 require 'spec_helper'
 
 describe PassRateHelper do
-
-  module Helper
-    extend PassRateHelper
+  before do
+    @builds = []
   end
 
-  let!(:builds) {
-    3.times.map { FactoryGirl.create(:build, :state => :succeeded) }
-  }
-  let!(:build_parts) {
-    builds.map {|build|
-      build_part = FactoryGirl.create(:build_part, :paths => ["a", "b"],
-                                      :kind => "spec",
-                                      :build_instance => build,
-                                      :queue => 'ci')
-      FactoryGirl.create(:build_attempt, :state => :passed, :build_part => build_part)
-      build_part
-    }
-  }
+  def create_some_builds_with_build_attempts(count)
+    count.times do
+      ba = FactoryGirl.create(:build_attempt, :state => :passed)
+      ba.build_instance.update_state_from_parts!
+      @builds << ba.build_instance
+    end
+  end
 
   describe 'error_free_pass_rate' do
 
-    subject { Helper.error_free_pass_rate(builds) }
+    subject { helper.error_free_pass_rate(@builds) }
 
     context "when all attempts passed" do
+      before { create_some_builds_with_build_attempts(3) }
       it { should == '100%' }
     end
 
     context "when some parts failed before passing" do
       before do
-        FactoryGirl.create(:build_attempt, :state => :failed, :build_part => build_parts.first)
+        create_some_builds_with_build_attempts(3)
+        FactoryGirl.create(:build_attempt, :state => :failed, :build_part => @builds.first.build_parts.first)
       end
       it { should == '67%' }
     end
 
     context "when not all parts ever passed" do
       before do
-        builds.first.update_attributes! :state => :failed
+        create_some_builds_with_build_attempts(2)
+        @builds.first.update_attributes! :state => :failed
       end
-      it { should == '67%' }
+      it { should == '50%' }
     end
   end
 
   describe 'eventual_pass_rate' do
 
-    subject { Helper.eventual_pass_rate(builds) }
+    subject { helper.eventual_pass_rate(@builds) }
 
     context "when all attempts passed" do
+      before { create_some_builds_with_build_attempts(2) }
       it { should == '100%' }
     end
 
     context "when some parts failed before passing" do
       before do
-        FactoryGirl.create(:build_attempt, :state => :failed, :build_part => build_parts.first)
+        create_some_builds_with_build_attempts(1)
+
+        failed_first = FactoryGirl.create(:build_attempt, :state => :failed)
+        FactoryGirl.create(:build_attempt, :state => :passed, :build_part => failed_first.build_part)
+        failed_first.build_instance.update_state_from_parts!
+        @builds << failed_first.build_instance
       end
       it { should == '100%' }
     end
 
     context "when not all parts ever passed" do
       before do
-        build_parts.first.build_attempts.delete_all # remove the good one
-        FactoryGirl.create(:build_attempt, :state => :failed, :build_part => build_parts.first)
-        builds.first.update_attributes! :state => :failed
+        never_passed = FactoryGirl.create(:build_attempt, :state => :failed)
+        FactoryGirl.create(:build_attempt, :state => :failed, :build_part => never_passed.build_part)
+        never_passed.build_instance.update_state_from_parts!
+        @builds << never_passed.build_instance
+
+        create_some_builds_with_build_attempts(1)
       end
-      it { should == '67%' }
+      it { should == '50%' }
     end
   end
 
   describe 'pass_rate_text' do
-    subject { Helper.pass_rate_text(number) }
+    subject { helper.pass_rate_text(number) }
 
     context "for a perfect score" do
       let(:number) { 1.000000 }
