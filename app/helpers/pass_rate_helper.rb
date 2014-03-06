@@ -18,11 +18,9 @@ module PassRateHelper
   # A string representing the percentage of the builds that had
   # all tests pass on the first try.
   def error_free_pass_rate(builds)
-    error_free_count = builds.select(&:succeeded?).select do |build|
-      build.build_parts.select do |parts|
-        parts.build_attempts.all_passed_on_first_try?
-      end.size == build.build_parts.size
-    end.size
+    error_free_count = builds.count do |build|
+      build.succeeded? && build.build_parts.all_passed_on_first_try?
+    end
     pass_rate_text(error_free_count / builds.size.to_f)
   end
 

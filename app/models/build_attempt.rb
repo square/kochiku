@@ -79,8 +79,4 @@ class BuildAttempt < ActiveRecord::Base
       File.read(error_artifact.log_file.path)
     end
   end
-
-  def self.all_passed_on_first_try?
-    count == count(conditions: {state: :passed})
-  end
 end
