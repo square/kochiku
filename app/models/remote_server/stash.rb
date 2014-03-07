@@ -7,8 +7,9 @@ module RemoteServer
     attr_reader :repo, :stash_request
 
     URL_PARSERS = [
-      %r{@(?<host>.*):(?<port>\d+)/(?<username>.*)/(?<project_name>.*)\.git},  # ssh
-      %r{https://(?<host>[^@]+)/scm/(?<username>.+)/(?<project_name>.+)\.git}, # https
+      %r{\Agit@(?<host>.*):(?<username>.*)/(?<project_name>.*)\.git\z},
+      %r{\Assh://git@(?<host>.*?)(?<port>:\d+)?/(?<username>.*)/(?<project_name>.*)\.git\z},
+      %r{\Ahttps://(?<host>[^@]+)/scm/(?<username>.+)/(?<project_name>.+)\.git\z},
     ]
 
     def self.project_params(url)
@@ -22,7 +23,9 @@ module RemoteServer
         username:   match[:username],
         repository: match[:project_name],
       }
-      params[:port] = match[:port] if match.names.include?('port')
+      if match.names.include?('port') && match['port'].present?
+        params[:port] = match[:port].delete(':')
+      end
       params
     end
 
