@@ -91,4 +91,36 @@ describe PassRateHelper do
       it { should == '42%' }
     end
   end
+
+  describe 'average_number_of_rebuilds' do
+    subject { helper.average_number_of_rebuilds(@builds) }
+
+    before do
+      # setup test with successful two builds containing varying build attempts
+      ba = FactoryGirl.create(:build_attempt, :state => :errored)
+      FactoryGirl.create(:build_attempt, :state => :failed, :build_part => ba.build_part)
+      FactoryGirl.create(:build_attempt, :state => :passed, :build_part => ba.build_part)
+      ba.build_instance.update_state_from_parts!
+      @builds << ba.build_instance
+
+      ba = FactoryGirl.create(:build_attempt, :state => :failed)
+      FactoryGirl.create(:build_attempt, :state => :passed, :build_part => ba.build_part)
+      ba.build_instance.update_state_from_parts!
+      @builds << ba.build_instance
+    end
+
+    it { should == 1.5 }
+
+    context 'with an unsuccessful build' do
+      before do
+        ba = FactoryGirl.create(:build_attempt, :state => :errored)
+        ba.build_instance.update_state_from_parts!
+        @builds << ba.build_instance
+      end
+
+      it 'should not impact the result' do
+        should == 1.5
+      end
+    end
+  end
 end

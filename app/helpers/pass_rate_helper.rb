@@ -1,12 +1,18 @@
 module PassRateHelper
 
   def pass_rate_css_class(rate)
-    if rate.to_i > 95
-      'high'
-    elsif rate.to_i > 80
-      'medium'
-    else
-      'low'
+    case rate.to_i
+    when 0..40 then 'bad'
+    when 40..75 then 'decent'
+    else 'great'
+    end
+  end
+
+  def rebuild_count_css_class(attempts)
+    case attempts
+    when 0..1 then 'great'
+    when 1..4 then 'decent'
+    else 'bad'
     end
   end
 
@@ -25,6 +31,21 @@ module PassRateHelper
   end
 
   def pass_rate_text(number)
-    "%1.0f" % (100 * number) + "%"
+    "%1.0f%" % (100 * number)
+  end
+
+  # Calculates the average number of rebuilds required before builds succeed.
+  # Only considers builds that are successful because builds that are not yet
+  # successful would skew the calculation.
+  def average_number_of_rebuilds(builds)
+    successful_builds = builds.select(&:succeeded?)
+    total_build_parts, total_build_attempts = 0, 0
+
+    successful_builds.each do |build|
+      total_build_attempts += build.build_attempts.count
+      total_build_parts += build.build_parts.count
+    end
+
+    (total_build_attempts - total_build_parts) / successful_builds.size.to_f
   end
 end

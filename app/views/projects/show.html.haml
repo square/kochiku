@@ -13,9 +13,15 @@
     = f.submit "Build", {class: 'build-button'}
 
 - rate = error_free_pass_rate(@builds)
-#performance{ title: "Percentage of builds with all parts succeeding on the first try", class: pass_rate_css_class(rate) }
-  %span.number= rate
-  %span.label pass rate
+- avg_rebuilds = average_number_of_rebuilds(@builds)
+.performance
+  %div{ title: "Percentage of builds with all parts succeeding on the first try", class: pass_rate_css_class(rate) }
+    %span.number= rate
+    %span.label pass rate
+
+  %div{ title: "Average number of build attempts re-attempted for each successful build", class: rebuild_count_css_class(avg_rebuilds) }
+    %span.number= "%0.1f" % avg_rebuilds
+    %span.label rebuilds required on average
 
 %h2.subheader
   - unless @build.project.main?
