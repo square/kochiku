@@ -111,7 +111,7 @@ describe PassRateHelper do
 
     it { should == 1.5 }
 
-    context 'with an unsuccessful build' do
+    context 'when there is an unsuccessful build' do
       before do
         ba = FactoryGirl.create(:build_attempt, :state => :errored)
         ba.build_instance.update_state_from_parts!
@@ -120,6 +120,30 @@ describe PassRateHelper do
 
       it 'should not impact the result' do
         should == 1.5
+      end
+    end
+  end
+
+  describe 'average_elapsed_time' do
+    subject { helper.average_elapsed_time(@builds) }
+
+    before do
+      @builds << build = FactoryGirl.create(:build, :state => :succeeded, :created_at => 1.hour.ago)
+      build_part = FactoryGirl.create(:build_part, :build_instance => build)
+      FactoryGirl.create(:build_attempt, :build_part => build_part, :finished_at => build.created_at + 30.minutes)
+    end
+
+    it { should be_within(1).of(30 * 60) }
+
+    context 'when there is an unsuccessful build' do
+      before do
+        ba = FactoryGirl.create(:build_attempt, :state => :errored)
+        ba.build_instance.update_state_from_parts!
+        @builds << ba.build_instance
+      end
+
+      it 'should not impact the result' do
+        should be_within(1).of(30 * 60)
       end
     end
   end

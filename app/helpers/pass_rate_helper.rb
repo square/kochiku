@@ -48,4 +48,20 @@ module PassRateHelper
 
     (total_build_attempts - total_build_parts) / successful_builds.size.to_f
   end
+
+  def average_elapsed_time(builds)
+    successful_builds = builds.select(&:succeeded?)
+
+    cumulative_execution_in_seconds = successful_builds.sum(&:elapsed_time)
+
+    if cumulative_execution_in_seconds.zero?
+      nil
+    else
+      cumulative_execution_in_seconds / successful_builds.size.to_f
+    end
+  end
+
+  def seconds_to_minutes(seconds)
+    (seconds / 60).to_i if seconds.is_a?(Numeric)
+  end
 end
