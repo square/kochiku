@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe PassRateHelper do
+describe ProjectStatsHelper do
   before do
     @builds = []
   end

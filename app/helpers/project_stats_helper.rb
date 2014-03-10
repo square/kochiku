@@ -1,4 +1,4 @@
-module PassRateHelper
+module ProjectStatsHelper
 
   def pass_rate_css_class(rate)
     case rate.to_i
