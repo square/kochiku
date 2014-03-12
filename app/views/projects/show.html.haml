@@ -16,7 +16,7 @@
 - avg_rebuilds = average_number_of_rebuilds(@builds)
 - avg_seconds_to_success = average_elapsed_time(@builds)
 .performance
-  - unless avg_seconds_to_success.nil?
+  - if avg_seconds_to_success
     %div{ title: "Average elapsed time for successful builds on #{@project.name}" }
       %span.label Average time:
       %span.number= "#{seconds_to_minutes(avg_seconds_to_success)} minutes"

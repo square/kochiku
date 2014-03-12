@@ -2,7 +2,7 @@ module ProjectStatsHelper
 
   def pass_rate_css_class(rate)
     case rate.to_i
-    when 0..40 then 'bad'
+    when 0..39 then 'bad'
     when 40..75 then 'decent'
     else 'great'
     end
