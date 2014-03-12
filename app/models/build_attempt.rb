@@ -1,6 +1,7 @@
 class BuildAttempt < ActiveRecord::Base
   has_many :build_artifacts, :dependent => :destroy, :inverse_of => :build_attempt
   belongs_to :build_part, :inverse_of => :build_attempts
+  delegate :build_instance, to: :build_part
 
   FAILED_BUILD_STATES = [:failed, :errored]
   COMPLETED_BUILD_STATES = [:passed, :aborted] + FAILED_BUILD_STATES
@@ -78,9 +79,5 @@ class BuildAttempt < ActiveRecord::Base
     if error_artifact = build_artifacts.error_txt.first
       File.read(error_artifact.log_file.path)
     end
-  end
-
-  def self.all_passed_on_first_try?
-    count == count(conditions: {state: :passed})
   end
 end

@@ -32,6 +32,11 @@ class Build < ActiveRecord::Base
     def errored
       not_passed_and_last_attempt_in_state(:errored)
     end
+    def all_passed_on_first_try?
+      successful_build_attempts = joins(:build_attempts).where("build_attempts.state" => :passed).count
+      unsuccessful_build_attempts = joins(:build_attempts).where("build_attempts.state != ?", :passed).count
+      successful_build_attempts > 0 && unsuccessful_build_attempts == 0
+    end
   end
   has_many :build_attempts, :through => :build_parts
   TERMINAL_STATES = [:failed, :succeeded, :errored, :aborted]
