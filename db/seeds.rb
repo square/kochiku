@@ -6,16 +6,57 @@ repo_infos = [{:name => 'kandan', :location => "git@github.com:kandanapp/kandan.
   builder01.local builder02.local
 /
 
+def artifact_directory
+  Rails.root.join('tmp')
+end
+
+def sample_file
+  name = artifact_directory.join('build_artifact.log')
+  return File.open(name) if name.exist?
+  File.open(name, 'w') do |file|
+    75.times { |i| file.puts "Line #{i}" }
+  end
+  File.open(name)
+end
+
+def create_artifact(attempt)
+  BuildArtifact.create!(
+    log_file: sample_file,
+    build_attempt: attempt
+  )
+end
+
+# Not sure creating artifacts is slower than creating anything
+# else, but to keep rake db:seed from taking a long time,
+# just make a few of them.
+def create_an_artifact(repository)
+  create_artifact(
+    repository.
+      projects.last.
+      builds.last.
+      build_parts.last.
+      build_attempts.last
+  )
+end
+
 def create_build_part(build, kind, paths, build_attempt_state)
   bp = BuildPart.create!(:build_instance => build,
                          :kind => kind,
                          :paths => paths,
                          :queue => 'ci')
   build_attempt_state ||= (BuildAttempt::STATES + [:passed] * 5).sample
-  BuildAttempt.create!(:build_part => bp, :builder => @builders.sample,
-                       :state => build_attempt_state,
-                       :started_at => Time.now,
-                       :finished_at => BuildAttempt::IN_PROGRESS_BUILD_STATES.include?(build_attempt_state) ? nil : rand(500).seconds.from_now)
+  if BuildAttempt::IN_PROGRESS_BUILD_STATES.include?(build_attempt_state)
+    finished = nil
+  else
+    finished = rand(500).seconds.from_now
+  end
+  attempt = BuildAttempt.create!(
+    :build_part => bp,
+    :builder => @builders.sample,
+    :state => build_attempt_state,
+    :started_at => Time.now,
+    :finished_at => finished
+  )
 end
 
 def create_builds_for(project, repo_info)
@@ -53,6 +94,8 @@ repo_infos.each do |repo_info|
   create_builds_for(master_project, repo_info)
   developer_project = Project.create!({:name => "johnny-#{repo_name}", :branch => 'topic-branch', :repository => repository})
   create_builds_for(developer_project, repo_info)
+
+  create_an_artifact(repository)
 end
 
 # create an extra running build for copycopter-server to show something that is in progress
