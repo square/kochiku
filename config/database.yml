@@ -3,7 +3,7 @@ development: &defaults
   encoding: utf8
   reconnect: false
   database: kochiku_development
-  pool: 5
+  pool: 15
   username: root
   password:
 
