@@ -1,6 +1,9 @@
-repo_infos = [{:name => 'kandan', :location => "git@github.com:kandanapp/kandan.git", :build_attempt_state => :passed},
-              {:name => 'copycopter-server', :build_attempt_state => :passed, :location => "git@github.com:copycopter/copycopter-server.git"},
-              {:name => 'lobsters', :build_attempt_state => :errored, :location => "git@github.com:jcs/lobsters.git"}]
+# Eagerly load all of the models to avoid errors related to multiple threads
+Dir[Rails.root.join("app/models/*.rb")].each {|f| require f}
+
+repo_infos = [{:name => 'kandan', :location => "git@github.com:kandanapp/kandan.git", :build_attempt_state => :passed, :types => [:spec, :cucumber]},
+              {:name => 'copycopter-server', :build_attempt_state => :passed, :location => "git@github.com:copycopter/copycopter-server.git", :types => [:spec]},
+              {:name => 'lobsters', :build_attempt_state => :errored, :location => "git@github.com:jcs/lobsters.git", :types => [:junit]}]
 
 @builders = %w/
   builder01.local builder02.local
@@ -10,32 +13,22 @@ def artifact_directory
   Rails.root.join('tmp')
 end
 
-def sample_file
+def write_the_sample_file
   name = artifact_directory.join('build_artifact.log')
-  return File.open(name) if name.exist?
   File.open(name, 'w') do |file|
     75.times { |i| file.puts "Line #{i}" }
   end
-  File.open(name)
+  name
 end
 
-def create_artifact(attempt)
+def sample_file
+  @sample_file ||= artifact_directory.join('build_artifact.log')
+end
+
+def create_build_artifact(attempt)
   BuildArtifact.create!(
-    log_file: sample_file,
+    log_file: sample_file.open,
     build_attempt: attempt
-  )
-end
-
-# Not sure creating artifacts is slower than creating anything
-# else, but to keep rake db:seed from taking a long time,
-# just make a few of them.
-def create_an_artifact(repository)
-  create_artifact(
-    repository.
-      projects.last.
-      builds.last.
-      build_parts.last.
-      build_attempts.last
   )
 end
 
@@ -57,46 +50,55 @@ def create_build_part(build, kind, paths, build_attempt_state)
     :started_at => Time.now,
     :finished_at => finished
   )
+  create_build_artifact(attempt)
+  bp
 end
 
-def create_builds_for(project, repo_info)
-  10.times do
-    build = Build.create!(:project => project,
-                          :ref => SecureRandom.hex,
-                          :state => :runnable)
+def create_build(project, test_types, build_attempt_state: :passed)
+  build = Build.create!(:project => project,
+                        :ref => SecureRandom.hex,
+                        :state => :runnable)
 
-    (repo_info[:types] || [:spec, :cucumber]).each do |kind|
-      if repo_info[:paths]
-        repo_info[:paths].each do |path|
-          create_build_part(build, kind, [ path ], repo_info[:build_attempt_state])
-        end
-      else
-        10.times do
-          paths = %w(
+  Array(test_types).each do |kind|
+    paths = %w(
             spec/controllers/admin/users_controller_spec.rb
             spec/jobs/merchant_location_update_job_spec.rb
             spec/models/loyalty/payer_spec.rb
             spec/views/mailers/application_mailer/interval_sales_report.text.plain.erb_spec.rb
-          )
-          create_build_part(build, kind, paths, repo_info[:build_attempt_state])
-        end
+    )
+
+    5.times do
+      create_build_part(build, kind, paths, build_attempt_state)
+    end
+  end
+
+  build.update_state_from_parts!
+end
+
+def populate_builds_for(project, repo_info)
+  thread_list = []
+
+  10.times do
+    thread_list << Thread.new do
+      ActiveRecord::Base.connection_pool.with_connection do
+        create_build(project, repo_info[:types], build_attempt_state: repo_info[:build_attempt_state])
       end
     end
-
-    build.update_state_from_parts!
   end
+
+  thread_list.each { |t| t.join }
 end
+
+write_the_sample_file
 
 repo_infos.each do |repo_info|
   repo_name = repo_info[:name]
   repository = Repository.create!({:url => repo_info[:location], :test_command => "script/ci", :run_ci => true})
   master_project = Project.create!({:name => repo_name, :branch => 'master', :repository => repository})
-  create_builds_for(master_project, repo_info)
+  populate_builds_for(master_project, repo_info)
   developer_project = Project.create!({:name => "johnny-#{repo_name}", :branch => 'topic-branch', :repository => repository})
-  create_builds_for(developer_project, repo_info)
-
-  create_an_artifact(repository)
+  populate_builds_for(developer_project, repo_info)
 end
 
 # create an extra running build for copycopter-server to show something that is in progress
-create_builds_for(Project.find_by_name("copycopter-server"), {:last_build_state => :running, :build_attempt_state => :running})
+create_build(Project.find_by_name("copycopter-server"), %w(spec), build_attempt_state: :running)
