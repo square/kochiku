@@ -1,7 +1,6 @@
-require 'resque/server'
-
 Kochiku::Application.routes.draw do
-  mount Resque::Server.new, :at => '/resque'
+  require "resque_web"
+  mount ResqueWeb::Engine => "/resque"
 
   root :to => "projects#ci_projects"
 
