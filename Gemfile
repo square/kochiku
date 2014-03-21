@@ -23,9 +23,7 @@ gem 'uglifier'
 gem 'therubyracer'
 
 gem 'resque'
-# The official resque-retry release has not merged https://github.com/lantins/resque-retry/pull/87
-# which fixes an annoying Resque::Helpers deprecation warning
-gem 'resque-retry', github: 'teeparham/resque-retry'
+gem 'resque-retry'
 
 gem 'json' # used by resque
 
