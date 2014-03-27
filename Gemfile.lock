@@ -9,14 +9,6 @@ GIT
       rack-test (>= 0.5.4)
       xpath (~> 2.0)
 
-GIT
-  remote: git://github.com/teeparham/resque-retry.git
-  revision: 615d418f927deef951782273ee45b0a22a2e53a4
-  specs:
-    resque-retry (1.0.0)
-      resque (>= 1.25.1)
-      resque-scheduler (>= 1.9.9)
-
 GEM
   remote: https://rubygems.org/
   specs:
@@ -69,6 +61,13 @@ GEM
     cocaine (0.5.3)
       climate_control (>= 0.0.3, < 1.0)
     coderay (1.1.0)
+    coffee-rails (4.0.1)
+      coffee-script (>= 2.2.0)
+      railties (>= 4.0.0, < 5.0)
+    coffee-script (2.2.0)
+      coffee-script-source
+      execjs
+    coffee-script-source (1.7.0)
     colorize (0.6.0)
     compass (0.12.2)
       chunky_png (~> 1.2)
@@ -124,7 +123,7 @@ GEM
     mini_portile (0.5.2)
     minitest (4.7.5)
     mono_logger (1.1.0)
-    multi_json (1.8.4)
+    multi_json (1.9.2)
     multi_xml (0.5.5)
     mysql2 (0.3.15)
     net-scp (1.1.2)
@@ -180,16 +179,26 @@ GEM
       redis (~> 3.0.4)
     ref (1.0.5)
     request_store (1.0.5)
-    resque (1.25.1)
+    resque (1.25.2)
       mono_logger (~> 1.0)
       multi_json (~> 1.0)
-      redis-namespace (~> 1.2)
+      redis-namespace (~> 1.3)
       sinatra (>= 0.9.2)
       vegas (~> 0.1.2)
-    resque-scheduler (2.4.0)
-      redis (>= 3.0.0)
+    resque-retry (1.1.4)
       resque (~> 1.25)
-      rufus-scheduler (~> 2.0)
+      resque-scheduler (~> 2.5)
+    resque-scheduler (2.5.5)
+      mono_logger (~> 1.0)
+      redis (~> 3.0.4)
+      resque (~> 1.25.1)
+      rufus-scheduler (~> 2.0.24)
+    resque-web (0.0.5)
+      coffee-rails
+      jquery-rails
+      resque
+      sass-rails
+      twitter-bootstrap-rails
     rspec-collection_matchers (0.0.3)
       rspec-expectations (>= 2.99.0.beta1)
     rspec-core (3.0.0.beta2)
@@ -252,7 +261,12 @@ GEM
     treetop (1.4.15)
       polyglot
       polyglot (>= 0.3.1)
-    tzinfo (0.3.38)
+    twitter-bootstrap-rails (2.2.8)
+      actionpack (>= 3.1)
+      execjs
+      rails (>= 3.1)
+      railties (>= 3.1)
+    tzinfo (0.3.39)
     uglifier (2.4.0)
       execjs (>= 0.3.0)
       json (>= 1.8.0)
@@ -296,7 +310,8 @@ DEPENDENCIES
   rails-erd
   rails-observers
   resque
-  resque-retry!
+  resque-retry
+  resque-web
   rspec-rails (~> 3.0.0.beta)
   rvm-capistrano
   sass
