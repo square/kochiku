@@ -24,7 +24,7 @@ module ProjectStatsHelper
   # A string representing the percentage of the builds that had
   # all tests pass on the first try.
   def error_free_pass_rate(builds)
-    error_free_count = builds.count do |build|
+    error_free_count = builds.to_a.count do |build|
       build.succeeded? && build.build_parts.all_passed_on_first_try?
     end
     pass_rate_text(error_free_count / builds.size.to_f)
@@ -62,6 +62,6 @@ module ProjectStatsHelper
   end
 
   def seconds_to_minutes(seconds)
-    (seconds / 60).to_i if seconds.is_a?(Numeric)
+    (seconds / 60).round if seconds.is_a?(Numeric)
   end
 end
