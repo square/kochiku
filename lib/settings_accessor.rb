@@ -45,8 +45,7 @@ class SettingsAccessor
   end
 
   def git_server(url)
-    matching_host = git_servers.keys.detect { |host| url.include?(host) }
-    matching_host ? git_servers[matching_host] : nil
+    git_servers.values.detect { |server| url.include?(server.host) || (server.alias && url.include?(server.alias)) }
   end
 
   def smtp_server

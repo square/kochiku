@@ -54,6 +54,18 @@ describe SettingsAccessor do
     expect(settings.git_server('https://foobar.com/square/kochiku.git')).to eq(nil)
   end
 
+  it "can look up git servers via alias" do
+    settings = SettingsAccessor.new(<<-YAML)
+    git_servers:
+      stash.example.com:
+        type: stash
+        alias: stash-alias.example.com
+      github.com:
+        type: github
+    YAML
+    expect(settings.git_server('git@stash-alias.example.com:square/kochiku.git').host).to eq('stash.example.com')
+  end
+
   it "can also give me the host which matched" do
     settings = SettingsAccessor.new(<<-YAML)
     git_servers:
