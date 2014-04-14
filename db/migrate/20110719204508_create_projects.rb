@@ -4,7 +4,7 @@ class CreateProjects < ActiveRecord::Migration
       t.string :name
       t.string :branch
 
-      t.timestamps
+      t.timestamps(null: false)
     end
     add_index :projects, [:name, :branch]
   end
