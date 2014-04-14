@@ -20,6 +20,7 @@ class RepositoriesController < ApplicationController
 
   def new
     @repository = Repository.new
+    @repository.run_ci = true
   end
 
   def destroy

@@ -13,15 +13,15 @@
     %label{:for => "command_flag"} Command Flag:
     = f.text_field :command_flag, {:placeholder => '', :autocapitalize => 'off', :autocorrect => 'off', :spellcheck => 'false'}
   %div
-    %label{:for => "timeout"} Build part timeout:
+    %label{:for => "timeout"} Timeout a build part after:
     = f.text_field :timeout, {:id => "timeout"}
     minutes
   %div
+    %label{:for => "run_ci"} Trigger build on push to master:
+    = f.check_box :run_ci, {:id => "run_ci"}
+  %div
     %label{:for => "build_pull_requests"} Build pull requests:
     = f.check_box :build_pull_requests, {:id => "build_pull_requests"}
-  %div
-    %label{:for => "run_ci"} Build on push:
-    = f.check_box :run_ci, {:id => "run_ci"}
   %div
     %label{:for => "allows_kochiku_merges"} Allow developers to request branches be merged into master on success:
     = f.check_box :allows_kochiku_merges, {:id => "allows_kochiku_merges"}
