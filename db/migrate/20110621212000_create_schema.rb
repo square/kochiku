@@ -5,7 +5,7 @@ class CreateSchema < ActiveRecord::Migration
       t.string :state
       t.string :queue
 
-      t.timestamps
+      t.timestamps(null: false)
     end
 
     create_table :build_parts do |t|
@@ -13,7 +13,7 @@ class CreateSchema < ActiveRecord::Migration
       t.string :kind
       t.text :paths
 
-      t.timestamps
+      t.timestamps(null: false)
     end
 
     create_table :build_part_results do |t|
@@ -23,7 +23,7 @@ class CreateSchema < ActiveRecord::Migration
       t.string :builder
       t.string :result
 
-      t.timestamps
+      t.timestamps(null: false)
     end
 
     create_table :build_artifacts do |t|
@@ -31,7 +31,7 @@ class CreateSchema < ActiveRecord::Migration
       t.string :type
       t.text :content
 
-      t.timestamps
+      t.timestamps(null: false)
     end
 
   end

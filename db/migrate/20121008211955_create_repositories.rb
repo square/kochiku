@@ -4,7 +4,7 @@ class CreateRepositories < ActiveRecord::Migration
       t.string :url
       t.string :test_command
       t.text :options
-      t.timestamps
+      t.timestamps(null: false)
     end
     add_index :repositories, :url
     add_column :projects, :repository_id, :integer
