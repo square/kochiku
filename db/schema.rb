@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20140128180258) do
+ActiveRecord::Schema.define(version: 20140415001051) do
 
   create_table "build_artifacts", force: true do |t|
     t.integer  "build_attempt_id"
@@ -84,7 +84,6 @@ ActiveRecord::Schema.define(version: 20140128180258) do
     t.datetime "updated_at",                                 null: false
     t.integer  "github_post_receive_hook_id"
     t.boolean  "run_ci"
-    t.boolean  "use_branches_on_green"
     t.boolean  "build_pull_requests"
     t.string   "on_green_update"
     t.string   "repo_cache_dir"

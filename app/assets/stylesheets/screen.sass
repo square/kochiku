@@ -176,15 +176,6 @@ h3
   font-size: 125%
   padding: 0 0 10px
 
-fieldset
-  legend
-    font-weight: bold
-  padding: 0.5em 0
-  margin: 1em 0
-form label
-  display: inline-block
-  min-width: 180px
-
 .info + .info
   margin-left: 8px
   padding-left: 8px
@@ -546,8 +537,26 @@ ol#build-paths
 .ci-unknown
   background-color: desaturate(darken($color-aborted, 10%), 20%)
 
-#repository_url, #repository_test_command, #on_green_update
-  width: 400px
+/* Repository form styles */
+
+fieldset
+  legend
+    font-weight: bold
+  padding: 0.5em 0
+  margin: 1em 0
+
+#repository-form label
+  display: inline-block
+  width: 220px
+
+// Give more spacing to the checkboxes
+#repository-form > div, #repository-form fieldset > div
+  min-height: 28px
+#repository-form input[type='checkbox']
+  margin-top: 8px
+
+input[name='repository[url]'], input[name='repository[test_command]'], input[name='repository[on_green_update]']
+  width: 300px
 
 .delete-form
   float: right
@@ -555,6 +564,8 @@ ol#build-paths
 
 .danger-button
   background-color: $color-failed !important
+
+/* END Repository form styles */
 
 .build-error
   pre
