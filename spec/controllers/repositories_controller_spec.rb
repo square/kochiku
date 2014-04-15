@@ -89,7 +89,6 @@ describe RepositoriesController do
     # boolean attributes
     [
       :run_ci,
-      :use_branches_on_green,
       :build_pull_requests,
       :send_build_failure_email,
       :allows_kochiku_merges
