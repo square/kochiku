@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20140415001051) do
+ActiveRecord::Schema.define(version: 20140415011144) do
 
   create_table "build_artifacts", force: true do |t|
     t.integer  "build_attempt_id"
@@ -56,7 +56,6 @@ ActiveRecord::Schema.define(version: 20140415001051) do
     t.integer  "project_id"
     t.boolean  "merge_on_success"
     t.string   "branch"
-    t.string   "target_name"
     t.boolean  "build_failure_email_sent"
     t.boolean  "promoted"
     t.string   "on_success_script_log_file"
@@ -87,7 +86,6 @@ ActiveRecord::Schema.define(version: 20140415001051) do
     t.boolean  "build_pull_requests"
     t.string   "on_green_update"
     t.string   "repo_cache_dir"
-    t.string   "command_flag"
     t.boolean  "send_build_failure_email",    default: true
     t.string   "on_success_script"
     t.integer  "timeout",                     default: 40

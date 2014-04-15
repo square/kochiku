@@ -10,9 +10,6 @@
     %label{:for => "test_command"} Test Command:
     = f.text_field :test_command, {:placeholder => 'e.g. script/ci', :autocapitalize => 'off', :autocorrect => 'off', :spellcheck => 'false'}
   %div
-    %label{:for => "command_flag"} Command Flag:
-    = f.text_field :command_flag, {:placeholder => '', :autocapitalize => 'off', :autocorrect => 'off', :spellcheck => 'false'}
-  %div
     %label{:for => "timeout"} Timeout a build part after:
     = f.text_field :timeout, {:id => "timeout"}
     minutes

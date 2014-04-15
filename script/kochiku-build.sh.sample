@@ -22,10 +22,6 @@ if ARGV.delete("--merge")
   auto_merge = "1"
 end
 
-if project_index = ARGV.index("--project")
-  target_name = ARGV[project_index + 1]
-  ARGV.slice!(project_index, 2)
-end
 # If a ref is given as an argument, use that. Otherwise use the current commit
 if ARGV[0]
   commit_ish = Shellwords.escape(ARGV[0])
@@ -58,7 +54,6 @@ params = {
   'build[branch]' => branch,
   'auto_merge' => auto_merge,
   'repo_url' => repo_url,
-  'build[target_name]' => target_name,
 }
 
 http = Net::HTTP.new(uri.host, uri.port)
