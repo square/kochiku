@@ -70,7 +70,7 @@ module RemoteServer
 
     def promote_branch!(branch, ref)
       GitRepo.inside_repo(repo) do
-        BuildStrategy.promote(:branch, branch, ref)
+        BuildStrategy.promote(branch, ref)
       end
     end
 
