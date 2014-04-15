@@ -66,7 +66,6 @@ describe Partitioner do
 
   context "with a ruby-based kochiku.yml" do
     let(:kochiku_yml_exists) { true }
-    let(:append_type_to_queue) { nil }
     let(:queue_override) { nil }
     let(:retry_count) { nil }
     let(:kochiku_yml) do
@@ -80,7 +79,6 @@ describe Partitioner do
             'workers' => 3,
             'balance' => rspec_balance,
             'manifest' => rspec_manifest,
-            'append_type_to_queue' => append_type_to_queue,
             'queue_override' => queue_override,
             'retry_count' => retry_count,
           }
@@ -106,15 +104,6 @@ describe Partitioner do
         partitions = partitioner.partitions(build)
         expect(partitions.first["queue"]).to eq("ci")
       end
-
-      context "when append_type_to_queue is in kochiku.yml" do
-        let(:append_type_to_queue) { true }
-
-        it "should append the type" do
-          partitions = partitioner.partitions(build)
-          expect(partitions.first["queue"]).to eq("ci-rspec")
-        end
-      end
     end
 
     context "with a branch build" do
@@ -123,15 +112,6 @@ describe Partitioner do
         partitions = partitioner.partitions(build)
         expect(partitions.first["queue"]).to eq("developer")
       end
-
-      context "when append_type_to_queue is in kochiku.yml" do
-        let(:append_type_to_queue) { true }
-
-        it "should append the type" do
-          partitions = partitioner.partitions(build)
-          expect(partitions.first["queue"]).to eq("developer-rspec")
-        end
-      end
     end
 
     context "with queue_override" do
@@ -139,14 +119,6 @@ describe Partitioner do
       it "should override the queue on the build part" do
         partitions = partitioner.partitions(build)
         expect(partitions.first["queue"]).to eq("override")
-      end
-
-      context "with append_type_to_queue true" do
-        let(:append_type_to_queue) { true }
-        it "should override the queue on the build part" do
-          partitions = partitioner.partitions(build)
-          expect(partitions.first["queue"]).to eq("override")
-        end
       end
     end
 
