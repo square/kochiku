@@ -56,10 +56,8 @@ class Build < ActiveRecord::Base
   scope :completed, -> { where(state: TERMINAL_STATES) }
   scope :successful_for_project, lambda { |project_id| where(:project_id => project_id, :state => :succeeded) }
 
-  def test_command(run_list)
-    command = repository.test_command
-    command += " #{repository.command_flag}" unless run_list.include?(target_name)
-    command
+  def test_command
+    repository.test_command
   end
 
   def previous_successful_build

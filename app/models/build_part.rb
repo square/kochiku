@@ -33,7 +33,7 @@ class BuildPart < ActiveRecord::Base
         "branch" => build_instance.branch,
         "test_files" => paths,
         "repo_name" => project.repository.repo_cache_name,
-        "test_command" => build_instance.test_command(paths),
+        "test_command" => build_instance.test_command,
         "repo_url" => project.repository.url_for_fetching,
         "remote_name" => "origin",
         "timeout" => project.repository.timeout.minutes,

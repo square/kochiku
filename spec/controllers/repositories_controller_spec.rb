@@ -117,7 +117,6 @@ describe RepositoriesController do
       :url,
       :test_command,
       :on_green_update,
-      :command_flag,
       :on_success_script,
       :on_success_note,
       :repository_name

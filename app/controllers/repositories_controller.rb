@@ -94,7 +94,7 @@ class RepositoriesController < ApplicationController
 
   def repository_params
     params.require(:repository).
-      permit(:url, :repository_name, :test_command, :command_flag, :timeout,
+      permit(:url, :repository_name, :test_command, :timeout,
              :build_pull_requests, :run_ci, :on_green_update,
              :on_success_note, :on_success_script,
              :send_build_failure_email, :allows_kochiku_merges)
