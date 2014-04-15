@@ -195,20 +195,6 @@ describe Repository do
     end
   end
 
-  context "#use_branches_on_green=" do
-    it "converts the checkbox to bool" do
-      repository = FactoryGirl.create(:repository)
-      repository.use_branches_on_green="1"
-      repository.save
-      repository.reload
-      expect(repository.use_branches_on_green).to eq(true)
-      repository.use_branches_on_green="0"
-      repository.save
-      repository.reload
-      expect(repository.use_branches_on_green).to eq(false)
-    end
-  end
-
   it "saves build tags" do
     repository = FactoryGirl.create(:repository)
     repository.on_green_update="1,2,3"

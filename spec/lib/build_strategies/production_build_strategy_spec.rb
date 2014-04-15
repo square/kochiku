@@ -46,7 +46,7 @@ describe BuildStrategy do
       }
 
       it "fails gracefully if the ref is undefined" do
-        expect(described_class).to receive(:promote).with(:tag, project.repository.promotion_refs.first, build.ref)
+        expect(described_class).to receive(:promote).with(project.repository.promotion_refs.first, build.ref)
         subject
       end
     end
@@ -54,13 +54,13 @@ describe BuildStrategy do
 
   describe "#promote" do
     subject {
-      described_class.promote(:branch, 'last-green', 'abc123',)
+      described_class.promote('last-green', 'abc123')
     }
 
     it "should promote a sha" do
       mock_git_command = double
       expect(mock_git_command).to receive(:run).and_return ""
-      allow(Cocaine::CommandLine).to receive(:new).with(["git push", "origin abc123:refs/heads/last-green -f"]).and_return mock_git_command
+      allow(Cocaine::CommandLine).to receive(:new).with("git push", "origin abc123:refs/heads/last-green -f").and_return mock_git_command
 
       subject
     end

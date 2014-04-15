@@ -1,4 +1,4 @@
-= form_for @repository, :url => @url do |f|
+= form_for @repository, :url => @url, :html => { :id => 'repository-form' } do |f|
   = f.error_messages
   %div
     %label{:for => "url"} Repository URL:
@@ -13,15 +13,15 @@
     %label{:for => "command_flag"} Command Flag:
     = f.text_field :command_flag, {:placeholder => '', :autocapitalize => 'off', :autocorrect => 'off', :spellcheck => 'false'}
   %div
-    %label{:for => "timeout"} Build part timeout:
+    %label{:for => "timeout"} Timeout a build part after:
     = f.text_field :timeout, {:id => "timeout"}
     minutes
   %div
+    %label{:for => "run_ci"} Trigger build on push to master:
+    = f.check_box :run_ci, {:id => "run_ci"}
+  %div
     %label{:for => "build_pull_requests"} Build pull requests:
     = f.check_box :build_pull_requests, {:id => "build_pull_requests"}
-  %div
-    %label{:for => "run_ci"} Build on push:
-    = f.check_box :run_ci, {:id => "run_ci"}
   %div
     %label{:for => "allows_kochiku_merges"} Allow developers to request branches be merged into master on success:
     = f.check_box :allows_kochiku_merges, {:id => "allows_kochiku_merges"}
@@ -29,11 +29,8 @@
   %fieldset
     %legend On a green build
     %div
-      %label{:for => "on_green_update"} Tag commit with:
-      = f.text_field :on_green_update, {:id => "on_green_update", :placeholder => "Comma separated list of tags"}
-    %div
-      %label{:for => "use_branches_on_green"} Use branches instead of tags:
-      = f.check_box :use_branches_on_green, {:id => "use_branches_on_green"}
+      %label{:for => "on_green_update"} Update branches to last green commit:
+      = f.text_field :on_green_update, {:id => "on_green_update", :placeholder => "Comma separated list of branches"}
     %div
       %label{:for => "on_success_note"} Add git note:
       = f.text_field :on_success_note, {:id => "on_success_note", :placeholder => "ex. (ci=green)"}

@@ -12,21 +12,13 @@ class BuildStrategy
     def promote_build(build_ref, repository)
       repository.promotion_refs.each do |promotion_ref|
         unless included_in_promotion_ref?(repository, build_ref, promotion_ref)
-          ref_type = repository.use_branches_on_green ? :branch : :tag
-          promote(ref_type, promotion_ref, build_ref)
+          promote(promotion_ref, build_ref)
         end
       end
     end
 
-    def promote(tag_or_branch, promotion_ref, ref_to_promote)
-      case tag_or_branch
-      when :tag
-        command = "git push", "origin #{ref_to_promote}:refs/tags/#{promotion_ref} -f"
-        Cocaine::CommandLine.new(command).run
-      when :branch
-        command = "git push", "origin #{ref_to_promote}:refs/heads/#{promotion_ref} -f"
-        Cocaine::CommandLine.new(command).run
-      end
+    def promote(promotion_ref, ref_to_promote)
+      Cocaine::CommandLine.new("git push", "origin #{ref_to_promote}:refs/heads/#{promotion_ref} -f").run
     end
 
     def add_note(build_ref, namespace, note)
@@ -59,12 +51,7 @@ class BuildStrategy
     def included_in_promotion_ref?(repository, build_ref, promotion_ref)
       return unless ref_exists?(promotion_ref)
 
-      target_to_check = if repository.use_branches_on_green
-        "origin/#{promotion_ref}"
-      else
-        promotion_ref
-      end
-      cherry_cmd = Cocaine::CommandLine.new("git cherry", "#{target_to_check} #{build_ref}")
+      cherry_cmd = Cocaine::CommandLine.new("git cherry", "#{promotion_ref} #{build_ref}")
       cherry_cmd.run.lines.count == 0
     end
 
