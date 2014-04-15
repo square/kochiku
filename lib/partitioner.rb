@@ -74,9 +74,7 @@ class Partitioner
     manifest = subset['manifest']
     retry_count = subset['retry_count'] || 0
 
-    append_type_to_queue = subset.fetch('append_type_to_queue', false)
     queue = queue_for_build(build)
-    queue += "-#{type}" if append_type_to_queue
 
     queue_override = subset.fetch('queue_override', nil)
     queue = queue_override if queue_override.present?
