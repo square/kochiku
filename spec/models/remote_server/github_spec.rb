@@ -1,36 +1,6 @@
 require 'spec_helper'
 
 describe RemoteServer::Github do
-  describe '#promote_branch!' do
-    let(:repo) { double(project_params: {}, url: 'git@github.com:square/kochiku.git') }
-    let(:server) { described_class.new(repo) }
-
-    it 'creates branch if it does not exist' do
-      expect(GithubRequest).to receive(:post) do |uri, args|
-        expect(args[:ref]).to eq('refs/heads/deployable-myapp')
-        expect(args[:sha]).to eq('abc123')
-      end
-      expect(GithubRequest).to receive(:patch) do |uri, args|
-        expect(uri.to_s).to match(/deployable-myapp\Z/)
-        expect(args[:force]).to eq('true')
-        expect(args[:sha]).to eq('abc123')
-      end
-      server.promote_branch!('deployable-myapp', 'abc123')
-    end
-
-    it 'updates branch to the given ref when it already exists' do
-      expect(GithubRequest)
-        .to receive(:post)
-        .and_raise(GithubRequest::ResponseError)
-      expect(GithubRequest).to receive(:patch) do |uri, args|
-        expect(uri.to_s).to match(/deployable-myapp\Z/)
-        expect(args[:force]).to eq('true')
-        expect(args[:sha]).to eq('abc123')
-      end
-      server.promote_branch!('deployable-myapp', 'abc123')
-    end
-  end
-
   describe "base_api_url" do
     describe "for github.com" do
       it "should use the api subdomain" do
