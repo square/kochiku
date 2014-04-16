@@ -1,4 +1,5 @@
 require 'spec_helper'
+require 'remote_server/stash'
 
 describe 'stash integration test' do
   before do

@@ -1,3 +1,6 @@
+require 'remote_server/stash'
+require 'remote_server/github'
+
 class Repository < ActiveRecord::Base
   UnknownServer = Class.new(RuntimeError)
 

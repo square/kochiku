@@ -1,4 +1,5 @@
 require 'spec_helper'
+require 'remote_server/github'
 
 describe RemoteServer::Github do
   describe "base_api_url" do
