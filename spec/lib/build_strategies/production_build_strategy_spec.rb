@@ -40,6 +40,22 @@ describe BuildStrategy do
 
     context "when pushing to a ref that doesn't exist" do
       before(:each) {
+        mock_show_ref_command = double
+        expect(mock_show_ref_command).to receive(:run).and_return "deadbeef refs/remote/origin/branch"
+        allow(Cocaine::CommandLine).to receive(:new).with("git show-ref", anything, anything).and_return mock_show_ref_command
+
+        mock_cherry_command = double
+        expect(mock_cherry_command).to receive(:run).and_return "+ deadbeef"
+        allow(Cocaine::CommandLine).to receive(:new).with("git cherry", "origin/#{project.repository.promotion_refs.first} #{build.ref}").and_return mock_cherry_command
+      }
+      it "pushes the ref" do
+        expect(described_class).to receive(:promote).with(project.repository.promotion_refs.first, build.ref)
+        subject
+      end
+    end
+
+    context "when pushing to a ref that doesn't exist" do
+      before(:each) {
         mock_git_command = double
         expect(mock_git_command).to receive(:run).and_return ""
         allow(Cocaine::CommandLine).to receive(:new).with("git show-ref", anything, anything).and_return mock_git_command
