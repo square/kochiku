@@ -23,8 +23,8 @@ describe BuildStateUpdateJob do
 
   shared_examples "a non promotable state" do
     it "should not promote the build" do
-      BuildStateUpdateJob.perform(build.id)
       expect(BuildStrategy).not_to receive(:promote_build)
+      BuildStateUpdateJob.perform(build.id)
     end
   end
 
