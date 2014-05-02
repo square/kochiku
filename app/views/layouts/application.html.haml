@@ -13,7 +13,7 @@
     - if (favicon = yield(:favicon)).present?
       = favicon
     - else
-      = favicon_link_tag
+      = favicon_link_tag '/favicon.ico'
   %body
     #page
       #header.section-wrapper
