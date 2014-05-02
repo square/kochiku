@@ -6,35 +6,36 @@ module RemoteServer
 
   # All integration with Github must go via this class.
   class Github
-    attr_reader :repo
-
     URL_PARSERS = [
-      %r{@(?<host>.*):(?<username>.*)/(?<project_name>.*)\.git},           # git@
-      %r{://(?<host>.*)/(?<username>.*)/(?<project_name>.*)\.git},         # git://
-      %r{https?://(?<host>.*)/(?<username>.*)/(?<project_name>[^.]*)\.?},  # https://
+      %r{\Agit@(?<host>.*):(?<username>.*)/(?<name>[^.]+)\.?},         # git@
+      %r{\Agit://(?<host>.*)/(?<username>.*)/(?<name>[^.]+)\.git},     # git://  (GHE only)
+      %r{\Ahttps?://(?<host>.*)/(?<username>.*)/(?<name>[^.]+)\.?},    # https://
     ]
 
-    # Prefer SSH format for Github
-    def self.canonical_repository_url_for(url)
-      params = project_params(url)
-      "git@#{params[:host]}:#{params[:username]}/#{params[:repository]}.git"
+    def initialize(url)
+      @url = url
+      attributes # force url parsing
     end
 
-    def self.project_params(url)
-      parser = URL_PARSERS.detect { |regexp| url =~ regexp }
-      raise UnknownUrl, "Do not recognize #{url} as a github URL." unless parser
+    def attributes
+      @attributes ||= begin
+        parser = URL_PARSERS.detect { |regexp| @url =~ regexp }
+        raise UnknownUrlFormat, "Do not recognize #{@url} as a github URL." unless parser
 
-      match = url.match(parser)
+        match = @url.match(parser)
 
-      {
-        host:       match[:host],
-        username:   match[:username],
-        repository: match[:project_name]
-      }
+        {
+          host: match[:host],
+          repository_namespace: match[:username],
+          repository_name: match[:name]
+        }.freeze
+      end
     end
 
-    def initialize(repo)
-      @repo = repo
+    # Public: Returns a url for the remote repo in the format Kochiku prefers
+    # for Github, which is the SSH format.
+    def canonical_repository_url
+      "git@#{attributes[:host]}:#{attributes[:repository_namespace]}/#{attributes[:repository_name]}.git"
     end
 
     def sha_for_branch(branch)
@@ -51,17 +52,15 @@ module RemoteServer
       GithubCommitStatus.new(build).update_commit_status!
     end
 
-    def install_post_receive_hook!
+    def install_post_receive_hook!(repo)
       GithubPostReceiveHook.new(repo).subscribe!
     end
 
     def base_api_url
-      params = repo.project_params
-
-      if repo.url =~ /github\.com/
-        "https://api.#{params[:host]}/repos/#{params[:username]}/#{params[:repository]}"
+      if @url =~ /github\.com/
+        "https://api.#{attributes[:host]}/repos/#{attributes[:repository_namespace]}/#{attributes[:repository_name]}"
       else # github enterprise
-        "https://#{params[:host]}/api/v3/repos/#{params[:username]}/#{params[:repository]}"
+        "https://#{attributes[:host]}/api/v3/repos/#{attributes[:repository_namespace]}/#{attributes[:repository_name]}"
       end
     end
 
@@ -70,9 +69,7 @@ module RemoteServer
     end
 
     def base_html_url
-      params = repo.project_params
-
-      "https://#{params[:host]}/#{params[:username]}/#{params[:repository]}"
+      "https://#{attributes[:host]}/#{attributes[:repository_namespace]}/#{attributes[:repository_name]}"
     end
   end
 

@@ -117,7 +117,7 @@ class BuildsController < ApplicationController
     elsif params['build']
       @project = Project.where(:name => params[:project_id]).first
       unless @project
-        normalized_url = Repository.canonical_repository_url(params[:repo_url])
+        normalized_url = RemoteServer.for_url(params[:repo_url]).canonical_repository_url
         repository = Repository.where(url: normalized_url).first_or_create!
         @project = repository.projects.create!(:name => params[:project_id])
       end

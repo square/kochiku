@@ -45,7 +45,7 @@ class Project < ActiveRecord::Base
   end
 
   def main?
-    self.name == repository.repository_name
+    self.name == repository.name
   end
 
   def most_recent_build

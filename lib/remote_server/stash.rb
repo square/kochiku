@@ -4,41 +4,44 @@ module RemoteServer
 
   # All integration with Stash must go via this class.
   class Stash
-    attr_reader :repo, :stash_request
+    attr_reader :stash_request
 
     URL_PARSERS = [
-      %r{\Agit@(?<host>.*):(?<username>.*)/(?<project_name>.*)\.git\z},
-      %r{\Assh://git@(?<host>.*?)(?<port>:\d+)?/(?<username>.*)/(?<project_name>.*)\.git\z},
-      %r{\Ahttps://(?<host>[^@]+)/scm/(?<username>.+)/(?<project_name>.+)\.git\z},
+      %r{\Agit@(?<host>.*):(?<username>.*)/(?<name>[^.]+)\.git\z},
+      %r{\Assh://git@(?<host>.*?)(?<port>:\d+)?/(?<username>.*)/(?<name>[^.]+)\.git\z},
+      %r{\Ahttps://(?<host>[^@]+)/scm/(?<username>.+)/(?<name>[^.]+)\.git\z},
     ]
 
-    def self.project_params(url)
-      parser = URL_PARSERS.detect { |regexp| url =~ regexp }
-      raise UnknownUrl, "Do not recognize #{url} as a Stash url." unless parser
-
-      match = url.match(parser)
-
-      params = {
-        host:       match[:host],
-        username:   match[:username],
-        repository: match[:project_name],
-      }
-      if match.names.include?('port') && match['port'].present?
-        params[:port] = match[:port].delete(':')
-      end
-      params
-    end
-
-    # Prefer HTTPS format for Stash
-    def self.canonical_repository_url_for(url)
-      params = project_params(url)
-      "https://#{params[:host]}/scm/#{params[:username]}/#{params[:repository]}.git"
-    end
-
-    def initialize(repo)
-      @repo = repo
-      @settings = Settings.git_server(repo.url)
+    def initialize(url)
+      @url = url
+      attributes # force url parsing
+      @settings = Settings.git_server(@url)
       @stash_request = StashRequest.new(@settings)
+    end
+
+    def attributes
+      @attributes ||= begin
+        parser = URL_PARSERS.detect { |regexp| @url =~ regexp }
+        raise UnknownUrlFormat, "Do not recognize #{@url} as a Stash url." unless parser
+
+        match = @url.match(parser)
+
+        attributes = {
+          host: match[:host],
+          repository_namespace: match[:username],
+          repository_name: match[:name],
+        }
+        if match.names.include?('port') && match['port'].present?
+          attributes[:port] = match[:port].delete(':')
+        end
+        attributes.freeze
+      end
+    end
+
+    # Public: Returns a url for the remote repo in the format Kochiku prefers
+    # for Stash, which is the HTTPS format.
+    def canonical_repository_url
+      "https://#{attributes[:host]}/scm/#{attributes[:repository_namespace]}/#{attributes[:repository_name]}.git"
     end
 
     def sha_for_branch(branch)
@@ -64,20 +67,16 @@ module RemoteServer
       }
     end
 
-    def install_post_receive_hook!
+    def install_post_receive_hook!(repo)
       # Unimplemented
     end
 
     def base_api_url
-      params = repo.project_params
-
-      "https://#{params[:host]}/rest/api/1.0/projects/#{params[:username]}/repos/#{params[:repository]}"
+      "https://#{attributes[:host]}/rest/api/1.0/projects/#{attributes[:repository_namespace]}/repos/#{attributes[:repository_name]}"
     end
 
     def base_html_url
-      params = repo.project_params
-
-      "https://#{params[:host]}/projects/#{params[:username]}/repos/#{params[:repository]}"
+      "https://#{attributes[:host]}/projects/#{attributes[:repository_namespace]}/repos/#{attributes[:repository_name]}"
     end
 
     def href_for_commit(sha)
@@ -95,49 +94,49 @@ module RemoteServer
         'INPROGRESS'
       end
     end
-  end
 
-  class StashRequest
-    def initialize(settings)
-      @settings = settings
-    end
-
-    # TODO: Configure OAuth
-
-    def setup_auth!(req)
-      req.basic_auth \
-        @settings.username,
-        File.read(@settings.password_file).chomp
-    end
-
-    def get(uri)
-      Rails.logger.info("Stash GET: #{uri}")
-      get = Net::HTTP::Get.new(uri)
-      setup_auth! get
-      make_request(get, URI(uri))
-    end
-
-    def post(uri, body)
-      Rails.logger.info("Stash POST: #{uri}, #{body}")
-      post = Net::HTTP::Post.new(uri, {'Content-Type' =>'application/json'})
-      setup_auth! post
-      post.body = body.to_json
-      make_request(post, URI(uri))
-    end
-
-    def make_request(method, uri, args = [])
-      body = nil
-      Net::HTTP.start(uri.host, uri.port, :use_ssl => true) do |http|
-        response = http.request(method, *args)
-        body = response.body
-        Rails.logger.info("Stash response: #{response.inspect}")
-        Rails.logger.info("Stash response body: #{body.inspect}")
-        unless response.is_a? Net::HTTPSuccess
-          raise "response: #{response.class} body: #{body}"
-        end
+    class StashRequest
+      def initialize(settings)
+        @settings = settings
       end
-      body
-    end
-  end
 
+      # TODO: Configure OAuth
+
+      def setup_auth!(req)
+        req.basic_auth \
+          @settings.username,
+          File.read(@settings.password_file).chomp
+      end
+
+      def get(uri)
+        Rails.logger.info("Stash GET: #{uri}")
+        get = Net::HTTP::Get.new(uri)
+        setup_auth! get
+        make_request(get, URI(uri))
+      end
+
+      def post(uri, body)
+        Rails.logger.info("Stash POST: #{uri}, #{body}")
+        post = Net::HTTP::Post.new(uri, {'Content-Type' =>'application/json'})
+        setup_auth! post
+        post.body = body.to_json
+        make_request(post, URI(uri))
+      end
+
+      def make_request(method, uri, args = [])
+        body = nil
+        Net::HTTP.start(uri.host, uri.port, :use_ssl => true) do |http|
+          response = http.request(method, *args)
+          body = response.body
+          Rails.logger.info("Stash response: #{response.inspect}")
+          Rails.logger.info("Stash response body: #{body.inspect}")
+          unless response.is_a? Net::HTTPSuccess
+            raise "response: #{response.class} body: #{body}"
+          end
+        end
+        body
+      end
+    end
+
+  end
 end

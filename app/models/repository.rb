@@ -1,26 +1,42 @@
-require 'remote_server/stash'
-require 'remote_server/github'
+require 'remote_server'
 
+# This Repository class should only concern itself with persisting and acting on
+# Repository records in the database. All non-database operations should go
+# through the RemoteServer classes.
 class Repository < ActiveRecord::Base
-  UnknownServer = Class.new(RuntimeError)
-
   has_many :projects, :dependent => :destroy
-  validates_presence_of :url
-  validates_uniqueness_of :repository_name
+  validates_presence_of :host, :name, :url
+  validates_uniqueness_of :name
   validates_numericality_of :timeout, :only_integer => true
-  validates_inclusion_of :timeout, :in => 0..1440
+  validates_inclusion_of :timeout, in: 0..1440, message: "the maximum timeout allowed is 1440 seconds"
 
-  before_validation :set_repository_name
+  validates_uniqueness_of :url, :allow_blank => true
+  validate :url_against_remote_servers
 
-  def remote_server
-    self.class.remote_server_for(url).new(self)
+  # Setting a URL will extract values for host, namespace, and name. This
+  # should not overwrite values for those attributes that were set in the same
+  # session.
+  def url=(value)
+    # this column is deprecated; eventually url will just be a virtual attribute
+    write_attribute(:url, value)
+
+    return unless RemoteServer.parseable_url?(value)
+
+    attrs_from_remote_server = RemoteServer.for_url(value).attributes
+    self.host = attrs_from_remote_server[:host] unless host_changed?
+    self.namespace = attrs_from_remote_server[:repository_namespace] unless namespace_changed?
+    self.name = attrs_from_remote_server[:repository_name] unless name_changed?
   end
 
-  def main_project
-    projects.where(name: repository_name).first
+  def remote_server
+    @remote_server ||= RemoteServer.for_url(url)
   end
 
   delegate :base_html_url, :base_api_url, to: :remote_server
+
+  def main_project
+    projects.where(name: name).first
+  end
 
   # Where to fetch from (git mirror if defined, otherwise the regular git url)
   def url_for_fetching
@@ -32,14 +48,8 @@ class Repository < ActiveRecord::Base
     end
   end
 
-  def set_repository_name
-    if self.repository_name.blank?
-      self.repository_name = project_params[:repository]
-    end
-  end
-
   def repo_cache_name
-    repo_cache_dir || "#{repository_name}-cache"
+    repo_cache_dir || "#{name}-cache"
   end
 
   def promotion_refs
@@ -50,30 +60,6 @@ class Repository < ActiveRecord::Base
     event_types = ['pull_request']
     event_types << 'push' if run_ci
     event_types
-  end
-
-  def self.remote_server_for(url)
-    server = Settings.git_server(url)
-
-    raise UnknownServer, url unless server
-
-    case server.type
-      when 'stash'
-        RemoteServer::Stash
-      when 'github'
-        RemoteServer::Github
-      else
-        raise "unknown server type #{type}"
-    end
-  end
-
-  # Public: transforms the given url into the format Kochiku prefers for the
-  # RemoteServer hosting the repository.
-  #
-  # Returns: the url tranformed into the preferred format as a String.
-  def self.canonical_repository_url(url)
-    remote_server_class = remote_server_for(url)
-    remote_server_class.canonical_repository_url_for(url)
   end
 
   def has_on_success_script?
@@ -93,15 +79,13 @@ class Repository < ActiveRecord::Base
     Build.joins(:project).where(:ref => sha, 'projects.repository_id' => self.id).first
   end
 
-  def project_params
-    Repository.project_params(url)
-  end
-
   private
 
-  def self.project_params(url)
-    return {} unless url.present?
+  def url_against_remote_servers
+    return unless url.present?
 
-    remote_server_for(url).project_params(url)
+    unless RemoteServer.parseable_url?(url)
+      errors.add(:url, 'is not in a format supported by Kochiku')
+    end
   end
 end

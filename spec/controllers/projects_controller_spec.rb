@@ -18,8 +18,8 @@ describe ProjectsController do
 
   describe "#ci_projects" do
     let(:repository) { FactoryGirl.create(:repository) }
-    let!(:ci_project) { FactoryGirl.create(:project, :name => repository.repository_name) }
-    let!(:non_ci_project) { FactoryGirl.create(:project, :name => repository.repository_name + "-pull_requests") }
+    let!(:ci_project) { FactoryGirl.create(:project, :name => repository.name) }
+    let!(:non_ci_project) { FactoryGirl.create(:project, :name => repository.name + "-pull_requests") }
 
     it "only shows the ci project" do
       get :ci_projects
@@ -50,7 +50,7 @@ describe ProjectsController do
   describe "#status_report" do
     render_views
     let(:repository) { FactoryGirl.create(:repository) }
-    let(:project) { FactoryGirl.create(:project, :repository => repository, :name => repository.repository_name) }
+    let(:project) { FactoryGirl.create(:project, :repository => repository, :name => repository.name) }
 
     context "when a project has no builds" do
       before { expect(project.builds).to be_empty }

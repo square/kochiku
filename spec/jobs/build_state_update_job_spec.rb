@@ -4,7 +4,7 @@ describe BuildStateUpdateJob do
   let(:repository) { FactoryGirl.create(:repository, url: 'git@github.com:square/test-repo.git') }
   let(:project) { FactoryGirl.create(:big_rails_project, :repository => repository, :name => name) }
   let(:build) { FactoryGirl.create(:build, :state => :runnable, :project => project) }
-  let(:name) { repository.repository_name + "_pull_requests" }
+  let(:name) { repository.name + "_pull_requests" }
   let(:current_repo_master) { build.ref }
 
   before do
@@ -65,7 +65,7 @@ describe BuildStateUpdateJob do
         end
 
         context "with ci project" do
-          let(:name) { repository.repository_name }
+          let(:name) { repository.name }
 
           context "new sha is available" do
             let(:current_repo_master) { "new-sha-11111111111111111111111111111111" }
@@ -111,7 +111,7 @@ describe BuildStateUpdateJob do
       end
 
       context "on main project" do
-        let(:project) { FactoryGirl.create(:project, :repository => repository, :name => repository.repository_name) }
+        let(:project) { FactoryGirl.create(:project, :repository => repository, :name => repository.name) }
 
         it "should promote the build" do
           expect(BuildStrategy).to receive(:promote_build).with(build.ref, build.repository)

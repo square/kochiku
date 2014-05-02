@@ -4,8 +4,8 @@
     %label{:for => "url"} Repository URL:
     = f.text_field :url, {:placeholder => '', :autocapitalize => 'off', :autocorrect => 'off', :spellcheck => 'false'}
   %div
-    %label{:for => "repository_name"} Repository Name:
-    = f.text_field :repository_name, {:placeholder => '(default is based off url)', :autocapitalize => 'off', :autocorrect => 'off', :spellcheck => 'false'}
+    %label{:for => "name"} Repository Name:
+    = f.text_field :name, {:placeholder => '(default is based off url)', :autocapitalize => 'off', :autocorrect => 'off', :spellcheck => 'false'}
   %div
     %label{:for => "test_command"} Test Command:
     = f.text_field :test_command, {:placeholder => 'e.g. script/ci', :autocapitalize => 'off', :autocorrect => 'off', :spellcheck => 'false'}

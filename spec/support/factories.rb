@@ -10,7 +10,7 @@ FactoryGirl.define do
     end
 
     factory :main_project do
-      name { repository.repository_name }
+      name { repository.name }
     end
   end
 
