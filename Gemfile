@@ -36,6 +36,7 @@ gem 'httparty'
 
 gem 'bullet'
 gem 'pry-rails'
+gem 'pry-byebug'
 
 gem 'colorize', require: false
 

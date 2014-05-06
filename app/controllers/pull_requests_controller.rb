@@ -29,7 +29,7 @@ class PullRequestsController < ApplicationController
     repository = Repository.find_by_url(payload['repository']['ssh_url'])
     return unless repository
     project = repository.projects.where(name: repository.repository_name + "-pull_requests").first_or_create
-    if active_pull_request? && (build_requested_for_pull_request? || repository.build_pull_requests)
+    if active_pull_request? && repository.build_pull_requests
       sha = payload["pull_request"]["head"]["sha"]
       branch = payload["pull_request"]["head"]["ref"]
 
@@ -39,10 +39,6 @@ class PullRequestsController < ApplicationController
 
   def active_pull_request?
     payload['action'] && payload['action'] != "closed"
-  end
-
-  def build_requested_for_pull_request?
-    payload["pull_request"] && payload["pull_request"]["body"].to_s.downcase.include?("!buildme")
   end
 
   def payload

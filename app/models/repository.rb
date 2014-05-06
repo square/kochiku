@@ -81,6 +81,15 @@ class Repository < ActiveRecord::Base
     on_success_note.to_s.strip.present?
   end
 
+  # Public: attempts to lookup a build for the commit under any of the
+  # repository's projects. This is done as an optimization since the contents
+  # of the commit are guaranteed to not have changed.
+  #
+  # Returns: Build AR object or nil
+  def build_for_commit(sha)
+    Build.joins(:project).where(:ref => sha, 'projects.repository_id' => self.id).first
+  end
+
   def project_params
     Repository.project_params(url)
   end

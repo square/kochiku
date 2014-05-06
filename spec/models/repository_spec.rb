@@ -245,4 +245,24 @@ describe Repository do
     end
 
   end
+
+  describe '#build_for_commit' do
+    let!(:repositoryA) { FactoryGirl.create(:repository) }
+    let!(:projectA1) { FactoryGirl.create(:project, repository: repositoryA) }
+    let!(:repositoryB) { FactoryGirl.create(:repository) }
+    let!(:buildA1) { FactoryGirl.create(:build, project: projectA1, ref: sha) }
+    let(:sha) { to_40('a') }
+
+    context 'a build for the sha exists under this repository' do
+      it 'should return an existing build with the same sha' do
+        expect(repositoryA.build_for_commit(sha)).to eq(buildA1)
+      end
+    end
+
+    context 'a build exists under a different repository' do
+      it 'should return nil' do
+        expect(repositoryB.build_for_commit(sha)).to be_nil
+      end
+    end
+  end
 end

@@ -17,7 +17,7 @@ FactoryGirl.define do
   factory :build do
     project
     state :partitioning
-    ref { SecureRandom.hex }
+    ref { SecureRandom.hex(20) } # 20 is the length in bytes, resulting string is twice n
 
     factory :main_project_build do
       association :project, :factory => :main_project
