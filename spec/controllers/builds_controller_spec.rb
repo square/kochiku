@@ -54,12 +54,21 @@ describe BuildsController do
       end
 
       let(:project_param) { "ganymede-hammertime" }
+      let(:ref) { "30b111147d9a245468c6650f54de5c16584bc154" }
       let(:build_info) do
         {
           :hostname => "ganymede",
           :project => "hammertime",
-          :ref => "30b111147d9a245468c6650f54de5c16584bc154"
+          :ref => ref,
         }
+      end
+
+      it "should create a repo if one does not exist" do
+        repo.destroy
+        expect {
+          post @action, @params.merge(:project_id => project_param, :build => build_info)
+        }.to change(Repository, :count).by(1)
+        expect(Repository.last.url).to eq(repo.url)
       end
 
       it "should create a new project if one does not exist" do
@@ -68,34 +77,43 @@ describe BuildsController do
         }.to change { Project.exists?(:name => project_param) }.from(false).to(true)
       end
 
-      context "when the pushed branch has already been built" do
+      context "when the pushed sha has already been built" do
         it "has no effect" do
           project = FactoryGirl.create(:project, :repository => repo)
-          build = FactoryGirl.create(:build, :project => project, :ref => "30b111147d9a245468c6650f54de5c16584bc154")
+          build = FactoryGirl.create(:build, :project => project, :ref => ref)
           expect {
             post @action, @params.merge(:project_id => project_param, :build => build_info)
             expect(response).to be_success
           }.to_not change(Build, :count)
           expect(response.headers["Location"]).to eq(project_build_url(project, build))
         end
+      end
 
-        it "rebuilds if the sha is on a different repo" do
-          project = FactoryGirl.create(:project)
-          build = FactoryGirl.create(:build, :project => project, :ref => "30b111147d9a245468c6650f54de5c16584bc154")
-          expect {
-            post @action, @params.merge(:project_id => project_param, :build => build_info)
-            expect(response).to be_success
-          }.to change(Build, :count)
-          expect(response.headers["Location"]).not_to eq(project_build_url(project, build))
+      context "when the sha is already associated with another project under this repo" do
+        it "should return a URL to the existing build" do
+          other_project = FactoryGirl.create(:project, :repository => repo)
+          other_build = FactoryGirl.create(:build, :project => other_project, :ref => ref)
+
+          this_project = FactoryGirl.create(:project, :repository => repo, :name => project_param)
+
+          post @action, @params.merge(:project_id => project_param, :build => build_info)
+          expect(response).to be_success
+          expect(response.headers["Location"]).to eq(project_build_url(other_project, other_build))
         end
       end
 
-      it "should create a repo if one does not exist" do
-        Repository.destroy_all
-        expect {
-          post @action, @params.merge(:project_id => project_param, :build => build_info)
-        }.to change(Repository, :count).by(1)
-        expect(Repository.last.url).to eq(repo.url)
+      context "when the sha is already used by a different repo" do
+        it "should create a new build" do
+          other_repo = FactoryGirl.create(:repository)
+          other_project = FactoryGirl.create(:project, :repository => other_repo)
+          other_build = FactoryGirl.create(:build, :project => other_project, :ref => ref)
+
+          expect {
+            post @action, @params.merge(:project_id => project_param, :build => build_info)
+            expect(response).to be_success
+          }.to change(Build, :count).by(1)
+          expect(response.headers["Location"]).to_not eq(project_build_url(other_project, other_build))
+        end
       end
 
       it "sets merge_on_success when param given" do
@@ -126,17 +144,6 @@ describe BuildsController do
         expect(new_build).to be_present
 
         expect(response.location).to eq(project_build_url(project_param, new_build))
-      end
-
-      it "should find an existing build" do
-        post @action, @params.merge(:project_id => project_param, :build => build_info)
-        expected_url = response.location
-
-        expect {
-          post @action, @params.merge(:project_id => project_param, :build => build_info)
-        }.to_not change { Build.count }
-
-        expect(response.location).to eq(expected_url)
       end
 
       it "should succeed if the repository url is in an alternate format" do
@@ -205,7 +212,8 @@ RESPONSE
         end
 
         it "creates the build for main project if no branch is given" do
-          allow(GitRepo).to receive(:sha_for_branch).and_return("deadbeef")
+          sha = to_40('1')
+          allow(GitRepo).to receive(:sha_for_branch).and_return(sha)
 
           expect {
             post @action, {:project_id => project.to_param}
@@ -213,7 +221,7 @@ RESPONSE
           build = Build.last
           expect(build.project).to eq(project)
           expect(build.branch).to eq("master")
-          expect(build.ref).to eq("deadbeef")
+          expect(build.ref).to eq(sha)
         end
 
         it "does not create a new build if the latest commit already has a build" do

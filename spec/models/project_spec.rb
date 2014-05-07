@@ -5,8 +5,8 @@ describe Project do
     let(:project) { FactoryGirl.create(:project) }
 
     it 'creates a new build only if one does not exist' do
-      build1 = project.ensure_master_build_exists('abc123')
-      build2 = project.ensure_master_build_exists('abc123')
+      build1 = project.ensure_master_build_exists(to_40('abcdef'))
+      build2 = project.ensure_master_build_exists(to_40('abcdef'))
       expect(build1).not_to eq(nil)
       expect(build1).to eq(build2)
     end
@@ -16,24 +16,25 @@ describe Project do
     let(:project) { FactoryGirl.create(:project) }
 
     it 'creates a new build only if one does not exist' do
-      build1 = project.ensure_branch_build_exists('mybranch', 'abc123')
-      build2 = project.ensure_branch_build_exists('mybranch', 'abc123')
+      build1 = project.ensure_branch_build_exists('mybranch', to_40('abcdef'))
+      build2 = project.ensure_branch_build_exists('mybranch', to_40('abcdef'))
       expect(build1).not_to eq(nil)
       expect(build1).to eq(build2)
+      expect(build1.branch).to eq('mybranch')
     end
 
     it 'aborts previous builds if the current build is a new build' do
-      build1 = project.ensure_branch_build_exists('mybranch', 'abc123')
-      build2 = project.ensure_branch_build_exists('mybranch', 'def456')
+      build1 = project.ensure_branch_build_exists('mybranch', '2df46538332f4f3216b5bfa015ecc39e63d5e725')
+      build2 = project.ensure_branch_build_exists('mybranch', '4025f76f8a6b2a31431caf4f1a9074675fefc641')
       expect(build1.reload).to be_aborted
       expect(build2.reload).not_to be_aborted
     end
 
     it 'does abort build if the build is already running' do
-      build1 = project.ensure_branch_build_exists('mybranch', 'abc123')
+      build1 = project.ensure_branch_build_exists('mybranch', to_40('abcdef'))
       expect(build1.reload).not_to be_aborted
 
-      build2 = project.ensure_branch_build_exists('mybranch', 'abc123')
+      build2 = project.ensure_branch_build_exists('mybranch', to_40('abcdef'))
       expect(build2.reload).not_to be_aborted
 
       expect(build1).not_to be_aborted
@@ -45,9 +46,9 @@ describe Project do
     let(:project) { FactoryGirl.create(:project) }
 
     it 'aborts non-finished builds for a branch' do
-      build1 = project.ensure_branch_build_exists('mybranch', 'abc123')
-      build2 = project.ensure_branch_build_exists('mybranch', 'efg456')
-      build3 = project.ensure_branch_build_exists('mybranch', 'hij789')
+      build1 = project.ensure_branch_build_exists('mybranch', to_40('1'))
+      build2 = project.ensure_branch_build_exists('mybranch', to_40('2'))
+      build3 = project.ensure_branch_build_exists('mybranch', to_40('3'))
       build1.state = :succeeded
       build1.save!
 

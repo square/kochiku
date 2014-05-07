@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20140415011144) do
+ActiveRecord::Schema.define(version: 20140506012721) do
 
   create_table "build_artifacts", force: true do |t|
     t.integer  "build_attempt_id"
@@ -49,10 +49,10 @@ ActiveRecord::Schema.define(version: 20140415011144) do
   add_index "build_parts", ["paths"], name: "index_build_parts_on_paths", length: {"paths"=>255}, using: :btree
 
   create_table "builds", force: true do |t|
-    t.string   "ref"
+    t.string   "ref",                        limit: 40, null: false
     t.string   "state"
-    t.datetime "created_at",                 null: false
-    t.datetime "updated_at",                 null: false
+    t.datetime "created_at",                            null: false
+    t.datetime "updated_at",                            null: false
     t.integer  "project_id"
     t.boolean  "merge_on_success"
     t.string   "branch"
@@ -63,7 +63,7 @@ ActiveRecord::Schema.define(version: 20140415011144) do
   end
 
   add_index "builds", ["project_id"], name: "index_builds_on_project_id", using: :btree
-  add_index "builds", ["ref"], name: "index_builds_on_ref", using: :btree
+  add_index "builds", ["ref", "project_id"], name: "index_builds_on_ref_and_project_id", unique: true, using: :btree
 
   create_table "projects", force: true do |t|
     t.string   "name"

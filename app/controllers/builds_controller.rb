@@ -21,9 +21,15 @@ class BuildsController < ApplicationController
   def create
     build = make_build
 
-    if build && build.save
-      head :ok, :location => project_build_url(build.project, build)
+    if build
+      if !build.new_record? || build.save
+        head :ok, :location => project_build_url(build.project, build)
+      else
+        render :text => build.errors.full_messages.join('\n'), :status => :unprocessable_entity
+      end
     else
+      # requested branch does not match project branch for Github request
+      # FIXME handle this differently, probably with a rescue_from
       head :ok
     end
   end
@@ -125,12 +131,18 @@ class BuildsController < ApplicationController
 
   def build_from_github
     load_project
-    payload = params['payload']
+    payload = params.fetch('payload')
+    sha1 = payload.fetch('after')
 
-    requested_branch = payload['ref'].split('/').last
+    requested_branch = payload.fetch('ref', '').split('/').last
 
     if @project.branch == requested_branch
-      @project.builds.find_existing_build_or_initialize(payload['after'], :state => :partitioning)
+      existing_build = @project.repository.build_for_commit(sha1)
+      if existing_build
+        existing_build
+      else
+        @project.builds.build(ref: sha1, state: :partitioning, branch: @project.branch)
+      end
     end
   end
 
@@ -140,10 +152,16 @@ class BuildsController < ApplicationController
       ref = GitRepo.sha_for_branch(@project.repository, "master")
       branch = "master"
     end
-    @project.builds.find_existing_build_or_initialize(
-      ref,
-      :state => :partitioning,
-      :merge_on_success => merge_on_success,
-      :branch => branch)
+
+    existing_build = @project.repository.build_for_commit(ref)
+    if existing_build
+      existing_build
+    else
+      @project.builds.build(ref: ref,
+                            state: :partitioning,
+                            merge_on_success: merge_on_success,
+                            branch: branch)
+    end
+
   end
 end

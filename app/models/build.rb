@@ -46,9 +46,11 @@ class Build < ActiveRecord::Base
   symbolize :state, :in => STATES
   serialize :error_details, Hash
 
-  validates_presence_of :project_id
-  validates_presence_of :ref
-  validates_uniqueness_of :ref, :scope => :project_id
+  validates :project_id, presence: true
+  validates :ref, presence: true,
+                  length: { is: 40, allow_blank: true },
+                  uniqueness: { scope: :project_id, allow_blank: true }
+
   mount_uploader :on_success_script_log_file, OnSuccessUploader
 
   after_commit :enqueue_partitioning_job, :on => :create
