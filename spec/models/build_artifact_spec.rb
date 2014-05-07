@@ -20,4 +20,20 @@ describe BuildArtifact do
       should include(junit_artifact)
     end
   end
+
+  describe "#log_contents" do
+    let!(:artifact)       { FactoryGirl.create :build_artifact }
+    let!(:artifact_gz) { FactoryGirl.create :build_artifact, :log_file => File.open(FIXTURE_PATH + 'stdout.log.gz') }    
+
+    it "should return the log contents for a log" do
+      log_contents = artifact.log_file.read
+      expect(artifact.log_contents).to eq(log_contents)
+    end
+
+    it "should return the log contents for a gzipped log" do
+      infile = open(artifact_gz.log_file.path)
+      log_contents = Zlib::GzipReader.new(infile).read
+      expect(artifact_gz.log_contents).to eq(log_contents)
+    end
+  end
 end

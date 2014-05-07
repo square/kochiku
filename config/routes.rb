@@ -25,6 +25,7 @@ Kochiku::Application.routes.draw do
       post 'rebuild-failed-parts', :action => "rebuild_failed_parts", :on => :member, :as => :rebuild_failed_parts
       resources :build_parts, :as => 'parts', :path => 'parts', :only => [:show] do
         post 'rebuild', :on => :member
+        resources :build_artifacts, :as => 'artifacts', :path => 'artifacts', :only => [:show] 
       end
     end
   end

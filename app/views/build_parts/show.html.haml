@@ -50,6 +50,7 @@
         %td
           - attempt.build_artifacts.each do |artifact|
             = link_to File.basename(artifact.log_file.to_s), artifact.log_file.url
+            = link_to "view", project_build_part_artifact_path( @project, @build, @build_part, artifact )
             %br
         %td
           - if attempt.unsuccessful? && @build_part.unsuccessful?

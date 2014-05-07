@@ -1,0 +1,27 @@
+= content_for :title do
+  = @build.ref[0, 7]
+  &ndash;
+  = @build.project.name
+= content_for :favicon do
+  = favicon_link_tag image_path("#{@build_part.to_color}.png"), :type => 'image/png'
+
+%h2.subheader
+  - unless @build.project.main?
+    - if main_project = @build.project.repository.main_project
+      = link_to main_project.name, main_project
+      &ndash;
+  = link_to(@build.project.name, project_path(@build.project))
+  &ndash;
+  = link_to project_build_path(@project, @build) do
+    %code.build-status{ class: @build.state, title: @build.ref }
+      = @build.ref[0, 7]
+  &ndash; Part #{link_to @build_part.id,project_build_part_path(@project, @build, @build_part.id)} - #{File.basename(@build_artifact.log_file.to_s)}
+
+.build-info.build-info-subheader
+  %span.info
+    %span.status{:class => 'build-part-' + @build_part.status.to_s}= @build_part.status.to_s.capitalize
+    on
+    %span.queue #{@build_part.queue} queue
+
+%div#log_output
+  = @log_output.html_safe
