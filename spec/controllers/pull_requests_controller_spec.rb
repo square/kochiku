@@ -43,7 +43,7 @@ describe PullRequestsController do
           }.to change(Build, :count).by(1)
           build = Build.last
           expect(build.branch).to eq("master")
-          expect(build.ref).to eq("SOME-SHA1")
+          expect(build.ref).to eq(to_40('2'))
         end
 
         it "does not a build for not master" do
@@ -62,10 +62,10 @@ describe PullRequestsController do
         end
 
         it "does not build if there is an active ci build" do
-          project.builds.create!(:ref => "sha", :state => :succeeded, :branch => 'master')
+          project.builds.create!(:ref => to_40('w'), :state => :succeeded, :branch => 'master')
           frozen_time = 3.seconds.from_now
           allow(Time).to receive(:now).and_return(frozen_time)
-          project.builds.create!(:ref => "sha2", :state => :partitioning, :branch => 'master')
+          project.builds.create!(:ref => to_40('y'), :state => :partitioning, :branch => 'master')
           expect {
             post :build, 'payload' => push_payload
             expect(response).to be_success
@@ -73,7 +73,7 @@ describe PullRequestsController do
         end
 
         it "builds if there is completed ci build" do
-          project.builds.create!(:ref => "sha", :state => :succeeded, :branch => 'master')
+          project.builds.create!(:ref => to_40('w'), :state => :succeeded, :branch => 'master')
           expect {
             post :build, 'payload' => push_payload
             expect(response).to be_success
@@ -81,10 +81,10 @@ describe PullRequestsController do
         end
 
         it "builds if there is a completed ci build after a build that is still building" do
-          project.builds.create!(:ref => "sha", :state => :partitioning, :branch => 'master')
+          project.builds.create!(:ref => to_40('w'), :state => :partitioning, :branch => 'master')
           frozen_time = 3.seconds.from_now
           allow(Time).to receive(:now).and_return(frozen_time)
-          project.builds.create!(:ref => "sha2", :state => :succeeded, :branch => 'master')
+          project.builds.create!(:ref => to_40('y'), :state => :succeeded, :branch => 'master')
           expect {
             post :build, 'payload' => push_payload
             expect(response).to be_success
@@ -100,6 +100,10 @@ describe PullRequestsController do
       end
 
       context "for pull requests" do
+        before do
+          repository.update_attribute(:build_pull_requests, true)
+        end
+
         it "creates the pull request project" do
           expect {
             post :build, 'payload' => pull_request_payload
@@ -116,14 +120,12 @@ describe PullRequestsController do
           }.to change(Build, :count).by(1)
           build = Build.last
           expect(build.branch).to eq("branch-name")
-          expect(build.ref).to eq("Some-sha")
+          expect(build.ref).to eq(to_40('1'))
         end
 
         it "will enqueue a build if autobuild pull requests is enabled" do
-          repository.build_pull_requests = "1"
-          repository.save!
           github_payload = pull_request_payload("pull_request" => {
-            "head" => {"sha" => "Some-sha", "ref" => "branch-name"},
+            "head" => {"sha" => to_40('1'), "ref" => "branch-name"},
             "body" => "best pull request ever",
           })
           expect {
@@ -134,8 +136,6 @@ describe PullRequestsController do
 
         context "when the pull request sha has already been built" do
           before do
-            repository.build_pull_requests = "1"
-            repository.save!
             @github_payload = pull_request_payload("pull_request" => {
               "head" => {"sha" => "de8251ff97ee194a289832576287d6f8ad74e3d0", "ref" => "branch-name"},
               "body" => "best pull request ever",
@@ -151,13 +151,13 @@ describe PullRequestsController do
             }.to_not change(Build, :count)
           end
 
-          it "rebuilds if the sha is on a different repo" do
+          it "still creates a build if the sha is used by a different repo" do
             project = FactoryGirl.create(:project)
-            build = FactoryGirl.create(:build, :project => project, :ref => "de8251ff97ee194a289832576287d6f8ad74e3d0")
+            FactoryGirl.create(:build, project: project, ref: "de8251ff97ee194a289832576287d6f8ad74e3d0")
+
             expect {
               post :build, 'payload' => @github_payload
-              expect(response).to be_success
-            }.to change(Build, :count)
+            }.to change(Build, :count).by(1)
           end
         end
 
@@ -165,17 +165,11 @@ describe PullRequestsController do
           let(:project) { FactoryGirl.create(:project, :name => "web-pull_requests", :repository => repository) }
 
           it "does not create a pull request if not requested" do
+            repository.update_attribute(:build_pull_requests, false)
             expect {
               post :build, 'payload' => pull_request_payload({"pull_request" => {"body" => "don't build it"}})
               expect(response).to be_success
             }.to_not change(project.builds, :count)
-          end
-
-          it "ignores !buildme casing" do
-            expect {
-              post :build, 'payload' => pull_request_payload({"pull_request" => {"body" => "!BuIlDMe"}})
-              expect(response).to be_success
-            }.to change(project.builds, :count).by(1)
           end
 
           it "does not build a closed pull request" do
@@ -192,17 +186,16 @@ describe PullRequestsController do
 
           context "when there are other builds for the same branch" do
             let(:branch_name) { "test-branch" }
-            let!(:build_one) { FactoryGirl.create(:build, :project => project, :branch => branch_name, :ref => "11deadbeef11") }
-            let!(:build_two) { FactoryGirl.create(:build, :project => project, :branch => branch_name, :ref => "22deadbeef22") }
+            let!(:build_one) { FactoryGirl.create(:build, :project => project, :branch => branch_name, :ref => to_40('w')) }
+            let!(:build_two) { FactoryGirl.create(:build, :project => project, :branch => branch_name, :ref => to_40('y')) }
 
             before do
-              repository.build_pull_requests = "1"
-              repository.save!
+              repository.update_attribute(:build_pull_requests, true)
             end
 
             it "aborts previous builds of the same branch" do
               github_payload = pull_request_payload("pull_request" => {
-                  "head" => {"sha" => "Some-sha", "ref" => branch_name},
+                  "head" => {"sha" => to_40('z'), "ref" => branch_name},
                   "body" => "best pull request ever",
               })
 
@@ -238,10 +231,10 @@ describe PullRequestsController do
     {
       "pull_request" => {
         "head" => {
-          "sha" => "Some-sha",
+          "sha" => to_40('1'),
           "ref" => "branch-name"
         },
-        "body" => "best pull request ever !BUILDME",
+        "body" => "best pull request ever",
         "title" => "this is a pull request",
       },
       "repository" => {
@@ -253,7 +246,7 @@ describe PullRequestsController do
 
   def push_payload(options = {})
     {
-      "after" => "SOME-SHA1",
+      "after" => to_40('2'),
       "repository" => {
         "url" => "https://git.example.com/square/web",
       },

@@ -56,7 +56,7 @@ end
 
 def create_build(project, test_types, build_attempt_state: :passed)
   build = Build.create!(:project => project,
-                        :ref => SecureRandom.hex,
+                        :ref => SecureRandom.hex(20),
                         :state => :runnable)
 
   Array(test_types).each do |kind|

@@ -18,7 +18,7 @@ describe Build do
       expect(build).to have(1).error_on(:project_id)
     end
 
-    it "should force uniqueness on project_id and ref pairs" do
+    it "should force uniqueness on ref" do
       build2 = FactoryGirl.build(:build, :project => project, :ref => build.ref)
       expect(build2).not_to be_valid
       expect(build2).to have(1).error_on(:ref)

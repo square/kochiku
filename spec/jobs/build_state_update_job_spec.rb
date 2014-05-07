@@ -68,12 +68,12 @@ describe BuildStateUpdateJob do
           let(:name) { repository.repository_name }
 
           context "new sha is available" do
-            let(:current_repo_master) { "new-sha" }
+            let(:current_repo_master) { "new-sha-11111111111111111111111111111111" }
 
             it "builds when there is a new sha to build" do
               expect { subject }.to change(project.builds, :count).by(1)
               build = project.builds.last
-              expect(build.ref).to eq("new-sha")
+              expect(build.ref).to eq(current_repo_master)
             end
 
             # TODO: this shouldn't be under the "when all parts have passed" context
@@ -86,11 +86,11 @@ describe BuildStateUpdateJob do
               build.build_parts.first.create_and_enqueue_new_build_attempt!
               expect { subject }.to change(project.builds, :count).by(1)
               build = project.builds.last
-              expect(build.ref).to eq("new-sha")
+              expect(build.ref).to eq(current_repo_master)
             end
 
             it "does not kick off a new build if one is already running" do
-              project.builds.create!(:ref => 'some-other-sha', :state => :partitioning, :branch => 'master')
+              project.builds.create!(:ref => 'some-other-sha-1111111111111111111111111', :state => :partitioning, :branch => 'master')
               expect { subject }.to_not change(project.builds, :count)
             end
 

@@ -8,11 +8,6 @@ class Project < ActiveRecord::Base
       build
     end
 
-    def find_existing_build_or_initialize(ref, initialization_values)
-      existing_build = Build.joins(:project).where("projects.repository_id = ? AND builds.ref = ?", proxy_association.owner.repository_id, ref).readonly(false).first
-      existing_build || build(initialization_values.merge(:ref => ref))
-    end
-
     def for_branch(branch)
       joins(:project).where(
         "projects.repository_id" => proxy_association.owner.repository_id,
@@ -29,10 +24,14 @@ class Project < ActiveRecord::Base
   end
 
   def ensure_branch_build_exists(branch, sha)
-    build = builds.find_existing_build_or_initialize(sha, :state  => :partitioning, :branch => branch)
-    abort_in_progress_builds_for_branch(branch, build)
-    build.save!
-    build
+    existing_build = repository.build_for_commit(sha)
+    if existing_build
+      existing_build
+    else
+      build = builds.create!(ref: sha, branch: branch, state: :partitioning)
+      abort_in_progress_builds_for_branch(branch, build)
+      build
+    end
   end
 
   def abort_in_progress_builds_for_branch(branch, current_build)
