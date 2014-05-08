@@ -1,11 +1,14 @@
 require 'spec_helper'
+require 'partitioner'
 
 describe Partitioner do
   let(:build) { FactoryGirl.create(:build) }
   let(:partitioner) { Partitioner.new }
 
   before do
+    allow(YAML).to receive(:load_file).and_call_original
     allow(YAML).to receive(:load_file).with(Partitioner::KOCHIKU_YML_LOC_2).and_return(kochiku_yml)
+    allow(File).to receive(:exist?).and_call_original
     allow(File).to receive(:exist?).with(Partitioner::KOCHIKU_YML_LOC_1).and_return(false) # always use loc_2 in the specs
     allow(File).to receive(:exist?).with(Partitioner::KOCHIKU_YML_LOC_2).and_return(kochiku_yml_exists)
   end
