@@ -205,38 +205,40 @@ describe Partitioner do
           context 'and time manifest files are specified' do
             before do allow(YAML).to receive(:load_file).with(rspec_time_manifest).and_return(
                 {
-                  'a' => [2],
-                  'b' => [5, 8],
-                  'c' => [6, 9],
-                  'd' => [5, 8],
+                  'a.spec' => [2],
+                  'b.spec' => [5, 8],
+                  'c.spec' => [9, 6],
+                  'd.spec' => [5, 8],
+                  'deleted.spec' => [10],
                 }
               )
             end
 
             before do allow(YAML).to receive(:load_file).with(cuke_time_manifest).and_return(
               {
-                'f' => [2],
-                'g' => [5, 8],
-                'h' => [6, 9],
-                'i' => [15, 16],
+                'f.feature' => [2],
+                'g.feature' => [5, 8],
+                'h.feature' => [6, 9],
+                'i.feature' => [15, 16],
               }
             )
             end
 
             let(:rspec_time_manifest) { 'rspec_time_manifest.yml' }
             let(:cuke_time_manifest) { 'cuke_time_manifest.yml' }
-            let(:matches) { %w(a b c d e) }
+            let(:spec_matches) { %w(a.spec b.spec c.spec d.spec e.spec) }
+            let(:feature_matches) { %w(f.feature g.feature h.feature i.feature) }
 
             it 'should greedily partition files in the time_manifest, and round robin the remaining files' do
+              allow(Dir).to receive(:[]).with("spec/**/*_spec.rb").and_return(spec_matches)
+              allow(Dir).to receive(:[]).with("features/**/*.feature").and_return(feature_matches)
               [
-                {'type' => 'rspec', 'files' => ['e'], 'queue' => 'developer', 'retry_count' => 0},
-                {'type' => 'rspec', 'files' => ['c', 'd'], 'queue' => 'developer', 'retry_count' => 0},
-                {'type' => 'rspec', 'files' => ['b', 'a'], 'queue' => 'developer', 'retry_count' => 0},
-                {'type' => 'cuke', 'files' => ['a', 'b'], 'queue' => 'developer', 'retry_count' => 0},
-                {'type' => 'cuke', 'files' => ['c', 'd'], 'queue' => 'developer', 'retry_count' => 0},
-                {'type' => 'cuke', 'files' => ['e'], 'queue' => 'developer', 'retry_count' => 0},
-                {'type' => 'cuke', 'files' => ['i'], 'queue' => 'developer', 'retry_count' => 0},
-                {'type' => 'cuke', 'files' => ['h', 'g', 'f'], 'queue' => 'developer', 'retry_count' => 0}
+                  {"type"=>"rspec", "files"=>["c.spec"], "queue"=>"developer", "retry_count"=>0},
+                  {"type"=>"rspec", "files"=>["d.spec", "e.spec"], "queue"=>"developer", "retry_count"=>0},
+                  {"type"=>"rspec", "files"=>["b.spec", "a.spec"], "queue"=>"developer", "retry_count"=>0},
+                  {"type"=>"cuke", "files"=>["i.feature"], "queue"=>"developer", "retry_count"=>0},
+                  {"type"=>"cuke", "files"=>["h.feature"], "queue"=>"developer", "retry_count"=>0},
+                  {"type"=>"cuke", "files"=>["g.feature", "f.feature"], "queue"=>"developer", "retry_count"=>0}
               ].each { |partition| should include(partition) }
             end
           end

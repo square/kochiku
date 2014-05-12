@@ -88,7 +88,7 @@ class Partitioner
 
     balanced_partitions = if file_to_times_hash.is_a?(Hash)
       @max_time ||= max_build_time
-      time_greedy_partitions_for(file_to_times_hash)
+      time_greedy_partitions_for(file_to_times_hash, files, workers)
     else
       []
     end
@@ -108,21 +108,30 @@ class Partitioner
     build.project.main? ? 'ci' : 'developer'
   end
 
-  def time_greedy_partitions_for(file_to_times_hash)
-    setup_time = file_to_times_hash.values.flatten.min
+  # Balance tests by putting each test into the worker with the shortest expected execution time
+  # If a test that no longer exists is referenced in the file_to_times_hash, do not include it in
+  # the list of tests to be executed.  If there are new tests not included in the file_to_times_hash,
+  # assume they will run fast.
+  def time_greedy_partitions_for(file_to_times_hash, all_files, workers)
+    min_test_time = file_to_times_hash.values.flatten.min
+    setup_time = (min_test_time)/2
 
+    # Any new tests get added in here.
+    all_files.each  { |file| file_to_times_hash[file] ||= [min_test_time] }
+    # exclude tests that are not present
+    file_to_times_hash.slice!(*all_files)
     files_by_worker = []
     runtimes_by_worker = []
 
     file_to_times_hash.to_a.sort_by { |a| a.last.max }.reverse_each do |file, times|
       file_runtime = times.max
-      fastest_worker_time, fastest_worker_index = runtimes_by_worker.each_with_index.min
-      if fastest_worker_time && fastest_worker_time + (file_runtime - setup_time) <= @max_time
-        files_by_worker[fastest_worker_index] << file
-        runtimes_by_worker[fastest_worker_index] += file_runtime - setup_time
-      else
+      if runtimes_by_worker.length < workers
         files_by_worker << [file]
         runtimes_by_worker << file_runtime
+      else
+        fastest_worker_time, fastest_worker_index = runtimes_by_worker.each_with_index.min
+        files_by_worker[fastest_worker_index] << file
+        runtimes_by_worker[fastest_worker_index] += file_runtime - setup_time
       end
     end
     files_by_worker
