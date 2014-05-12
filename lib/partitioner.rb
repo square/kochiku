@@ -2,6 +2,10 @@ class Partitioner
   KOCHIKU_YML_LOC_1 = 'config/kochiku.yml'
   KOCHIKU_YML_LOC_2 = 'config/ci/kochiku.yml'
 
+  def queue_for_build(build)
+    build.project.main? ? 'ci' : 'developer'
+  end
+
   def partitions(build)
     if kochiku_yml_location
       # Handle old kochiku.yml
@@ -102,10 +106,6 @@ class Partitioner
       end
       part
     end.select { |p| p['files'].present? }
-  end
-
-  def queue_for_build(build)
-    build.project.main? ? 'ci' : 'developer'
   end
 
   # Balance tests by putting each test into the worker with the shortest expected execution time
