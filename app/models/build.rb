@@ -86,17 +86,19 @@ class Build < ActiveRecord::Base
   end
 
   def update_state_from_parts!
-    return if build_parts.empty? || self.state == :aborted
+    return if build_parts.empty?
 
     errored = build_parts.errored
     passed = build_parts.passed
     failed = build_parts.failed
 
-    state = case
-      when errored.any?
-        :errored
+    next_state = case
       when (build_parts - passed).empty?
         :succeeded
+      when self.state == :aborted
+        :aborted
+      when errored.any?
+        :errored
       when (passed | failed).count == build_parts.count
         :failed
       else
@@ -104,8 +106,8 @@ class Build < ActiveRecord::Base
       end
 
     previous_state = self.state
-    update_attributes!(:state => state)
-    [previous_state, state]
+    update_attributes!(:state => next_state) unless previous_state == next_state
+    [previous_state, next_state]
   end
 
   # As implemented, finished_at will return the wrong value if there is a

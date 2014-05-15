@@ -178,6 +178,30 @@ describe Build do
 
       expect(build.state).to eq(:succeeded)
     end
+
+    context "when the build is aborted" do
+      let(:build) { FactoryGirl.create(:build, :project => project, :state => :aborted) }
+
+      it "should set state to succeeded if a build is aborted, but all of its parts passed" do
+        # scenario is applicable if a build is aborted only after its build parts are already running
+        FactoryGirl.create(:build_attempt, build_part: build_part_1, state: :passed)
+        FactoryGirl.create(:build_attempt, build_part: build_part_2, state: :passed)
+        build.update_state_from_parts!
+
+        expect(build.state).to eq(:succeeded)
+      end
+
+      it "should remain aborted when build attempts finish as errored or failed" do
+        FactoryGirl.create(:build_attempt, build_part: build_part_1, state: :passed)
+        ba = FactoryGirl.create(:build_attempt, build_part: build_part_1, state: :errored)
+        build.update_state_from_parts!
+        expect(build.state).to eq(:aborted)
+
+        ba.update_attributes!(state: :failed)
+        build.update_state_from_parts!
+        expect(build.state).to eq(:aborted)
+      end
+    end
   end
 
   describe "#elapsed_time" do
