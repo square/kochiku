@@ -98,88 +98,109 @@ describe Build do
   end
 
   describe "#update_state_from_parts!" do
-    let(:parts) { [{'type' => 'cucumber', 'files' => ['a'], 'queue' => 'ci', 'retry_count' => 0},
-                   {'type' => 'rspec', 'files' => ['b'], 'queue' => 'ci', 'retry_count' => 0}] }
-    before do
-      stub_request(:post, /https:\/\/git\.squareup\.com\/api\/v3\/repos\/square\/kochiku\/statuses\//)
-      allow(build).to receive(:running!)
-      build.partition(parts)
-      expect(build.state).to eq(:runnable)
-    end
+    let(:build) { FactoryGirl.create(:build, :project => project, :state => :running) }
+    let!(:build_part_1) { FactoryGirl.create(:build_part, :build_instance => build) }
+    let!(:build_part_2) { FactoryGirl.create(:build_part, :build_instance => build) }
 
     it "should set a build state to running if it is successful so far, but still incomplete" do
-      build.build_parts[0].last_attempt.finish!(:passed)
+      FactoryGirl.create(:build_attempt, build_part: build_part_1, state: :passed)
+      FactoryGirl.create(:build_attempt, build_part: build_part_2, state: :running)
       build.update_state_from_parts!
 
       expect(build.state).to eq(:running)
     end
 
     it "should set build state to errored if any of its parts errored" do
-      build.build_parts[0].last_attempt.finish!(:errored)
-      build.build_parts[1].last_attempt.finish!(:passed)
+      FactoryGirl.create(:build_attempt, build_part: build_part_1, state: :errored)
+      FactoryGirl.create(:build_attempt, build_part: build_part_2, state: :passed)
       build.update_state_from_parts!
 
       expect(build.state).to eq(:errored)
     end
 
-    it "should set build state to succeeded all of its parts passed" do
-      build.build_parts[0].last_attempt.finish!(:passed)
-      build.build_parts[1].last_attempt.finish!(:passed)
+    it "should set build state to succeeded if all of its parts passed" do
+      FactoryGirl.create(:build_attempt, build_part: build_part_1, state: :passed)
+      FactoryGirl.create(:build_attempt, build_part: build_part_2, state: :passed)
       build.update_state_from_parts!
 
       expect(build.state).to eq(:succeeded)
     end
 
     it "should set a build state to doomed if it has a failed part but is still has more parts to process" do
-      build.build_parts[0].last_attempt.finish!(:failed)
+      FactoryGirl.create(:build_attempt, build_part: build_part_1, state: :failed)
       build.update_state_from_parts!
       expect(build.state).to eq(:doomed)
     end
 
     it "should change a doomed build to failed once it is complete" do
-      build.build_parts[0].last_attempt.finish!(:failed)
+      ba1 = FactoryGirl.create(:build_attempt, build_part: build_part_1, state: :failed)
+      ba2 = FactoryGirl.create(:build_attempt, build_part: build_part_2, state: :running)
       build.update_state_from_parts!
       expect(build.state).to eq(:doomed)
 
-      build.build_parts[1].last_attempt.finish!(:passed)
+      ba2.update_attributes!(state: :passed)
       build.update_state_from_parts!
       expect(build.state).to eq(:failed)
     end
 
     it "should set build_state to running when a failed attempt is retried" do
-      build.build_parts[0].last_attempt.finish!(:passed)
-      build.build_parts[1].last_attempt.finish!(:failed)
-      build.build_parts[1].build_attempts.create!(:state => :running)
+      ba1 = FactoryGirl.create(:build_attempt, build_part: build_part_1, state: :passed)
+      ba2_1 = FactoryGirl.create(:build_attempt, build_part: build_part_2, state: :failed)
+      ba2_2 = FactoryGirl.create(:build_attempt, build_part: build_part_2, state: :running)
       build.update_state_from_parts!
 
       expect(build.state).to eq(:running)
     end
 
     it "should set build_state to doomed when an attempt is retried but other attempts are failed" do
-      build.build_parts[0].last_attempt.finish!(:failed)
-      build.build_parts[1].last_attempt.finish!(:failed)
-      build.build_parts[1].build_attempts.create!(:state => :running)
+      ba1 = FactoryGirl.create(:build_attempt, build_part: build_part_1, state: :failed)
+      ba2_1 = FactoryGirl.create(:build_attempt, build_part: build_part_2, state: :failed)
+      ba2_2 = FactoryGirl.create(:build_attempt, build_part: build_part_2, state: :running)
       build.update_state_from_parts!
 
       expect(build.state).to eq(:doomed)
     end
 
     it "should ignore the old build_attempts" do
-      build.build_parts[0].last_attempt.finish!(:passed)
-      build.build_parts[1].last_attempt.finish!(:errored)
-      build.build_parts[1].build_attempts.create!(:state => :passed)
+      ba1 = FactoryGirl.create(:build_attempt, build_part: build_part_1, state: :passed)
+      ba2_1 = FactoryGirl.create(:build_attempt, build_part: build_part_2, state: :errored)
+      ba2_2 = FactoryGirl.create(:build_attempt, build_part: build_part_2, state: :passed)
       build.update_state_from_parts!
 
       expect(build.state).to eq(:succeeded)
     end
 
     it "should not ignore old build_attempts that passed" do
-      build.build_parts[0].last_attempt.finish!(:passed)
-      build.build_parts[1].last_attempt.finish!(:passed)
-      build.build_parts[1].build_attempts.create!(:state => :errored)
+      ba1 = FactoryGirl.create(:build_attempt, build_part: build_part_1, state: :passed)
+      ba2_1 = FactoryGirl.create(:build_attempt, build_part: build_part_2, state: :passed)
+      ba2_2 = FactoryGirl.create(:build_attempt, build_part: build_part_2, state: :errored)
       build.update_state_from_parts!
 
       expect(build.state).to eq(:succeeded)
+    end
+
+    context "when the build is aborted" do
+      let(:build) { FactoryGirl.create(:build, :project => project, :state => :aborted) }
+
+      it "should set state to succeeded if a build is aborted, but all of its parts passed" do
+        # scenario is applicable if a build is aborted only after its build parts are already running
+        FactoryGirl.create(:build_attempt, build_part: build_part_1, state: :passed)
+        FactoryGirl.create(:build_attempt, build_part: build_part_2, state: :passed)
+        build.update_state_from_parts!
+
+        expect(build.state).to eq(:succeeded)
+      end
+
+      it "should remain aborted when build attempts finish as errored or failed" do
+        FactoryGirl.create(:build_attempt, build_part: build_part_1, state: :passed)
+        ba = FactoryGirl.create(:build_attempt, build_part: build_part_1, state: :errored)
+        build.update_state_from_parts!
+        expect(build.state).to eq(:aborted)
+
+        ba.update_attributes!(state: :failed)
+        build.update_state_from_parts!
+        expect(build.state).to eq(:aborted)
+      end
     end
   end
 

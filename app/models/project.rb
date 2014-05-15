@@ -35,7 +35,9 @@ class Project < ActiveRecord::Base
   end
 
   def abort_in_progress_builds_for_branch(branch, current_build)
-    builds.for_branch(branch).readonly(false).each { |build| build.abort! unless build == current_build }
+    builds.for_branch(branch).readonly(false).
+      reject { |build| build == current_build }.
+      each { |build| build.abort! }
   end
 
   def to_param
