@@ -75,25 +75,22 @@ class GitRepo
 
       if !File.directory?(cached_repo_path)
         clone_repo(repository, cached_repo_path)
-      elsif !valid_remote_url?(repository, cached_repo_path)
-        FileUtils.rm_rf(cached_repo_path)
-        clone_repo(repository, cached_repo_path)
+      else
+        harmonize_remote_url(cached_repo_path, repository.url_for_fetching)
       end
 
       cached_repo_path
     end
 
-    def valid_remote_url?(repository, cached_repo_path)
-      expected_url = repository.url_for_fetching
-
+    def harmonize_remote_url(cached_repo_path, expected_url)
       Dir.chdir(cached_repo_path) do
         remote_url = Cocaine::CommandLine.new("git config --get remote.origin.url").run.chomp
         if remote_url != expected_url
-          Rails.logger.info "#{remote_url.inspect} does not match #{expected_url.inspect}."
-          return false
+          Rails.logger.info "#{remote_url.inspect} does not match #{expected_url.inspect}. Updating it."
+          Cocaine::CommandLine.new("git remote set-url origin #{expected_url}").run
         end
       end
-      true
+      nil
     end
 
     def synchronize_cache_repo(cached_repo_path, branch)
