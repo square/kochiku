@@ -13,12 +13,8 @@ class PullRequestsController < ApplicationController
   protected
 
   def handle_repo_push_request
-    ssh_url = begin
-      RemoteServer.for_url(payload['repository']['url']).canonical_repository_url
-    rescue RemoteServer::UnknownGitServer
-      nil
-    end
-    repository = Repository.find_by_url(ssh_url)
+    ssh_url = RemoteServer.for_url(payload['repository']['url']).canonical_repository_url
+    repository = Repository.lookup_by_url(ssh_url)
     return unless repository
     project = repository.projects.where(name: repository.name).first_or_create
     if payload["ref"] == "refs/heads/master" && repository.run_ci?
@@ -28,7 +24,7 @@ class PullRequestsController < ApplicationController
   end
 
   def handle_pull_request
-    repository = Repository.find_by_url(payload['repository']['ssh_url'])
+    repository = Repository.lookup_by_url(payload['repository']['ssh_url'])
     return unless repository
     project = repository.projects.where(name: repository.name + "-pull_requests").first_or_create
     if active_pull_request? && repository.build_pull_requests

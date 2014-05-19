@@ -41,7 +41,7 @@ module RemoteServer
     # Public: Returns a url for the remote repo in the format Kochiku prefers
     # for Stash, which is the HTTPS format.
     def canonical_repository_url
-      "https://#{attributes[:host]}/scm/#{attributes[:repository_namespace]}/#{attributes[:repository_name]}.git"
+      "https://#{@settings.host}/scm/#{attributes[:repository_namespace]}/#{attributes[:repository_name]}.git"
     end
 
     def sha_for_branch(branch)
@@ -57,7 +57,6 @@ module RemoteServer
     def update_commit_status!(build)
       build_url = Rails.application.routes.url_helpers.project_build_url(build.project, build)
 
-      # TODO: Tie host to build/repository.
       @stash_request.post "https://#{@settings.host}/rest/build-status/1.0/commits/#{build.ref}", {
         state:       stash_status_for(build),
         key:         'kochiku',

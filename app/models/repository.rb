@@ -13,6 +13,20 @@ class Repository < ActiveRecord::Base
   validates_uniqueness_of :url, :allow_blank => true
   validate :url_against_remote_servers
 
+  def self.lookup_by_url(url)
+    git_server_settings = Settings.git_server(url)
+    canonical_host = git_server_settings.host
+    host_alias = git_server_settings.alias
+
+    remote_server = RemoteServer.for_url(url)
+    repository_namespace = remote_server.attributes.fetch(:repository_namespace)
+    repository_name = remote_server.attributes.fetch(:repository_name)
+
+    Repository.where(host: [canonical_host, host_alias].compact,
+                     namespace: repository_namespace,
+                     name: repository_name).first
+  end
+
   # Setting a URL will extract values for host, namespace, and name. This
   # should not overwrite values for those attributes that were set in the same
   # session.

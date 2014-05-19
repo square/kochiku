@@ -8,10 +8,34 @@ describe Repository do
         type: stash
       git.example.com:
         type: github
+        alias: git-alias.example.com
       github.com:
         type: github
     YAML
     stub_const "Settings", settings
+  end
+
+  describe '.lookup_by_url' do
+    it 'should return the Repository (straightforward)' do
+      repo = FactoryGirl.create(:repository)
+      expect(Repository.lookup_by_url(repo.url)).to eq(repo)
+    end
+
+    it 'should return the Repository when a host alias is used during creation' do
+      repo = FactoryGirl.create(:repository, url: "git@git-alias.example.com:square/some-repo.git")
+      expect(Repository.lookup_by_url("git@git.example.com:square/some-repo.git")).to eq(repo)
+    end
+
+    it 'should return the Repository when a host alias is used during lookup' do
+      repo = FactoryGirl.create(:repository, url: "git@git.example.com:square/some-repo.git")
+      expect(Repository.lookup_by_url("git@git-alias.example.com:square/some-repo.git")).to eq(repo)
+    end
+
+    it 'should return nil if lookup fails' do
+      expect(
+        Repository.lookup_by_url("git@git-alias.example.com:square/some-repo.git")
+      ).to be_nil
+    end
   end
 
   describe 'creation' do

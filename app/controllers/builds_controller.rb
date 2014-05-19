@@ -2,6 +2,9 @@ require 'git_repo'
 
 class BuildsController < ApplicationController
   before_filter :load_project, :only => [:show, :abort, :build_status, :toggle_merge_on_success, :rebuild_failed_parts, :request_build]
+
+  # do not require authenticity_token for create so that it can be called by
+  # the kochiku command line script
   skip_before_filter :verify_authenticity_token, :only => [:create]
 
   def show
@@ -117,8 +120,8 @@ class BuildsController < ApplicationController
     elsif params['build']
       @project = Project.where(:name => params[:project_id]).first
       unless @project
-        normalized_url = RemoteServer.for_url(params[:repo_url]).canonical_repository_url
-        repository = Repository.where(url: normalized_url).first_or_create!
+        repository = Repository.lookup_by_url(params[:repo_url])
+        raise ActiveRecord::RecordNotFound, "Repository for #{params[:repo_url]} not found" unless repository
         @project = repository.projects.create!(:name => params[:project_id])
       end
       project_build(params[:build][:branch], params[:build][:ref])

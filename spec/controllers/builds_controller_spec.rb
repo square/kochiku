@@ -63,12 +63,11 @@ describe BuildsController do
         }
       end
 
-      it "should create a repo if one does not exist" do
+      it "should raise an error if the repo does not exist" do
         repo.destroy
         expect {
           post @action, @params.merge(:project_id => project_param, :build => build_info)
-        }.to change(Repository, :count).by(1)
-        expect(Repository.last.url).to eq(repo.url)
+        }.to raise_error(ActiveRecord::RecordNotFound)
       end
 
       it "should create a new project if one does not exist" do

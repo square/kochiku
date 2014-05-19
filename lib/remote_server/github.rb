@@ -15,6 +15,7 @@ module RemoteServer
     def initialize(url)
       @url = url
       attributes # force url parsing
+      @settings = Settings.git_server(@url)
     end
 
     def attributes
@@ -35,7 +36,7 @@ module RemoteServer
     # Public: Returns a url for the remote repo in the format Kochiku prefers
     # for Github, which is the SSH format.
     def canonical_repository_url
-      "git@#{attributes[:host]}:#{attributes[:repository_namespace]}/#{attributes[:repository_name]}.git"
+      "git@#{@settings.host}:#{attributes[:repository_namespace]}/#{attributes[:repository_name]}.git"
     end
 
     def sha_for_branch(branch)
