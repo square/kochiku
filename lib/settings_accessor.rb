@@ -45,7 +45,10 @@ class SettingsAccessor
   end
 
   def git_server(url)
-    git_servers.values.detect { |server| url.include?(server.host) || (server.alias && url.include?(server.alias)) }
+    git_servers.values.detect do |server|
+      url.include?(server.host) ||
+        (server.aliases && server.aliases.detect { |a| url.include?(a) })
+    end
   end
 
   def smtp_server

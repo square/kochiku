@@ -15,14 +15,11 @@ class Repository < ActiveRecord::Base
 
   def self.lookup_by_url(url)
     git_server_settings = Settings.git_server(url)
-    canonical_host = git_server_settings.host
-    host_alias = git_server_settings.alias
-
     remote_server = RemoteServer.for_url(url)
     repository_namespace = remote_server.attributes.fetch(:repository_namespace)
     repository_name = remote_server.attributes.fetch(:repository_name)
 
-    Repository.where(host: [canonical_host, host_alias].compact,
+    Repository.where(host: [git_server_settings.host, *git_server_settings.aliases].compact,
                      namespace: repository_namespace,
                      name: repository_name).first
   end

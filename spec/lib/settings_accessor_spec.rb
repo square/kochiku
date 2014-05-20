@@ -59,11 +59,15 @@ describe SettingsAccessor do
     git_servers:
       stash.example.com:
         type: stash
-        alias: stash-alias.example.com
+        aliases:
+          - stash-alias.example.com
+          - other-stash-alias.example.com
       github.com:
         type: github
     YAML
     expect(settings.git_server('git@stash-alias.example.com:square/kochiku.git').host).to eq('stash.example.com')
+    expect(settings.git_server('git@other-stash-alias.example.com:square/kochiku.git').host).to eq('stash.example.com')
+    expect(settings.git_server('git@not-an-alias.example.com:square/kochiku.git')).to eq(nil)
   end
 
   it "can also give me the host which matched" do

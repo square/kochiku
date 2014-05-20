@@ -8,7 +8,8 @@ describe Repository do
         type: stash
       git.example.com:
         type: github
-        alias: git-alias.example.com
+        aliases:
+          - git-alias.example.com
       github.com:
         type: github
     YAML
@@ -49,11 +50,11 @@ describe Repository do
     it 'should not allow url to trump explicit values' do
       repo = Repository.new(name: 'explicit_name',
                             namespace: 'explicit_namespace',
-                            host: 'alias.example.com')
+                            host: 'git-alias.example.com')
       repo.url = "git://git.example.com/who/what.git"
       expect(repo.name).to eq('explicit_name')
       expect(repo.namespace).to eq('explicit_namespace')
-      expect(repo.host).to eq('alias.example.com')
+      expect(repo.host).to eq('git-alias.example.com')
     end
   end
 
