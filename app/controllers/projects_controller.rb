@@ -4,9 +4,9 @@ class ProjectsController < ApplicationController
   end
 
   def ci_projects
-    @repositories = Repository.select(:repository_name)
+    @repositories = Repository.select(:name)
     @projects = Project.includes(:repository).
-      where(:name => @repositories.map(&:repository_name)).decorate
+      where(:name => @repositories.map(&:name)).decorate
   end
 
   def show
@@ -51,7 +51,7 @@ class ProjectsController < ApplicationController
   # This action returns the current build status for all of the main projects in the system
   def status_report
     @projects = Repository.all.map { |repo|
-      Project.where(:repository_id => repo.id, :name => repo.repository_name).first.decorate
+      Project.where(:repository_id => repo.id, :name => repo.name).first.decorate
     }.compact
   end
 end

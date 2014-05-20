@@ -8,11 +8,97 @@ describe Repository do
         type: stash
       git.example.com:
         type: github
+        aliases:
+          - git-alias.example.com
       github.com:
         type: github
     YAML
     stub_const "Settings", settings
   end
+
+  describe '.lookup_by_url' do
+    it 'should return the Repository (straightforward)' do
+      repo = FactoryGirl.create(:repository)
+      expect(Repository.lookup_by_url(repo.url)).to eq(repo)
+    end
+
+    it 'should return the Repository when a host alias is used during creation' do
+      repo = FactoryGirl.create(:repository, url: "git@git-alias.example.com:square/some-repo.git")
+      expect(Repository.lookup_by_url("git@git.example.com:square/some-repo.git")).to eq(repo)
+    end
+
+    it 'should return the Repository when a host alias is used during lookup' do
+      repo = FactoryGirl.create(:repository, url: "git@git.example.com:square/some-repo.git")
+      expect(Repository.lookup_by_url("git@git-alias.example.com:square/some-repo.git")).to eq(repo)
+    end
+
+    it 'should return nil if lookup fails' do
+      expect(
+        Repository.lookup_by_url("git@git-alias.example.com:square/some-repo.git")
+      ).to be_nil
+    end
+  end
+
+  describe 'creation' do
+    it 'should extract attributes from the url' do
+      repo = Repository.new(url: "git://git.example.com/who/what.git")
+      expect(repo.host).to eq('git.example.com')
+      expect(repo.namespace).to eq('who')
+      expect(repo.name).to eq('what')
+    end
+
+    it 'should not allow url to trump explicit values' do
+      repo = Repository.new(name: 'explicit_name',
+                            namespace: 'explicit_namespace',
+                            host: 'git-alias.example.com')
+      repo.url = "git://git.example.com/who/what.git"
+      expect(repo.name).to eq('explicit_name')
+      expect(repo.namespace).to eq('explicit_namespace')
+      expect(repo.host).to eq('git-alias.example.com')
+    end
+  end
+
+  describe 'validations' do
+
+    context 'for url' do
+      it "should add a error on url, if url is an an unsupported format" do
+        repo = Repository.new(url: "file://data/git/fun-proj.git")
+        expect(repo).to have(1).error_on(:url)
+        expect(repo.errors_on(:url)).to include("is not in a format supported by Kochiku")
+      end
+
+    end
+
+    context "when name" do
+      context "is set" do
+        it "leaves it as is" do
+          repo = Repository.new(url: "git://git.example.com/square/kochiku-name.git",
+              name: "another_project")
+          repo.valid?
+          expect(repo.name).to eq("another_project")
+        end
+      end
+
+      context "is not set when saving" do
+        it "sets the name based on the repository url" do
+          repo = Repository.new(url: "git://git.example.com/square/kochiku-name.git")
+          repo.valid?
+          expect(repo.name).to eq("kochiku-name")
+        end
+
+        context "when that name already exists" do
+          let!(:existing_repo) { FactoryGirl.create(:repository, name: 'my-repo') }
+
+          it "does not validate" do
+            repo = FactoryGirl.build(:repository, name: 'my-repo')
+            expect(repo).to_not be_valid
+          end
+        end
+      end
+    end
+
+  end
+
 
   describe '#main_project' do
     let(:repository) { project.repository }
@@ -27,7 +113,7 @@ describe Repository do
 
     context 'with a matching main project name' do
       let!(:main_project) do
-        repository.projects.create name: repository.repository_name
+        repository.projects.create name: repository.name
       end
 
       it 'returns the main project' do
@@ -86,71 +172,6 @@ describe Repository do
     it "handles git read only urls" do
       repo = Repository.new(url: "git://git.example.com/square/kochiku.git")
       expect(repo.base_html_url).to eq("https://git.example.com/square/kochiku")
-    end
-  end
-
-  context "#repository_name" do
-    context "respository_name is set" do
-      it "returns the value" do
-        repo = Repository.new(url: "git://git.example.com/square/kochiku-name.git",
-            repository_name: "another_project")
-        repo.save
-        repo.reload
-        expect(repo.repository_name).to eq("another_project")
-      end
-    end
-
-    context "repository_name is not set when saving" do
-      it "sets the repository name based on the repository url" do
-        repo = Repository.new(url: "git://git.example.com/square/kochiku-name.git")
-        repo.save
-        repo.reload
-        expect(repo.repository_name).to eq("kochiku-name")
-      end
-
-      context "when that name already exists" do
-        let!(:existing_repo) { FactoryGirl.create(:repository, repository_name: 'my-repo') }
-
-        it "does not validate" do
-          repo = FactoryGirl.build(:repository, repository_name: 'my-repo')
-          expect(repo).to_not be_valid
-        end
-      end
-    end
-
-    context "without url" do
-      let(:repository) { Repository.new(url: '') }
-
-      it "gives validation error without blowing up" do
-        expect(repository).to_not be_valid
-        expect(repository).to have(1).errors_on (:url)
-      end
-    end
-  end
-
-  context "with stash repository" do
-    before do
-      allow(Settings).to receive(:stash_host).and_return('stash.example.com')
-    end
-
-    let(:repo) {
-      Repository.new(url: "https://stash.example.com/scm/myproject/myrepo.git").tap(&:valid?)
-    }
-
-    context "#repository_name" do
-      it "returns the repositories name" do
-        expect(repo.repository_name).to eq("myrepo")
-      end
-    end
-
-    context '.project_params' do
-      it 'parses out pertinent information' do
-        expect(repo.project_params).to eq(
-          host:       'stash.example.com',
-          username:   'myproject',
-          repository: 'myrepo'
-        )
-      end
     end
   end
 
@@ -214,36 +235,6 @@ describe Repository do
     it "is true if there is a script" do
       expect(Repository.new(:on_success_script => "hi").has_on_success_script?).to be true
     end
-  end
-
-  describe '.canonical_repository_url' do
-
-    context 'a github url' do
-      it 'should return a ssh url when given a https url' do
-        result = Repository.canonical_repository_url("https://github.com/square/test-repo1.git")
-        expect(result).to eq("git@github.com:square/test-repo1.git")
-      end
-
-      it 'should do nothing when given a ssh url' do
-        ssh_url = "git@github.com:square/test-repo1.git"
-        result = Repository.canonical_repository_url(ssh_url)
-        expect(result).to eq(ssh_url)
-      end
-    end
-
-    context 'a stash url' do
-      it 'should return a https url when given a ssh url' do
-        result = Repository.canonical_repository_url("ssh://git@stash.example.com:7999/foo/bar.git")
-        expect(result).to eq("https://stash.example.com/scm/foo/bar.git")
-      end
-
-      it 'should do nothing when given a https url' do
-        https_url = "https://stash.example.com/scm/foo/bar.git"
-        result = Repository.canonical_repository_url(https_url)
-        expect(result).to eq(https_url)
-      end
-    end
-
   end
 
   describe '#build_for_commit' do

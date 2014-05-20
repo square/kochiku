@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20140506012721) do
+ActiveRecord::Schema.define(version: 20140507184819) do
 
   create_table "build_artifacts", force: true do |t|
     t.integer  "build_attempt_id"
@@ -90,10 +90,13 @@ ActiveRecord::Schema.define(version: 20140506012721) do
     t.string   "on_success_script"
     t.integer  "timeout",                     default: 40
     t.string   "on_success_note"
-    t.string   "repository_name"
+    t.string   "name",                                       null: false
     t.boolean  "allows_kochiku_merges",       default: true
+    t.string   "host",                                       null: false
+    t.string   "namespace"
   end
 
+  add_index "repositories", ["host", "namespace", "name"], name: "index_repositories_on_host_and_namespace_and_name", unique: true, using: :btree
   add_index "repositories", ["url"], name: "index_repositories_on_url", using: :btree
 
 end

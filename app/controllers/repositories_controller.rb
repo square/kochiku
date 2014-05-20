@@ -3,10 +3,16 @@ class RepositoriesController < ApplicationController
   skip_before_filter :verify_authenticity_token, :only => [:build_ref]
 
   def create
-    @repository = Repository.where(url: params[:repository][:url]).first_or_initialize
-    if @repository.update_attributes(repository_params)
-      @repository.projects.find_or_create_by(name: "#{@repository.repository_name}-pull_requests")
-      project = @repository.projects.find_or_create_by(name: @repository.repository_name)
+    if params.fetch(:repository)[:url].blank?
+      redirect_to new_repository_path, error: "Missing required value: Repository URL"
+      return
+    end
+
+    @repository = Repository.new(repository_params)
+    if @repository.save
+      # create two initial projects; one for ci on the master branch, and one for pull-requests
+      @repository.projects.find_or_create_by(name: "#{@repository.name}-pull_requests")
+      project = @repository.projects.find_or_create_by(name: @repository.name)
       redirect_to project_url(project)
     else
       render template: 'repositories/new'
@@ -76,7 +82,7 @@ class RepositoriesController < ApplicationController
   end
 
   def ensure_build(repository, branch, sha)
-    project_name = repository.repository_name
+    project_name = repository.name
     project_name += '-pull_requests' unless branch == 'master'
 
     project = repository.projects.where(name: project_name).first_or_create
@@ -94,7 +100,7 @@ class RepositoriesController < ApplicationController
 
   def repository_params
     params.require(:repository).
-      permit(:url, :repository_name, :test_command, :timeout,
+      permit(:url, :name, :test_command, :timeout,
              :build_pull_requests, :run_ci, :on_green_update,
              :on_success_note, :on_success_script,
              :send_build_failure_email, :allows_kochiku_merges)

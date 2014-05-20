@@ -380,9 +380,9 @@ describe Build do
     let(:project) { FactoryGirl.create(:big_rails_project, :repository => repository, :name => name) }
     let(:repository) { FactoryGirl.create(:repository)}
     let(:build) { FactoryGirl.create(:build, :state => :runnable, :project => project) }
-    let(:name) { repository.repository_name + "_pull_requests" }
+    let(:name) { repository.name + "_pull_requests" }
     let(:current_repo_master) { build.ref }
-    let(:name) { repository.repository_name }
+    let(:name) { repository.name }
     let(:build_attempt) { build.build_parts.first.build_attempts.create!(:state => :failed) }
 
     it "should not send a failure email if the project has never had a successful build" do

@@ -93,7 +93,7 @@ describe PullRequestsController do
 
         it "it should not error if the repository url in the request is not found" do
           expect {
-            post :build, 'payload' => push_payload("repository" => {"url" => "git@does:not/exist.git"})
+            post :build, 'payload' => push_payload("repository" => {"url" => "git@git.example.com:doesnot/exist.git"})
             expect(response).to be_success
           }.to_not change(Build, :count)
         end
@@ -218,7 +218,7 @@ describe PullRequestsController do
 
         it "it should not error if the repository url in the request is not found" do
           expect {
-            pr_payload = pull_request_payload("repository" => { "ssh_url" => "git@none.git" })
+            pr_payload = pull_request_payload("repository" => { "ssh_url" => "git@git.example.com:doesnot/exist.git" })
             post :build, 'payload' => pr_payload
             expect(response).to be_success
           }.to_not change(Build, :count)

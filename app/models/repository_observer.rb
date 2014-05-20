@@ -3,7 +3,7 @@ class RepositoryObserver < ActiveRecord::Observer
 
   def after_save(record)
     if setup_hook?
-      record.remote_server.install_post_receive_hook!
+      record.remote_server.install_post_receive_hook!(record)
     end
   end
 

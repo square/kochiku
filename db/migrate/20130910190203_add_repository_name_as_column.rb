@@ -14,7 +14,7 @@ class AddRepositoryNameAsColumn < ActiveRecord::Migration
   end
 
   def project_params(url)
-    # TODO: Move these parsers to RemoteServer classes.
+    # TODO: Use the parsers in the RemoteServer classes.
     parser = URL_PARSERS[url.slice(0,4)]
     match = url.match(parser)
 
