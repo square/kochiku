@@ -1,7 +1,7 @@
 source 'https://rubygems.org'
 
-gem 'rails', '~> 4.0.2'
-gem 'passenger', '~> 4.0.10', group: :production
+gem 'rails', '~> 4.1.1'
+gem 'passenger', '~> 4.0.41', group: :production
 gem 'dynamic_form'
 gem 'rails-observers'
 
@@ -12,7 +12,7 @@ gem 'symbolize'
 
 gem 'haml-rails'
 gem 'sass'
-gem 'sass-rails'
+gem 'sass-rails', '4.0.3'  # locked for https://github.com/sstephenson/sprockets/issues/540
 gem 'compass'
 gem 'compass-rails'
 gem 'jquery-rails'
@@ -47,7 +47,7 @@ group :test, :development do
 end
 
 group :development do
-  gem 'capistrano', require: false
+  gem 'capistrano', '< 3.0', require: false
   gem 'quiet_assets'
   gem 'rvm-capistrano', require: false
   gem 'thin'
