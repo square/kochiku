@@ -28,7 +28,7 @@ class BuildsController < ApplicationController
       if !build.new_record? || build.save
         head :ok, :location => project_build_url(build.project, build)
       else
-        render :text => build.errors.full_messages.join('\n'), :status => :unprocessable_entity
+        render :plain => build.errors.full_messages.join('\n'), :status => :unprocessable_entity
       end
     else
       # requested branch does not match project branch for Github request
