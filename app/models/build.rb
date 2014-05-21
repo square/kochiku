@@ -2,7 +2,7 @@ require 'on_success_uploader'
 require 'fileless_io'
 
 class Build < ActiveRecord::Base
-  belongs_to :project, :inverse_of => :builds
+  belongs_to :project, :inverse_of => :builds, :touch => true
   has_one :repository, :through => :project
   has_many :build_parts, :dependent => :destroy, :inverse_of => :build_instance do
     def not_passed_and_last_attempt_in_state(*state)

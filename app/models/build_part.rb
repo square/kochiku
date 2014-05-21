@@ -1,5 +1,6 @@
 class BuildPart < ActiveRecord::Base
-  belongs_to :build_instance, :class_name => "Build", :foreign_key => "build_id", :inverse_of => :build_parts    # using build_instance because AR defines #build for associations, and it wins
+  # using 'build_instance' instead of 'build' because AR defines `build` for associations, and it wins
+  belongs_to :build_instance, :class_name => "Build", :foreign_key => "build_id", :inverse_of => :build_parts, :touch => true
   has_many :build_attempts, :dependent => :destroy, :inverse_of => :build_part
   has_one :project, :through => :build_instance
   symbolize :queue

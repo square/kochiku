@@ -8,9 +8,11 @@ Kochiku::Application.configure do
 
   config.eager_load = false
 
-  # Show full error reports and disable caching
+  # Show full error reports
   config.consider_all_requests_local = true
-  config.action_controller.perform_caching = false
+
+  # Enable page, action, and fragment caching
+  config.action_controller.perform_caching = true
 
   # Don't care if the mailer can't send
   config.action_mailer.raise_delivery_errors = false

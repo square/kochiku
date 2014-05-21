@@ -39,9 +39,13 @@ class ProjectsController < ApplicationController
   def build_time_history
     @project = Project.find_by_name!(params[:project_id])
 
+    history_json = Rails.cache.fetch("build-time-history-#{@project.id}-#{@project.updated_at}") do
+      @project.decorate.build_time_history.to_json
+    end
+
     respond_to do |format|
       format.json do
-        render :json => @project.decorate.build_time_history
+        render :json => history_json
       end
     end
   end
