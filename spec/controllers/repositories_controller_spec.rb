@@ -3,9 +3,14 @@ require 'spec_helper'
 describe RepositoriesController do
   render_views
   describe "create action" do
+    before do
+      @params = {
+        repository: { url: "git@git.example.com:square/kochiku.git", test_command: "script/something" }
+      }
+    end
     it "should perform a basic create" do
       expect{
-        post :create, :repository => {:url => "git@git.example.com:square/kochiku.git", :test_command => "script/something"}
+        post :create, @params
         expect(response).to be_redirect
       }.to change(Repository, :count).by(1)
       repository = Repository.where(url: "git@git.example.com:square/kochiku.git").first
@@ -13,9 +18,9 @@ describe RepositoriesController do
       expect(repository.test_command).to eq("script/something")
     end
 
-    it "creates a ci project" do
+    it "creates a ci and pull_requests project" do
       expect{
-        post :create, :repository => {:url => "git@git.example.com:square/kochiku.git", :test_command => "script/something"}
+        post :create, @params
         expect(response).to be_redirect
       }.to change(Project, :count).by(2)
       repository = Repository.where(url: "git@git.example.com:square/kochiku.git").first
@@ -25,9 +30,9 @@ describe RepositoriesController do
 
     context "with repository name" do
       it "creates a project with the specified name" do
+        @params[:repository][:name] = 'a-project-name'
         expect{
-          post :create, :repository => {url: "git@git.example.com:square/kochiku.git",
-              test_command: "script/something", repository_name: "a-project-name"}
+          post :create, @params
           expect(response).to be_redirect
         }.to change(Project, :count).by(2)
         repository = Repository.where(url: "git@git.example.com:square/kochiku.git").first
@@ -37,13 +42,14 @@ describe RepositoriesController do
     end
 
     context "with validation errors" do
-      let(:params) { { url: '' } }
-
       it "re-renders form with errors" do
-        post :create, repository: params
+        # timeout outside of the allowable range
+        @params[:repository][:timeout] = '1000000'
+
+        post :create, @params
         expect(response).to be_success
         expect(assigns[:repository].errors.full_messages.join(',')).
-          to include("Url can't be blank")
+          to include("the maximum timeout allowed is 1440 seconds")
         expect(response).to render_template('new')
       end
     end
@@ -114,12 +120,11 @@ describe RepositoriesController do
 
     # string attributes
     [
-      :url,
       :test_command,
       :on_green_update,
       :on_success_script,
       :on_success_note,
-      :repository_name
+      :name
     ].each do |attribute|
       it "should successfully update the #{attribute} attribute" do
         new_value = "Keytar Intelligentsia artisan typewriter 3 wolf moon"
@@ -163,7 +168,7 @@ describe RepositoriesController do
 
   describe 'post /build-ref' do
     let(:repository) { FactoryGirl.create(:repository) }
-    let(:repo_name) { repository.repository_name }
+    let(:repo_name) { repository.name }
     let(:fake_sha) { to_40('1') }
 
     it "creates a master build with query string parameters" do

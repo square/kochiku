@@ -63,12 +63,11 @@ describe BuildsController do
         }
       end
 
-      it "should create a repo if one does not exist" do
+      it "should raise an error if the repo does not exist" do
         repo.destroy
         expect {
           post @action, @params.merge(:project_id => project_param, :build => build_info)
-        }.to change(Repository, :count).by(1)
-        expect(Repository.last.url).to eq(repo.url)
+        }.to raise_error(ActiveRecord::RecordNotFound)
       end
 
       it "should create a new project if one does not exist" do
@@ -150,7 +149,7 @@ describe BuildsController do
         expect(repo).to_not be_new_record
 
         post @action, @params.merge(:project_id => project_param, :build => build_info,
-                                    :repo_url => "https://github.com/square/#{repo.repository_name}.git")
+                                    :repo_url => "https://github.com/square/#{repo.name}.git")
         expect(response).to be_success
 
         project = Project.where(name: project_param).first
@@ -205,7 +204,7 @@ RESPONSE
 
       context "and project is main project" do
         let(:repo) { FactoryGirl.create(:repository, url: 'git@github.com:square/test-repo.git') }
-        let(:project) { FactoryGirl.create(:project, :name => repo.repository_name, :repository => repo) }
+        let(:project) { FactoryGirl.create(:project, :name => repo.name, :repository => repo) }
 
         before do
           expect(project).to be_main
@@ -256,7 +255,7 @@ RESPONSE
 
       context "when github returns a 404" do
         it "throws not found exception" do
-          stub_request(:get, "https://api.github.com/repos/square/#{project.repository.repository_name}/git/refs/heads/#{branch}").to_return(:status => 200, :body => '{"message": "Not Found"}')
+          stub_request(:get, "https://api.github.com/repos/square/#{project.repository.name}/git/refs/heads/#{branch}").to_return(:status => 200, :body => '{"message": "Not Found"}')
           expect do
             post @action, {:project_id => project.to_param, :build => {:branch => branch}}
           end.to_not change { Build.count }
@@ -330,7 +329,7 @@ RESPONSE
 
     context "for master builds" do
       let(:repository) { FactoryGirl.create(:repository, :url => "git@github.com:org/test-repo.git") }
-      let(:project) { FactoryGirl.create(:project, :repository => repository, :name => repository.repository_name) }
+      let(:project) { FactoryGirl.create(:project, :repository => repository, :name => repository.name) }
 
       it "renders the merge_on_success checkbox disabled" do
         get @action, @params

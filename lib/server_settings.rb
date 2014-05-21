@@ -1,6 +1,6 @@
 class ServerSettings
 
-  attr_reader :type, :username, :mirror, :host
+  attr_reader :type, :username, :mirror, :host, :aliases
 
   def initialize(raw_settings, host)
     @host = host
@@ -9,11 +9,13 @@ class ServerSettings
       @username = raw_settings[:username]
       @raw_password_file = raw_settings[:password_file]
       @mirror = raw_settings[:mirror]
+      @aliases = raw_settings[:aliases]
     else
       @type = nil
       @username = nil
       @raw_password_file = nil
       @mirror = nil
+      @aliases = nil
     end
   end
 

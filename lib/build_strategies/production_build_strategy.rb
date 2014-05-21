@@ -4,7 +4,8 @@ require 'git_merge_executor'
 
 class BuildStrategy
   class << self
-    # The primary function of promote_build is to push a new tag or update a branch
+    # The primary function of promote_build is to update the branches specified
+    # in on_green_update field of Repository.
     #
     # A feature of promote build is that it will not cause the promotion ref to move
     # backwards. For instance, if build 1 finishes after build 2, we don't cause the promotion ref to move
@@ -12,13 +13,9 @@ class BuildStrategy
     def promote_build(build_ref, repository)
       repository.promotion_refs.each do |promotion_ref|
         unless included_in_promotion_ref?(build_ref, promotion_ref)
-          promote(promotion_ref, build_ref)
+          update_branch(promotion_ref, build_ref)
         end
       end
-    end
-
-    def promote(promotion_ref, ref_to_promote)
-      Cocaine::CommandLine.new("git push", "origin #{ref_to_promote}:refs/heads/#{promotion_ref} -f").run
     end
 
     def add_note(build_ref, namespace, note)
@@ -59,5 +56,10 @@ class BuildStrategy
       show_ref = Cocaine::CommandLine.new("git show-ref", promotion_ref, :expected_outcodes => [0,1])
       show_ref.run.present?
     end
+
+    def update_branch(branch_name, ref_to_promote)
+      Cocaine::CommandLine.new("git push", "origin #{ref_to_promote}:refs/heads/#{branch_name}").run
+    end
+
   end
 end
