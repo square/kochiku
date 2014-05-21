@@ -32,4 +32,14 @@ Kochiku::Application.configure do
   config.sass.preferred_syntax = :sass
   Rails.application.routes.default_url_options[:host] = "localhost:3000"
   config.action_mailer.default_url_options = {:host => "localhost:3000"}
+
+  config.after_initialize do
+    Bullet.enable = true
+    Bullet.bullet_logger = true
+    Bullet.console = true
+    Bullet.rails_logger = true
+
+    # Added because Projects#show.rss does not use the build_attempts but Projects#show.html does use them
+    Bullet.add_whitelist :type => :unused_eager_loading, :class_name => "BuildPart", :association => :build_attempts
+  end
 end
