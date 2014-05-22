@@ -43,6 +43,10 @@ class BuildStrategy
       end
     end
 
+    def update_branch(branch_name, ref_to_promote)
+      Cocaine::CommandLine.new("git push", "origin #{ref_to_promote}:refs/heads/#{branch_name}").run
+    end
+
   private
 
     def included_in_promotion_ref?(build_ref, promotion_ref)
@@ -55,10 +59,6 @@ class BuildStrategy
     def ref_exists?(promotion_ref)
       show_ref = Cocaine::CommandLine.new("git show-ref", promotion_ref, :expected_outcodes => [0,1])
       show_ref.run.present?
-    end
-
-    def update_branch(branch_name, ref_to_promote)
-      Cocaine::CommandLine.new("git push", "origin #{ref_to_promote}:refs/heads/#{branch_name}").run
     end
 
   end

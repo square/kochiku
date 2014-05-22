@@ -70,13 +70,13 @@ describe BuildStrategy do
 
   describe "#update_branch" do
     subject {
-      described_class.send(:update_branch, 'last-green', 'abc123')
+      described_class.update_branch('last-green', 'abc123')
     }
 
     it "should promote a sha" do
       mock_git_command = double
       expect(mock_git_command).to receive(:run).and_return ""
-      allow(Cocaine::CommandLine).to receive(:new).with("git push", "origin abc123:refs/heads/last-green").and_return mock_git_command
+      expect(Cocaine::CommandLine).to receive(:new).with("git push", "origin abc123:refs/heads/last-green").and_return mock_git_command
 
       subject
     end
