@@ -7,9 +7,9 @@ module RemoteServer
   # All integration with Github must go via this class.
   class Github
     URL_PARSERS = [
-      %r{\Agit@(?<host>.*):(?<username>.*)/(?<name>[^.]+)\.?},         # git@
-      %r{\Agit://(?<host>.*)/(?<username>.*)/(?<name>[^.]+)\.git},     # git://  (GHE only)
-      %r{\Ahttps?://(?<host>.*)/(?<username>.*)/(?<name>[^.]+)\.?},    # https://
+      %r{\Agit@(?<host>.*):(?<username>.*)/(?<name>[-.\w]+?)(\.git)?\z},       # git@
+      %r{\Agit://(?<host>.*)/(?<username>.*)/(?<name>[-.\w]+)\.git\z},         # git://  (GHE only)
+      %r{\Ahttps?://(?<host>.*)/(?<username>.*)/(?<name>[-.\w]+?)(\.git)?\z},  # https://
     ]
 
     def initialize(url)

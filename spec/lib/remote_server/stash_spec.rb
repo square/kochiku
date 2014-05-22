@@ -98,6 +98,33 @@ describe RemoteServer::Stash do
         port:                 '7999'
       )
     end
+
+    it 'should allow periods, hyphens, and underscores in repository names' do
+      result = described_class.new("git@stash.example.com:angular/an-gu_lar.js.git")
+      expect(result.attributes[:repository_name]).to eq('an-gu_lar.js')
+
+      result = described_class.new("ssh://git@stash.example.com/angular/an-gu_lar.js.git")
+      expect(result.attributes[:repository_name]).to eq('an-gu_lar.js')
+
+      result = described_class.new("https://stash.example.com/scm/angular/an-gu_lar.js.git")
+      expect(result.attributes[:repository_name]).to eq('an-gu_lar.js')
+    end
+
+    it 'should not allow characters disallowed by Github in repository names' do
+      %w(! @ # $ % ^ & * ( ) = + \ | ` ~ [ ] { } : ; ' " ?).each do |symbol|
+        expect {
+          described_class.new("git@stash.example.com:angular/bad#{symbol}name.git")
+        }.to raise_error(RemoteServer::UnknownUrlFormat)
+
+        expect {
+          described_class.new("ssh://git@stash.example.com/angular/bad#{symbol}name.git")
+        }.to raise_error(RemoteServer::UnknownUrlFormat)
+
+        expect {
+          described_class.new("https://stash.example.com/scm/angular/bad#{symbol}name.git")
+        }.to raise_error(RemoteServer::UnknownUrlFormat)
+      end
+    end
   end
 
   describe "#canonical_repository_url" do

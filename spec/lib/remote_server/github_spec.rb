@@ -43,6 +43,17 @@ describe RemoteServer::Github do
       )
     end
 
+    it 'parses git:// URLs' do
+      result = described_class.new \
+        "git://github.com/who/myrepo.git"
+
+      expect(result.attributes).to eq(
+        host:                 'github.com',
+        repository_namespace: 'who',
+        repository_name:      'myrepo'
+      )
+    end
+
     it 'parses HTTPS URLs' do
       result = described_class.new \
         "https://git.example.com/who/myrepo.git"
@@ -52,6 +63,33 @@ describe RemoteServer::Github do
         repository_namespace: 'who',
         repository_name:      'myrepo'
       )
+    end
+
+    it 'should allow periods, hyphens, and underscores in repository names' do
+      result = described_class.new("git@github.com:angular/an-gu_lar.js.git")
+      expect(result.attributes[:repository_name]).to eq('an-gu_lar.js')
+
+      result = described_class.new("git://github.com/angular/an-gu_lar.js.git")
+      expect(result.attributes[:repository_name]).to eq('an-gu_lar.js')
+
+      result = described_class.new("https://github.com/angular/an-gu_lar.js.git")
+      expect(result.attributes[:repository_name]).to eq('an-gu_lar.js')
+    end
+
+    it 'should not allow characters disallowed by Github in repository names' do
+      %w(! @ # $ % ^ & * ( ) = + \ | ` ~ [ ] { } : ; ' " ?).each do |symbol|
+        expect {
+          described_class.new("git@github.com:angular/bad#{symbol}name.git")
+        }.to raise_error(RemoteServer::UnknownUrlFormat)
+
+        expect {
+          described_class.new("git://github.com/angular/bad#{symbol}name.git")
+        }.to raise_error(RemoteServer::UnknownUrlFormat)
+
+        expect {
+          described_class.new("https://github.com/angular/bad#{symbol}name.git")
+        }.to raise_error(RemoteServer::UnknownUrlFormat)
+      end
     end
   end
 

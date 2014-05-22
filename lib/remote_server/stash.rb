@@ -7,9 +7,9 @@ module RemoteServer
     attr_reader :stash_request
 
     URL_PARSERS = [
-      %r{\Agit@(?<host>.*):(?<username>.*)/(?<name>[^.]+)\.git\z},
-      %r{\Assh://git@(?<host>.*?)(?<port>:\d+)?/(?<username>.*)/(?<name>[^.]+)\.git\z},
-      %r{\Ahttps://(?<host>[^@]+)/scm/(?<username>.+)/(?<name>[^.]+)\.git\z},
+      %r{\Agit@(?<host>.*):(?<username>.*)/(?<name>[-.\w]+)\.git\z},
+      %r{\Assh://git@(?<host>.*?)(?<port>:\d+)?/(?<username>.*)/(?<name>[-.\w]+)\.git\z},
+      %r{\Ahttps://(?<host>[^@]+)/scm/(?<username>.+)/(?<name>[-.\w]+)\.git\z},
     ]
 
     def initialize(url)
