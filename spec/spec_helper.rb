@@ -15,6 +15,9 @@ FIXTURE_PATH = Rails.root.join('spec', 'fixtures')
 # in spec/support/ and its subdirectories.
 Dir[Rails.root.join("spec/support/**/*.rb")].each {|f| require f}
 
+# Checks for pending migrations before tests are run.
+ActiveRecord::Migration.maintain_test_schema!
+
 # Test decorators independent of ActionController
 # https://github.com/drapergem/draper#isolated-tests
 Draper::ViewContext.test_strategy :fast
