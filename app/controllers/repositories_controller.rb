@@ -37,6 +37,7 @@ class RepositoriesController < ApplicationController
   def update
     @repository = Repository.find(params[:id])
     if @repository.update_attributes(repository_params)
+      flash[:message] = "Settings updated."
       redirect_to edit_repository_url(@repository)
     else
       render template: 'repositories/edit'
