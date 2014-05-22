@@ -1,14 +1,11 @@
-require 'build'
-require 'build_attempt'
-
 class RenameErrorStateToErrored < ActiveRecord::Migration
   def self.up
-    BuildAttempt.update_all({:state => 'errored'}, {:state => 'error'})
-    Build.update_all({:state => 'errored'}, {:state => 'error'})
+    execute("UPDATE build_attempts SET state='errored' WHERE state='error'")
+    execute("UPDATE builds SET state='errored' WHERE state='error'")
   end
 
   def self.down
-    BuildAttempt.update_all({:state => 'error'}, {:state => 'errored'})
-    Build.update_all({:state => 'error'}, {:state => 'errored'})
+    execute("UPDATE builds SET state='error' WHERE state='errored'")
+    execute("UPDATE build_attempts SET state='error' WHERE state='errored'")
   end
 end
