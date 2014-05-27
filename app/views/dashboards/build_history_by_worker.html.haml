@@ -1,0 +1,12 @@
+#worker-health-wrap
+  %table#worker-health
+    %thead
+      %th.right Worker
+      %th Build Attempts
+    %tbody
+      - @workers.each do |worker,status|
+        %tr
+          %td.right= worker
+          %td
+            - status.each do |state|
+              %span.attempt-status{:class => state}
