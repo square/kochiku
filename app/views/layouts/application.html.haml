@@ -41,7 +41,7 @@
 
       #nav
         .section= link_to("Build taking too long? (Resque Admin)", "/resque")
-        .section= link_to("Worker Health", build_history_by_worker_path(count: 2000))
+        .section= link_to("Worker Health", build_history_by_worker_path(count: 5000))
 
   = javascript_include_tag 'application'
   :javascript
