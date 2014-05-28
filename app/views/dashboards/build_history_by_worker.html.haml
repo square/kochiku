@@ -1,0 +1,13 @@
+#worker-health-wrap
+  %table#worker-health
+    %thead
+      %th.right Worker
+      %th Build Attempts
+    %tbody
+      - @workers.each do |worker_name, build_attempts|
+        %tr
+          %td.right= worker_name
+          %td
+            - build_attempts.each do |build_attempt|
+              = link_to build_part_redirect_path(build_attempt) do
+                %span.attempt-status{:class => build_attempt.state}
