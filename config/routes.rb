@@ -28,12 +28,14 @@ Kochiku::Application.routes.draw do
       end
     end
   end
+
   match '/XmlStatusReport.aspx', to: "projects#status_report", defaults: {:format => 'xml'}, via: :get
   match '/worker_health', to: "dashboards#build_history_by_worker", via: :get, as: :build_history_by_worker
 
   match '/build_attempts/:build_attempt_id/build_artifacts' => "build_artifacts#create", :via => :post
   match '/build_attempts/:id/start' => "build_attempts#start", :via => :post
   match '/build_attempts/:id/finish' => "build_attempts#finish", :via => :post, :as => :finish_build_attempt
+  match '/build_attempts/:id/build_part' => "build_attempts#build_part", :via => :get, :as => :build_part_redirect
   match '/pull-request-builder' => "pull_requests#build", :via => :post, :as => :pull_request_build
 end
 # TODO routing specs

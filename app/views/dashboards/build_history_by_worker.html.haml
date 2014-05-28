@@ -4,9 +4,10 @@
       %th.right Worker
       %th Build Attempts
     %tbody
-      - @workers.each do |worker,status|
+      - @workers.each do |worker_name, build_attempts|
         %tr
-          %td.right= worker
+          %td.right= worker_name
           %td
-            - status.each do |state|
-              %span.attempt-status{:class => state}
+            - build_attempts.each do |build_attempt|
+              = link_to build_part_redirect_path(build_attempt) do
+                %span.attempt-status{:class => build_attempt.state}

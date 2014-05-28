@@ -29,4 +29,15 @@ class BuildAttemptsController < ApplicationController
       end
     end
   end
+
+  # Redirects to the show page for the build_attempt's build_part. Added as a
+  # shortcut method to use when the IDs of the relation chain is not handy.
+  def build_part
+    @build_attempt = BuildAttempt.find(params[:id])
+
+    redirect_to project_build_part_path(
+      @build_attempt.build_part.build_instance.project,
+      @build_attempt.build_part.build_instance,
+      @build_attempt.build_part)
+  end
 end
