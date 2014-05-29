@@ -12,8 +12,8 @@ class AddHostAndNamespaceToRepositories < ActiveRecord::Migration
     Repository.all.each do |repository|
       attributes = RemoteServer.for_url(repository.url).attributes
       repository.update_attributes!(
-        :host => attributes[:host],
-        :namespace => attributes[:username]
+        :host => attributes.fetch(:host),
+        :namespace => attributes.fetch(:repository_namespace)
       )
     end
   end
