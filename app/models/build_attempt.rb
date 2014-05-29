@@ -71,6 +71,10 @@ class BuildAttempt < ActiveRecord::Base
     state == :running
   end
 
+  def errored?
+    state == :errored
+  end
+
   def should_reattempt?
     unsuccessful? && build_part.should_reattempt?
   end

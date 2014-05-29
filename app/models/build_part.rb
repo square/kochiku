@@ -99,8 +99,15 @@ class BuildPart < ActiveRecord::Base
   end
 
   def should_reattempt?
-    (build_attempts.unsuccessful.count - 1) < retry_count &&
+    if (build_attempts.unsuccessful.count - 1) < retry_count &&
         (build_instance.merge_on_success? || build_instance.project.main?)
+      true
+    elsif elapsed_time && elapsed_time < 60 && last_attempt.errored? &&
+        build_attempts.unsuccessful.count < 5
+      true
+    else
+      false
+    end
   end
 
   def last_stdout_artifact

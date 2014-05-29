@@ -265,5 +265,43 @@ describe BuildPart do
         expect(build_part.should_reattempt?).to be true
       end
     end
+
+    context "when it fails very fast" do
+      let(:build_part) { FactoryGirl.create(:build_part, retry_count: 0, build_instance: build) }
+
+      before do
+        FactoryGirl.create(:build_attempt, build_part: build_part, state: :errored, started_at: 10.seconds.ago, finished_at: Time.now)
+      end
+
+      it "will reattempt" do
+        expect(build_part.should_reattempt?).to be true
+      end
+    end
+
+    context "after 5 failures" do
+      let(:build_part) { FactoryGirl.create(:build_part, retry_count: 0, build_instance: build) }
+
+      before do
+        5.times do
+          FactoryGirl.create(:build_attempt, build_part: build_part, state: :errored, started_at: 10.seconds.ago, finished_at: Time.now)
+        end
+      end
+
+      it "not will reattempt" do
+        expect(build_part.should_reattempt?).to be false
+      end
+    end
+
+    context "when it fails after a longer time" do
+      let(:build_part) { FactoryGirl.create(:build_part, retry_count: 0, build_instance: build) }
+
+      before do
+        FactoryGirl.create(:build_attempt, build_part: build_part, state: :errored, started_at: 70.seconds.ago, finished_at: Time.now)
+      end
+
+      it "shouldn't reattempt" do
+        expect(build_part.should_reattempt?).to be false
+      end
+    end
   end
 end
