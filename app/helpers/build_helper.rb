@@ -18,10 +18,10 @@ module BuildHelper
       if build_part.paths.size == 1
         values << build_part.paths.first
       else
-        first, *rest = build_part.paths[0, 3]
+        first, *rest = build_part.paths
         first = first.sub(/([^\/]+)/, '<b class="root">\1</b>')
         paths = [first, rest].join(', ')
-        values << "#{build_part.paths.length} <span class=\"paths\">(#{paths})</span>".html_safe
+        values << "#{build_part.paths.length} <span class=\"paths\" title=\"#{build_part.paths.join(', ')}\">(#{paths})</span>".html_safe
       end
     end
   end
