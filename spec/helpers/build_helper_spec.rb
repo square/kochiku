@@ -28,7 +28,14 @@ describe BuildHelper do
     let!(:build_part) { FactoryGirl.create(:build_part, :build_instance => build, :paths => ['a', 'b']) }
     it "returns the info" do
       expect(build_metadata_headers(build)).to include("Paths")
-      expect(build_metadata_values(build, build_part)).to include("2 <span class=\"paths\">(<b class=\"root\">a</b>, b)</span>")
+      metadata_values = build_metadata_values(build, build_part).first
+
+      expect(metadata_values).to start_with(build_part.paths.size.to_s)
+
+      doc = Nokogiri::HTML(metadata_values)
+      node = doc.at_css('span')
+      expect(node['title']).to eq('a, b')
+      expect(node.inner_html).to eq("(<b class=\"root\">a</b>, b)")
     end
   end
 end
