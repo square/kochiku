@@ -24,7 +24,7 @@ gem 'therubyracer'
 
 gem 'resque'
 gem 'resque-retry'
-gem 'resque-web', require: 'resque_web'
+gem 'resque-web', github: 'resque/resque-web', require: 'resque_web'
 
 gem 'json' # used by resque
 

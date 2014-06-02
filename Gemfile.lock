@@ -9,6 +9,17 @@ GIT
       rack-test (>= 0.5.4)
       xpath (~> 2.0)
 
+GIT
+  remote: git://github.com/resque/resque-web.git
+  revision: b24852c5635637f27ca140c0debdea9b0b81bcf8
+  specs:
+    resque-web (0.0.5)
+      coffee-rails
+      jquery-rails
+      resque
+      sass-rails
+      twitter-bootstrap-rails
+
 GEM
   remote: https://rubygems.org/
   specs:
@@ -204,12 +215,6 @@ GEM
       redis (~> 3.0.4)
       resque (~> 1.25.1)
       rufus-scheduler (~> 2.0.24)
-    resque-web (0.0.5)
-      coffee-rails
-      jquery-rails
-      resque
-      sass-rails
-      twitter-bootstrap-rails
     rspec-collection_matchers (0.0.3)
       rspec-expectations (>= 2.99.0.beta1)
     rspec-core (3.0.0.beta2)
@@ -324,7 +329,7 @@ DEPENDENCIES
   rails-observers
   resque
   resque-retry
-  resque-web
+  resque-web!
   rspec-rails (~> 3.0.0.beta)
   rvm-capistrano
   sass
