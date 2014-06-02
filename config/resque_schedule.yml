@@ -1,0 +1,8 @@
+poll_repositories_for_changes:
+  every:
+    - "10m"
+    - :first_in: "5s"
+  class: "PollReposJob"
+  queue: low
+  args:
+  description: "Fetches any missed changes from added repositories"
