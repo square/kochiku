@@ -40,10 +40,9 @@ describe BuildsController do
       end
 
       context "when the project does not exist" do
-        it "should raise RecordNotFound so Rails returns a 404" do
-          expect {
-            post @action, @params.merge(:project_id => 'not_here', :payload => @payload)
-          }.to raise_error(ActiveRecord::RecordNotFound)
+        it "should return a 404" do
+          post @action, @params.merge(:project_id => 'not_here', :payload => @payload)
+          expect(response.code).to eq("404")
         end
       end
     end
@@ -63,11 +62,10 @@ describe BuildsController do
         }
       end
 
-      it "should raise an error if the repo does not exist" do
+      it "should return a 404 if the repo does not exist" do
         repo.destroy
-        expect {
-          post @action, @params.merge(:project_id => project_param, :build => build_info)
-        }.to raise_error(ActiveRecord::RecordNotFound)
+        post @action, @params.merge(:project_id => project_param, :build => build_info)
+        expect(response.code).to eq("404")
       end
 
       it "should create a new project if one does not exist" do
@@ -165,10 +163,9 @@ describe BuildsController do
 
 
     context "when a non existent project is specified" do
-      it "throws not found exception" do
-        expect {
-          post :request_build, {:project_id => "does-not-exist", :build => {:branch => branch}}
-        }.to raise_exception(ActiveRecord::RecordNotFound)
+      it "should return a 404" do
+        post :request_build, {:project_id => "does-not-exist", :build => {:branch => branch}}
+        expect(response.code).to eq("404")
       end
     end
 
