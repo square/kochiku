@@ -57,6 +57,5 @@ end
 
 group :test do
   gem 'webmock', require: false
-  # Track latest capybara to silence rspec 3 deprecation
-  gem 'capybara', :github => 'jnicklas/capybara'
+  gem 'capybara', '~> 2.3'
 end
