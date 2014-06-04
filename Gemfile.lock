@@ -329,6 +329,7 @@ DEPENDENCIES
   rails-observers
   resque
   resque-retry
+  resque-scheduler
   resque-web!
   rspec-rails (~> 3.0.0.beta)
   rvm-capistrano
