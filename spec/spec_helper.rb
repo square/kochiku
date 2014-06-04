@@ -43,6 +43,11 @@ RSpec.configure do |config|
   # Define which fixtures should be globally available. Set to :all to load everything
   # config.global_fixtures = :all
 
+  # RSpec Rails can automatically mix in different behaviours to your tests
+  # based on their file location, for example enabling you to call `get` and
+  # `post` in specs under `spec/controllers`.
+  config.infer_spec_type_from_file_location!
+
   config.before :each do
     WebMock.disable_net_connect!
     allow(JobBase).to receive(:enqueue_in)
