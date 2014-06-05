@@ -31,34 +31,6 @@ RESPONSE
     stub_request(:get, "#{repo_uri}/git/refs/heads/#{branch}").to_return(:status => 200, :body => build_ref_info)
   end
 
-  describe "#sha_for_branch" do
-    let(:subject) { GitRepo.sha_for_branch(repository, branch) }
-
-    context "with a non-existant repo" do
-      let(:repository) { FactoryGirl.create(:repository, url: 'git@git.example.com:square/non-existent-repo.git') }
-
-      before do
-        bad_repo_response = '{ "message": "Not Found" }'
-        stub_request(:get, "#{repo_uri}/git/refs/heads/#{branch}").to_return(:status => 200, :body => bad_repo_response)
-      end
-
-      it "returns nil for non-existant repo" do
-        expect(subject).to be_nil
-      end
-    end
-
-    it "returns nil with non-existant branch" do
-      branch = "nonexistant-branch"
-      stub_request(:get, "#{repo_uri}/git/refs/heads/#{branch}").to_return(:status => 200, :body => '{ "message": "Not Found" }')
-
-      expect(GitRepo.sha_for_branch(repository, branch)).to be_nil
-    end
-
-    it "returns the HEAD SHA for the branch" do
-      expect(GitRepo.sha_for_branch(repository, branch)).to eq(branch_head_sha)
-    end
-  end
-
   describe "#synchronize_with_remote" do
     it "should throw an exception after the third fetch attempt" do
       fetch_double = double('git fetch')
@@ -94,7 +66,7 @@ RESPONSE
           # Clone the repo first time, prime the cache.
           GitRepo.inside_repo(repository) {}
 
-          `git clone #{old_remote} #{new_remote}`
+          `git clone -q #{old_remote} #{new_remote}`
 
           repository = double('Repository',
             repo_cache_name:  'test-repo',

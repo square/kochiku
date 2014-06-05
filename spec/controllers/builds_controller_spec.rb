@@ -209,7 +209,8 @@ RESPONSE
 
         it "creates the build for main project if no branch is given" do
           sha = to_40('1')
-          allow(GitRepo).to receive(:sha_for_branch).and_return(sha)
+          fake_remote_server = double(:sha_for_branch => sha)
+          allow(RemoteServer).to receive(:for_url).with(repo.url).and_return(fake_remote_server)
 
           expect {
             post @action, {:project_id => project.to_param}
@@ -222,7 +223,8 @@ RESPONSE
 
         it "does not create a new build if the latest commit already has a build" do
           FactoryGirl.create(:build, :state => :errored, :project => project, :branch => "master", :ref => branch_head_sha)
-          allow(GitRepo).to receive(:sha_for_branch).and_return(branch_head_sha)
+          fake_remote_server = double(:sha_for_branch => branch_head_sha)
+          allow(RemoteServer).to receive(:for_url).with(repo.url).and_return(fake_remote_server)
 
           expect do
             post @action, {:project_id => project.to_param}

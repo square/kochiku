@@ -14,7 +14,9 @@ describe BuildStateUpdateJob do
     # We are stubbing methods that are not called from the class under test.
     allow(GitRepo).to receive(:harmonize_remote_url)
     allow(GitRepo).to receive(:synchronize_with_remote).and_return(true)
-    allow(GitRepo).to receive(:sha_for_branch).and_return(current_repo_master)
+    mocked_remote_server = RemoteServer.for_url(repository.url)
+    allow(mocked_remote_server).to receive(:sha_for_branch).and_return(current_repo_master)
+    allow(RemoteServer).to receive(:for_url).with(repository.url).and_return(mocked_remote_server)
     allow(BuildStrategy).to receive(:promote_build)
     allow(BuildStrategy).to receive(:run_success_script)
     stub_request(:post, %r{#{repository.base_api_url}/statuses})

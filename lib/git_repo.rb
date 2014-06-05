@@ -52,10 +52,6 @@ class GitRepo
       end
     end
 
-    def sha_for_branch(repo, branch)
-      repo.remote_server.sha_for_branch(branch)
-    end
-
     def inside_repo(repository, sync: true)
       cached_repo_path = cached_repo_for(repository)
 
