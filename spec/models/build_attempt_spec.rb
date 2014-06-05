@@ -4,7 +4,7 @@ describe BuildAttempt do
   it "requires a valid state" do
     build_attempt = BuildAttempt.new(:state => "asasdfsdf")
     expect(build_attempt).not_to be_valid
-    expect(build_attempt).to have(1).errors_on(:state)
+    expect(build_attempt).to have(1).error_on(:state)
     build_attempt.state = :runnable
     expect(build_attempt).to be_valid
   end

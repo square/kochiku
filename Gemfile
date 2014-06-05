@@ -6,7 +6,7 @@ gem 'dynamic_form'
 gem 'rails-observers'
 
 gem 'carrierwave'
-gem 'draper', '~> 1.3'
+gem 'draper', '~> 1.3', github: 'drapergem/draper', ref: 'c44894373c2ecbec41c5f3a84c83a2c21cf36aee'
 gem 'mysql2'
 gem 'symbolize'
 
@@ -25,7 +25,7 @@ gem 'therubyracer'
 gem 'resque'
 gem 'resque-scheduler'
 gem 'resque-retry'
-gem 'resque-web', github: 'resque/resque-web', require: 'resque_web'
+gem 'resque-web', '>= 0.0.6', require: 'resque_web'
 
 gem 'json' # used by resque
 
@@ -42,9 +42,9 @@ gem 'pry-byebug'
 gem 'colorize', require: false
 
 group :test, :development do
-  gem 'rspec-rails', '~> 3.0.0.beta'
+  gem 'rspec-rails', '~> 3.0.0'
+  gem 'rspec-collection_matchers'
   gem 'factory_girl_rails'
-  gem 'launchy'
 end
 
 group :development do
@@ -57,6 +57,5 @@ end
 
 group :test do
   gem 'webmock', require: false
-  # Track latest capybara to silence rspec 3 deprecation
-  gem 'capybara', :github => 'jnicklas/capybara'
+  gem 'capybara', '~> 2.3'
 end
