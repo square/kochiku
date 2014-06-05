@@ -14,35 +14,37 @@ class GitRepo
 
       Dir.mktmpdir(nil, WORKING_DIR) do |dir|
         # clone local repo (fast!)
-        run! "git clone #{cached_repo_path} #{dir}"
+        Cocaine::CommandLine.new("git clone", "#{cached_repo_path} #{dir}").run
 
         Dir.chdir(dir) do
           raise RefNotFoundError, "repo:#{repository.url} branch:#{branch}, sha:#{sha}" unless system("git rev-list --quiet -n1 #{sha}")
 
-          run! "git checkout --quiet #{sha}"
+          Cocaine::CommandLine.new("git checkout", "--quiet :commit").run(commit: sha)
 
-          run! "git submodule --quiet init"
+          if File.exists?('.gitmodules')
+            Cocaine::CommandLine.new("git submodule", "--quiet init").run
+            submodules = Cocaine::CommandLine.new('git config', '--get-regexp "^submodule\\..*\\.url$"').run
 
-          submodules = `git config --get-regexp "^submodule\\..*\\.url$"`
-
-          unless submodules.empty?
-            cached_submodules = nil
-            inside_repo(repository, sync: false) do
-              cached_submodules = `git config --get-regexp "^submodule\\..*\\.url$"`
-            end
-
-            # Redirect the submodules to the cached_repo
-            # If the submodule was added after the initial clone of the cache
-            # repo then it will not be present in the cached_repo and we fall
-            # back to cloning it for each build.
-            submodules.each_line do |config_line|
-              if cached_submodules.include?(config_line)
-                submodule_path = config_line.match(/submodule\.(.*?)\.url/)[1]
-                `git config --replace-all submodule.#{submodule_path}.url "#{cached_repo_path}/#{submodule_path}"`
+            unless submodules.empty?
+              cached_submodules = nil
+              inside_repo(repository, sync: false) do
+                cached_submodules = Cocaine::CommandLine.new('git config', '--get-regexp "^submodule\\..*\\.url$"').run
               end
-            end
 
-            run! "git submodule --quiet update"
+              # Redirect the submodules to the cached_repo
+              # If the submodule was added after the initial clone of the cache
+              # repo then it will not be present in the cached_repo and we fall
+              # back to cloning it for each build.
+              submodules.each_line do |config_line|
+                if cached_submodules.include?(config_line)
+                  submodule_path = config_line.match(/submodule\.(.*?)\.url/)[1]
+                  Cocaine::CommandLine.new("git config",
+                                           "--replace-all submodule.#{submodule_path}.url '#{cached_repo_path}/#{submodule_path}'").run
+                end
+              end
+
+              Cocaine::CommandLine.new('git submodule', '--quiet update').run
+            end
           end
 
           yield dir
@@ -84,10 +86,10 @@ class GitRepo
 
     def harmonize_remote_url(cached_repo_path, expected_url)
       Dir.chdir(cached_repo_path) do
-        remote_url = Cocaine::CommandLine.new("git config --get remote.origin.url").run.chomp
+        remote_url = Cocaine::CommandLine.new("git config", "--get remote.origin.url").run.chomp
         if remote_url != expected_url
           Rails.logger.info "#{remote_url.inspect} does not match #{expected_url.inspect}. Updating it."
-          Cocaine::CommandLine.new("git remote set-url origin #{expected_url}").run
+          Cocaine::CommandLine.new("git remote", "set-url origin #{expected_url}").run
         end
       end
       nil
@@ -97,13 +99,7 @@ class GitRepo
       Dir.chdir(cached_repo_path) do
         # update the cached repo
         synchronize_with_remote('origin', branch)
-        Cocaine::CommandLine.new("git submodule update", "--init --quiet").run
-      end
-    end
-
-    def run!(cmd)
-      unless system(cmd)
-        raise "non-0 exit code #{$?} returned from [#{cmd}]"
+        Cocaine::CommandLine.new("git submodule update", "--init --quiet").run if File.exists?('.gitmodules')
       end
     end
 
