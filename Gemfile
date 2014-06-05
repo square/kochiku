@@ -30,6 +30,7 @@ gem 'resque-web', '>= 0.0.6', require: 'resque_web'
 gem 'json' # used by resque
 
 gem 'chunky_png'
+gem 'posix-spawn'  # used by cocaine
 gem 'cocaine'
 gem 'awesome_print', require: false
 gem 'nokogiri'
