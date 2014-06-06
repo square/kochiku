@@ -58,4 +58,8 @@ class SettingsAccessor
   def git_pair_email_prefix
     @hash[:git_pair_email_prefix]
   end
+
+  def worker_thresholds
+    @hash[:worker_thresholds]
+  end
 end
