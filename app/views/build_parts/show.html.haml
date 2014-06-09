@@ -40,22 +40,23 @@
       %th.right.actions Actions
   %tbody
     - @build_part.build_attempts.each_with_index do |attempt, index|
-      %tr
-        %td.right= index + 1
-        %td
-          %span.attempt-status{:class => attempt.state}= attempt.state.to_s.capitalize
-        %td= attempt.started_at
-        %td.right= duration_strftime(attempt.elapsed_time)
-        %td.right= attempt.builder ? attempt.builder.sub(".#{Settings.domain_name}", '') : "pending"
-        %td
-          - attempt.build_artifacts.each do |artifact|
-            = link_to File.basename(artifact.log_file.to_s), artifact.log_file.url
-            %br
-        %td
-          - if attempt.unsuccessful? && @build_part.unsuccessful?
-            = link_to("Rebuild", rebuild_project_build_part_path(@project, @build, @build_part), :method => :post)
-          - if attempt.running?
-            = link_to("Abandon", finish_build_attempt_path(attempt, :state => :errored), :method => :post)
+      - cache("build-attempt-#{attempt.id}-#{attempt.updated_at.to_i}") do
+        %tr
+          %td.right= index + 1
+          %td
+            %span.attempt-status{:class => attempt.state}= attempt.state.to_s.capitalize
+          %td= attempt.started_at
+          %td.right= duration_strftime(attempt.elapsed_time)
+          %td.right= attempt.builder ? attempt.builder.sub(".#{Settings.domain_name}", '') : "pending"
+          %td
+            - attempt.build_artifacts.each do |artifact|
+              = link_to File.basename(artifact.log_file.to_s), artifact.log_file.url
+              %br
+          %td
+            - if attempt.unsuccessful? && @build_part.unsuccessful?
+              = link_to("Rebuild", rebuild_project_build_part_path(@project, @build, @build_part), :method => :post)
+            - if attempt.running?
+              = link_to("Abandon", finish_build_attempt_path(attempt, :state => :errored), :method => :post)
 
 %ol#build-paths
   - @build_part.paths.each do |path|
@@ -63,6 +64,12 @@
 
 = content_for :javascript do
   :javascript
-    if ($('.build-part-info tbody tr').length > 0)
+    if ($('.build-part-info tbody tr').length > 0) {
       $('.build-part-info').tablesorter({ sortList: [ [0, 0] ] });
-    Kochiku.delayedRefresh();
+      StartTimes = #{
+        start_times = {}
+        @build.build_parts.each_with_index { |attempt, index| start_times[index + 1] = attempt.started_at }
+        start_times.to_json
+    }
+    Kochiku.delayedRefresh({table: '.build-part-info tbody tr', statusCol: 1, elapsedCol: 3,
+      renderTime: Date.parse("#{@build_part.updated_at}")});

@@ -1,5 +1,5 @@
 class BuildPartsController < ApplicationController
-  before_filter :load_project_build_and_part, :only => [:rebuild, :show]
+  before_filter :load_project_build_and_part, :only => [:rebuild, :show, :update_time]
 
   def show
   end
@@ -7,6 +7,14 @@ class BuildPartsController < ApplicationController
   def rebuild
     @build_part.rebuild!
     redirect_to [@project, @build]
+  end
+
+  def update_time
+    respond_to do |format|
+      format.json do
+        render :json => @build_part.updated_at
+      end
+    end
   end
 
 private
