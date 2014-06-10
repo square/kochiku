@@ -7,6 +7,11 @@ class BuildsController < ApplicationController
   # the kochiku command line script
   skip_before_filter :verify_authenticity_token, :only => [:create]
 
+  caches_action :show, :cache_path => proc { |c|
+    build = Project.find_by_name!(params[:project_id]).builds.includes(build_parts: :build_attempts).find(params[:id])
+    { :tag => build.updated_at.to_i }
+  }
+
   def show
     @build = @project.builds.includes(build_parts: :build_attempts).find(params[:id])
 

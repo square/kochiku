@@ -1,4 +1,9 @@
 class ProjectsController < ApplicationController
+  caches_action :show, :cache_path => proc { |c|
+    project = Project.find_by_name!(params[:id])
+    { :tag => project.updated_at.to_i }
+  }
+
   def index
     @projects = Project.order("name ASC").decorate
   end
