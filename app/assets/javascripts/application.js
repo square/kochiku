@@ -23,20 +23,19 @@ Kochiku = {};
 StartTimes = {};
 
 Kochiku.delayedRefresh = function(updateInfo) {
-  $(updateInfo.table).each( function(index, element) {
-    if($(element).children()[updateInfo.statusCol].children[0].className.match(/running$/)) {
-      var startTime = new Date(Date.parse(StartTimes[$(element).children()[0].innerText]));
-      var now = new Date();
-      $(this).children()[updateInfo.elapsedCol].innerHTML =
-        Math.round((now-startTime)/60000) + ":" + ("00" + (Math.round((now-startTime)/1000)%60)).slice(-2);
-    }
+  var now = new Date();
+  $(updateInfo.table).find('tr:has(.running)').each( function() {
+      var startTime = new Date(Date.parse(StartTimes[$(this).children()[0].innerText]));
+      $(this).find('.elapsed').text(
+        Math.round((now-startTime)/60000) + ":" + ("00" + (Math.round((now-startTime)/1000)%60)).slice(-2));
   });
   setTimeout(function() {
     if($('input#refresh').is(':checked')) {
-      $.getJSON(document.URL + '/update_time', function( data ) {
+      $.getJSON(document.URL + '/modified_time', function( data ) {
         var buildTime = new Date(Date.parse(data));
-        if(buildTime > updateInfo.renderTime)
+        if(buildTime > updateInfo.renderTime) {
           window.location.reload();
+        }
       });
       Kochiku.delayedRefresh(updateInfo);
     }

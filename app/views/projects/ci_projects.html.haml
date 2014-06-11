@@ -4,7 +4,7 @@
 
 .projects.projects-grid
   - @projects.each do |project|
-    - cache("project-grid-#{project.id}-#{project.updated_at.to_i}") do
+    - cache(project) do
       %div.ci-build-info{:class => "ci-#{project.most_recent_build_state}" }
         %div.project-name
           = link_to(project.name, project_path(project))

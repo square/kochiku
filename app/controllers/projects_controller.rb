@@ -20,7 +20,7 @@ class ProjectsController < ApplicationController
     @builds = @project.builds.includes(build_parts: :build_attempts).last(12)
     @current_build = @builds.last
 
-    @build_parts = ActiveSupport::OrderedHash.new
+    @build_parts = Hash.new
     @builds.reverse_each do |build|
       build.build_parts.each do |build_part|
         key = [build_part.paths.first, build_part.kind, build_part.options['ruby']]

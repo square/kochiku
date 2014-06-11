@@ -1,7 +1,7 @@
 require 'git_repo'
 
 class BuildsController < ApplicationController
-  before_filter :load_project, :only => [:show, :abort, :build_status, :toggle_merge_on_success, :rebuild_failed_parts, :request_build, :update_time]
+  before_filter :load_project, :only => [:show, :abort, :build_status, :toggle_merge_on_success, :rebuild_failed_parts, :request_build, :modified_time]
 
   # do not require authenticity_token for create so that it can be called by
   # the kochiku command line script
@@ -117,7 +117,7 @@ class BuildsController < ApplicationController
     end
   end
 
-  def update_time
+  def modified_time
     @build = @project.builds.find(params[:id])
     respond_to do |format|
       format.json do

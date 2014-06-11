@@ -1,5 +1,8 @@
 class BuildPartsController < ApplicationController
-  before_filter :load_project_build_and_part, :only => [:rebuild, :show, :update_time]
+  before_filter :load_project_build_and_part, :only => [:rebuild, :show, :modified_time]
+  caches_action :show, :cache_path => proc { |c|
+    { :tag => @build_part.updated_at.to_i }
+  }
 
   def show
   end
@@ -9,7 +12,7 @@ class BuildPartsController < ApplicationController
     redirect_to [@project, @build]
   end
 
-  def update_time
+  def modified_time
     respond_to do |format|
       format.json do
         render :json => @build_part.updated_at

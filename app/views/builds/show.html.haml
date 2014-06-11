@@ -65,7 +65,7 @@
       %th.right.actions Actions
   %tbody
     - @build.build_parts.each do |part|
-      - cache("build-part-#{part.id}-#{part.updated_at.to_i}") do
+      - cache(part) do
         %tr
           %td.right= link_to(part.id, project_build_part_path(@project, @build, part))
           %td
@@ -81,7 +81,7 @@
           %td.right
             - builder = part.last_attempt.try(:builder)
             = builder ? builder.sub(".#{Settings.domain_name}", '') : "pending"
-          %td.right= part.elapsed_time ? duration_strftime(part.elapsed_time) : "pending"
+          %td.right.elapsed= part.elapsed_time ? duration_strftime(part.elapsed_time) : "pending"
           %td.right= part.build_attempts.size
           %td.right
             - if part.unsuccessful?
@@ -97,5 +97,4 @@
         start_times.to_json
       };
     }
-    Kochiku.delayedRefresh({table: '.build-summary tbody tr', statusCol: 1, elapsedCol: 5,
-      renderTime: Date.parse("#{@build.updated_at}")});
+    Kochiku.delayedRefresh({table: '.build-summary tbody', renderTime: Date.parse("#{@build.updated_at}")});
