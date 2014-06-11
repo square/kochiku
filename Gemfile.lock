@@ -68,7 +68,7 @@ GEM
     chunky_png (1.2.9)
     climate_control (0.0.3)
       activesupport (>= 3.0)
-    cocaine (0.5.3)
+    cocaine (0.5.4)
       climate_control (>= 0.0.3, < 1.0)
     coderay (1.1.0)
     coffee-rails (4.0.1)
@@ -145,6 +145,7 @@ GEM
       rack
       rake (>= 0.8.1)
     polyglot (0.3.4)
+    posix-spawn (0.3.8)
     pry (0.9.12.6)
       coderay (~> 1.0)
       method_source (~> 0.8)
@@ -312,6 +313,7 @@ DEPENDENCIES
   mysql2
   nokogiri
   passenger (~> 4.0.41)
+  posix-spawn
   pry-byebug
   pry-rails
   quiet_assets

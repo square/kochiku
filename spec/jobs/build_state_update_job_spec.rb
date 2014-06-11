@@ -12,7 +12,6 @@ describe BuildStateUpdateJob do
     build.build_parts.create!(:kind => :cucumber, :paths => ["baz"], :queue => :ci)
     # TODO: This is terrible, need to fold this feedback back into the design.
     # We are stubbing methods that are not called from the class under test.
-    allow(GitRepo).to receive(:run!)
     allow(GitRepo).to receive(:harmonize_remote_url)
     allow(GitRepo).to receive(:synchronize_with_remote).and_return(true)
     allow(GitRepo).to receive(:sha_for_branch).and_return(current_repo_master)
