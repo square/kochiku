@@ -2,7 +2,19 @@ poll_repositories_for_changes:
   every:
     - "10m"
     - :first_in: "5s"
-  class: "PollReposJob"
+  class: "PollRepositoriesJob"
   queue: low
   args:
   description: "Fetches any missed changes from added repositories"
+resize_worker_pool:
+  every:
+    - "1m"
+  class: "AutosizeWorkersJob"
+  args:
+  description: "Determines the correct worker size pool"
+monitor_worker_pool:
+  every:
+    - "10s"
+  class: "MonitorWorkersJob"
+  args:
+  description: "Records the current number of workers and tasks"

@@ -42,3 +42,24 @@ git_servers:
 #    type: stash
 #    username: kochiku-robot
 #    password_file: config/secrets/kochiku-robot-password
+
+# if you want to manage ec2 workers automatically, the settings go here.  The sampling job runs
+# every ten seconds on the high queue, which runs on the kochiku master.
+worker_thresholds:
+  # Never go below this number, even if they are all idle
+  # minimum_total_workers: 50
+  # never go above this many workers
+  # maximum_total_workers: 500
+  # When adjusting up or down, do this many instances at a time
+  # instance_chunk_size: 10
+  # must collect this many samples that meet a criteria before adjustment is made.
+  # This is in 10-second counts; 30=300s=5m
+  # number_of_samples: 30
+  # in order to adjust down, must have more than this many idle instances
+  # idle_excess_count: 50
+  # in order to adjust up, must have less than this many idle instances
+  # idle_insufficient_count: 30
+  # Hard-path to executable that spins up <n> instances
+  # spin_up_script: /Users/square/Development/slave-driver/new-instance.rb
+  # queue that auto-sizes.  Schedule the shutdown instance jobs on this queue.
+  # autosize_queue: developer-linux
