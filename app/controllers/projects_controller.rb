@@ -1,7 +1,7 @@
 class ProjectsController < ApplicationController
   caches_action :show, :cache_path => proc { |c|
-    project = Project.find_by_name!(params[:id])
-    { :tag => project.updated_at.to_i }
+    updated_at = Project.where(:name => params[:id]).select(:updated_at).first!.updated_at
+    { :modified => updated_at.to_i }
   }
 
   def index

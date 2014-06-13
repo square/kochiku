@@ -1,7 +1,7 @@
 class BuildPartsController < ApplicationController
   before_filter :load_project_build_and_part, :only => [:rebuild, :show, :modified_time]
   caches_action :show, :cache_path => proc { |c|
-    { :tag => @build_part.updated_at.to_i }
+    { :modified => @build_part.updated_at.to_i }
   }
 
   def show

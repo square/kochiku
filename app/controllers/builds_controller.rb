@@ -8,8 +8,8 @@ class BuildsController < ApplicationController
   skip_before_filter :verify_authenticity_token, :only => [:create]
 
   caches_action :show, :cache_path => proc { |c|
-    build = Project.find_by_name!(params[:project_id]).builds.includes(build_parts: :build_attempts).find(params[:id])
-    { :tag => build.updated_at.to_i }
+    updated_at = @project.builds.select(:updated_at).find(params[:id]).updated_at
+    { :modified => updated_at.to_i }
   }
 
   def show
@@ -118,10 +118,10 @@ class BuildsController < ApplicationController
   end
 
   def modified_time
-    @build = @project.builds.find(params[:id])
+    updated_at = @project.builds.select(:updated_at).find(params[:id]).updated_at
     respond_to do |format|
       format.json do
-        render :json => @build.updated_at
+        render :json => updated_at
       end
     end
   end
