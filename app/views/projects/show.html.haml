@@ -100,16 +100,17 @@
             - if build_part && build_part.unsuccessful?
               = link_to "Rebuild", "/projects/#{@project.to_param}/builds/#{@current_build.to_param}/parts/#{build_part.to_param}/rebuild", method: :post
 
-= content_for :javascript do
-  :javascript
-    StartTimes = #{
-      start_times = {}
-      @current_build.build_parts.each { |part| start_times[dom_id(part)] = part.updated_at }
-      start_times.to_json
-    };
-    $('.project-part-info tbody').find('tr:has(.running)').each( function() {
-      var startTime = new Date(Date.parse(StartTimes[$(this)[0].id]));
-      var now = new Date();
-      $(this).find('.elapsed').text(
-        Math.round((now-startTime)/60000) + ":" + ("00" + (Math.round((now-startTime)/1000)%60)).slice(-2));
-    });
+- if @current_build
+  = content_for :javascript do
+    :javascript
+      StartTimes = #{
+        start_times = {}
+        @current_build.build_parts.each { |part| start_times[dom_id(part)] = part.updated_at }
+        start_times.to_json
+      };
+      $('.project-part-info tbody').find('tr:has(.running)').each( function() {
+        var startTime = new Date(Date.parse(StartTimes[$(this)[0].id]));
+        var now = new Date();
+        $(this).find('.elapsed').text(
+          Math.round((now-startTime)/60000) + ":" + ("00" + (Math.round((now-startTime)/1000)%60)).slice(-2));
+      });
