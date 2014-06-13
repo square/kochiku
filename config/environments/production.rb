@@ -14,6 +14,8 @@ Kochiku::Application.configure do
   config.consider_all_requests_local = true   # internal service; safe to show errors
   config.action_controller.perform_caching = true
 
+  config.cache_store = :file_store, "tmp/cache"
+
   # Disable Rails's static asset server (Apache or nginx will already do this)
   config.serve_static_assets = false
 
