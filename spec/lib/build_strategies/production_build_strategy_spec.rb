@@ -38,30 +38,21 @@ describe BuildStrategy do
   describe "#promote_build" do
     subject { described_class.promote_build(build.ref, project.repository) }
 
-    context "when pushing to a ref that doesn't exist" do
+    context "when the ref is an ancestor" do
       before(:each) {
-        mock_show_ref_command = double
-        expect(mock_show_ref_command).to receive(:run).and_return "deadbeef refs/remote/origin/branch"
-        allow(Cocaine::CommandLine).to receive(:new).with("git show-ref", anything, anything).and_return mock_show_ref_command
-
-        mock_cherry_command = double
-        expect(mock_cherry_command).to receive(:run).and_return "+ deadbeef"
-        allow(Cocaine::CommandLine).to receive(:new).with("git cherry", "origin/#{project.repository.promotion_refs.first} #{build.ref}").and_return mock_cherry_command
+        expect(described_class).to receive(:included_in_promotion_ref?).and_return(true)
       }
-      it "pushes the ref" do
-        expect(described_class).to receive(:update_branch).with(project.repository.promotion_refs.first, build.ref)
+      it "does not perform an update" do
+        expect(described_class).to_not receive(:update_branch)
         subject
       end
     end
 
-    context "when pushing to a ref that doesn't exist" do
+    context "when the ref is not an ancestor" do
       before(:each) {
-        mock_git_command = double
-        expect(mock_git_command).to receive(:run).and_return ""
-        allow(Cocaine::CommandLine).to receive(:new).with("git show-ref", anything, anything).and_return mock_git_command
+        expect(described_class).to receive(:included_in_promotion_ref?).and_return(false)
       }
-
-      it "fails gracefully if the ref is undefined" do
+      it "should update the promotion branch" do
         expect(described_class).to receive(:update_branch).with(project.repository.promotion_refs.first, build.ref)
         subject
       end
@@ -76,7 +67,7 @@ describe BuildStrategy do
     it "should promote a sha" do
       mock_git_command = double
       expect(mock_git_command).to receive(:run).and_return ""
-      expect(Cocaine::CommandLine).to receive(:new).with("git push", "origin abc123:refs/heads/last-green").and_return mock_git_command
+      expect(Cocaine::CommandLine).to receive(:new).with("git push", "--force origin abc123:refs/heads/last-green").and_return mock_git_command
 
       subject
     end
