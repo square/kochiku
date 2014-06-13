@@ -55,16 +55,12 @@ class BuildStrategy
   private
 
     def included_in_promotion_ref?(build_ref, promotion_ref)
-      return unless ref_exists?(promotion_ref)
-
-      cherry_cmd = Cocaine::CommandLine.new("git cherry", "origin/#{promotion_ref} #{build_ref}")
-      cherry_cmd.run.lines.count == 0
+      # --is-ancestor was added in git 1.8.0
+      # exit ->   1: not an ancestor
+      # exit -> 128: the commit does not exist
+      ancestor_cmd = Cocaine::CommandLine.new("git merge-base", "--is-ancestor #{build_ref} origin/#{promotion_ref}", :expected_outcodes => [0, 1, 128])
+      ancestor_cmd.run
+      ancestor_cmd.exit_status == 0
     end
-
-    def ref_exists?(promotion_ref)
-      show_ref = Cocaine::CommandLine.new("git show-ref", promotion_ref, :expected_outcodes => [0,1])
-      show_ref.run.present?
-    end
-
   end
 end
