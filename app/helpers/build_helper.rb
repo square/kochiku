@@ -34,15 +34,6 @@ module BuildHelper
     build.build_parts.none? {|build_part| build_part.paths.size > 1 }
   end
 
-  def average_time(build_parts)
-    # build_parts is a hash of build => build_part
-    build_parts = build_parts.reject { |build, build_part| build.is_running? }
-    total = build_parts.inject(0) do |sum, (build, build_part)|
-      sum + (build_part.elapsed_time || 0)
-    end
-    total.to_f / build_parts.length
-  end
-
   def eligible_for_merge_on_success?(build)
     !build.succeeded? && !build.project.main? && build.repository.allows_kochiku_merges?
   end

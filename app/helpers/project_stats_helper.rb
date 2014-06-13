@@ -49,15 +49,15 @@ module ProjectStatsHelper
     (total_build_attempts - total_build_parts) / successful_builds.size.to_f
   end
 
-  def average_elapsed_time(builds)
+  def median_elapsed_time(builds)
     successful_builds = builds.select(&:succeeded?)
-
-    cumulative_execution_in_seconds = successful_builds.sum(&:elapsed_time)
-
-    if cumulative_execution_in_seconds.zero?
+    elapsed_times = successful_builds.map { |build| build.elapsed_time }
+    times = elapsed_times.length
+    if times.zero?
       nil
     else
-      cumulative_execution_in_seconds / successful_builds.size.to_f
+      elapsed_times.sort!
+      (elapsed_times[(times - 1) / 2] + elapsed_times[times / 2]) / 2.0
     end
   end
 

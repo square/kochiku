@@ -124,16 +124,18 @@ describe ProjectStatsHelper do
     end
   end
 
-  describe 'average_elapsed_time' do
-    subject { helper.average_elapsed_time(@builds) }
+  describe 'median_elapsed_time' do
+    subject { helper.median_elapsed_time(@builds) }
 
     before do
-      @builds << build = FactoryGirl.create(:build, :state => :succeeded, :created_at => 1.hour.ago)
-      build_part = FactoryGirl.create(:build_part, :build_instance => build)
-      FactoryGirl.create(:build_attempt, :build_part => build_part, :finished_at => build.created_at + 30.minutes)
+      5.times do |i|
+        @builds << build = FactoryGirl.create(:build, :state => :succeeded, :created_at => (10 + 5*i).minutes.ago)
+        build_part = FactoryGirl.create(:build_part, :build_instance => build)
+        FactoryGirl.create(:build_attempt, :build_part => build_part, :finished_at => build.created_at + (3*i).minutes)
+      end
     end
 
-    it { should be_within(1).of(30 * 60) }
+    it { should be_within(1).of(6 * 60) }
 
     context 'when there is an unsuccessful build' do
       before do
@@ -143,7 +145,19 @@ describe ProjectStatsHelper do
       end
 
       it 'should not impact the result' do
-        should be_within(1).of(30 * 60)
+        should be_within(1).of(6 * 60)
+      end
+    end
+
+    context 'when there is an even number of builds' do
+      before do
+        @builds << build = FactoryGirl.create(:build, :state => :succeeded, :created_at => 45.minutes.ago)
+        build_part = FactoryGirl.create(:build_part, :build_instance => build)
+        FactoryGirl.create(:build_attempt, :build_part => build_part, :finished_at => build.created_at + 17.minutes)
+      end
+
+      it 'should average the middle two' do
+        should be_within(1).of((6 + 9) * 30)
       end
     end
   end
