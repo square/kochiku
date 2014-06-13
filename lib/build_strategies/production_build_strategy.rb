@@ -7,9 +7,14 @@ class BuildStrategy
     # The primary function of promote_build is to update the branches specified
     # in on_green_update field of Repository.
     #
-    # A feature of promote build is that it will not cause the promotion ref to move
-    # backwards. For instance, if build 1 finishes after build 2, we don't cause the promotion ref to move
-    # backwards by overwriting promotion_ref with build 1
+    # A feature of promote_build is that it will not cause the promotion ref to
+    # move backwards. For instance, if build 1 finishes after build 2, we don't
+    # cause the promotion ref to move backwards by overwriting promotion_ref
+    # with build 1
+    #
+    # promote_build does use a force push in order to overwrite experimental
+    # branches that may have been manually placed on the promotion ref by a
+    # developer for testing.
     def promote_build(build_ref, repository)
       repository.promotion_refs.each do |promotion_ref|
         unless included_in_promotion_ref?(build_ref, promotion_ref)
@@ -44,7 +49,7 @@ class BuildStrategy
     end
 
     def update_branch(branch_name, ref_to_promote)
-      Cocaine::CommandLine.new("git push", "origin #{ref_to_promote}:refs/heads/#{branch_name}").run
+      Cocaine::CommandLine.new("git push", "--force origin #{ref_to_promote}:refs/heads/#{branch_name}").run
     end
 
   private
