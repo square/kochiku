@@ -45,7 +45,7 @@
         %td
           %span.attempt-status{:class => attempt.state}= attempt.state.to_s.capitalize
         %td= attempt.started_at
-        %td.right= duration_strftime(attempt.elapsed_time)
+        %td.right.elapsed= duration_strftime(attempt.elapsed_time)
         %td.right= attempt.builder ? attempt.builder.sub(".#{Settings.domain_name}", '') : "pending"
         %td
           - attempt.build_artifacts.each do |artifact|
@@ -63,6 +63,12 @@
 
 = content_for :javascript do
   :javascript
-    if ($('.build-part-info tbody tr').length > 0)
+    if ($('.build-part-info tbody tr').length > 0) {
       $('.build-part-info').tablesorter({ sortList: [ [0, 0] ] });
-    Kochiku.delayedRefresh();
+      StartTimes = #{
+        start_times = {}
+        @build_part.build_attempts.each_with_index { |attempt, index| start_times[index + 1] = attempt.started_at }
+        start_times.to_json
+      };
+    }
+    Kochiku.delayedRefresh({table: '.build-part-info tbody', renderTime: Date.parse("#{@build_part.updated_at}")});

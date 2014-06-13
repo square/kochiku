@@ -4,17 +4,18 @@
 
 .projects.projects-grid
   - @projects.each do |project|
-    %div.ci-build-info{:class => "ci-#{project.most_recent_build_state}" }
-      %div.project-name
-        = link_to(project.name, project_path(project))
-      - if project.most_recent_build.try(:is_running?)
-        %div.state{:class => "build-#{project.most_recent_build_state}" }
-          = project.most_recent_build_state.to_s.capitalize
-      %div.state
-        =  project.last_completed_build && project.last_completed_build.finished_at ? "Last built #{time_ago_in_words(project.last_completed_build.finished_at)} ago" : "Never built"
-      - if project.last_completed_build
-        %div.state{:class => "build-#{project.last_completed_build.state}" }
-          = project.last_completed_build.state.to_s.capitalize
-          = "in " + distance_of_time_in_words(project.last_build_duration) if project.last_build_duration
-      %div.project-link
-        = link_to("Projects", projects_repository_path(project.repository))
+    - cache(project) do
+      %div.ci-build-info{:class => "ci-#{project.most_recent_build_state}" }
+        %div.project-name
+          = link_to(project.name, project_path(project))
+        - if project.most_recent_build.try(:is_running?)
+          %div.state{:class => "build-#{project.most_recent_build_state}" }
+            = project.most_recent_build_state.to_s.capitalize
+        %div.state
+          =  project.last_completed_build && project.last_completed_build.finished_at ? "Last built #{time_ago_in_words(project.last_completed_build.finished_at)} ago" : "Never built"
+        - if project.last_completed_build
+          %div.state{:class => "build-#{project.last_completed_build.state}" }
+            = project.last_completed_build.state.to_s.capitalize
+            = "in " + distance_of_time_in_words(project.last_build_duration) if project.last_build_duration
+        %div.project-link
+          = link_to("Projects", projects_repository_path(project.repository))

@@ -4,6 +4,7 @@ gem 'rails', '~> 4.1.1'
 gem 'passenger', '~> 4.0.41', group: :production
 gem 'dynamic_form'
 gem 'rails-observers'
+gem 'actionpack-action_caching'
 
 gem 'carrierwave'
 gem 'draper', '~> 1.3', github: 'drapergem/draper', ref: 'c44894373c2ecbec41c5f3a84c83a2c21cf36aee'

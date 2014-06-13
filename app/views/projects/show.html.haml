@@ -12,22 +12,23 @@
       = f.text_field :branch, {placeholder: 'Branch to build', class: 'sha', autocapitalize: 'off', autocorrect: 'off', spellcheck: 'false'}
     = f.submit "Build", {class: 'build-button'}
 
-- rate = error_free_pass_rate(@builds)
-- avg_rebuilds = average_number_of_rebuilds(@builds)
-- avg_seconds_to_success = average_elapsed_time(@builds)
-.performance
-  - if avg_seconds_to_success
-    %div{ title: "Average elapsed time for successful builds on #{@project.name}" }
-      %span.label Average time:
-      %span.number= "#{seconds_to_minutes(avg_seconds_to_success)} minutes"
+- cache(@project) do
+  - rate = error_free_pass_rate(@builds)
+  - avg_rebuilds = average_number_of_rebuilds(@builds)
+  - avg_seconds_to_success = average_elapsed_time(@builds)
+  .performance
+    - if avg_seconds_to_success
+      %div{ title: "Average elapsed time for successful builds on #{@project.name}" }
+        %span.label Average time:
+        %span.number= "#{seconds_to_minutes(avg_seconds_to_success)} minutes"
 
-  %div{ title: "Average number of build parts reattempted to get to a successful build", class: rebuild_count_css_class(avg_rebuilds) }
-    %span.number= "%0.1f" % avg_rebuilds
-    %span.label rebuilds required on average
+    %div{ title: "Average number of build parts reattempted to get to a successful build", class: rebuild_count_css_class(avg_rebuilds) }
+      %span.number= "%0.1f" % avg_rebuilds
+      %span.label rebuilds required on average
 
-  %div{ title: "Percentage of builds with all parts succeeding on the first try", class: pass_rate_css_class(rate) }
-    %span.number= rate
-    %span.label pass rate on first try
+    %div{ title: "Percentage of builds with all parts succeeding on the first try", class: pass_rate_css_class(rate) }
+      %span.number= rate
+      %span.label pass rate on first try
 
 %h2.subheader
   - unless @build.project.main?
@@ -52,7 +53,7 @@
     });
 
 - if @current_build
-  %table
+  %table.project-part-info
     %thead
       %tr
         %th.right.whisker Previous
@@ -69,31 +70,47 @@
     - @build_parts.each do |key, build_parts_by_build|
       - part = build_parts_by_build.values.first
       - build_part = build_parts_by_build[@current_build]
-      %tr
-        %td.right.whisker
-          - total_attempts = 0
-          - @builds[0..-2].each do |previous_build|
-            - if previous_part = build_parts_by_build[previous_build]
-              - attempts = previous_part.build_attempts.size
-              - total_attempts += attempts
-              = link_to "/projects/#{@project.to_param}/builds/#{previous_build.to_param}/parts/#{previous_part.to_param}" do
-                %span.part-status{class: [previous_part.status, "attempt-#{attempts}"], title: pluralize(attempts, 'attempt'), data: { ref: previous_build.ref[0, 5] }}
-            - else
-              %span.part-status.attempt-0
-        %td
-          - if build_part
-            %span.part-status{class: build_part.status}
-              = link_to build_part.status.to_s.capitalize, "/projects/#{@project.to_param}/builds/#{@current_build.to_param}/parts/#{build_part.to_param}"
-        - build_metadata_values(@current_build, part).each do |value|
-          %td= value
-        %td= part.kind.to_s.capitalize
-        %td.right= build_part.elapsed_time ? duration_strftime(build_part.elapsed_time) : "pending" if build_part
-        %td.right= duration_strftime(average_time(build_parts_by_build))
-        %td.right
-          = build_part.build_attempts.size if build_part
-          - average = (total_attempts.to_f / (@builds.length-1)).round 0 if @builds.length > 1
-          - if average && average > 1
-            %span{ title: 'Average' } / #{average}
-        %td.right
-          - if build_part && build_part.unsuccessful?
-            = link_to "Rebuild", "/projects/#{@project.to_param}/builds/#{@current_build.to_param}/parts/#{build_part.to_param}/rebuild", method: :post
+      - cache(part) do
+        %tr{ :id => dom_id(part) }
+          %td.right.whisker
+            - total_attempts = 0
+            - @builds[0..-2].each do |previous_build|
+              - if previous_part = build_parts_by_build[previous_build]
+                - attempts = previous_part.build_attempts.size
+                - total_attempts += attempts
+                = link_to "/projects/#{@project.to_param}/builds/#{previous_build.to_param}/parts/#{previous_part.to_param}" do
+                  %span.part-status{class: [previous_part.status, "attempt-#{attempts}"], title: pluralize(attempts, 'attempt'), data: { ref: previous_build.ref[0, 5] }}
+              - else
+                %span.part-status.attempt-0
+          %td
+            - if build_part
+              %span.part-status{class: build_part.status}
+                = link_to build_part.status.to_s.capitalize, "/projects/#{@project.to_param}/builds/#{@current_build.to_param}/parts/#{build_part.to_param}"
+          - build_metadata_values(@current_build, part).each do |value|
+            %td= value
+          %td= part.kind.to_s.capitalize
+          %td.right.elapsed= build_part.elapsed_time ? duration_strftime(build_part.elapsed_time) : "pending" if build_part
+          %td.right= duration_strftime(average_time(build_parts_by_build))
+          %td.right
+            = build_part.build_attempts.size if build_part
+            - average = (total_attempts.to_f / (@builds.length-1)).round 0 if @builds.length > 1
+            - if average && average > 1
+              %span{ title: 'Average' } / #{average}
+          %td.right
+            - if build_part && build_part.unsuccessful?
+              = link_to "Rebuild", "/projects/#{@project.to_param}/builds/#{@current_build.to_param}/parts/#{build_part.to_param}/rebuild", method: :post
+
+- if @current_build
+  = content_for :javascript do
+    :javascript
+      StartTimes = #{
+        start_times = {}
+        @current_build.build_parts.each { |part| start_times[dom_id(part)] = part.updated_at }
+        start_times.to_json
+      };
+      $('.project-part-info tbody').find('tr:has(.running)').each( function() {
+        var startTime = new Date(Date.parse(StartTimes[$(this)[0].id]));
+        var now = new Date();
+        $(this).find('.elapsed').text(
+          Math.round((now-startTime)/60000) + ":" + ("00" + (Math.round((now-startTime)/1000)%60)).slice(-2));
+      });

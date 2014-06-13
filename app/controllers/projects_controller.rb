@@ -1,4 +1,9 @@
 class ProjectsController < ApplicationController
+  caches_action :show, :cache_path => proc { |c|
+    updated_at = Project.where(:name => params[:id]).select(:updated_at).first!.updated_at
+    { :modified => updated_at.to_i }
+  }
+
   def index
     @projects = Project.order("name ASC").decorate
   end
@@ -15,7 +20,7 @@ class ProjectsController < ApplicationController
     @builds = @project.builds.includes(build_parts: :build_attempts).last(12)
     @current_build = @builds.last
 
-    @build_parts = ActiveSupport::OrderedHash.new
+    @build_parts = Hash.new
     @builds.reverse_each do |build|
       build.build_parts.each do |build_part|
         key = [build_part.paths.first, build_part.kind, build_part.options['ruby']]
@@ -39,9 +44,13 @@ class ProjectsController < ApplicationController
   def build_time_history
     @project = Project.find_by_name!(params[:project_id])
 
+    history_json = Rails.cache.fetch("build-time-history-#{@project.id}-#{@project.updated_at}") do
+      @project.decorate.build_time_history.to_json
+    end
+
     respond_to do |format|
       format.json do
-        render :json => @project.decorate.build_time_history
+        render :json => history_json
       end
     end
   end
