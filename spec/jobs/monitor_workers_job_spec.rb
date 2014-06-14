@@ -3,6 +3,7 @@ require 'spec_helper'
 describe 'When collecting stats' do
 
   it 'should collect a fixed number of stats' do
+    # FIXME: fix this test so it does not create 1000 Redis connections
     1.upto(1000) do
       MonitorWorkersJob.perform
     end

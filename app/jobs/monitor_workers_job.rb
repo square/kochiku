@@ -3,6 +3,8 @@ class MonitorWorkersJob < JobBase
   @queue = :high
 
   def self.perform
+    return unless Settings.worker_thresholds
+
     redis_connection = Redis.new
     redis_connection.ltrim(MonitorWorkersJob.REDIS_STATS_KEY, 0, Settings.worker_thresholds[:number_of_samples]-2)
     stats = Resque.info

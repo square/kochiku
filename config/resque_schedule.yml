@@ -6,15 +6,19 @@ poll_repositories_for_changes:
   queue: low
   args:
   description: "Fetches any missed changes from added repositories"
-resize_worker_pool:
-  every:
-    - "1m"
-  class: "AutosizeWorkersJob"
-  args:
-  description: "Determines the correct worker size pool"
-monitor_worker_pool:
-  every:
-    - "10s"
-  class: "MonitorWorkersJob"
-  args:
-  description: "Records the current number of workers and tasks"
+
+# These autoscale jobs are turned off by default. Uncomment and configure
+# worker_thresholds in application.yml if you would like to use them.
+#
+# resize_worker_pool:
+#   every:
+#     - "1m"
+#   class: "AutosizeWorkersJob"
+#   args:
+#   description: "Determines the correct worker size pool"
+# monitor_worker_pool:
+#   every:
+#     - "10s"
+#   class: "MonitorWorkersJob"
+#   args:
+#   description: "Records the current number of workers and tasks"
