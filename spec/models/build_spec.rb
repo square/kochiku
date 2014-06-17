@@ -376,7 +376,7 @@ describe Build do
     end
   end
 
-  context "send_build_status_email!" do
+  describe "#send_build_status_email!" do
     let(:project) { FactoryGirl.create(:big_rails_project, :repository => repository, :name => name) }
     let(:repository) { FactoryGirl.create(:repository)}
     let(:build) { FactoryGirl.create(:build, :state => :runnable, :project => project) }
@@ -430,6 +430,12 @@ describe Build do
 
         it "should not send a failure email" do
           expect(BuildMailer).not_to receive(:build_break_email)
+          build.send_build_status_email!
+        end
+
+        it "should send a success email" do
+          build.update_attribute(:state, :succeeded)
+          expect(BuildMailer).to receive(:build_success_email).and_return(OpenStruct.new(:deliver => nil))
           build.send_build_status_email!
         end
       end

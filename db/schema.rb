@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20140507184819) do
+ActiveRecord::Schema.define(version: 20140617214701) do
 
   create_table "build_artifacts", force: true do |t|
     t.integer  "build_attempt_id"
@@ -49,17 +49,18 @@ ActiveRecord::Schema.define(version: 20140507184819) do
   add_index "build_parts", ["paths"], name: "index_build_parts_on_paths", length: {"paths"=>255}, using: :btree
 
   create_table "builds", force: true do |t|
-    t.string   "ref",                        limit: 40, null: false
+    t.string   "ref",                        limit: 40,                 null: false
     t.string   "state"
-    t.datetime "created_at",                            null: false
-    t.datetime "updated_at",                            null: false
+    t.datetime "created_at",                                            null: false
+    t.datetime "updated_at",                                            null: false
     t.integer  "project_id"
     t.boolean  "merge_on_success"
     t.string   "branch"
-    t.boolean  "build_failure_email_sent"
+    t.boolean  "build_failure_email_sent",              default: false, null: false
     t.boolean  "promoted"
     t.string   "on_success_script_log_file"
     t.text     "error_details"
+    t.boolean  "build_success_email_sent",              default: false, null: false
   end
 
   add_index "builds", ["project_id"], name: "index_builds_on_project_id", using: :btree
@@ -86,7 +87,7 @@ ActiveRecord::Schema.define(version: 20140507184819) do
     t.boolean  "build_pull_requests"
     t.string   "on_green_update"
     t.string   "repo_cache_dir"
-    t.boolean  "send_build_failure_email",    default: true
+    t.boolean  "send_build_failure_email",    default: true, null: false
     t.string   "on_success_script"
     t.integer  "timeout",                     default: 40
     t.string   "on_success_note"
@@ -94,6 +95,7 @@ ActiveRecord::Schema.define(version: 20140507184819) do
     t.boolean  "allows_kochiku_merges",       default: true
     t.string   "host",                                       null: false
     t.string   "namespace"
+    t.boolean  "send_build_success_email",    default: true, null: false
   end
 
   add_index "repositories", ["host", "namespace", "name"], name: "index_repositories_on_host_and_namespace_and_name", unique: true, using: :btree

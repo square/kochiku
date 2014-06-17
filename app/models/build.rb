@@ -208,11 +208,17 @@ class Build < ActiveRecord::Base
   end
 
   def send_build_status_email!
-    return if (project.main? && !previous_successful_build) || !repository.send_build_failure_email?
+    return if project.main? && !previous_successful_build
 
-    if completed? && failed? && !build_failure_email_sent?
-      if Build.where(id: self.id, build_failure_email_sent: nil).update_all(build_failure_email_sent: true) == 1
-        BuildMailer.build_break_email(self).deliver
+    if completed?
+      if failed? && !build_failure_email_sent? && repository.send_build_failure_email?
+        if Build.where(id: self.id, build_failure_email_sent: false).update_all(build_failure_email_sent: true) == 1
+          BuildMailer.build_break_email(self).deliver
+        end
+      elsif succeeded? && !project.main? && !build_success_email_sent? && repository.send_build_success_email?
+        if Build.where(id: self.id, build_success_email_sent: false).update_all(build_success_email_sent: true) == 1
+          BuildMailer.build_success_email(self).deliver
+        end
       end
     end
   end

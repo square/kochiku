@@ -24,11 +24,20 @@ class BuildMailer < ActionMailer::Base
 
     @failed_build_parts = @build.build_parts.failed_or_errored
 
-    email_user, email_domain = Settings.sender_email_address.split('@')
-
     mail :to => @emails,
          :bcc => Settings.kochiku_notifications_email_address,
          :subject => "[kochiku] #{@build.project.name} build for branch #{@build.branch} failed",
-         :from => "#{email_user}+#{@build.project.name.parameterize}@#{email_domain}"
+         :from => Settings.sender_email_address
+  end
+
+  def build_success_email(build)
+    @build = build
+    @email = GitBlame.emails_in_branch(@build).first
+    @git_changes = GitBlame.changes_in_branch(@build)
+
+    mail :to => @email,
+         :bcc => Settings.kochiku_notifications_email_address,
+         :subject => "[kochiku] #{@build.project.name} build for branch #{@build.branch} passed",
+         :from => Settings.sender_email_address
   end
 end

@@ -34,6 +34,9 @@
     %div
       %label{:for => "on_success_script"} Run:
       = f.text_field :on_success_script, {:id => "on_success_script"}
+    %div
+      %label{:for => "send_build_success_email"} Send email to contributers:
+      = f.check_box :send_build_success_email, {:id => "send_build_success_email"}
 
   %fieldset
     %legend On a red build
