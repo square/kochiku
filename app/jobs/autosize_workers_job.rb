@@ -6,8 +6,7 @@ class AutosizeWorkersJob < JobBase
   def self.perform
     worker_thresholds = Settings.worker_thresholds
     return unless worker_thresholds.present?
-    redis_connection = Redis.new
-    stat_list = redis_connection.lrange(MonitorWorkersJob.REDIS_STATS_KEY, 0, -1)
+    stat_list = REDIS.lrange(MonitorWorkersJob.REDIS_STATS_KEY, 0, -1)
     return if stat_list.length < worker_thresholds[:number_of_samples]
     current_workers = Resque.info[:workers]
     workers_to_shutdown = [worker_thresholds[:instance_chunk_size], current_workers-worker_thresholds[:minimum_total_workers]].min
@@ -28,7 +27,7 @@ class AutosizeWorkersJob < JobBase
     end
 
     # reset stats on the server so we only resize once.
-    redis_connection.del(MonitorWorkersJob.REDIS_STATS_KEY)
+    REDIS.del(MonitorWorkersJob.REDIS_STATS_KEY)
     # adjust pool size up or down as needed.
     adjust_worker_count(workers_to_spinup - workers_to_shutdown)
   end

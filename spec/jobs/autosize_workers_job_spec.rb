@@ -39,7 +39,7 @@ describe AutosizeWorkersJob do
     }
   }
 
-  let(:redis_connection) { Redis.new }
+  let(:redis_connection) { REDIS }
 
   subject { AutosizeWorkersJob.perform }
 
