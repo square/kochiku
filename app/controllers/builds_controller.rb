@@ -75,11 +75,11 @@ class BuildsController < ApplicationController
       unless params[:build] && params[:build][:branch].present?
         flash[:error] = "Error adding build! branch can't be blank"
       else
-        sha = @project.repository.remote_server.sha_for_branch(params[:build][:branch])
-        if sha.nil?
-          flash[:error] = "Error adding build! branch #{params[:build][:branch]} not found on remote server."
-        else
+        begin
+          sha = @project.repository.sha_for_branch(params[:build][:branch])
           build = project_build(params[:build][:branch], sha)
+        rescue RefDoesNotExist
+          flash[:error] = "Error adding build! branch #{params[:build][:branch]} not found on remote server."
         end
       end
     end
@@ -177,7 +177,7 @@ class BuildsController < ApplicationController
   def project_build(branch, ref)
     merge_on_success = params[:merge_on_success] || false
     if @project.main?
-      ref = @project.repository.remote_server.sha_for_branch("master")
+      ref = @project.repository.sha_for_branch("master")
       branch = "master"
     end
 

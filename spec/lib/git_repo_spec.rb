@@ -10,27 +10,6 @@ describe GitRepo do
     stub_const "Settings", settings
   end
 
-  let(:repository) { FactoryGirl.create(:repository, url: 'git@git.example.com:square/web.git') }
-  let(:repo_uri) { repository.base_api_url }
-  let(:branch) { "test/branch" }
-  let(:branch_head_sha) { "4b41fe773057b2f1e2063eb94814d32699a34541" }
-
-  before do
-    build_ref_info = <<RESPONSE
-{
-  "ref": "refs/heads/#{branch}",
-  "url": "#{repo_uri}/git/refs/heads/#{branch}",
-  "object": {
-    "sha": "#{branch_head_sha}",
-    "type": "commit",
-    "url": "#{repo_uri}/git/commits/#{branch_head_sha}"
-  }
-}
-RESPONSE
-
-    stub_request(:get, "#{repo_uri}/git/refs/heads/#{branch}").to_return(:status => 200, :body => build_ref_info)
-  end
-
   describe "#synchronize_with_remote" do
     it "should throw an exception after the third fetch attempt" do
       fetch_double = double('git fetch')

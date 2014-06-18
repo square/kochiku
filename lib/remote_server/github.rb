@@ -47,6 +47,8 @@ module RemoteServer
         sha = branch_info['object']['sha']
       end
       sha
+    rescue GithubRequest::ResponseError
+      raise RefDoesNotExist
     end
 
     def update_commit_status!(build)

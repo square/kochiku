@@ -4,6 +4,7 @@ require 'remote_server/stash'
 module RemoteServer
   UnknownGitServer = Class.new(RuntimeError)
   UnknownUrlFormat = Class.new(RuntimeError)
+  RefDoesNotExist = Class.new(RuntimeError)
 
   def self.for_url(url)
     server = Settings.git_server(url)

@@ -43,20 +43,14 @@ class Repository < ActiveRecord::Base
     @remote_server ||= RemoteServer.for_url(url)
   end
 
-  delegate :base_html_url, :base_api_url, to: :remote_server
+  delegate :base_html_url, :base_api_url, :sha_for_branch, to: :remote_server
 
   def main_project
     projects.where(name: name).first
   end
 
-  # Where to fetch from (git mirror if defined, otherwise the regular git url)
   def url_for_fetching
-    server = Settings.git_server(url)
-    if server.mirror.present?
-      url.gsub(%r{(git@|https://).*?(:|/)}, server.mirror)
-    else
-      url
-    end
+    GitRepo.fetch_url(url)
   end
 
   def repo_cache_name

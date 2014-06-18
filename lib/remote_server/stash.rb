@@ -52,6 +52,15 @@ module RemoteServer
       response = JSON.parse(response_body)
       branch_data = response["values"][0] || {}
       branch_data['id']
+    rescue => e
+      case e.message.split(" ")[0]
+      when "Net::HTTPNotFound"
+        raise RefDoesNotExist
+      when "Net::HTTPBadRequest"
+        raise RefDoesNotExist
+      else
+        raise e
+      end
     end
 
     def update_commit_status!(build)
@@ -130,7 +139,7 @@ module RemoteServer
           Rails.logger.info("Stash response: #{response.inspect}")
           Rails.logger.info("Stash response body: #{body.inspect}")
           unless response.is_a? Net::HTTPSuccess
-            raise "response: #{response.class} body: #{body}"
+            raise "#{response.class} body: #{body}"
           end
         end
         body

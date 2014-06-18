@@ -16,7 +16,7 @@ class BuildStateUpdateJob < JobBase
 
     # trigger another build if there are new commits to build
     if build.project.main? && build.completed?
-      sha = build.repository.remote_server.sha_for_branch("master")
+      sha = build.repository.sha_for_branch("master")
       build.project.builds.create_new_build_for(sha)
     end
 
