@@ -60,4 +60,5 @@ end
 group :test do
   gem 'webmock', require: false
   gem 'capybara', '~> 2.3'
+  gem 'fakeredis', :require => "fakeredis/rspec"
 end
