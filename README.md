@@ -18,8 +18,10 @@ Kochiku currently integrates with git repositories stored in Github (including G
 Support for headless git servers is coming soon.
 
 ## User Guide
+
 - [Installation & Deployment](https://github.com/square/kochiku/wiki/Installation-&-Deployment)
 - [Adding a repository](https://github.com/square/kochiku/wiki/How-to-add-a-repository-to-Kochiku)
 - [Initiating a build](https://github.com/square/kochiku/wiki/How-to-initiate-a-build-on-Kochiku)
 - [Hacking on Kochiku](https://github.com/square/kochiku/wiki/Hacking-on-Kochiku)
+- [Changelog](https://github.com/square/kochiku/wiki/CHANGELOG)
 - [Additional documentation](https://github.com/square/kochiku/wiki/_pages)
