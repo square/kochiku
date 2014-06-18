@@ -384,4 +384,26 @@ RESPONSE
       end
     end
   end
+
+  describe "#retry_partitioning" do
+    let(:build) { FactoryGirl.create(:build) }
+
+    subject { post :rebuild_failed_parts, :project_id => build.project.to_param, :id => build.id }
+
+    context "when there are no build parts" do
+      it "enques a partitioning job" do
+        expect(build).to_not receive(:enqueue_partitioning_job)
+        subject
+      end
+    end
+
+    context "when there are already build parts" do
+      let(:part) { FactoryGirl.create(:build_part, :build_instance => build) }
+
+      it "does nothing" do
+        expect(build).to_not receive(:enqueue_partitioning_job)
+        subject
+      end
+    end
+  end
 end

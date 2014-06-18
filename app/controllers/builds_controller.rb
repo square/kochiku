@@ -1,7 +1,7 @@
 require 'git_repo'
 
 class BuildsController < ApplicationController
-  before_filter :load_project, :only => [:show, :abort, :build_status, :toggle_merge_on_success, :rebuild_failed_parts, :request_build, :modified_time]
+  before_filter :load_project, :only => [:show, :abort, :build_status, :toggle_merge_on_success, :rebuild_failed_parts, :retry_partitioning, :request_build, :modified_time]
 
   # do not require authenticity_token for create so that it can be called by
   # the kochiku command line script
@@ -40,6 +40,17 @@ class BuildsController < ApplicationController
       # FIXME handle this differently, probably with a rescue_from
       head :ok
     end
+  end
+
+  def retry_partitioning
+    @build = @project.builds.includes(:build_parts => :build_attempts).find(params[:id])
+    # This means there was an error with the partitioning job; redo it
+    if @build.build_parts.empty?
+      @build.enqueue_partitioning_job
+      @build.update_attributes :state => :running, :error_details => nil
+    end
+
+    redirect_to [@project, @build]
   end
 
   def rebuild_failed_parts
