@@ -5,12 +5,11 @@ class MonitorWorkersJob < JobBase
   def self.perform
     return unless Settings.worker_thresholds
 
-    redis_connection = Redis.new
-    redis_connection.ltrim(MonitorWorkersJob.REDIS_STATS_KEY, 0, Settings.worker_thresholds[:number_of_samples]-2)
+    REDIS.ltrim(MonitorWorkersJob.REDIS_STATS_KEY, 0, Settings.worker_thresholds[:number_of_samples]-2)
     stats = Resque.info
     # add timestamp to stats so we can make sure the sampling is stable.
     stats[:when] = Time.now.to_i
-    redis_connection.lpush(MonitorWorkersJob.REDIS_STATS_KEY, stats.to_json)
+    REDIS.lpush(MonitorWorkersJob.REDIS_STATS_KEY, stats.to_json)
   end
 
   def self.REDIS_STATS_KEY
