@@ -74,7 +74,7 @@ describe 'RemoteServer::GitHub' do
   end
 
   it_behaves_like 'a remote server' do
-    let(:remote_server) { RemoteServer::Github.new(url) }
+    let(:remote_server) { RemoteServer::Github.new(url, Settings.git_server(url)) }
   end
 end
 
@@ -115,6 +115,6 @@ describe 'RemoteServer::Stash' do
   end
 
   it_behaves_like 'a remote server' do
-    let(:remote_server) { RemoteServer::Stash.new(url) }
+    let(:remote_server) { RemoteServer::Stash.new(url, Settings.git_server(url)) }
   end
 end

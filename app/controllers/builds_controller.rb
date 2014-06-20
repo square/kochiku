@@ -43,11 +43,11 @@ class BuildsController < ApplicationController
   end
 
   def retry_partitioning
-    @build = @project.builds.includes(:build_parts => :build_attempts).find(params[:id])
+    @build = @project.builds.find(params[:id])
     # This means there was an error with the partitioning job; redo it
     if @build.build_parts.empty?
       @build.enqueue_partitioning_job
-      @build.update_attributes :state => :running, :error_details => nil
+      @build.update_attributes! :state => :partitioning, :error_details => nil
     end
 
     redirect_to [@project, @build]
@@ -60,7 +60,7 @@ class BuildsController < ApplicationController
       # passed but the latest attempt failed. We do not want to rebuild those parts.
       part.rebuild! if part.unsuccessful?
     end
-    @build.update_attributes state: :running
+    @build.update_attributes! state: :running
 
     redirect_to [@project, @build]
   end
@@ -78,7 +78,7 @@ class BuildsController < ApplicationController
         begin
           sha = @project.repository.sha_for_branch(params[:build][:branch])
           build = project_build(params[:build][:branch], sha)
-        rescue RefDoesNotExist
+        rescue RemoteServer::RefDoesNotExist
           flash[:error] = "Error adding build! branch #{params[:build][:branch]} not found on remote server."
         end
       end

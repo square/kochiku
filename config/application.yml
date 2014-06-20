@@ -37,6 +37,12 @@ git_servers:
 #  git.example.com:
 #    mirror: 'git://git-mirror.example.com/'
 
+# If you have multiple domains pointing at your git server then define them as aliases
+# git.example.com:
+#   aliases:
+#     - alias.example
+#     - git.alias.com
+
 # Example of Atlassian Stash integration.
 #  stash.example.com:
 #    type: stash

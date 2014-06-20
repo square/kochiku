@@ -44,11 +44,10 @@
     %span.info
       = button_to "Abort Build", abort_project_build_path(@build.project, @build), method: :patch, class: "abort-build"
   - if @build.failed? || @build.aborted?
-    - if @build.build_parts.empty?
-      %span.info
+    %span.info
+      - if @build.build_parts.empty?
         = button_to "Retry Partitioning", retry_partitioning_project_build_path(@project, @build), :method => :post, :form_class => "retry-partitioning"
-    - else
-      %span.info
+      - else
         = button_to "Rebuild failed parts", rebuild_failed_parts_project_build_path(@project, @build), :method => :post, :form_class => "rebuild-parts"
 
 - if @build.error_details.present?

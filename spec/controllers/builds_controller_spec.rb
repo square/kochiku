@@ -388,21 +388,20 @@ RESPONSE
   describe "#retry_partitioning" do
     let(:build) { FactoryGirl.create(:build) }
 
-    subject { post :rebuild_failed_parts, :project_id => build.project.to_param, :id => build.id }
-
     context "when there are no build parts" do
       it "enques a partitioning job" do
-        expect(build).to_not receive(:enqueue_partitioning_job)
-        subject
+        expect(Resque).to receive(:enqueue)
+        post :retry_partitioning, :project_id => build.project.to_param, :id => build.id
+        expect(response).to redirect_to(project_build_path(build.project, build))
       end
     end
 
     context "when there are already build parts" do
-      let(:part) { FactoryGirl.create(:build_part, :build_instance => build) }
-
       it "does nothing" do
-        expect(build).to_not receive(:enqueue_partitioning_job)
-        subject
+        expect(Resque).to_not receive(:enqueue)
+        FactoryGirl.create(:build_part, :build_instance => build)
+        post :retry_partitioning, :project_id => build.project.to_param, :id => build.id
+        expect(response).to redirect_to(project_build_path(build.project, build))
       end
     end
   end

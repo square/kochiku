@@ -12,10 +12,10 @@ module RemoteServer
       %r{\Ahttps://(?<host>[^@]+)/scm/(?<username>.+)/(?<name>[-.\w]+)\.git\z},
     ]
 
-    def initialize(url)
+    def initialize(url, server)
       @url = url
+      @settings = server
       attributes # force url parsing
-      @settings = Settings.git_server(@url)
       @stash_request = StashRequest.new(@settings)
     end
 
@@ -30,6 +30,7 @@ module RemoteServer
           host: match[:host],
           repository_namespace: match[:username],
           repository_name: match[:name],
+          possible_hosts: [@settings.host, *@settings.aliases].compact,
         }
         if match.names.include?('port') && match['port'].present?
           attributes[:port] = match[:port].delete(':')
@@ -44,6 +45,16 @@ module RemoteServer
       "https://#{@settings.host}/scm/#{attributes[:repository_namespace]}/#{attributes[:repository_name]}.git"
     end
 
+    # Where to fetch from: git mirror if defined,
+    # otherwise the canonical url
+    def url_for_fetching
+      if @settings.mirror.present?
+        canonical_repository_url.gsub(%r{(git@|https://).*?(:|/)}, @settings.mirror)
+      else
+        canonical_repository_url
+      end
+    end
+
     def sha_for_branch(branch)
       return branch if branch =~ /\A[0-9a-f]{40}\Z/
 
@@ -54,10 +65,8 @@ module RemoteServer
       branch_data['id']
     rescue => e
       case e.message.split(" ")[0]
-      when "Net::HTTPNotFound"
-        raise RefDoesNotExist
-      when "Net::HTTPBadRequest"
-        raise RefDoesNotExist
+      when "Net::HTTPNotFound", "Net::HTTPBadRequest"
+        raise RefDoesNotExist, "Could not locate ref #{branch} on remote git server"
       else
         raise e
       end

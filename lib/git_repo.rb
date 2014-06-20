@@ -21,7 +21,7 @@ class GitRepo
 
           Cocaine::CommandLine.new("git checkout", "--quiet :commit").run(commit: sha)
 
-          update_modules_from_cache(repository, cached_repo_path)
+          synchronize_submodules_from_cached_repo(repository, cached_repo_path)
 
           yield dir
         end
@@ -40,17 +40,6 @@ class GitRepo
 
     def create_working_dir
       FileUtils.mkdir_p(WORKING_DIR)
-    end
-
-    # Where to fetch from: git mirror if defined,
-    # otherwise the regular git url formatted for https
-    def fetch_url(repo_url)
-      server = Settings.git_server(repo_url)
-      if server.mirror.present?
-        repo_url.gsub(%r{((ssh://)?git@|https://).*?(:|/)}, server.mirror)
-      else
-        repo_url
-      end
     end
 
     private
@@ -82,7 +71,7 @@ class GitRepo
       Dir.chdir(cached_repo_path) do
         # update the cached repo
         synchronize_with_remote('origin', branch)
-        synchronize_cache_modules
+        synchronize_submodules
       end
     end
 
@@ -120,20 +109,23 @@ class GitRepo
       yield submodules unless submodules.empty?
     end
 
-    def synchronize_cache_modules
+    def synchronize_submodules
       with_submodules do |submodules|
         submodules.each_line do |config_line|
           submodule_path = config_line.match(/submodule\.(.*?)\.url/)[1]
-          submodule_url = fetch_url(config_line.split(" ")[1])
-          Cocaine::CommandLine.new("git config",
-                                   "--replace-all submodule.#{submodule_path}.url '#{submodule_url}'").run
+          existing_url = config_line.split(" ")[1]
+          submodule_url = RemoteServer.for_url(existing_url).url_for_fetching
+          if existing_url != submodule_url
+            Cocaine::CommandLine.new("git config",
+                                  "--replace-all submodule.#{submodule_path}.url '#{submodule_url}'").run
+          end
         end
 
         Cocaine::CommandLine.new('git submodule', '--quiet update').run
       end
     end
 
-    def update_modules_from_cache(repo, cached_repo_path)
+    def synchronize_submodules_from_cached_repo(repo, cached_repo_path)
       with_submodules do |submodules|
         cached_submodules = nil
         inside_repo(repo, sync: false) do
@@ -141,7 +133,7 @@ class GitRepo
         end
 
         # Redirect the submodules to the cached_repo
-        # If the submodule was since the last time the cached was synchronized with the remote
+        # If the submodule was added since the last time the cache was synchronized with the remote
         # then it will not be present in the cached_repo and we will use a remote url to clone
         submodules.each_line do |config_line|
           submodule_path = config_line.match(/submodule\.(.*?)\.url/)[1]
@@ -149,9 +141,12 @@ class GitRepo
             Cocaine::CommandLine.new("git config",
                                      "--replace-all submodule.#{submodule_path}.url '#{cached_repo_path}/#{submodule_path}'").run
           else
-            submodule_url = fetch_url(config_line.split(" ")[1])
-            Cocaine::CommandLine.new("git config",
-                                     "--replace-all submodule.#{submodule_path}.url '#{submodule_url}'").run
+            existing_url = config_line.split(" ")[1]
+            submodule_url = RemoteServer.for_url(existing_url).url_for_fetching
+            if existing_url != submodule_url
+              Cocaine::CommandLine.new("git config",
+                                    "--replace-all submodule.#{submodule_path}.url '#{submodule_url}'").run
+            end
           end
         end
 

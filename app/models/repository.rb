@@ -14,12 +14,12 @@ class Repository < ActiveRecord::Base
   validate :url_against_remote_servers
 
   def self.lookup_by_url(url)
-    git_server_settings = Settings.git_server(url)
     remote_server = RemoteServer.for_url(url)
     repository_namespace = remote_server.attributes.fetch(:repository_namespace)
     repository_name = remote_server.attributes.fetch(:repository_name)
+    repository_host_and_aliases = remote_server.attributes.fetch(:possible_hosts)
 
-    Repository.where(host: [git_server_settings.host, *git_server_settings.aliases].compact,
+    Repository.where(host: repository_host_and_aliases,
                      namespace: repository_namespace,
                      name: repository_name).first
   end
@@ -43,14 +43,10 @@ class Repository < ActiveRecord::Base
     @remote_server ||= RemoteServer.for_url(url)
   end
 
-  delegate :base_html_url, :base_api_url, :sha_for_branch, to: :remote_server
+  delegate :base_html_url, :base_api_url, :sha_for_branch, :url_for_fetching, to: :remote_server
 
   def main_project
     projects.where(name: name).first
-  end
-
-  def url_for_fetching
-    GitRepo.fetch_url(url)
   end
 
   def repo_cache_name
