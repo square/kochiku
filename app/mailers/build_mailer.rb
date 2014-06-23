@@ -32,7 +32,7 @@ class BuildMailer < ActionMailer::Base
 
   def build_success_email(build)
     @build = build
-    @email = GitBlame.emails_in_branch(@build).first
+    @email = GitBlame.last_email_in_branch(@build)
     @git_changes = GitBlame.changes_in_branch(@build)
 
     mail :to => @email,

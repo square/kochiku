@@ -82,7 +82,7 @@ describe BuildMailer do
 
     before do
       allow(GitBlame).to receive(:changes_in_branch).and_return([{:hash => "sha", :author => "Joe", :date => "some day", :message => "always be shipping it"}])
-      allow(GitBlame).to receive(:emails_in_branch).and_return(["foo@example.com"])
+      allow(GitBlame).to receive(:last_email_in_branch).and_return("foo@example.com")
     end
 
     it "sends an email" do
