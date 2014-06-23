@@ -66,7 +66,7 @@
   %tbody
     - @build.build_parts.each do |part|
       - cache(part) do
-        %tr
+        %tr{:"data-id" => part.id}
           %td.right= link_to(part.id, project_build_part_path(@project, @build, part))
           %td
             %span.part-status{:class => part.status}
