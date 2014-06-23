@@ -65,27 +65,26 @@
       %th.right.actions Actions
   %tbody
     - @build.build_parts.each do |part|
-      - cache(part) do
-        %tr{:"data-id" => part.id}
-          %td.right= link_to(part.id, project_build_part_path(@project, @build, part))
-          %td
-            %span.part-status{:class => part.status}
-              - text = part.status.to_s.capitalize
-              - if artifact = part.last_stdout_artifact
-                =link_to(text, artifact.log_file.url, :title => 'Last completed stdout.log')
-              - else
-                =text
-          - build_metadata_values(@build, part).each do |value|
-            %td= value
-          %td= part.kind.to_s.capitalize
-          %td.right
-            - builder = part.last_attempt.try(:builder)
-            = builder ? builder.sub(".#{Settings.domain_name}", '') : "pending"
-          %td.right.elapsed= part.elapsed_time ? duration_strftime(part.elapsed_time) : "pending"
-          %td.right= part.build_attempts.size
-          %td.right
-            - if part.unsuccessful?
-              = link_to("Rebuild", rebuild_project_build_part_path(@project, @build, part), :method => :post)
+      %tr{:"data-id" => part.id}
+        %td.right= link_to(part.id, project_build_part_path(@project, @build, part))
+        %td
+          %span.part-status{:class => part.status}
+            - text = part.status.to_s.capitalize
+            - if artifact = part.last_stdout_artifact
+              =link_to(text, artifact.log_file.url, :title => 'Last completed stdout.log')
+            - else
+              =text
+        - build_metadata_values(@build, part).each do |value|
+          %td= value
+        %td= part.kind.to_s.capitalize
+        %td.right
+          - builder = part.last_attempt.try(:builder)
+          = builder ? builder.sub(".#{Settings.domain_name}", '') : "pending"
+        %td.right.elapsed= part.elapsed_time ? duration_strftime(part.elapsed_time) : "pending"
+        %td.right= part.build_attempts.size
+        %td.right
+          - if part.unsuccessful?
+            = link_to("Rebuild", rebuild_project_build_part_path(@project, @build, part), :method => :post)
 
 = content_for :javascript do
   :javascript

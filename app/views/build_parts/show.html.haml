@@ -40,7 +40,7 @@
       %th.right.actions Actions
   %tbody
     - @build_part.build_attempts.each_with_index do |attempt, index|
-      %tr
+      %tr{:"data-id" => index + 1}
         %td.right= index + 1
         %td
           %span.attempt-status{:class => attempt.state}= attempt.state.to_s.capitalize
