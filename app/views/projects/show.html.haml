@@ -103,12 +103,15 @@
     :javascript
       StartTimes = #{
         start_times = {}
-        @current_build.build_parts.each { |part| start_times[dom_id(part)] = part.updated_at }
+        @current_build.build_parts.each { |part| start_times[dom_id(part)] = part.started_at if part.is_running? }
         start_times.to_json
       };
-      $('.project-part-info tbody').find('tr:has(.running)').each( function() {
-        var startTime = new Date(Date.parse(StartTimes[$(this)[0].id]));
+      for(part_dom_id in StartTimes) {
+        if(!StartTimes.hasOwnProperty(part_dom_id)) {
+          continue;
+        }
+        var startTime = new Date(Date.parse(StartTimes[part_dom_id]));
         var now = new Date();
-        $(this).find('.elapsed').text(
+        $('.project-part-info tbody').find('tr#' + part_dom_id + ' > .elapsed').text(
           Math.round((now-startTime)/60000) + ":" + ("00" + (Math.round((now-startTime)/1000)%60)).slice(-2));
-      });
+      }
