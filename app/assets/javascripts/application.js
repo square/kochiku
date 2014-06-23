@@ -25,7 +25,7 @@ StartTimes = {};
 Kochiku.delayedRefresh = function(updateInfo) {
   var now = new Date();
   $(updateInfo.table).find('tr:has(.running)').each( function() {
-      var startTime = new Date(Date.parse(StartTimes[$(this).children()[0].innerText]));
+      var startTime = new Date(Date.parse(StartTimes[$(this).data('id')]));
       $(this).find('.elapsed').text(
         Math.round((now-startTime)/60000) + ":" + ("00" + (Math.round((now-startTime)/1000)%60)).slice(-2));
   });
