@@ -16,7 +16,8 @@ describe 'stash integration test' do
     allow(File).to receive(:read).with("/password").and_return("stashpassword")
   end
 
-  let(:stash) { RemoteServer::Stash.new('https://stash.example.com/scm/foo/bar.git') }
+  let(:url) { 'https://stash.example.com/scm/foo/bar.git' }
+  let(:stash) { RemoteServer::Stash.new(url, Settings.git_server(url)) }
   let(:stash_request) { stash.stash_request }
 
   describe ".setup_auth!" do
@@ -46,82 +47,90 @@ describe 'stash integration test' do
 end
 
 describe RemoteServer::Stash do
+  def make_server(url)
+    described_class.new(url, Settings.git_server(url))
+  end
+
   describe '#attributes' do
     it 'parses HTTPS url' do
-      result = described_class.new \
+      result = make_server \
         "https://stash.example.com/scm/myproject/myrepo.git"
 
       expect(result.attributes).to eq(
         host:                 'stash.example.com',
         repository_namespace: 'myproject',
-        repository_name:      'myrepo'
+        repository_name:      'myrepo',
+        possible_hosts:       ['stash.example.com']
       )
     end
 
     it 'does not support HTTP auth credentials in URL' do
       # Use a netrc file instead.
-      expect { described_class.new \
+      expect { make_server \
         "https://don@stash.example.com/scm/myproject/myrepo.git"
       }.to raise_error(RemoteServer::UnknownUrlFormat)
     end
 
     it 'parses ssh URLs' do
-      result = described_class.new \
+      result = make_server \
         "git@stash.example.com:myproject/myrepo.git"
 
       expect(result.attributes).to eq(
         host:                 'stash.example.com',
         repository_namespace: 'myproject',
-        repository_name:      'myrepo'
+        repository_name:      'myrepo',
+        possible_hosts:       ['stash.example.com']
       )
     end
 
     it 'parses ssh URLs prefixed with ssh://' do
-      result = described_class.new \
+      result = make_server \
         "ssh://git@stash.example.com/myproject/myrepo.git"
 
       expect(result.attributes).to eq(
         host:                 'stash.example.com',
         repository_namespace: 'myproject',
-        repository_name:      'myrepo'
+        repository_name:      'myrepo',
+        possible_hosts:       ['stash.example.com']
       )
     end
 
     it 'parses ssh URLs with an explicit port' do
-      result = described_class.new \
+      result = make_server \
         "ssh://git@stash.example.com:7999/myproject/myrepo.git"
 
       expect(result.attributes).to eq(
         host:                 'stash.example.com',
         repository_namespace: 'myproject',
         repository_name:      'myrepo',
-        port:                 '7999'
+        port:                 '7999',
+        possible_hosts:       ['stash.example.com']
       )
     end
 
     it 'should allow periods, hyphens, and underscores in repository names' do
-      result = described_class.new("git@stash.example.com:angular/an-gu_lar.js.git")
+      result = make_server("git@stash.example.com:angular/an-gu_lar.js.git")
       expect(result.attributes[:repository_name]).to eq('an-gu_lar.js')
 
-      result = described_class.new("ssh://git@stash.example.com/angular/an-gu_lar.js.git")
+      result = make_server("ssh://git@stash.example.com/angular/an-gu_lar.js.git")
       expect(result.attributes[:repository_name]).to eq('an-gu_lar.js')
 
-      result = described_class.new("https://stash.example.com/scm/angular/an-gu_lar.js.git")
+      result = make_server("https://stash.example.com/scm/angular/an-gu_lar.js.git")
       expect(result.attributes[:repository_name]).to eq('an-gu_lar.js')
     end
 
     it 'should not allow characters disallowed by Github in repository names' do
       %w(! @ # $ % ^ & * ( ) = + \ | ` ~ [ ] { } : ; ' " ?).each do |symbol|
         expect {
-          described_class.new("git@stash.example.com:angular/bad#{symbol}name.git")
+          make_server("git@stash.example.com:angular/bad#{symbol}name.git")
         }.to raise_error(RemoteServer::UnknownUrlFormat)
 
         expect {
-          described_class.new("ssh://git@stash.example.com/angular/bad#{symbol}name.git")
+          make_server("ssh://git@stash.example.com/angular/bad#{symbol}name.git")
         }.to raise_error(RemoteServer::UnknownUrlFormat)
 
         expect {
-          described_class.new("https://stash.example.com/scm/angular/bad#{symbol}name.git")
+          make_server("https://stash.example.com/scm/angular/bad#{symbol}name.git")
         }.to raise_error(RemoteServer::UnknownUrlFormat)
       end
     end
@@ -130,13 +139,13 @@ describe RemoteServer::Stash do
   describe "#canonical_repository_url" do
     it 'should return a https url when given a ssh url' do
       ssh_url = "ssh://git@stash.example.com:7999/foo/bar.git"
-      result = described_class.new(ssh_url).canonical_repository_url
+      result = make_server(ssh_url).canonical_repository_url
       expect(result).to eq("https://stash.example.com/scm/foo/bar.git")
     end
 
     it 'should do nothing when given a https url' do
       https_url = "https://stash.example.com/scm/foo/bar.git"
-      result = described_class.new(https_url).canonical_repository_url
+      result = make_server(https_url).canonical_repository_url
       expect(result).to eq(https_url)
     end
   end

@@ -4,6 +4,7 @@ require 'remote_server/stash'
 module RemoteServer
   UnknownGitServer = Class.new(RuntimeError)
   UnknownUrlFormat = Class.new(RuntimeError)
+  RefDoesNotExist = Class.new(RuntimeError)
 
   def self.for_url(url)
     server = Settings.git_server(url)
@@ -12,9 +13,9 @@ module RemoteServer
 
     case server.type
       when 'stash'
-        RemoteServer::Stash.new(url)
+        RemoteServer::Stash.new(url, server)
       when 'github'
-        RemoteServer::Github.new(url)
+        RemoteServer::Github.new(url, server)
       else
         raise UnknownGitServer, "No implementation for server type #{type}"
     end

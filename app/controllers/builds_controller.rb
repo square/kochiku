@@ -1,7 +1,7 @@
 require 'git_repo'
 
 class BuildsController < ApplicationController
-  before_filter :load_project, :only => [:show, :abort, :build_status, :toggle_merge_on_success, :rebuild_failed_parts, :request_build, :modified_time]
+  before_filter :load_project, :only => [:show, :abort, :build_status, :toggle_merge_on_success, :rebuild_failed_parts, :retry_partitioning, :request_build, :modified_time]
 
   # do not require authenticity_token for create so that it can be called by
   # the kochiku command line script
@@ -42,6 +42,17 @@ class BuildsController < ApplicationController
     end
   end
 
+  def retry_partitioning
+    @build = @project.builds.find(params[:id])
+    # This means there was an error with the partitioning job; redo it
+    if @build.build_parts.empty?
+      @build.enqueue_partitioning_job
+      @build.update_attributes! :state => :partitioning, :error_details => nil
+    end
+
+    redirect_to [@project, @build]
+  end
+
   def rebuild_failed_parts
     @build = @project.builds.includes(:build_parts => :build_attempts).find(params[:id])
     @build.build_parts.failed_errored_or_aborted.each do |part|
@@ -49,7 +60,7 @@ class BuildsController < ApplicationController
       # passed but the latest attempt failed. We do not want to rebuild those parts.
       part.rebuild! if part.unsuccessful?
     end
-    @build.update_attributes state: :running
+    @build.update_attributes! state: :running
 
     redirect_to [@project, @build]
   end
@@ -64,11 +75,11 @@ class BuildsController < ApplicationController
       unless params[:build] && params[:build][:branch].present?
         flash[:error] = "Error adding build! branch can't be blank"
       else
-        sha = GitRepo.sha_for_branch(@project.repository, params[:build][:branch])
-        if sha.nil?
-          flash[:error] = "Error adding build! branch #{params[:build][:branch]} not found on remote server."
-        else
+        begin
+          sha = @project.repository.sha_for_branch(params[:build][:branch])
           build = project_build(params[:build][:branch], sha)
+        rescue RemoteServer::RefDoesNotExist
+          flash[:error] = "Error adding build! branch #{params[:build][:branch]} not found on remote server."
         end
       end
     end
@@ -166,7 +177,7 @@ class BuildsController < ApplicationController
   def project_build(branch, ref)
     merge_on_success = params[:merge_on_success] || false
     if @project.main?
-      ref = GitRepo.sha_for_branch(@project.repository, "master")
+      ref = @project.repository.sha_for_branch("master")
       branch = "master"
     end
 

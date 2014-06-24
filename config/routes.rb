@@ -23,6 +23,7 @@ Kochiku::Application.routes.draw do
       patch 'abort', :action => "abort", :on => :member
       get 'status', :action => "build_status", :on => :member, :defaults => { :format => 'json' }
       post 'rebuild-failed-parts', :action => "rebuild_failed_parts", :on => :member, :as => :rebuild_failed_parts
+      post 'retry-partitioning', :action => "retry_partitioning", :on => :member, :as => :retry_partitioning
       get 'modified_time', :action => "modified_time", :on => :member, :defaults => { :format => 'json' }
       resources :build_parts, :as => 'parts', :path => 'parts', :only => [:show] do
         post 'rebuild', :on => :member

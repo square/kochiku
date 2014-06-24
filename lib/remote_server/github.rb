@@ -12,10 +12,10 @@ module RemoteServer
       %r{\Ahttps?://(?<host>.*)/(?<username>.*)/(?<name>[-.\w]+?)(\.git)?\z},  # https://
     ]
 
-    def initialize(url)
+    def initialize(url, server)
       @url = url
+      @settings = server
       attributes # force url parsing
-      @settings = Settings.git_server(@url)
     end
 
     def attributes
@@ -28,7 +28,8 @@ module RemoteServer
         {
           host: match[:host],
           repository_namespace: match[:username],
-          repository_name: match[:name]
+          repository_name: match[:name],
+          possible_hosts: [@settings.host, *@settings.aliases].compact,
         }.freeze
       end
     end
@@ -39,6 +40,16 @@ module RemoteServer
       "git@#{@settings.host}:#{attributes[:repository_namespace]}/#{attributes[:repository_name]}.git"
     end
 
+    # Where to fetch from: git mirror if defined,
+    # otherwise the canonical url
+    def url_for_fetching
+      if @settings.mirror.present?
+        canonical_repository_url.gsub(%r{(git@|https://).*?(:|/)}, @settings.mirror)
+      else
+        canonical_repository_url
+      end
+    end
+
     def sha_for_branch(branch)
       response_body = GithubRequest.get(URI("#{base_api_url}/git/refs/heads/#{branch}"))
       branch_info = JSON.parse(response_body)
@@ -47,6 +58,8 @@ module RemoteServer
         sha = branch_info['object']['sha']
       end
       sha
+    rescue GithubRequest::ResponseError
+      raise RefDoesNotExist, "Could not locate ref #{branch} on remote git server"
     end
 
     def update_commit_status!(build)

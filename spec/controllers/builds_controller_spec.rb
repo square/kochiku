@@ -209,7 +209,8 @@ RESPONSE
 
         it "creates the build for main project if no branch is given" do
           sha = to_40('1')
-          allow(GitRepo).to receive(:sha_for_branch).and_return(sha)
+          fake_remote_server = double(:sha_for_branch => sha)
+          allow(RemoteServer).to receive(:for_url).with(repo.url).and_return(fake_remote_server)
 
           expect {
             post @action, {:project_id => project.to_param}
@@ -222,7 +223,8 @@ RESPONSE
 
         it "does not create a new build if the latest commit already has a build" do
           FactoryGirl.create(:build, :state => :errored, :project => project, :branch => "master", :ref => branch_head_sha)
-          allow(GitRepo).to receive(:sha_for_branch).and_return(branch_head_sha)
+          fake_remote_server = double(:sha_for_branch => branch_head_sha)
+          allow(RemoteServer).to receive(:for_url).with(repo.url).and_return(fake_remote_server)
 
           expect do
             post @action, {:project_id => project.to_param}
@@ -379,6 +381,27 @@ RESPONSE
         FactoryGirl.create(:build_attempt, :build_part => parts[1], :state => :failed) # attempt 2
 
         expect { subject }.to_not change(BuildAttempt, :count)
+      end
+    end
+  end
+
+  describe "#retry_partitioning" do
+    let(:build) { FactoryGirl.create(:build) }
+
+    context "when there are no build parts" do
+      it "enques a partitioning job" do
+        expect(Resque).to receive(:enqueue)
+        post :retry_partitioning, :project_id => build.project.to_param, :id => build.id
+        expect(response).to redirect_to(project_build_path(build.project, build))
+      end
+    end
+
+    context "when there are already build parts" do
+      it "does nothing" do
+        expect(Resque).to_not receive(:enqueue)
+        FactoryGirl.create(:build_part, :build_instance => build)
+        post :retry_partitioning, :project_id => build.project.to_param, :id => build.id
+        expect(response).to redirect_to(project_build_path(build.project, build))
       end
     end
   end
