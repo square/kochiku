@@ -17,6 +17,7 @@ describe BuildStateUpdateJob do
     mocked_remote_server = RemoteServer.for_url(repository.url)
     allow(mocked_remote_server).to receive(:sha_for_branch).and_return(current_repo_master)
     allow(RemoteServer).to receive(:for_url).with(repository.url).and_return(mocked_remote_server)
+    allow(GitBlame).to receive(:last_email_in_branch).and_return("example@email.com")
     allow(BuildStrategy).to receive(:promote_build)
     allow(BuildStrategy).to receive(:run_success_script)
     stub_request(:post, %r{#{repository.base_api_url}/statuses})

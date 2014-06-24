@@ -1,0 +1,16 @@
+Project <%= @build.project.name %> succeded on branch <%= @build.branch %>
+<%= project_build_url(@build.project, @build) %>
+
+--------------------------------------------------------------------------------
+Changes included in build
+--------------------------------------------------------------------------------
+
+<% @git_changes.each do |git_change| %>
+  commit <%= git_change[:hash] %>
+  Author: <%= git_change[:author] %>
+  Date: <%=  git_change[:date] %>
+
+      <%= git_change[:message] %>
+
+
+<% end %>

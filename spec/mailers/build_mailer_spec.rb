@@ -76,4 +76,27 @@ describe BuildMailer do
       end
     end
   end
+
+  describe '#build_success_email' do
+    let(:build) { FactoryGirl.create(:build, :branch => "branch-of-master") }
+
+    before do
+      allow(GitBlame).to receive(:changes_in_branch).and_return([{:hash => "sha", :author => "Joe", :date => "some day", :message => "always be shipping it"}])
+      allow(GitBlame).to receive(:last_email_in_branch).and_return("foo@example.com")
+    end
+
+    it "sends an email" do
+      build_part = build.build_parts.create!(:paths => ["a", "b"], :kind => "cucumber", :queue => :ci)
+      build_part.build_attempts.create!(:state => :passed, :builder => "test-builder")
+
+      email = BuildMailer.build_success_email(build)
+
+      expect(email.to).to eq(["foo@example.com"])
+
+      expect(email.html_part.body).to include(build_part.project.name)
+      expect(email.text_part.body).to include(build_part.project.name)
+      expect(email.html_part.body).to include("http://")
+      expect(email.text_part.body).to include("http://")
+    end
+  end
 end
