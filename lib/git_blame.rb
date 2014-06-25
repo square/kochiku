@@ -78,7 +78,7 @@ class GitBlame
     end
 
     def lookup_git_names_and_emails(git_names_and_emails)
-      git_names_and_emails.map do |git_name_and_email|
+      Array(git_names_and_emails).map do |git_name_and_email|
         name, email = git_name_and_email.split(":")
         Array(email_from_git_email(email))
       end.flatten.compact.uniq
