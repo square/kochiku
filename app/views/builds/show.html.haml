@@ -35,8 +35,12 @@
   - if @build.succeeded? && !@project.main?
     %a.info{:href => show_link_to_create_pull_request(@build), :title => 'create a pull request against master'}
       Create pull request
-  %span.info= "Created #{time_ago_in_words @build.created_at} ago"
-  %span.info= "Updated #{time_ago_in_words @build.updated_at} ago"
+  %span.info
+    Created
+    %abbr.timeago{:title => @build.created_at.to_json} recently
+  %span.info
+    Updated
+    %abbr.timeago{:title => @build.updated_at.to_json} at some point
   - if @build.completed?
     %span.info
       = "Built in #{duration_strftime(@build.elapsed_time, "%Hh %Mm %Ss")}"
@@ -99,4 +103,4 @@
         start_times.to_json
       };
     }
-    Kochiku.delayedRefresh({table: '.build-summary tbody', renderTime: Date.parse("#{@build.updated_at}")});
+    Kochiku.delayedRefresh({table: '.build-summary tbody', renderTime: Date.parse(#{@build.updated_at.to_json})});
