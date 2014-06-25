@@ -2,6 +2,7 @@
 //= require jquery_ujs
 //= require jquery.tipTip
 //= require jquery.tablesorter
+//= require jquery.timeago
 //= require jquery.flot
 //= require jquery.flot.errorbars
 //= require jquery.flot.categories
@@ -27,7 +28,7 @@ Kochiku.delayedRefresh = function(updateInfo) {
   $(updateInfo.table).find('tr:has(.running)').each( function() {
       var startTime = new Date(Date.parse(StartTimes[$(this).data('id')]));
       $(this).find('.elapsed').text(
-        Math.round((now-startTime)/60000) + ":" + ("00" + (Math.round((now-startTime)/1000)%60)).slice(-2));
+        Math.floor((now-startTime)/60000) + ":" + ("00" + (Math.round((now-startTime)/1000)%60)).slice(-2));
   });
   setTimeout(function() {
     if($('input#refresh').is(':checked')) {
@@ -41,6 +42,10 @@ Kochiku.delayedRefresh = function(updateInfo) {
     }
   }, 5000);
 };
+
+jQuery(document).ready(function() {
+  jQuery("abbr.timeago").timeago();
+});
 
 Kochiku.graphBuildTimes = function(projectName) {
   var url = '/projects/' + projectName + '/build-time-history.json',

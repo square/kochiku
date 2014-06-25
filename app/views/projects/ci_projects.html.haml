@@ -11,8 +11,12 @@
         - if project.most_recent_build.try(:is_running?)
           %div.state{:class => "build-#{project.most_recent_build_state}" }
             = project.most_recent_build_state.to_s.capitalize
-        %div.state
-          =  project.last_completed_build && project.last_completed_build.finished_at ? "Last built #{time_ago_in_words(project.last_completed_build.finished_at)} ago" : "Never built"
+        - if project.last_completed_build && project.last_completed_build.finished_at
+          %div.state
+            Last built
+            %abbr.timeago.state{:title => project.last_completed_build.finished_at.to_json} a while ago
+        - else
+          %div.state Never built
         - if project.last_completed_build
           %div.state{:class => "build-#{project.last_completed_build.state}" }
             = project.last_completed_build.state.to_s.capitalize
