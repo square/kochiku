@@ -6,6 +6,10 @@ describe BuildPart do
   let(:build) { FactoryGirl.create(:build, :project => project) }
   let(:build_part) { FactoryGirl.create(:build_part, :paths => ["a", "b"], :kind => "spec", :build_instance => build, :queue => 'ci') }
 
+  before do
+    allow(GitRepo).to receive(:load_kochiku_yml).and_return(nil)
+  end
+
   describe "#create_and_enqueue_new_build_attempt!" do
     it "should create a new build attempt" do
       expect {

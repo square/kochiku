@@ -6,11 +6,8 @@ describe Partitioner do
   let(:partitioner) { Partitioner.new }
 
   before do
-    allow(YAML).to receive(:load_file).and_call_original
-    allow(YAML).to receive(:load_file).with(Partitioner::KOCHIKU_YML_LOC_2).and_return(kochiku_yml)
-    allow(File).to receive(:exist?).and_call_original
-    allow(File).to receive(:exist?).with(Partitioner::KOCHIKU_YML_LOC_1).and_return(false) # always use loc_2 in the specs
-    allow(File).to receive(:exist?).with(Partitioner::KOCHIKU_YML_LOC_2).and_return(kochiku_yml_exists)
+    allow(GitRepo).to receive(:load_kochiku_yml).and_return(kochiku_yml)
+    allow(GitRepo).to receive(:inside_copy).and_yield()
   end
 
   let(:kochiku_yml) {
@@ -34,7 +31,6 @@ describe Partitioner do
     ]
   }
 
-  let(:kochiku_yml_exists) { false }
   let(:pom_xml_exists) { false }
   let(:rspec_balance) { 'alphabetically' }
   let(:rspec_manifest) { nil }
@@ -44,7 +40,6 @@ describe Partitioner do
   let(:cuke_time_manifest) { nil }
 
   context "with a kochiku.yml that does not use Ruby" do
-    let(:kochiku_yml_exists) { true }
     let(:kochiku_yml) do
       {
         "targets" => [
@@ -68,7 +63,6 @@ describe Partitioner do
 
 
   context "with a ruby-based kochiku.yml" do
-    let(:kochiku_yml_exists) { true }
     let(:queue_override) { nil }
     let(:retry_count) { nil }
     let(:kochiku_yml) do
@@ -135,7 +129,7 @@ describe Partitioner do
   end
 
   context "when there is no kochiku yml" do
-    let(:kochiku_yml_exists) { false }
+    let(:kochiku_yml) { nil }
 
     it "should return a single partiion" do
       partitions = partitioner.partitions(build)
@@ -149,12 +143,11 @@ describe Partitioner do
     subject { partitioner.partitions(build) }
 
     context 'when there is not a kochiku.yml' do
-      let(:kochiku_yml_exists) { false }
+      let(:kochiku_yml) { nil }
       it { should == [{"type" => "spec", "files" => ['no-manifest'], 'queue' => 'developer', 'retry_count' => 0}] }
     end
 
     context 'when there is a kochiku.yml' do
-      let(:kochiku_yml_exists) { true }
 
       before { allow(Dir).to receive(:[]).and_return(matches) }
 

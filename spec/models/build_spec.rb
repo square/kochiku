@@ -5,6 +5,10 @@ describe Build do
   let(:build) { FactoryGirl.create(:build, :project => project) }
   let(:parts) { [{'type' => 'cucumber', 'files' => ['a', 'b'], 'queue' => 'ci'}, {'type' => 'rspec', 'files' => ['c', 'd'], 'queue' => 'ci'}] }
 
+  before do
+    allow(GitRepo).to receive(:load_kochiku_yml).and_return(nil)
+  end
+
   describe "validations" do
     it "requires a ref to be set" do
       build.ref = nil

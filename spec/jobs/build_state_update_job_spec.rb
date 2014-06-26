@@ -12,6 +12,7 @@ describe BuildStateUpdateJob do
     build.build_parts.create!(:kind => :cucumber, :paths => ["baz"], :queue => :ci)
     # TODO: This is terrible, need to fold this feedback back into the design.
     # We are stubbing methods that are not called from the class under test.
+    allow(GitRepo).to receive(:load_kochiku_yml).and_return(nil)
     allow(GitRepo).to receive(:harmonize_remote_url)
     allow(GitRepo).to receive(:synchronize_with_remote).and_return(true)
     mocked_remote_server = RemoteServer.for_url(repository.url)

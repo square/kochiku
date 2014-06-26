@@ -59,7 +59,7 @@ class Build < ActiveRecord::Base
   scope :successful_for_project, lambda { |project_id| where(:project_id => project_id, :state => :succeeded) }
 
   def test_command
-    repository.test_command
+    (kochiku_yml && kochiku_yml.has_key?('test_command')) ? kochiku_yml['test_command'] : repository.test_command
   end
 
   def previous_successful_build
@@ -68,6 +68,10 @@ class Build < ActiveRecord::Base
 
   def enqueue_partitioning_job
     Resque.enqueue(BuildPartitioningJob, self.id)
+  end
+
+  def kochiku_yml
+    @kochiku_yml ||= GitRepo.load_kochiku_yml(repository, ref)
   end
 
   def partition(parts)
@@ -108,6 +112,10 @@ class Build < ActiveRecord::Base
     previous_state = self.state
     update_attributes!(:state => next_state) unless previous_state == next_state
     [previous_state, next_state]
+  end
+
+  def update_commit_status!
+    repository.remote_server.update_commit_status!(self)
   end
 
   # As implemented, finished_at will return the wrong value if there is a

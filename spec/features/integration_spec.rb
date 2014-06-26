@@ -47,6 +47,7 @@ feature "a failed build" do
   before :each do
     @build_attempt = FactoryGirl.create(:build_attempt, :state => :failed)
     @build_part = @build_attempt.build_part
+    allow(GitRepo).to receive(:load_kochiku_yml).and_return(nil)
   end
 
   it "can be rebuilt" do

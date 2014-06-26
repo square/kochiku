@@ -344,6 +344,10 @@ RESPONSE
     let(:build) { FactoryGirl.create(:build) }
     let(:parts) { (1..4).map { FactoryGirl.create(:build_part, :build_instance => build) } }
 
+    before do
+      allow(GitRepo).to receive(:load_kochiku_yml).and_return(nil)
+    end
+
     subject { post :rebuild_failed_parts, :project_id => build.project.to_param, :id => build.id }
 
     context "happy path" do

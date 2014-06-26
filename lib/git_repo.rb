@@ -23,7 +23,10 @@ class GitRepo
 
           synchronize_submodules_from_cached_repo(repository, cached_repo_path)
 
+          # The thread business is an optimization for file reading
+          Thread.current[:inside_repo] = { :repo => repository, :ref => sha }
           yield dir
+          Thread.current[:inside_repo] = nil
         end
       end
     end
@@ -34,15 +37,68 @@ class GitRepo
       Dir.chdir(cached_repo_path) do
         synchronize_with_remote('origin') if sync
 
+        # The thread business is an optimization for file reading
+        Thread.current[:inside_repo] = { :repo => repository, :ref => "HEAD" }
         yield
+        Thread.current[:inside_repo] = nil
       end
     end
 
-    def create_working_dir
-      FileUtils.mkdir_p(WORKING_DIR)
+    def read_from_repo(file_name, repository, ref="HEAD")
+      # This is terrible, but it uses the knowledge that we're already inside of
+      # the target repo to read files quickly, and safely gets them when we're not
+      if Thread.current[:inside_repo]
+        inside_of = Thread.current[:inside_repo]
+        if inside_of[:repo] != repository
+          raise "Reading files from #{repository} while inside #{inside_of[:repo]}"
+        elsif inside_of[:ref] != ref
+          Cocaine::CommandLine.new("git show :ref::file", "",
+            { :swallow_stderr => true, :expected_outcodes => [0, 128] })
+            .run(:ref => ref, :file => file_path)
+        else
+          File.open(file_path).read() if File.exists?(file_path)
+        end
+      else
+        inside_repo(repository) do
+          Cocaine::CommandLine.new("git show :ref::file", "",
+            { :swallow_stderr => true, :expected_outcodes => [0, 128] })
+            .run(:ref => ref, :file => file_path)
+        end
+      end
+    end
+
+    def load_kochiku_yml(repository, ref="HEAD")
+      # Since there are multiple locations for the yml, we need to be in the repo for this
+      if Thread.current[:inside_repo]
+        inside_of = Thread.current[:inside_repo]
+        if inside_of[:repo] != repository
+          raise "Reading files from #{repository} while inside #{inside_of[:repo]}"
+        elsif inside_of[:ref] != ref
+          inside_copy(repository, ref) do
+            read_repo_config
+          end
+        else
+          read_repo_config
+        end
+      else
+        inside_copy(repository, ref) do
+          read_repo_config
+        end
+      end
     end
 
     private
+
+    KOCHIKU_YML_LOCS = [
+      'kochiku.yml',
+      'config/kochiku.yml',
+      'config/ci/kochiku.yml',
+    ]
+
+    def read_repo_config
+      kochiku_yml_location = KOCHIKU_YML_LOCS.detect { |loc| File.exists?(loc) }
+      YAML.load_file(kochiku_yml_location) if kochiku_yml_location
+    end
 
     def cached_repo_for(repository)
       cached_repo_path = File.join(WORKING_DIR, repository.repo_cache_name)

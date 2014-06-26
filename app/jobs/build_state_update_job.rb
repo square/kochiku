@@ -12,7 +12,7 @@ class BuildStateUpdateJob < JobBase
 
   def perform
     build = Build.find(@build_id)
-    build.repository.remote_server.update_commit_status!(build)
+    build.update_commit_status!
 
     # trigger another build if there are new commits to build
     if build.project.main? && build.completed?
