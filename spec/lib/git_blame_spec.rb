@@ -10,7 +10,7 @@ describe GitBlame do
 
     context "with many build breakers, and no git prefix" do
       before do
-        allow(GitBlame).to receive(:git_names_and_emails_since_last_green).and_return("User One:userone@example.com\nUser Two:usertwo@example.com")
+        allow(GitBlame).to receive(:git_names_and_emails_since_last_green).and_return(["User One:userone@example.com","User Two:usertwo@example.com"])
       end
 
       it "returns the emails of the users" do
@@ -18,7 +18,7 @@ describe GitBlame do
       end
 
       it "will not return the same user twice" do
-        allow(GitBlame).to receive(:git_names_and_emails_since_last_green).and_return("User One:userone@example.com\nUser One:userone@example.com")
+        allow(GitBlame).to receive(:git_names_and_emails_since_last_green).and_return(["User One:userone@example.com","User One:userone@example.com"])
         expect(subject).to eq(["userone@example.com"])
       end
     end
@@ -29,22 +29,22 @@ describe GitBlame do
       end
 
       it "should be able to extract a single user" do
-        allow(GitBlame).to receive(:git_names_and_emails_since_last_green).and_return("First Last:git+userone@example.com")
+        allow(GitBlame).to receive(:git_names_and_emails_since_last_green).and_return(["First Last:git+userone@example.com"])
         expect(subject).to eq(["userone@example.com"])
       end
 
       it "should be able to extract multiple users" do
-        allow(GitBlame).to receive(:git_names_and_emails_since_last_green).and_return("First Last:git+one+two+three@example.com")
+        allow(GitBlame).to receive(:git_names_and_emails_since_last_green).and_return(["First Last:git+one+two+three@example.com"])
         expect(subject).to eq(["one@example.com", "two@example.com", "three@example.com"])
       end
 
       it "does not affect users with no plus sign" do
-        allow(GitBlame).to receive(:git_names_and_emails_since_last_green).and_return("One:one@example.com\nTwo:two@foo.example.org")
+        allow(GitBlame).to receive(:git_names_and_emails_since_last_green).and_return(["One:one@example.com","Two:two@foo.example.org"])
         expect(subject).to eq(["one@example.com", "two@foo.example.org"])
       end
 
       it "does not affect an email with a similar format but not starting with the prefix and a plus sign" do
-        allow(GitBlame).to receive(:git_names_and_emails_since_last_green).and_return("One:github+one+two@example.com")
+        allow(GitBlame).to receive(:git_names_and_emails_since_last_green).and_return(["One:github+one+two@example.com"])
         expect(subject).to eq(["github+one+two@example.com"])
       end
     end
@@ -59,7 +59,7 @@ describe GitBlame do
 
     context "with many build breakers" do
       before do
-        allow(GitBlame).to receive(:git_names_and_emails_in_branch).and_return("User One:userone@example.com\nUser Two:usertwo@example.com")
+        allow(GitBlame).to receive(:git_names_and_emails_in_branch).and_return(["User One:userone@example.com","User Two:usertwo@example.com"])
       end
 
       it "returns the emails of the users" do
@@ -72,7 +72,7 @@ describe GitBlame do
     subject { GitBlame.last_email_in_branch(build) }
 
     before do
-      allow(GitBlame).to receive(:last_git_name_and_email_in_branch).and_return("User One:userone@example.com\n")
+      allow(GitBlame).to receive(:last_git_name_and_email_in_branch).and_return("User One:userone@example.com")
     end
 
     it "returns a single email" do
