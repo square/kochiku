@@ -12,7 +12,7 @@ class GitBlame
     end
 
     def last_email_in_branch(build)
-      lookup_git_names_and_emails(last_git_name_and_email_in_branch(build))
+      lookup_git_names_and_emails(last_git_name_and_email_in_branch(build).strip)
     end
 
     def changes_since_last_green(build)

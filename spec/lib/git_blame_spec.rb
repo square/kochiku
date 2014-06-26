@@ -68,6 +68,18 @@ describe GitBlame do
     end
   end
 
+  describe "#last_email_in_branch" do
+    subject { GitBlame.last_email_in_branch(build) }
+
+    before do
+      allow(GitBlame).to receive(:last_git_name_and_email_in_branch).and_return("User One:userone@example.com\n")
+    end
+
+    it "returns a single email" do
+        expect(subject).to eq(["userone@example.com"])
+    end
+  end
+
   describe "#changes_since_last_green" do
     subject { GitBlame.changes_since_last_green(build) }
 
