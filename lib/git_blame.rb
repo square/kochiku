@@ -4,11 +4,11 @@ require 'git_repo'
 class GitBlame
   class << self
     def emails_since_last_green(build)
-      lookup_git_names_and_emails(git_names_and_emails_since_last_green(build).split("\n"))
+      lookup_git_names_and_emails(git_names_and_emails_since_last_green(build))
     end
 
     def emails_in_branch(build)
-      lookup_git_names_and_emails(git_names_and_emails_in_branch(build).split("\n"))
+      lookup_git_names_and_emails(git_names_and_emails_in_branch(build))
     end
 
     def last_email_in_branch(build)
@@ -61,19 +61,19 @@ class GitBlame
 
     def git_names_and_emails_since_last_green(build)
       GitRepo.inside_repo(build.repository) do
-        Cocaine::CommandLine.new("git log --format='%cn:%ce' --no-merges '#{build.previous_successful_build.try(:ref)}...#{build.ref}'").run
+        Cocaine::CommandLine.new("git log --format='%cn:%ce' --no-merges '#{build.previous_successful_build.try(:ref)}...#{build.ref}'").run.split("\n")
       end
     end
 
     def git_names_and_emails_in_branch(build)
       GitRepo.inside_repo(build.repository) do
-        Cocaine::CommandLine.new("git log --format='%cn:%ce' --no-merges 'origin/master..origin/#{build.branch}'").run
+        Cocaine::CommandLine.new("git log --format='%cn:%ce' --no-merges 'origin/master..origin/#{build.branch}'").run.split("\n")
       end
     end
 
     def last_git_name_and_email_in_branch(build)
       GitRepo.inside_repo(build.repository) do
-        Cocaine::CommandLine.new("git log --format='%cn:%ce' -1 'origin/#{build.branch}'").run
+        Cocaine::CommandLine.new("git log --format='%cn:%ce' -1 'origin/#{build.branch}'").run.strip
       end
     end
 
