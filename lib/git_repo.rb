@@ -114,10 +114,14 @@ class GitRepo
         submodules.each_line do |config_line|
           submodule_path = config_line.match(/submodule\.(.*?)\.url/)[1]
           existing_url = config_line.split(" ")[1]
-          submodule_url = RemoteServer.for_url(existing_url).url_for_fetching
-          if existing_url != submodule_url
-            Cocaine::CommandLine.new("git config",
-                                  "--replace-all submodule.#{submodule_path}.url '#{submodule_url}'").run
+          begin
+            submodule_url = RemoteServer.for_url(existing_url).url_for_fetching
+            if existing_url != submodule_url
+              Cocaine::CommandLine.new("git config",
+                                       "--replace-all submodule.#{submodule_path}.url '#{submodule_url}'").run
+            end
+          rescue RemoteServer::UnknownGitServer
+            # If the settings don't contain information about the server, don't rewrite it
           end
         end
 
@@ -142,10 +146,14 @@ class GitRepo
                                      "--replace-all submodule.#{submodule_path}.url '#{cached_repo_path}/#{submodule_path}'").run
           else
             existing_url = config_line.split(" ")[1]
-            submodule_url = RemoteServer.for_url(existing_url).url_for_fetching
-            if existing_url != submodule_url
-              Cocaine::CommandLine.new("git config",
-                                    "--replace-all submodule.#{submodule_path}.url '#{submodule_url}'").run
+            begin
+              submodule_url = RemoteServer.for_url(existing_url).url_for_fetching
+              if existing_url != submodule_url
+                Cocaine::CommandLine.new("git config",
+                                         "--replace-all submodule.#{submodule_path}.url '#{submodule_url}'").run
+              end
+            rescue RemoteServer::UnknownGitServer
+              # If the settings don't contain information about the server, don't rewrite it
             end
           end
         end
