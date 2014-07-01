@@ -8,6 +8,7 @@ describe BuildStrategy do
 
   before(:each) do
     CommandStubber.new # ensure Open3 is stubbed
+    allow(GitRepo).to receive(:inside_repo).and_yield
 
     expect(Rails.application.config.action_mailer.delivery_method).to eq(:test)
   end
@@ -36,7 +37,7 @@ describe BuildStrategy do
   end
 
   describe "#promote_build" do
-    subject { described_class.promote_build(build.ref, project.repository) }
+    subject { described_class.promote_build(build) }
 
     context "when the ref is an ancestor" do
       before(:each) {

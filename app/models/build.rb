@@ -62,6 +62,10 @@ class Build < ActiveRecord::Base
     (kochiku_yml && kochiku_yml.has_key?('test_command')) ? kochiku_yml['test_command'] : repository.test_command
   end
 
+  def on_success_script
+    (kochiku_yml && kochiku_yml.has_key?('on_success_script')) ? kochiku_yml['on_success_script'] : repository.on_success_script
+  end
+
   def previous_successful_build
     Build.successful_for_project(project_id).order("id DESC").where("id < ?", self.id).first
   end
@@ -160,15 +164,9 @@ class Build < ActiveRecord::Base
   end
 
   def promote!
-    BuildStrategy.promote_build(ref, repository)
-    if repository.has_on_success_script? &&
-        !promoted? &&
-        Build.where(id: self.id, promoted: nil).update_all(promoted: true) == 1
-      output = BuildStrategy.run_success_script(repository, ref, branch)
-      script_log = FilelessIO.new(output)
-      script_log.original_filename = "on_success_script.log"
-      self.on_success_script_log_file = script_log
-      self.save!
+    if !promoted?
+      BuildStrategy.promote_build(ref, repository)
+      Build.where(id: self.id, promoted: nil).update_all(promoted: true)
     end
   end
 

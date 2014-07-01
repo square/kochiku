@@ -1,4 +1,3 @@
-require 'open3'
 require 'git_blame'
 require 'git_merge_executor'
 
@@ -15,10 +14,12 @@ class BuildStrategy
     # promote_build does use a force push in order to overwrite experimental
     # branches that may have been manually placed on the promotion ref by a
     # developer for testing.
-    def promote_build(build_ref, repository)
-      repository.promotion_refs.each do |promotion_ref|
-        unless included_in_promotion_ref?(build_ref, promotion_ref)
-          update_branch(promotion_ref, build_ref)
+    def promote_build(build)
+      GitRepo.inside_repo(build.repository) do
+        build.repository.promotion_refs.each do |promotion_ref|
+          unless included_in_promotion_ref?(build.ref, promotion_ref)
+            update_branch(promotion_ref, build.ref)
+          end
         end
       end
     end
@@ -29,22 +30,16 @@ class BuildStrategy
       Cocaine::CommandLine.new("git push -f origin refs/notes/#{namespace}").run
     end
 
-    def run_success_script(repository, build_ref, build_branch)
-      GitRepo.inside_copy(repository, build_ref, build_branch) do |dir|
-        output, status = Open3.capture2e(repository.on_success_script, :chdir => dir)
-        output += "\nExited with status: #{status.exitstatus}"
-        return output
-      end
-    end
-
     def merge_ref(build)
-      begin
-        emails = GitBlame.emails_in_branch(build)
-        merger = GitMergeExecutor.new
-        log = merger.merge(build)
-        MergeMailer.merge_successful(build, emails, log).deliver
-      rescue GitMergeExecutor::UnableToMergeError => ex
-        MergeMailer.merge_failed(build, emails, ex.message).deliver
+      GitRepo.inside_repo(build.repository) do
+        begin
+          emails = GitBlame.emails_in_branch(build)
+          merger = GitMergeExecutor.new
+          log = merger.merge(build)
+          MergeMailer.merge_successful(build, emails, log).deliver
+        rescue GitMergeExecutor::UnableToMergeError => ex
+          MergeMailer.merge_failed(build, emails, ex.message).deliver
+        end
       end
     end
 

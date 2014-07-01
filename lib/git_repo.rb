@@ -7,17 +7,17 @@ class GitRepo
   WORKING_DIR = Rails.root.join('tmp', 'build-partition')
 
   class << self
-    def inside_copy(repository, sha, branch = "master")
+    def inside_copy(repository, sha)
       cached_repo_path = cached_repo_for(repository)
 
-      synchronize_cache_repo(cached_repo_path, branch)
+      synchronize_cache_repo(cached_repo_path)
 
       Dir.mktmpdir(nil, WORKING_DIR) do |dir|
         # clone local repo (fast!)
         Cocaine::CommandLine.new("git clone", "#{cached_repo_path} #{dir}").run
 
         Dir.chdir(dir) do
-          raise RefNotFoundError, "repo:#{repository.url} branch:#{branch}, sha:#{sha}" unless system("git rev-list --quiet -n1 #{sha}")
+          raise RefNotFoundError, "repo:#{repository.url}, sha:#{sha}" unless system("git rev-list --quiet -n1 #{sha}")
 
           Cocaine::CommandLine.new("git checkout", "--quiet :commit").run(commit: sha)
 
@@ -123,10 +123,10 @@ class GitRepo
       nil
     end
 
-    def synchronize_cache_repo(cached_repo_path, branch)
+    def synchronize_cache_repo(cached_repo_path)
       Dir.chdir(cached_repo_path) do
         # update the cached repo
-        synchronize_with_remote('origin', branch)
+        synchronize_with_remote('origin')
         synchronize_submodules
       end
     end
@@ -139,10 +139,7 @@ class GitRepo
           run
     end
 
-    def synchronize_with_remote(name, branch = nil)
-      # Undo this for now, partition does not seem as stable with this enabled.
-      #refspec = branch.to_s.empty? ? "" : "+#{branch}"
-      #Cocaine::CommandLine.new("git fetch", "--quiet --prune --no-tags #{name} #{refspec}").run
+    def synchronize_with_remote(name)
       Cocaine::CommandLine.new("git fetch", "--quiet --prune --no-tags #{name}").run
     rescue Cocaine::ExitStatusError => e
       # likely caused by another 'git fetch' that is currently in progress. Wait a few seconds and try again

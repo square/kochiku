@@ -1,7 +1,7 @@
 class Partitioner
 
   def partitions(build)
-    GitRepo.inside_copy(build.repository, build.ref, build.branch) do
+    GitRepo.inside_copy(build.repository, build.ref) do
       @kochiku_yml = build.kochiku_yml
       if @kochiku_yml
         # Handle old kochiku.yml
@@ -64,6 +64,7 @@ class Partitioner
     workers = subset.fetch('workers', 1)
     manifest = subset['manifest']
     retry_count = subset['retry_count'] || 0
+    log_files = subset['log_files']
 
     queue = queue_for_build(build)
 
@@ -87,7 +88,8 @@ class Partitioner
     files -= balanced_partitions.flatten
 
     (Strategies.send(strategy, files, workers) + balanced_partitions).map do |part_files|
-      part = {'type' => type, 'files' => part_files.compact, 'queue' => queue, 'retry_count' => retry_count}
+      part = {'type' => type, 'files' => part_files.compact, 'queue' => queue,
+              'retry_count' => retry_count, 'log_files' => log_files}
       if subset['options']
         part['options'] = subset['options']
       end
