@@ -73,4 +73,23 @@ describe BuildStrategy do
       subject
     end
   end
+
+  describe "#run_success_script" do
+    let (:repository) { project.repository }
+    subject {
+      described_class.run_success_script(build)
+    }
+
+    before do
+      repository.update_attribute(:on_success_script, "./this_is_a_triumph")
+      allow(GitRepo).to receive(:inside_copy).and_yield
+    end
+
+    it "run success script only once" do
+      command = double("Cocaine::CommandLine", :run => "this is some output\n", :exit_status => "255")
+      allow(Cocaine::CommandLine).to receive(:new).and_return(command)
+      subject
+      expect(build.reload.on_success_script_log_file.read).to eq("this is some output\n\nExited with status: 255")
+    end
+  end
 end

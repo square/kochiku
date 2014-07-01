@@ -165,13 +165,13 @@ class Build < ActiveRecord::Base
 
   def promote!
     if !promoted?
-      BuildStrategy.promote_build(ref, repository)
-      Build.where(id: self.id, promoted: nil).update_all(promoted: true)
+      BuildStrategy.promote_build(self)
+      update!(promoted: true)
     end
   end
 
   def add_note!
-    BuildStrategy.add_note(ref, "ci-#{project.name}", repository.on_success_note)
+    BuildStrategy.add_note(ref, "ci-#{project.name}", repository)
   end
 
   def completed?

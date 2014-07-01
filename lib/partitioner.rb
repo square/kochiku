@@ -64,7 +64,7 @@ class Partitioner
     workers = subset.fetch('workers', 1)
     manifest = subset['manifest']
     retry_count = subset['retry_count'] || 0
-    log_files = subset['log_files']
+    log_files = subset['log_file_globs']
 
     queue = queue_for_build(build)
 
@@ -89,7 +89,7 @@ class Partitioner
 
     (Strategies.send(strategy, files, workers) + balanced_partitions).map do |part_files|
       part = {'type' => type, 'files' => part_files.compact, 'queue' => queue,
-              'retry_count' => retry_count, 'log_files' => log_files}
+              'retry_count' => retry_count, 'log_file_globs' => log_files}
       if subset['options']
         part['options'] = subset['options']
       end

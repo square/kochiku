@@ -24,10 +24,24 @@ class BuildStrategy
       end
     end
 
-    def add_note(build_ref, namespace, note)
-      Cocaine::CommandLine.new("git fetch -f origin refs/notes/*:refs/notes/*").run
-      Cocaine::CommandLine.new("git notes --ref=#{namespace} add -f -m '#{note}' #{build_ref}").run
-      Cocaine::CommandLine.new("git push -f origin refs/notes/#{namespace}").run
+    def add_note(build_ref, namespace, repository)
+      GitRepo.inside_repo(repository) do
+        Cocaine::CommandLine.new("git", "fetch -f origin refs/notes/*:refs/notes/*").run
+        Cocaine::CommandLine.new("git", "notes --ref=#{namespace} add -f -m '#{repository.on_success_note}' #{build_ref}").run
+        Cocaine::CommandLine.new("git", "push -f origin refs/notes/#{namespace}").run
+      end
+    end
+
+    def run_success_script(build)
+      GitRepo.inside_copy(build.repository, build.ref) do
+        command = Cocaine::CommandLine.new(build.on_success_script, "", :expected_outcodes => 0..255)
+        output = command.run
+        output += "\nExited with status: #{command.exit_status}"
+        script_log = FilelessIO.new(output)
+        script_log.original_filename = "on_success_script.log"
+        build.on_success_script_log_file = script_log
+        build.save!
+      end
     end
 
     def merge_ref(build)
