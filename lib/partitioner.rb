@@ -49,22 +49,24 @@ class Partitioner
     options = {}
     options['language'] = @kochiku_yml['language'] if @kochiku_yml['language']
     options['ruby'] = ruby_version if ruby_version
+    options['log_file_globs'] = @kochiku_yml['log_file_globs'] if @kochiku_yml['log_file_globs']
 
     @kochiku_yml['targets'].flat_map do |subset|
       partitions_for(
         build,
-        subset.merge('options' => options)
+        subset.merge('options' => options.merge(subset.fetch('options', {})))
       )
     end
   end
 
   def partitions_for(build, subset)
+    subset['options'] ||= {}
     glob = subset.fetch('glob', '/dev/null')
     type = subset.fetch('type', 'test')
     workers = subset.fetch('workers', 1)
     manifest = subset['manifest']
     retry_count = subset['retry_count'] || 0
-    log_files = subset['log_file_globs']
+    subset['options']['log_file_globs'] = subset['log_file_globs'] if subset['log_file_globs']
 
     queue = queue_for_build(build)
 
@@ -89,10 +91,7 @@ class Partitioner
 
     (Strategies.send(strategy, files, workers) + balanced_partitions).map do |part_files|
       part = {'type' => type, 'files' => part_files.compact, 'queue' => queue,
-              'retry_count' => retry_count, 'log_file_globs' => log_files}
-      if subset['options']
-        part['options'] = subset['options']
-      end
+              'retry_count' => retry_count, 'options' => subset['options']}
       part
     end.select { |p| p['files'].present? }
   end

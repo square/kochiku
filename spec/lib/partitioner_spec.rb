@@ -61,6 +61,46 @@ describe Partitioner do
     end
   end
 
+  context "with a kochiku.yml that specifies log files" do
+    let(:kochiku_yml) do
+      {
+        'log_file_globs' => ['glob1'],
+        "targets" => [
+          {
+            'type' => 'other',
+            'glob' => 'spec/**/*_spec.rb',
+            'workers' => 1,
+          },
+        ]
+      }
+    end
+
+    it "should include the log_file_globs" do
+      partitions = partitioner.partitions(build)
+      expect(partitions.first['options']['log_file_globs']).to eq(['glob1'])
+    end
+
+    context "with a kochiku.yml that specifies log files" do
+      let(:kochiku_yml) do
+        {
+          'log_file_globs' => ['glob1'],
+          "targets" => [
+            {
+              'type' => 'other',
+              'glob' => 'spec/**/*_spec.rb',
+              'workers' => 1,
+              'log_file_globs' => ['glob2'],
+            },
+          ]
+        }
+      end
+
+      it "should not include a ruby version" do
+        partitions = partitioner.partitions(build)
+        expect(partitions.first['options']['log_file_globs']).to eq(['glob2'])
+      end
+    end
+  end
 
   context "with a ruby-based kochiku.yml" do
     let(:queue_override) { nil }
@@ -158,16 +198,16 @@ describe Partitioner do
 
       context 'when there is one file matching the glob' do
         let(:matches) { %w(a) }
-        it { [{ 'type' => 'rspec', 'files' => %w(a), 'queue' => 'developer', 'retry_count' => 0, 'log_file_globs' => nil }].each { |partition| should include(partition) } }
+        it { [{ 'type' => 'rspec', 'files' => %w(a), 'queue' => 'developer', 'retry_count' => 0, 'options' => {} }].each { |partition| should include(partition) } }
       end
 
       context 'when there are many files matching the glob' do
         let(:matches) { %w(a b c d) }
         it {
           [
-            { 'type' => 'rspec', 'files' => %w(a b), 'queue' => 'developer', 'retry_count' => 0, 'log_file_globs' => nil },
-            { 'type' => 'rspec', 'files' => %w(c), 'queue' => 'developer', 'retry_count' => 0, 'log_file_globs' => nil },
-            { 'type' => 'rspec', 'files' => %w(d), 'queue' => 'developer', 'retry_count' => 0, 'log_file_globs' => nil },
+            { 'type' => 'rspec', 'files' => %w(a b), 'queue' => 'developer', 'retry_count' => 0, 'options' => {} },
+            { 'type' => 'rspec', 'files' => %w(c), 'queue' => 'developer', 'retry_count' => 0, 'options' => {} },
+            { 'type' => 'rspec', 'files' => %w(d), 'queue' => 'developer', 'retry_count' => 0, 'options' => {} },
           ].each { |partition| should include(partition) }
         }
 
@@ -175,9 +215,9 @@ describe Partitioner do
           let(:rspec_balance) { 'round_robin' }
           it {
             [
-              { 'type' => 'rspec', 'files' => %w(a d), 'queue' => 'developer', 'retry_count' => 0, 'log_file_globs' => nil },
-              { 'type' => 'rspec', 'files' => %w(b), 'queue' => 'developer', 'retry_count' => 0, 'log_file_globs' => nil },
-              { 'type' => 'rspec', 'files' => %w(c), 'queue' => 'developer', 'retry_count' => 0, 'log_file_globs' => nil },
+              { 'type' => 'rspec', 'files' => %w(a d), 'queue' => 'developer', 'retry_count' => 0, 'options' => {} },
+              { 'type' => 'rspec', 'files' => %w(b), 'queue' => 'developer', 'retry_count' => 0, 'options' => {} },
+              { 'type' => 'rspec', 'files' => %w(c), 'queue' => 'developer', 'retry_count' => 0, 'options' => {} },
             ].each { |partition| should include(partition) }
           }
 
@@ -188,9 +228,9 @@ describe Partitioner do
 
             it {
               [
-                { 'type' => 'rspec', 'files' => %w(c d), 'queue' => 'developer', 'retry_count' => 0, 'log_file_globs' => nil },
-                { 'type' => 'rspec', 'files' => %w(b), 'queue' => 'developer', 'retry_count' => 0, 'log_file_globs' => nil },
-                { 'type' => 'rspec', 'files' => %w(a), 'queue' => 'developer', 'retry_count' => 0, 'log_file_globs' => nil },
+                { 'type' => 'rspec', 'files' => %w(c d), 'queue' => 'developer', 'retry_count' => 0, 'options' => {} },
+                { 'type' => 'rspec', 'files' => %w(b), 'queue' => 'developer', 'retry_count' => 0, 'options' => {} },
+                { 'type' => 'rspec', 'files' => %w(a), 'queue' => 'developer', 'retry_count' => 0, 'options' => {} },
               ].each { |partition| should include(partition) }
             }
           end
@@ -226,12 +266,12 @@ describe Partitioner do
               allow(Dir).to receive(:[]).with("spec/**/*_spec.rb").and_return(spec_matches)
               allow(Dir).to receive(:[]).with("features/**/*.feature").and_return(feature_matches)
               [
-                  {"type"=>"rspec", "files"=>["c.spec"], "queue"=>"developer", "retry_count"=>0, "log_file_globs"=>nil},
-                  {"type"=>"rspec", "files"=>["d.spec", "e.spec"], "queue"=>"developer", "retry_count"=>0, "log_file_globs"=>nil},
-                  {"type"=>"rspec", "files"=>["b.spec", "a.spec"], "queue"=>"developer", "retry_count"=>0, "log_file_globs"=>nil},
-                  {"type"=>"cuke", "files"=>["i.feature"], "queue"=>"developer", "retry_count"=>0, "log_file_globs"=>nil},
-                  {"type"=>"cuke", "files"=>["h.feature"], "queue"=>"developer", "retry_count"=>0, "log_file_globs"=>nil},
-                  {"type"=>"cuke", "files"=>["g.feature", "f.feature"], "queue"=>"developer", "retry_count"=>0, "log_file_globs"=>nil}
+                  {"type"=>"rspec", "files"=>["c.spec"], "queue"=>"developer", "retry_count"=>0, 'options' => {}},
+                  {"type"=>"rspec", "files"=>["d.spec", "e.spec"], "queue"=>"developer", "retry_count"=>0, 'options' => {}},
+                  {"type"=>"rspec", "files"=>["b.spec", "a.spec"], "queue"=>"developer", "retry_count"=>0, 'options' => {}},
+                  {"type"=>"cuke", "files"=>["i.feature"], "queue"=>"developer", "retry_count"=>0, 'options' => {}},
+                  {"type"=>"cuke", "files"=>["h.feature"], "queue"=>"developer", "retry_count"=>0, 'options' => {}},
+                  {"type"=>"cuke", "files"=>["g.feature", "f.feature"], "queue"=>"developer", "retry_count"=>0, 'options' => {}}
               ].each { |partition| should include(partition) }
             end
           end
@@ -249,9 +289,9 @@ describe Partitioner do
 
           it {
             [
-              { 'type' => 'rspec', 'files' => %w(b a), 'queue' => 'developer', 'retry_count' => 0, 'log_file_globs' => nil },
-              { 'type' => 'rspec', 'files' => %w(c), 'queue' => 'developer', 'retry_count' => 0, 'log_file_globs' => nil },
-              { 'type' => 'rspec', 'files' => %w(d), 'queue' => 'developer', 'retry_count' => 0, 'log_file_globs' => nil },
+              { 'type' => 'rspec', 'files' => %w(b a), 'queue' => 'developer', 'retry_count' => 0, 'options' => {} },
+              { 'type' => 'rspec', 'files' => %w(c), 'queue' => 'developer', 'retry_count' => 0, 'options' => {} },
+              { 'type' => 'rspec', 'files' => %w(d), 'queue' => 'developer', 'retry_count' => 0, 'options' => {} },
             ].each { |partition| should include(partition) }
           }
         end
@@ -268,9 +308,9 @@ describe Partitioner do
 
           it {
             [
-              { 'type' => 'rspec', 'files' => %w(b), 'queue' => 'developer', 'retry_count' => 0, 'log_file_globs' => nil },
-              { 'type' => 'rspec', 'files' => %w(c), 'queue' => 'developer', 'retry_count' => 0, 'log_file_globs' => nil },
-              { 'type' => 'rspec', 'files' => %w(d a), 'queue' => 'developer', 'retry_count' => 0, 'log_file_globs' => nil },
+              { 'type' => 'rspec', 'files' => %w(b), 'queue' => 'developer', 'retry_count' => 0, 'options' => {} },
+              { 'type' => 'rspec', 'files' => %w(c), 'queue' => 'developer', 'retry_count' => 0, 'options' => {} },
+              { 'type' => 'rspec', 'files' => %w(d a), 'queue' => 'developer', 'retry_count' => 0, 'options' => {} },
             ].each { |partition| should include(partition) }
           }
         end
@@ -287,9 +327,9 @@ describe Partitioner do
 
           it {
             [
-              { 'type' => 'rspec', 'files' => %w(a b), 'queue' => 'developer', 'retry_count' => 0, 'log_file_globs' => nil },
-              { 'type' => 'rspec', 'files' => %w(c), 'queue' => 'developer', 'retry_count' => 0, 'log_file_globs' => nil },
-              { 'type' => 'rspec', 'files' => %w(d), 'queue' => 'developer', 'retry_count' => 0, 'log_file_globs' => nil },
+              { 'type' => 'rspec', 'files' => %w(a b), 'queue' => 'developer', 'retry_count' => 0, 'options' => {} },
+              { 'type' => 'rspec', 'files' => %w(c), 'queue' => 'developer', 'retry_count' => 0, 'options' => {} },
+              { 'type' => 'rspec', 'files' => %w(d), 'queue' => 'developer', 'retry_count' => 0, 'options' => {} },
             ].each { |partition| should include(partition) }
           }
         end
@@ -299,10 +339,10 @@ describe Partitioner do
 
           it {
             [
-              { 'type' => 'rspec', 'files' => %w(a), 'queue' => 'developer', 'retry_count' => 0, 'log_file_globs' => nil },
-              { 'type' => 'rspec', 'files' => %w(b), 'queue' => 'developer', 'retry_count' => 0, 'log_file_globs' => nil },
-              { 'type' => 'rspec', 'files' => %w(c), 'queue' => 'developer', 'retry_count' => 0, 'log_file_globs' => nil },
-              { 'type' => 'rspec', 'files' => %w(d), 'queue' => 'developer', 'retry_count' => 0, 'log_file_globs' => nil },
+              { 'type' => 'rspec', 'files' => %w(a), 'queue' => 'developer', 'retry_count' => 0, 'options' => {} },
+              { 'type' => 'rspec', 'files' => %w(b), 'queue' => 'developer', 'retry_count' => 0, 'options' => {} },
+              { 'type' => 'rspec', 'files' => %w(c), 'queue' => 'developer', 'retry_count' => 0, 'options' => {} },
+              { 'type' => 'rspec', 'files' => %w(d), 'queue' => 'developer', 'retry_count' => 0, 'options' => {} },
             ].each { |partition| should include(partition) }
           }
         end
