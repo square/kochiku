@@ -7,17 +7,17 @@ class GitRepo
   WORKING_DIR = Rails.root.join('tmp', 'build-partition')
 
   class << self
-    def inside_copy(repository, sha, branch = "master")
+    def inside_copy(repository, sha)
       cached_repo_path = cached_repo_for(repository)
 
-      synchronize_cache_repo(cached_repo_path, branch)
+      synchronize_cache_repo(cached_repo_path)
 
       Dir.mktmpdir(nil, WORKING_DIR) do |dir|
         # clone local repo (fast!)
         Cocaine::CommandLine.new("git clone", "#{cached_repo_path} #{dir}").run
 
         Dir.chdir(dir) do
-          raise RefNotFoundError, "repo:#{repository.url} branch:#{branch}, sha:#{sha}" unless system("git rev-list --quiet -n1 #{sha}")
+          raise RefNotFoundError, "repo:#{repository.url}, sha:#{sha}" unless system("git rev-list --quiet -n1 #{sha}")
 
           Cocaine::CommandLine.new("git checkout", "--quiet :commit").run(commit: sha)
 
@@ -38,11 +38,29 @@ class GitRepo
       end
     end
 
-    def create_working_dir
-      FileUtils.mkdir_p(WORKING_DIR)
+    def load_kochiku_yml(repository, ref)
+      inside_repo(repository) do
+        read_repo_config(ref)
+      end
     end
 
     private
+
+    KOCHIKU_YML_LOCS = [
+      'kochiku.yml',
+      'config/kochiku.yml',
+      'config/ci/kochiku.yml',
+    ]
+
+    def read_repo_config(ref)
+      command = Cocaine::CommandLine.new("git show", ":ref::file",
+                                         { :swallow_stderr => true, :expected_outcodes => [0, 128] })
+      KOCHIKU_YML_LOCS.each do |loc|
+        file = command.run(:ref => ref, :file => loc)
+        return YAML.load(file) if command.exit_status == 0
+      end
+      nil
+    end
 
     def cached_repo_for(repository)
       cached_repo_path = File.join(WORKING_DIR, repository.repo_cache_name)
@@ -67,10 +85,10 @@ class GitRepo
       nil
     end
 
-    def synchronize_cache_repo(cached_repo_path, branch)
+    def synchronize_cache_repo(cached_repo_path)
       Dir.chdir(cached_repo_path) do
         # update the cached repo
-        synchronize_with_remote('origin', branch)
+        synchronize_with_remote('origin')
         synchronize_submodules
       end
     end
@@ -83,10 +101,7 @@ class GitRepo
           run
     end
 
-    def synchronize_with_remote(name, branch = nil)
-      # Undo this for now, partition does not seem as stable with this enabled.
-      #refspec = branch.to_s.empty? ? "" : "+#{branch}"
-      #Cocaine::CommandLine.new("git fetch", "--quiet --prune --no-tags #{name} #{refspec}").run
+    def synchronize_with_remote(name)
       Cocaine::CommandLine.new("git fetch", "--quiet --prune --no-tags #{name}").run
     rescue Cocaine::ExitStatusError => e
       # likely caused by another 'git fetch' that is currently in progress. Wait a few seconds and try again

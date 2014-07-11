@@ -12,7 +12,7 @@ class BuildStateUpdateJob < JobBase
 
   def perform
     build = Build.find(@build_id)
-    build.repository.remote_server.update_commit_status!(build)
+    build.update_commit_status!
 
     # trigger another build if there are new commits to build
     if build.project.main? && build.completed?
@@ -20,21 +20,20 @@ class BuildStateUpdateJob < JobBase
       build.project.builds.create_new_build_for(sha)
     end
 
-    if build.succeeded? && build.repository.has_on_success_note?
-      GitRepo.inside_repo(build.repository) do
+    if build.succeeded?
+      if build.repository.has_on_success_note?
         build.add_note!
+      end
+      if build.on_success_script.present? && !build.on_success_script_log_file.present?
+        BuildStrategy.run_success_script(build)
       end
     end
 
     if build.promotable?
-      GitRepo.inside_repo(build.repository) do
-        build.promote!
-      end
+      build.promote!
     elsif build.merge_on_success_enabled?
       if build.mergable_by_kochiku?
-        GitRepo.inside_repo(build.repository) do
-          build.merge_to_master!
-        end
+        build.merge_to_master!
       else
         Rails.logger.info("Build #{build.id} has merge_on_success enabled but cannot be merged.")
       end

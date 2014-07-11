@@ -12,14 +12,15 @@ describe BuildStateUpdateJob do
     build.build_parts.create!(:kind => :cucumber, :paths => ["baz"], :queue => :ci)
     # TODO: This is terrible, need to fold this feedback back into the design.
     # We are stubbing methods that are not called from the class under test.
+    allow(GitRepo).to receive(:load_kochiku_yml).and_return(nil)
     allow(GitRepo).to receive(:harmonize_remote_url)
     allow(GitRepo).to receive(:synchronize_with_remote).and_return(true)
+    allow(GitRepo).to receive(:inside_repo).and_yield
     mocked_remote_server = RemoteServer.for_url(repository.url)
     allow(mocked_remote_server).to receive(:sha_for_branch).and_return(current_repo_master)
     allow(RemoteServer).to receive(:for_url).with(repository.url).and_return(mocked_remote_server)
     allow(GitBlame).to receive(:last_email_in_branch).and_return("example@email.com")
-    allow(BuildStrategy).to receive(:promote_build)
-    allow(BuildStrategy).to receive(:run_success_script)
+    allow(BuildStrategy).to receive(:update_branch)
     stub_request(:post, %r{#{repository.base_api_url}/statuses})
   end
 
@@ -116,29 +117,53 @@ describe BuildStateUpdateJob do
         let(:project) { FactoryGirl.create(:project, :repository => repository, :name => repository.name) }
 
         it "should promote the build" do
-          expect(BuildStrategy).to receive(:promote_build).with(build.ref, build.repository)
+          expect(BuildStrategy).to receive(:promote_build).with(build)
           expect(BuildStrategy).not_to receive(:run_success_script)
           BuildStateUpdateJob.perform(build.id)
-        end
-
-        context "with a success script" do
-          before do
-            repository.update_attribute(:on_success_script, "./this_is_a_triumph")
-          end
-
-          it "promote the build only once" do
-            expect(BuildStrategy).to receive(:run_success_script).once.with(build.repository, build.ref, build.branch).and_return("this is a log file\n\n")
-            2.times {
-              BuildStateUpdateJob.perform(build.id)
-            }
-            expect(build.reload.on_success_script_log_file.read).to eq("this is a log file\n\n")
-          end
         end
       end
 
       it "kochiku should merge the branch if eligible" do
         build.update_attributes(:merge_on_success => true)
         expect(BuildStrategy).to receive(:merge_ref).with(build)
+        BuildStateUpdateJob.perform(build.id)
+      end
+    end
+
+    context "when there is a success script" do
+      let(:build) { FactoryGirl.create(:build, :state => :succeeded, :project => project) }
+
+      before do
+        repository.update_attribute(:on_success_script, "./this_is_a_triumph")
+      end
+
+      it "runs the success script" do
+        expect(BuildStrategy).to receive(:run_success_script)
+        BuildStateUpdateJob.perform(build.id)
+      end
+
+      context "when the success script has been run" do
+        before do
+          build.on_success_script_log_file = FilelessIO.new("test").tap {|fio| fio.original_filename = "bar.txt" }
+          build.save!
+        end
+
+        it "does not run the success script" do
+          expect(BuildStrategy).to_not receive(:run_success_script)
+          BuildStateUpdateJob.perform(build.id)
+        end
+      end
+    end
+
+    context "where this is no success script" do
+      let(:build) { FactoryGirl.create(:build, :state => :succeeded, :project => project) }
+
+      before do
+        expect(repository.on_success_script).to_not be_present
+      end
+
+      it "does not try to execute a success script" do
+        expect(BuildStrategy).to_not receive(:run_success_script)
         BuildStateUpdateJob.perform(build.id)
       end
     end

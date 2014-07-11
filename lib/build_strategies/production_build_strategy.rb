@@ -1,4 +1,3 @@
-require 'open3'
 require 'git_blame'
 require 'git_merge_executor'
 
@@ -15,36 +14,46 @@ class BuildStrategy
     # promote_build does use a force push in order to overwrite experimental
     # branches that may have been manually placed on the promotion ref by a
     # developer for testing.
-    def promote_build(build_ref, repository)
-      repository.promotion_refs.each do |promotion_ref|
-        unless included_in_promotion_ref?(build_ref, promotion_ref)
-          update_branch(promotion_ref, build_ref)
+    def promote_build(build)
+      GitRepo.inside_repo(build.repository) do
+        build.repository.promotion_refs.each do |promotion_ref|
+          unless included_in_promotion_ref?(build.ref, promotion_ref)
+            update_branch(promotion_ref, build.ref)
+          end
         end
       end
     end
 
-    def add_note(build_ref, namespace, note)
-      Cocaine::CommandLine.new("git fetch -f origin refs/notes/*:refs/notes/*").run
-      Cocaine::CommandLine.new("git notes --ref=#{namespace} add -f -m '#{note}' #{build_ref}").run
-      Cocaine::CommandLine.new("git push -f origin refs/notes/#{namespace}").run
+    def add_note(build_ref, namespace, repository)
+      GitRepo.inside_repo(repository) do
+        Cocaine::CommandLine.new("git", "fetch -f origin refs/notes/*:refs/notes/*").run
+        Cocaine::CommandLine.new("git", "notes --ref=#{namespace} add -f -m '#{repository.on_success_note}' #{build_ref}").run
+        Cocaine::CommandLine.new("git", "push -f origin refs/notes/#{namespace}").run
+      end
     end
 
-    def run_success_script(repository, build_ref, build_branch)
-      GitRepo.inside_copy(repository, build_ref, build_branch) do |dir|
-        output, status = Open3.capture2e(repository.on_success_script, :chdir => dir)
-        output += "\nExited with status: #{status.exitstatus}"
-        return output
+    def run_success_script(build)
+      GitRepo.inside_copy(build.repository, build.ref) do
+        command = Cocaine::CommandLine.new(build.on_success_script, "", :expected_outcodes => 0..255)
+        output = command.run
+        output += "\nExited with status: #{command.exit_status}"
+        script_log = FilelessIO.new(output)
+        script_log.original_filename = "on_success_script.log"
+        build.on_success_script_log_file = script_log
+        build.save!
       end
     end
 
     def merge_ref(build)
-      begin
-        emails = GitBlame.emails_in_branch(build)
-        merger = GitMergeExecutor.new
-        log = merger.merge(build)
-        MergeMailer.merge_successful(build, emails, log).deliver
-      rescue GitMergeExecutor::UnableToMergeError => ex
-        MergeMailer.merge_failed(build, emails, ex.message).deliver
+      GitRepo.inside_repo(build.repository) do
+        begin
+          emails = GitBlame.emails_in_branch(build)
+          merger = GitMergeExecutor.new
+          log = merger.merge(build)
+          MergeMailer.merge_successful(build, emails, log).deliver
+        rescue GitMergeExecutor::UnableToMergeError => ex
+          MergeMailer.merge_failed(build, emails, ex.message).deliver
+        end
       end
     end
 

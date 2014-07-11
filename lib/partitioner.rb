@@ -1,45 +1,28 @@
 class Partitioner
-  KOCHIKU_YML_LOC_1 = 'config/kochiku.yml'
-  KOCHIKU_YML_LOC_2 = 'config/ci/kochiku.yml'
-
-  def queue_for_build(build)
-    build.project.main? ? 'ci' : 'developer'
-  end
 
   def partitions(build)
-    if kochiku_yml_location
-      # Handle old kochiku.yml
-      if kochiku_yml.is_a?(Array)
-        kochiku_yml.map { |subset| partitions_for(build, subset) }.flatten
+    GitRepo.inside_copy(build.repository, build.ref) do
+      @kochiku_yml = build.kochiku_yml
+      if @kochiku_yml
+        # Handle old kochiku.yml
+        if @kochiku_yml.is_a?(Array)
+          @kochiku_yml.map { |subset| partitions_for(build, subset) }.flatten
+        else
+          build_partitions(build)
+        end
       else
-        build_partitions(build)
+        [{'type' => 'spec', 'files' => ['no-manifest'], 'queue' => queue_for_build(build), 'retry_count' => 0}]
       end
-    else
-      [{'type' => 'spec', 'files' => ['no-manifest'], 'queue' => queue_for_build(build), 'retry_count' => 0}]
     end
   end
 
   private
 
-  def kochiku_yml
-    @kochiku_yml ||= YAML.load_file(kochiku_yml_location)
-  end
-
-  # Returns location of the kochiku.yml file within the repository. Returns nil
-  # if the file is not present.
-  def kochiku_yml_location
-    if File.exist?(KOCHIKU_YML_LOC_1)
-      KOCHIKU_YML_LOC_1
-    elsif File.exist?(KOCHIKU_YML_LOC_2)
-      KOCHIKU_YML_LOC_2
-    end
-  end
-
   def max_build_time
-    if kochiku_yml.is_a?(Array)
-      kochiku_yml
+    if @kochiku_yml.is_a?(Array)
+      @kochiku_yml
     else
-      kochiku_yml.fetch('targets')
+      @kochiku_yml.fetch('targets')
     end.map do |subset|
       file_to_times_hash = load_manifest(subset['time_manifest'])
       if file_to_times_hash.is_a?(Hash)
@@ -48,9 +31,13 @@ class Partitioner
     end.flatten.compact.max
   end
 
+  def queue_for_build(build)
+    build.project.main? ? "ci" : "developer"
+  end
+
   def build_partitions(build)
-    if kochiku_yml['ruby']
-      kochiku_yml['ruby'].flat_map do |ruby|
+    if @kochiku_yml['ruby']
+      @kochiku_yml['ruby'].flat_map do |ruby|
         build_targets(build, ruby)
       end
     else
@@ -60,23 +47,26 @@ class Partitioner
 
   def build_targets(build, ruby_version=nil)
     options = {}
-    options['language'] = kochiku_yml['language'] if kochiku_yml['language']
+    options['language'] = @kochiku_yml['language'] if @kochiku_yml['language']
     options['ruby'] = ruby_version if ruby_version
+    options['log_file_globs'] = @kochiku_yml['log_file_globs'] if @kochiku_yml['log_file_globs']
 
-    kochiku_yml['targets'].flat_map do |subset|
+    @kochiku_yml['targets'].flat_map do |subset|
       partitions_for(
         build,
-        subset.merge('options' => options)
+        subset.merge('options' => options.merge(subset.fetch('options', {})))
       )
     end
   end
 
   def partitions_for(build, subset)
+    subset['options'] ||= {}
     glob = subset.fetch('glob', '/dev/null')
     type = subset.fetch('type', 'test')
     workers = subset.fetch('workers', 1)
     manifest = subset['manifest']
     retry_count = subset['retry_count'] || 0
+    subset['options']['log_file_globs'] = subset['log_file_globs'] if subset['log_file_globs']
 
     queue = queue_for_build(build)
 
@@ -99,11 +89,9 @@ class Partitioner
 
     files -= balanced_partitions.flatten
 
-    (Strategies.send(strategy, files, workers) + balanced_partitions).map do |files|
-      part = {'type' => type, 'files' => files.compact, 'queue' => queue, 'retry_count' => retry_count}
-      if subset['options']
-        part['options'] = subset['options']
-      end
+    (Strategies.send(strategy, files, workers) + balanced_partitions).map do |part_files|
+      part = {'type' => type, 'files' => part_files.compact, 'queue' => queue,
+              'retry_count' => retry_count, 'options' => subset['options']}
       part
     end.select { |p| p['files'].present? }
   end

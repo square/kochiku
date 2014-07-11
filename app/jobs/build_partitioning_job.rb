@@ -14,10 +14,8 @@ class BuildPartitioningJob < JobBase
   end
 
   def perform
-    GitRepo.inside_copy(@build.repository, @build.ref, @build.branch) do
-      @build.partition(Partitioner.new.partitions(@build))
-      @build.repository.remote_server.update_commit_status!(@build)
-    end
+    @build.partition(Partitioner.new.partitions(@build))
+    @build.update_commit_status!
   end
 
   def on_exception(e)
