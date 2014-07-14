@@ -29,6 +29,15 @@ describe Build do
     end
   end
 
+  describe '#kochiku_yml' do
+    it 'only tries to load once if it fails' do
+      expect(GitRepo).to receive(:load_kochiku_yml).once
+      5.times do
+        build.kochiku_yml
+      end
+    end
+  end
+
   describe "#partition" do
     it "should create a BuildPart for each path" do
       build.partition(parts)
