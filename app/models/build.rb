@@ -135,6 +135,12 @@ class Build < ActiveRecord::Base
     last_finished_at - created_at
   end
 
+  def linear_time
+    build_parts.inject(0) do |sum, part|
+      sum + part.elapsed_time if part.elapsed_time
+    end
+  end
+
   def succeeded?
     state == :succeeded
   end

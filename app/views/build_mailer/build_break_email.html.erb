@@ -1,31 +1,34 @@
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/html">
-<head>
-  <meta content='text/html; charset=UTF-8' http-equiv='Content-Type'/>
-</head>
-<body>
-<h2>Project <%= @build.project.name %> failed on branch <%= @build.branch %></h2>
-<%= project_build_url(@build.project, @build) %><br>
+  <head>
+    <meta content='text/html; charset=UTF-8' http-equiv='Content-Type'/>
+  </head>
+  <body>
+    <h1><%= @build.branch %> build failed for <%= @build.project.name %></h1>
+    <%= link_to('Link to build.', project_build_url(@build.project, @build)) %>
+    The build was sharded into <%= @build.build_parts.count %> parts and took
+    <%= @build.elapsed_time.to_i/60 %> minutes instead of <%= @build.linear_time.to_i/60 %>.<br>
 
-Failed build parts:
-<ul>
-  <% @failed_build_parts.each do |failed_build_part| %>
-  <li>
-    <%= project_build_part_url(@build.project, @build, failed_build_part) %> for details or go directly to <%= failed_build_stdout(failed_build_part) %>
-  </li>
+    <h2>Failed build parts:</h2>
+    <ul>
+      <% @failed_build_parts.each do |failed_build_part| %>
+        <li>
+        <%= link_to("Part number #{failed_build_part.id}", project_build_part_url(@build.project, @build, failed_build_part)) %>
+        failed after <%= failed_build_part.elapsed_time.to_i/60 %> minutes,
+        for details you can go directly to the <%= link_to('stdout', failed_build_stdout(failed_build_part)) %>
+    </li>
+    <% end %>
+    </ul>
+
+    <h2>
+      <%= "Changes #{@build.project.main? ? 'since last success' : 'included in build'}" %>
+    </h2>
+    <% @git_changes.each do |git_change| %>
+      <b>SHA: <%= link_to(git_change[:hash], "#{@build.project.repository.remote_server.href_for_commit(git_change[:hash])}") %></b><br>
+      <b>Committer:</b> <%= git_change[:author] %><br>
+      <b>Date:</b> <%=  git_change[:date] %><br>
+    <pre><%= git_change[:message] %></pre>
+    <br><br>
   <% end %>
-</ul>
-<br>
-
-<h2>Changes since last success</h2>
-<% @git_changes.each do |git_change| %>
-  <b>commit <%= link_to(git_change[:hash], "#{@build.project.repository.remote_server.href_for_commit(git_change[:hash])}") %></b><br>
-  Author: <%= git_change[:author] %><br>
-  Date: <%=  git_change[:date] %><br>
-  <br>
-  <%= git_change[:message] %>
-  <br><br>
-<% end %>
-
-</body>
+  </body>
 </html>

@@ -1,20 +1,21 @@
-Project <%= @build.project.name %> failed on branch <%= @build.branch %>
+<%= @build.branch %> build failed for <%= @build.project.name %>
 <%= project_build_url(@build.project, @build) %>
+The build was sharded into <%= @build.build_parts.count %> parts and took <%= @build.elapsed_time.to_i/60 %> minutes instead of <%= @build.linear_time.to_i/60 %>
 
 Failed build parts:
 <% @failed_build_parts.each do |failed_build_part| %>
   Go to <%= project_build_part_url(@build.project, @build, failed_build_part) %> for details
-
   Or go directly to <%= failed_build_stdout(failed_build_part) %>
+
 <% end %>
 
 --------------------------------------------------------------------------------
-Changes since last success
+<%= "Changes #{@build.project.main? ? 'since last success' : 'included in build'}" %>
 --------------------------------------------------------------------------------
 
 <% @git_changes.each do |git_change| %>
-  commit <%= git_change[:hash] %>
-  Author: <%= git_change[:author] %>
+  SHA: <%= git_change[:hash] %>
+  Committer: <%= git_change[:author] %>
   Date: <%=  git_change[:date] %>
 
       <%= git_change[:message] %>

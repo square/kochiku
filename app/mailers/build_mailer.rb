@@ -26,7 +26,7 @@ class BuildMailer < ActionMailer::Base
 
     mail :to => @emails,
          :bcc => Settings.kochiku_notifications_email_address,
-         :subject => "[kochiku] #{@build.project.name} build for branch #{@build.branch} failed",
+         :subject => "[kochiku - failure] #{@build.branch} build for #{@build.project.name}",
          :from => Settings.sender_email_address
   end
 
@@ -37,7 +37,7 @@ class BuildMailer < ActionMailer::Base
 
     mail :to => @email,
          :bcc => Settings.kochiku_notifications_email_address,
-         :subject => "[kochiku] #{@build.project.name} build for branch #{@build.branch} passed",
+         :subject => "[kochiku - success] #{@build.branch} build for #{@build.project.name}",
          :from => Settings.sender_email_address
   end
 end
