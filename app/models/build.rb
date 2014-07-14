@@ -75,7 +75,11 @@ class Build < ActiveRecord::Base
   end
 
   def kochiku_yml
-    @kochiku_yml ||= GitRepo.load_kochiku_yml(repository, ref)
+    if @kochiku_yml.nil?
+      @kochiku_yml = GitRepo.load_kochiku_yml(repository, ref) || false
+    else
+      @kochiku_yml
+    end
   end
 
   def partition(parts)
