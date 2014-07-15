@@ -6,7 +6,5 @@ class BuildStrategy
     end
     def run_success_script(build)
     end
-    def add_note(build_ref, namespace, note)
-    end
   end
 end

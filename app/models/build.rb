@@ -180,10 +180,6 @@ class Build < ActiveRecord::Base
     end
   end
 
-  def add_note!
-    BuildStrategy.add_note(ref, "ci-#{project.name}", repository)
-  end
-
   def completed?
     TERMINAL_STATES.include?(state)
   end

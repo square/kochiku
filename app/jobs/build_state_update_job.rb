@@ -21,9 +21,6 @@ class BuildStateUpdateJob < JobBase
     end
 
     if build.succeeded?
-      if build.repository.has_on_success_note?
-        build.add_note!
-      end
       if build.on_success_script.present? && !build.on_success_script_log_file.present?
         BuildStrategy.run_success_script(build)
       end
