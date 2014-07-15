@@ -19,7 +19,7 @@
 
   .actions
     %label
-      = check_box_tag :refresh, true, @build_part.is_running?
+      = check_box_tag :refresh, true, @build_part.not_finished?
       Refresh
 
 .build-info.build-info-subheader

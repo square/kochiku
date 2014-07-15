@@ -45,19 +45,19 @@ class ProjectsController < ApplicationController
     project = Project.find_by_name!(params[:id])
     @builds = project.builds.includes(:build_parts => :build_attempts).last(params[:count] || 12) # Get this from a param
 
-    build_part_attempts = Hash.new
-    build_part_failures = Hash.new
-    failed_parts = Hash.new
+    build_part_attempts = Hash.new(0)
+    build_part_failures = Hash.new(0)
+    failed_parts = Hash.new([])
     @builds.each do |build|
       build.build_parts.each do |build_part|
         key = [build_part.paths.sort, build_part.kind]
         build_part.build_attempts.each do |build_attempt|
           if build_attempt.successful?
-            build_part_attempts[key] = (build_part_attempts[key] || 0) + 1
+            build_part_attempts[key] = build_part_attempts[key] + 1
           elsif build_attempt.unsuccessful?
-            build_part_attempts[key] = (build_part_attempts[key] || 0) + 1
-            build_part_failures[key] = (build_part_failures[key] || 0) + 1
-            failed_parts[key] = (failed_parts[key] || []) << build_part
+            build_part_attempts[key] = build_part_attempts[key] + 1
+            build_part_failures[key] = build_part_failures[key] + 1
+            failed_parts[key] = failed_parts[key] << build_part
           end
         end
       end

@@ -66,7 +66,7 @@ class BuildPart < ActiveRecord::Base
     started_at && !finished_at
   end
 
-  def is_running?
+  def not_finished?
     !finished_at
   end
 
