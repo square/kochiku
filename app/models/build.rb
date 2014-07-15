@@ -141,7 +141,7 @@ class Build < ActiveRecord::Base
 
   def linear_time
     build_parts.inject(0) do |sum, part|
-      sum + part.elapsed_time if part.elapsed_time
+      sum + (part.elapsed_time || 0)
     end
   end
 
