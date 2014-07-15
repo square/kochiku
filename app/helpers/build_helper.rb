@@ -14,15 +14,18 @@ module BuildHelper
   def build_metadata_values(build, build_part)
     [].tap do |values|
       values << build_part.options["ruby"] if is_a_ruby_build?(build)
+      values << format_paths(build_part)
+    end
+  end
 
-      if build_part.paths.size == 1
-        values << build_part.paths.first
-      else
-        first, *rest = build_part.paths
-        first = first.sub(/([^\/]+)/, '<b class="root">\1</b>')
-        paths = [first, rest].join(', ')
-        values << "#{build_part.paths.length} <span class=\"paths\" title=\"#{build_part.paths.join(', ')}\">(#{paths})</span>".html_safe
-      end
+  def format_paths(build_part)
+    if build_part.paths.size == 1
+      build_part.paths.first
+    else
+      first, *rest = build_part.paths
+      first = first.sub(/([^\/]+)/, '<b class="root">\1</b>')
+      paths = [first, rest].join(', ')
+      "#{build_part.paths.length} <span class=\"paths\" title=\"#{build_part.paths.join(', ')}\">(#{paths})</span>".html_safe
     end
   end
 

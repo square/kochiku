@@ -387,6 +387,11 @@ input.ref
   font-size: 150%
 input.build-button
   font-size: 120%
+/* health pretends to be a button */
+.health
+  font-family: $font-base
+  float: right
+  margin: 8px 5px
 
 table
   table-layout: fixed
@@ -534,8 +539,9 @@ ol#build-paths
 .ci-succeeded
   background-color: desaturate(darken($color-passed, 20%), 20%)
 
-.ci-unknown
+.ci-unknown, .ci-aborted
   background-color: desaturate(darken($color-aborted, 10%), 20%)
+  font-weight: bold
 
 /* Repository form styles */
 
