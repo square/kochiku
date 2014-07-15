@@ -33,7 +33,7 @@
       %tr
         %th.right.whisker Rate
         %th Part Info
-    - @part_climate.sort.each do |key, parts_with_failures|
+    - @part_climate.sort.reverse.each do |key, parts_with_failures|
       %tr
         %td.right= "#{key[0]}%"
         %td= format_paths(parts_with_failures.first)
