@@ -29,9 +29,6 @@
       %label{:for => "on_green_update"} Update branches to last green commit:
       = f.text_field :on_green_update, {:id => "on_green_update", :placeholder => "Comma separated list of branches"}
     %div
-      %label{:for => "on_success_note"} Add git note:
-      = f.text_field :on_success_note, {:id => "on_success_note", :placeholder => "ex. (ci=green)"}
-    %div
       %label{:for => "on_success_script"} Run:
       = f.text_field :on_success_script, {:id => "on_success_script"}
     %div

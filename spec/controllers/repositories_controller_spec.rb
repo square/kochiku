@@ -123,7 +123,6 @@ describe RepositoriesController do
       :test_command,
       :on_green_update,
       :on_success_script,
-      :on_success_note,
       :name
     ].each do |attribute|
       it "should successfully update the #{attribute} attribute" do
