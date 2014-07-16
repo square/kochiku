@@ -47,7 +47,7 @@ class ProjectsController < ApplicationController
 
     build_part_attempts = Hash.new(0)
     build_part_failures = Hash.new(0)
-    failed_parts = Hash.new([])
+    failed_parts = Hash.new
     @builds.each do |build|
       build.build_parts.each do |build_part|
         key = [build_part.paths.sort, build_part.kind]
@@ -57,7 +57,7 @@ class ProjectsController < ApplicationController
           elsif build_attempt.unsuccessful?
             build_part_attempts[key] = build_part_attempts[key] + 1
             build_part_failures[key] = build_part_failures[key] + 1
-            failed_parts[key] = failed_parts[key] << build_part
+            failed_parts[key] = (failed_parts[key] || []) << build_part
           end
         end
       end
