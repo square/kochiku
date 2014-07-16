@@ -161,8 +161,8 @@ describe BuildPart do
     end
   end
 
-  describe "#is_running?" do
-    subject { build_part.is_running? }
+  describe "#not_finished?" do
+    subject { build_part.not_finished? }
     context "when not finished" do
       it { should be true }
     end

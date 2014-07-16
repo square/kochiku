@@ -1,6 +1,11 @@
 <%= @build.branch %> build succeeded for <%= @build.project.name %>
 <%= project_build_url(@build.project, @build) %>
-The build was sharded into <%= @build.build_parts.count %> parts and took <%= @build.elapsed_time.to_i/60 %> minutes instead of <%= @build.linear_time.to_i/60 %>.
+<% if @build.build_parts.count > 1 %>
+  The build was sharded into <%= @build.build_parts.count %> parts and took
+  <%= @build.elapsed_time.to_i/60 %> minutes instead of <%= @build.linear_time.to_i/60 %>.
+<% else %>
+  The build took <%= @build.elapsed_time.to_i/60 %> minutes.
+<% end %>
 
 --------------------------------------------------------------------------------
 Changes included in build

@@ -13,6 +13,7 @@
     = f.submit "Build", {class: 'build-button'}
 
 - cache(@project) do
+  %div{class: 'health button'}= link_to('Health', url_for([:health, @project])+'?count=12', {:style => 'color: white'})
   - rate = error_free_pass_rate(@builds)
   - avg_rebuilds = average_number_of_rebuilds(@builds)
   - median_seconds_to_success = median_elapsed_time(@builds)
@@ -21,6 +22,9 @@
       %div{ title: "Median elapsed time for successful builds on #{@project.name}" }
         %span.label Median time:
         %span.number= "#{seconds_to_minutes(median_seconds_to_success)} minutes"
+    - else
+      %div{ title: "Median elapsed time for successful builds on #{@project.name}" }
+        %span.label Never built
 
     %div{ title: "Average number of build parts reattempted to get to a successful build", class: rebuild_count_css_class(avg_rebuilds) }
       %span.number= "%0.1f" % avg_rebuilds
@@ -28,7 +32,7 @@
 
     %div{ title: "Percentage of builds with all parts succeeding on the first try", class: pass_rate_css_class(rate) }
       %span.number= rate
-      %span.label pass rate on first try
+      %span.label completion rate on first try
 
 %h2.subheader
   - unless @build.project.main?
@@ -88,7 +92,7 @@
           - build_metadata_values(@current_build, part).each do |value|
             %td= value
           %td= part.kind.to_s.capitalize
-          %td.right.elapsed= build_part.elapsed_time ? duration_strftime(build_part.elapsed_time) : "pending" if build_part
+          %td.right.elapsed= build_part.elapsed_time ? duration_strftime(build_part.elapsed_time) : '' if build_part
           %td.right
             = build_part.build_attempts.size if build_part
             - average = (total_attempts.to_f / (@builds.length-1)).round 0 if @builds.length > 1
@@ -104,7 +108,7 @@
       (function() {
         var startTimes = #{
           start_times = {}
-          @current_build.build_parts.each { |part| start_times[dom_id(part)] = part.started_at if part.is_running? }
+          @current_build.build_parts.each { |part| start_times[dom_id(part)] = part.started_at if part.running? }
           start_times.to_json
         };
         var now = new Date();

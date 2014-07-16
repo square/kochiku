@@ -1,0 +1,47 @@
+= content_for :title, @project.name
+= content_for :favicon do
+  - if @current_build
+    = favicon_link_tag image_path("#{@current_build.to_color}.png"), type: 'image/png'
+
+- content_for :header do
+  %ul.links
+    %li= link_to("Settings", edit_repository_path(@project.repository), class: "info")
+    %li= link_to("Developer Builds", projects_repository_path(@project.repository))
+
+- cache(@project) do
+  - rate = error_free_pass_rate(@builds)
+  - avg_rebuilds = average_number_of_rebuilds(@builds)
+  - median_seconds_to_success = median_elapsed_time(@builds)
+  .performance
+    - if median_seconds_to_success
+      %div{ title: "Median elapsed time for successful builds on #{@project.name}" }
+        %span.label Median time:
+        %span.number= "#{seconds_to_minutes(median_seconds_to_success)} minutes"
+
+    %div{ title: "Average number of build parts reattempted to get to a successful build", class: rebuild_count_css_class(avg_rebuilds) }
+      %span.number= "%0.1f" % avg_rebuilds
+      %span.label rebuilds required on average
+
+    %div{ title: "Percentage of builds with all parts succeeding on the first try", class: pass_rate_css_class(rate) }
+      %span.number= rate
+      %span.label pass rate on first try
+
+- if @part_climate.count > 0
+  %h2.subheader= "#{@project.name} part failure stats over #{@builds.count} builds"
+  %table.project-part-info
+    %thead
+      %tr
+        %th.right.whisker Rate
+        %th Part Info
+    - @part_climate.sort.reverse.each do |key, parts_with_failures|
+      %tr
+        %td.right= "#{key[0]}%"
+        %td= format_paths(parts_with_failures.first)
+      %tr
+        %td
+        %td
+          - parts_with_failures.each do |part|
+            = link_to "/projects/#{@project.to_param}/builds/#{part.build_instance.to_param}/parts/#{part.to_param}" do
+              %span.part-status{class: [part.status, "attempt-#{part.build_attempts.size}"]}
+- else
+  %h2.subheader= "#{@project.name} hasn't failed in #{@builds.count} builds"

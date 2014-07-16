@@ -19,7 +19,7 @@
 
   .actions
     %label
-      = check_box_tag :refresh, true, @build_part.is_running?
+      = check_box_tag :refresh, true, @build_part.not_finished?
       Refresh
 
 .build-info.build-info-subheader
@@ -52,10 +52,10 @@
             = link_to File.basename(artifact.log_file.to_s), artifact.log_file.url
             %br
         %td
-          - if attempt.unsuccessful? && @build_part.unsuccessful?
+          - if (attempt.unsuccessful? || attempt.aborted?) && @build_part.unsuccessful?
             = link_to("Rebuild", rebuild_project_build_part_path(@project, @build, @build_part), :method => :post)
-          - if attempt.running?
-            = link_to("Abandon", finish_build_attempt_path(attempt, :state => :errored), :method => :post)
+          - if not attempt.stopped?
+            = link_to("Abandon", finish_build_attempt_path(attempt, :state => :aborted), :method => :post)
 
 %ol#build-paths
   - @build_part.paths.each do |path|

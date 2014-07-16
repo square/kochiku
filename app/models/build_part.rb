@@ -62,7 +62,11 @@ class BuildPart < ActiveRecord::Base
     !successful?
   end
 
-  def is_running?
+  def running?
+    started_at && !finished_at
+  end
+
+  def not_finished?
     !finished_at
   end
 

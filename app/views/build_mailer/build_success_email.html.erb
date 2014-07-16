@@ -6,8 +6,12 @@
   <body>
     <h1><%= @build.branch %> build succeeded for <%= @build.project.name %></h1>
     <%= link_to('Link to build.', project_build_url(@build.project, @build)) %>
-    The build was sharded into <%= @build.build_parts.count %> parts and took
-    <%= @build.elapsed_time.to_i/60 %> minutes instead of <%= @build.linear_time.to_i/60 %>.<br>
+    <% if @build.build_parts.count > 1 %>
+      The build was sharded into <%= @build.build_parts.count %> parts and took
+      <%= @build.elapsed_time.to_i/60 %> minutes instead of <%= @build.linear_time.to_i/60 %>.<br>
+    <% else %>
+      The build took <%= @build.elapsed_time.to_i/60 %> minutes.<br>
+    <% end %>
     <h2>Changes included in build</h2>
     <% @git_changes.each do |git_change| %>
       <b>SHA: <%= link_to(git_change[:hash], "#{@build.project.repository.remote_server.href_for_commit(git_change[:hash])}") %></b><br>

@@ -41,6 +41,37 @@ class ProjectsController < ApplicationController
     end
   end
 
+  def health
+    project = Project.find_by_name!(params[:id])
+    @builds = project.builds.includes(:build_parts => :build_attempts).last(params[:count] || 12) # Get this from a param
+
+    build_part_attempts = Hash.new(0)
+    build_part_failures = Hash.new(0)
+    failed_parts = Hash.new([])
+    @builds.each do |build|
+      build.build_parts.each do |build_part|
+        key = [build_part.paths.sort, build_part.kind]
+        build_part.build_attempts.each do |build_attempt|
+          if build_attempt.successful?
+            build_part_attempts[key] = build_part_attempts[key] + 1
+          elsif build_attempt.unsuccessful?
+            build_part_attempts[key] = build_part_attempts[key] + 1
+            build_part_failures[key] = build_part_failures[key] + 1
+            failed_parts[key] = failed_parts[key] << build_part
+          end
+        end
+      end
+    end
+
+    @part_climate = Hash.new
+    failed_parts.each do |key,parts|
+      part_error_rate = (build_part_failures[key] * 100 / build_part_attempts[key])
+      @part_climate[[part_error_rate, key]] = parts.uniq
+    end
+
+    @project = project.decorate
+  end
+
   def build_time_history
     @project = Project.find_by_name!(params[:project_id])
 
