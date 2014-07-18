@@ -50,9 +50,11 @@ group :test, :development do
 end
 
 group :development do
-  gem 'capistrano', '< 3.0', require: false
+  gem 'capistrano', '~> 3.0', require: false
+  gem 'capistrano-rails', '~> 1.1', require: false
+  gem 'capistrano-bundler', '~> 1.1', require: false
   gem 'quiet_assets'
-  gem 'rvm-capistrano', require: false
+  gem 'capistrano-rvm', '~> 0.1', require: false
   gem 'thin'
   gem 'rails-erd'
 end

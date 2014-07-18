@@ -8,9 +8,6 @@ vendor/ruby
 # file with the real db config for production
 /config/database.production.yml
 
-# deploy.custom.rb contains installation specific capistrano config
-/config/deploy.custom.rb
-
 # application settings
 /config/application.yml
 robot-password
