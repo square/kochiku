@@ -1,0 +1,41 @@
+# Users may choose to:
+#
+# A) edit the deploy tasks directly inside this file
+# B) create another .cap file and define your deploy:restart task inside
+#
+# Option B is recommended because it will make merging in upstream Kochiku
+# changes easy.
+namespace :deploy do
+
+  # task :start do
+  #   on roles(:worker) do
+  #   end
+  #   on roles(:app) do
+  #   end
+  # end
+
+  # task :stop do
+  #   on roles(:worker) do
+  #   end
+  #   on roles(:app) do
+  #   end
+  # end
+
+  # task :restart do
+  #   on roles(:worker) do
+  #     # Necessary step to restart the Resque workers specific to your
+  #     # deployment
+  #   end
+  #   on roles(:app) do
+  #     # Example restart step for a Phusion Passenger deployment
+  #     execute :touch, "#{current_release}/tmp/restart.txt"
+  #   end
+  # end
+
+  task :overwrite_database_yml do
+    on roles(:app) do |host|
+      execute :mv, "#{release_path}/config/database.production.yml", "#{release_path}/config/database.yml"
+    end
+  end
+end
+# vi: filetype=ruby

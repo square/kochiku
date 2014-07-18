@@ -1,0 +1,18 @@
+namespace :kochiku do
+  task :setup do
+    on roles([:app, :worker]) do
+      SSHKit.config.command_map.prefix[:gem].pop    #pop off 'bundle exec'
+
+      execute :gem, "install", "bundler",  "--conservative", "-v", "1.3"
+      execute "mkdir -p #{shared_path}/build-partition #{shared_path}/log_files"
+    end
+  end
+
+  task :symlinks do
+    on roles([:app, :worker]) do
+      execute "ln -nfFs #{shared_path}/build-partition #{current_path}/tmp/build-partition"
+      execute "ln -nfFs #{shared_path}/log_files #{current_path}/public/log_files"
+    end
+  end
+end
+# vi: filetype=ruby
