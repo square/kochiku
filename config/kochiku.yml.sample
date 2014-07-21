@@ -1,0 +1,28 @@
+# By listing ruby versions, all of you tests can be run against multiple versions
+ruby:
+  - 2.1.2
+
+# You can list additional log files to be uploaded by the workers
+# the stdout from your build will always be uploaded
+log_file_globs:
+  - log/test.log
+  - myLogs/*.log
+
+# Your test command should be specified here
+test_command: script/ci
+
+# You can create a script to be run inside your repo after a green build
+on_success_script: script/success
+
+# Listing targets helps kochiku shard your build
+targets:
+  - type: spec
+    glob: spec/**/*_spec.rb
+    workers: 1
+    # If you have multiple workers, you can set a balance strategy
+    balance: round_robin # is the default strategy
+    # Creating a time manifest helps kochiku better partition the target
+    time_manifest: config/ci/time_manifest.yml # requires round_robin balance
+    # Listing log files for a target overrides the global log files
+    log_file_globs:
+      - log/*.html
