@@ -6,9 +6,10 @@
   %div
     %label{:for => "name"} Repository Name:
     = f.text_field :name, {:placeholder => '(default is based off url)', :autocapitalize => 'off', :autocorrect => 'off', :spellcheck => 'false'}
-  %div
-    %label{:for => "test_command"} Test Command:
-    = f.text_field :test_command, {:placeholder => 'e.g. script/ci', :autocapitalize => 'off', :autocorrect => 'off', :spellcheck => 'false'}
+  - if @repository.test_command.present?
+    %div{ title: 'Test command should now be specified in the kochiku.yml' }
+      %label{:for => "test_command"} Test Command: (Deprecated)
+      = f.text_field :test_command, {:id => 'test_command', :disabled => true}
   %div
     %label{:for => "timeout"} Timeout a build part after:
     = f.text_field :timeout, {:id => "timeout"}
@@ -28,9 +29,10 @@
     %div
       %label{:for => "on_green_update"} Update branches to last green commit:
       = f.text_field :on_green_update, {:id => "on_green_update", :placeholder => "Comma separated list of branches"}
-    %div
-      %label{:for => "on_success_script"} Run:
-      = f.text_field :on_success_script, {:id => "on_success_script"}
+    - if @repository.on_success_script.present?
+      %div{ title: 'On success script should now be specified in the kochiku.yml' }
+        %label{:for => "on_success_script"} Run: (Deprecated)
+        = f.text_field :on_success_script, {:id => "on_success_script", :disabled => true}
     %div
       %label{:for => "send_build_success_email"} Send email to contributers:
       = f.check_box :send_build_success_email, {:id => "send_build_success_email"}

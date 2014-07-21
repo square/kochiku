@@ -15,7 +15,6 @@ describe RepositoriesController do
       }.to change(Repository, :count).by(1)
       repository = Repository.where(url: "git@git.example.com:square/kochiku.git").first
       expect(repository).to be_present
-      expect(repository.test_command).to eq("script/something")
     end
 
     it "creates a ci and pull_requests project" do
@@ -69,16 +68,15 @@ describe RepositoriesController do
   end
 
   describe "update" do
-    let!(:repository) { FactoryGirl.create(:repository, :url => "git@git.example.com:square/kochiku.git", :test_command => "script/something")}
+    let!(:repository) { FactoryGirl.create(:repository, :url => "git@git.example.com:square/kochiku.git")}
 
     it "updates existing repository" do
       expect{
-        patch :update, :id => repository.id, :repository => {:url => "git@git.example.com:square/kochiku-worker.git", :test_command => "script/something-else"}
+        patch :update, :id => repository.id, :repository => {:url => "git@git.example.com:square/kochiku-worker.git"}
         expect(response).to be_redirect
       }.to_not change(Repository, :count)
       repository.reload
       expect(repository.url).to eq("git@git.example.com:square/kochiku-worker.git")
-      expect(repository.test_command).to eq("script/something-else")
       expect(response).to be_redirect
     end
 
@@ -97,6 +95,7 @@ describe RepositoriesController do
       :run_ci,
       :build_pull_requests,
       :send_build_failure_email,
+      :send_build_success_email,
       :allows_kochiku_merges
     ].each do |attribute|
       it "should successfully update the #{attribute} attribute" do
@@ -120,9 +119,7 @@ describe RepositoriesController do
 
     # string attributes
     [
-      :test_command,
       :on_green_update,
-      :on_success_script,
       :name
     ].each do |attribute|
       it "should successfully update the #{attribute} attribute" do
