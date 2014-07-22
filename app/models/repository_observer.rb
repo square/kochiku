@@ -8,6 +8,6 @@ class RepositoryObserver < ActiveRecord::Observer
   end
 
   def setup_hook?
-    Rails.env == "production"
+    Rails.env.production? || Rails.env.staging?
   end
 end
