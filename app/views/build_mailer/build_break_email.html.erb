@@ -20,9 +20,20 @@
         <%= link_to("Part number #{failed_build_part.id}", project_build_part_url(@build.project, @build, failed_build_part)) %>
         failed after <%= failed_build_part.elapsed_time.to_i/60 %> minutes,
         for details you can go directly to the <%= link_to('stdout', failed_build_stdout(failed_build_part)) %>
-    </li>
-    <% end %>
+      <% end %>
     </ul>
+    <br>
+    <% @responsible_email_and_files.each do |email, files| %>
+      <%= email %> was emailed because of changes to:
+      <ul>
+        <% files.each do |file| %>
+          <li>
+          <%= file %>
+        </li>
+      <% end %>
+      </ul>
+    <% end %>
+    <br>
 
     <h2>
       <%= "Changes #{@build.project.main? ? 'since last success' : 'included in build'}" %>
@@ -31,8 +42,8 @@
       <b>SHA: <%= link_to(git_change[:hash], "#{@build.project.repository.remote_server.href_for_commit(git_change[:hash])}") %></b><br>
       <b>Committer:</b> <%= git_change[:author] %><br>
       <b>Date:</b> <%=  git_change[:date] %><br>
-    <pre><%= git_change[:message] %></pre>
-    <br><br>
-  <% end %>
+      <pre><%= git_change[:message] %></pre>
+      <br><br>
+    <% end %>
   </body>
 </html>

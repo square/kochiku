@@ -53,6 +53,7 @@ Kochiku.graphBuildTimes = function(projectName) {
       cucumber:     'hsl(87,  63%, 47%)',
       spec:         'hsl(187, 63%, 47%)',
       jasmine:      'hsl(27,  63%, 47%)',
+      maven:        'hsl(207, 63%, 47%)',
       unit:         'hsl(187, 63%, 47%)',
       integration:  'hsl(87,  63%, 47%)',
       acceptance:   'hsl(207, 63%, 47%)'

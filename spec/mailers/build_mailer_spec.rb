@@ -1,4 +1,5 @@
-require "spec_helper"
+require 'spec_helper'
+require 'partitioner'
 
 describe BuildMailer do
   let(:build) { FactoryGirl.create(:build) }
@@ -28,9 +29,18 @@ describe BuildMailer do
   end
 
   describe "#build_break_email" do
-    context "on master as the main build for the project" do
-      let(:build) { FactoryGirl.create(:main_project_build) }
+    let(:build) { FactoryGirl.create(:main_project_build) }
 
+    before do
+      partitioner = instance_double('Partitioner::Base')
+      allow(partitioner).to receive(:emails_for_commits_causing_failures).and_return({})
+      allow(Partitioner).to receive(:for_build).and_return(partitioner)
+
+      build_part = build.build_parts.create!(:paths => ["a", "b"], :kind => "cucumber", :queue => :ci)
+      build_part.build_attempts.create!(:state => :failed, :builder => "test-builder")
+    end
+
+    context "on master as the main build for the project" do
       before do
         allow(GitBlame).to receive(:changes_since_last_green).and_return([{:hash => "sha", :author => "Joe", :date => "some day", :message => "always be shipping it"}])
         allow(GitBlame).to receive(:emails_since_last_green).and_return(["foo@example.com"])
@@ -39,15 +49,11 @@ describe BuildMailer do
       it "sends the email" do
         expect(build.project).to be_main
 
-        build_part = build.build_parts.create!(:paths => ["a", "b"], :kind => "cucumber", :queue => :ci)
-        build_part.build_attempts.create!(:state => :failed, :builder => "test-builder")
-
         email = BuildMailer.build_break_email(build)
 
         expect(email.to).to eq(["foo@example.com"])
-
-        expect(email.html_part.body).to include(build_part.project.name)
-        expect(email.text_part.body).to include(build_part.project.name)
+        expect(email.html_part.body).to include(build.project.name)
+        expect(email.text_part.body).to include(build.project.name)
         expect(email.html_part.body).to include("http://")
         expect(email.text_part.body).to include("http://")
       end
@@ -62,15 +68,30 @@ describe BuildMailer do
       end
 
       it "sends the email" do
-        build_part = build.build_parts.create!(:paths => ["a", "b"], :kind => "cucumber", :queue => :ci)
-        build_part.build_attempts.create!(:state => :failed, :builder => "test-builder")
-
         email = BuildMailer.build_break_email(build)
 
         expect(email.to).to eq(["foo@example.com"])
+        expect(email.html_part.body).to include(build.project.name)
+        expect(email.text_part.body).to include(build.project.name)
+        expect(email.html_part.body).to include("http://")
+        expect(email.text_part.body).to include("http://")
+      end
+    end
 
-        expect(email.html_part.body).to include(build_part.project.name)
-        expect(email.text_part.body).to include(build_part.project.name)
+    context "with emails from a partitioner" do
+      before do
+        partitioner = instance_double('Partitioner::Base')
+        allow(partitioner).to receive(:emails_for_commits_causing_failures).and_return({'foo@example.com' => ['sha']})
+        allow(Partitioner).to receive(:for_build).and_return(partitioner)
+        allow(GitBlame).to receive(:changes_since_last_green).and_return([{:hash => "sha", :author => "Foo", :date => "some day", :message => "does this work? LOL"}])
+      end
+
+      it "uses those emails" do
+        email = BuildMailer.build_break_email(build)
+
+        expect(email.to).to eq(["foo@example.com"])
+        expect(email.html_part.body).to include(build.project.name)
+        expect(email.text_part.body).to include(build.project.name)
         expect(email.html_part.body).to include("http://")
         expect(email.text_part.body).to include("http://")
       end

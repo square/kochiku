@@ -66,6 +66,10 @@ class Build < ActiveRecord::Base
     (kochiku_yml && kochiku_yml.has_key?('on_success_script')) ? kochiku_yml['on_success_script'] : repository.on_success_script
   end
 
+  def previous_build
+    project.builds.order("id DESC").where("id < ?", self.id).first
+  end
+
   def previous_successful_build
     Build.successful_for_project(project_id).order("id DESC").where("id < ?", self.id).first
   end

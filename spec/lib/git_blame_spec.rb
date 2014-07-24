@@ -120,6 +120,23 @@ describe GitBlame do
     end
   end
 
+  describe "#files_changed_since_last_build" do
+    let(:options) { {} }
+    subject { GitBlame.files_changed_since_last_build(build, options) }
+
+    before do
+      allow(GitBlame).to receive(:files_changed_since_last_build).and_call_original
+    end
+
+    it "should parse the git log and return change file paths" do
+      allow(GitRepo).to receive(:inside_repo).and_return("::!::User One:userone@example.com::!::\n\npath/one/file.java\npath/two/file.java")
+      git_file_changes = subject
+      expect(git_file_changes.size).to eq(2)
+      expect(git_file_changes).to include({:file => "path/one/file.java", :emails => []})
+      expect(git_file_changes).to include({:file => "path/two/file.java", :emails => []})
+    end
+  end
+
   describe "#files_changed_since_last_green" do
     let(:options) { {} }
     subject { GitBlame.files_changed_since_last_green(build, options) }

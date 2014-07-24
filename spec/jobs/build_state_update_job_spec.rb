@@ -102,7 +102,6 @@ describe BuildStateUpdateJob do
               expect { subject }.to_not change(project.builds, :count)
               expect(new_build.reload.state).to eq(:failed)
             end
-
           end
 
           context "no new sha" do

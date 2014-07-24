@@ -40,6 +40,8 @@ class GitRepo
 
     def load_kochiku_yml(repository, ref)
       inside_repo(repository) do
+        raise RefNotFoundError, "repo:#{repository.url}, sha:#{ref}" unless system("git rev-list --quiet -n1 #{ref}")
+
         read_repo_config(ref)
       end
     end
