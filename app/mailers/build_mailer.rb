@@ -14,11 +14,22 @@ class BuildMailer < ActionMailer::Base
 
   def build_break_email(build)
     @build = build
+
+    # Allow the partitioner to be selective about who is emailed
+    partitioner = Partitioner.for_build(@build)
+    @responsible_email_and_files = partitioner.emails_for_commits_causing_failures
+    @emails = @responsible_email_and_files.keys
+    if @emails.empty?
+      if @build.project.main?
+        @emails = GitBlame.emails_since_last_green(@build)
+      else
+        @emails = GitBlame.emails_in_branch(@build)
+      end
+    end
+
     if @build.project.main?
-      @emails = GitBlame.emails_since_last_green(@build)
       @git_changes = GitBlame.changes_since_last_green(@build)
     else
-      @emails = GitBlame.emails_in_branch(@build)
       @git_changes = GitBlame.changes_in_branch(@build)
     end
 

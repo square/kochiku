@@ -20,9 +20,7 @@ class BuildPart < ActiveRecord::Base
   def create_and_enqueue_new_build_attempt!
     build_attempt = build_attempts.create!(:state => :runnable)
     build_instance.running!
-
     BuildAttemptJob.enqueue_on(queue.to_s, job_args(build_attempt))
-
     build_attempt
   end
 

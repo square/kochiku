@@ -31,6 +31,13 @@ class GitBlame
       parse_git_changes(output)
     end
 
+    def files_changed_since_last_build(build, options = {})
+      output = GitRepo.inside_repo(build.repository) do
+        Cocaine::CommandLine.new("git log --no-merges --format='::!::%an:%ae::!::' --name-only '#{build.previous_build.try(:ref)}...#{build.ref}'").run
+      end
+      parse_git_files_changes(output, options)
+    end
+
     def files_changed_since_last_green(build, options = {})
       output = GitRepo.inside_repo(build.repository) do
         # TODO: Push this down into GitRepo and integration test it.

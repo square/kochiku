@@ -14,7 +14,7 @@ class BuildPartitioningJob < JobBase
   end
 
   def perform
-    @build.partition(Partitioner.new.partitions(@build))
+    @build.partition(Partitioner.for_build(@build).partitions)
     @build.update_commit_status!
   end
 

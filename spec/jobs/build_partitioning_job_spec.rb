@@ -11,7 +11,7 @@ describe BuildPartitioningJob do
       before do
         allow(GitRepo).to receive(:inside_copy).and_yield
         allow(Build).to receive(:find).with(id).and_return(build)
-        allow(Partitioner).to receive(:new).and_return(partitioner)
+        allow(Partitioner).to receive(:for_build).with(build).and_return(partitioner)
         allow(partitioner).to receive(:partitions).and_return('PARTITIONS')
         allow(build).to receive(:partition).with('PARTITIONS')
       end
@@ -41,7 +41,7 @@ describe BuildPartitioningJob do
 
     context "when a non-retryable error occurs" do
       error_message = "A name error occurred"
-      before { allow(GitRepo).to receive(:inside_copy).and_raise(NameError.new(error_message)) }
+      before { allow(GitRepo).to receive(:load_kochiku_yml).and_raise(NameError.new(error_message)) }
 
       it "should re-raise the error and set the build state to errored" do
         expect { subject }.to raise_error(NameError)
@@ -53,7 +53,7 @@ describe BuildPartitioningJob do
     end
 
     context "when a retryable error occurs" do
-      before { allow(GitRepo).to receive(:inside_copy).and_raise(GitRepo::RefNotFoundError) }
+      before { allow(GitRepo).to receive(:load_kochiku_yml).and_raise(GitRepo::RefNotFoundError) }
 
       it "should re-raise the error and set the build state to waiting for sync" do
         expect { subject }.to raise_error(GitRepo::RefNotFoundError)

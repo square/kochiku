@@ -56,6 +56,7 @@ RSpec.configure do |config|
     allow(GitBlame).to receive(:git_names_and_emails_in_branch).and_return("")
     allow(GitBlame).to receive(:changes_since_last_green).and_return([])
     allow(GitBlame).to receive(:changes_in_branch).and_return([])
+    allow(GitBlame).to receive(:files_changed_since_last_build).and_return([])
     allow(GitBlame).to receive(:files_changed_since_last_green).and_return([])
     allow(GitBlame).to receive(:files_changed_in_branch).and_return([])
 
