@@ -2,7 +2,6 @@ require 'remote_server'
 
 # TODO: Combine this controller with RepositoriesController#build_ref
 class PullRequestsController < ApplicationController
-  skip_before_filter :verify_authenticity_token, :only => [:build]
 
   def build
     handle_pull_request if payload["pull_request"]
