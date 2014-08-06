@@ -1,6 +1,5 @@
 # TODO: Combine this controller with PullRequestsController#build
 class RepositoriesController < ApplicationController
-  skip_before_filter :verify_authenticity_token, :only => [:build_ref]
 
   def create
     if params.fetch(:repository)[:url].blank?

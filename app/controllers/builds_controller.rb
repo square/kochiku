@@ -3,10 +3,6 @@ require 'git_repo'
 class BuildsController < ApplicationController
   before_filter :load_project, :only => [:show, :abort, :build_status, :toggle_merge_on_success, :rebuild_failed_parts, :retry_partitioning, :request_build, :modified_time]
 
-  # do not require authenticity_token for create so that it can be called by
-  # the kochiku command line script
-  skip_before_filter :verify_authenticity_token, :only => [:create]
-
   caches_action :show, :cache_path => proc { |c|
     updated_at = @project.builds.select(:updated_at).find(params[:id]).updated_at
     { :modified => updated_at.to_i }
