@@ -46,6 +46,34 @@ class GitBlame
   end
 end
 
+class Partitioner
+  def self.for_build(build)
+    Base.new(build, nil)
+  end
+
+  class Base
+    def initialize(build, kochiku_yml)
+      @build = build
+      @kochiku_yml = kochiku_yml
+    end
+
+    def partitions
+      [
+        {
+          'type' => 'test',
+          'files' => ['no-manifest'],
+          'queue' => @build.project.main? ? 'ci' : 'developer',
+          'retry_count' => 0
+        }
+      ]
+    end
+
+    def emails_for_commits_causing_failures
+      {}
+    end
+  end
+end
+
 class BuildMailerPreview < ActionMailer::Preview
   def build_break_email
     BuildMailer.build_break_email(Build.where(:state => :errored).first)

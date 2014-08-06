@@ -2,7 +2,7 @@
 <%= project_build_url(@build.project, @build) %>
 <% if @build.build_parts.count > 1 %>
   The build was sharded into <%= @build.build_parts.count %> parts and took <%= @build.elapsed_time.to_i/60 %> minutes.
-  (<%= @build.idle_time.to_i/60 %>m idle, <%= @build.build_time.to_i/60 %>m
+  (<%= @build.idle_time.to_i/60 %>m idle, <%= @build.longest_build_part.to_i/60 %>m
   <% if @build.retry_count > 0 %>
     running, requiring <%= @build.retry_count %> retries.)
   <% else %>
@@ -14,7 +14,7 @@
   <% end %>
 <% else %>
   The build took <%= @build.elapsed_time.to_i/60 %> minutes.
-  (<%= @build.idle_time.to_i/60 %>m idle, <%= @build.build_time.to_i/60 %>m
+  (<%= @build.idle_time.to_i/60 %>m idle, <%= @build.longest_build_part.to_i/60 %>m
   <% if @build.retry_count > 0 %>
     running, requiring <%= @build.retry_count %> retries.)
   <% else %>

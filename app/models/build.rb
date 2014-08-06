@@ -150,8 +150,8 @@ class Build < ActiveRecord::Base
   end
 
   def retry_count
-    build_parts.inject(0) do |sum, part|
-      sum + (part.build_attempts.count - 1)
+    build_parts.sum(0) do |part|
+      part.build_attempts.count - 1
     end
   end
 
@@ -159,12 +159,14 @@ class Build < ActiveRecord::Base
     build_parts.max_by { |part| part.build_attempts.count }.build_attempts.count - 1
   end
 
-  def build_time
+  # This can be used as `building_time` under the assumption that
+  # all parts executed in parallel.
+  def longest_build_part
     build_parts.max_by { |part| part.elapsed_time }.elapsed_time
   end
 
   def idle_time
-    (elapsed_time || 0) - (build_time || 0)
+    (elapsed_time || 0) - (longest_build_part || 0)
   end
 
   def succeeded?
