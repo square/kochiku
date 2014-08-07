@@ -8,7 +8,7 @@ class Repository < ActiveRecord::Base
   validates_presence_of :host, :name, :url
   validates_uniqueness_of :name
   validates_numericality_of :timeout, :only_integer => true
-  validates_inclusion_of :timeout, in: 0..1440, message: "the maximum timeout allowed is 1440 seconds"
+  validates_inclusion_of :timeout, :in => 0..1440, :message => 'The maximum timeout allowed is 1440 minutes'
 
   validates_uniqueness_of :url, :allow_blank => true
   validate :url_against_remote_servers

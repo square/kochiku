@@ -48,7 +48,7 @@ describe RepositoriesController do
         post :create, @params
         expect(response).to be_success
         expect(assigns[:repository].errors.full_messages.join(',')).
-          to include("the maximum timeout allowed is 1440 seconds")
+          to include("The maximum timeout allowed is 1440 minutes")
         expect(response).to render_template('new')
       end
     end
