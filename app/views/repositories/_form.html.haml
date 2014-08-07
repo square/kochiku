@@ -24,6 +24,9 @@
     %label{:for => "allows_kochiku_merges"} Allow developers to request branches be merged into master on success:
     = f.check_box :allows_kochiku_merges, {:id => "allows_kochiku_merges"}
 
+    - display_css = @repository.allows_kochiku_merges ? '' : 'display: none'
+    %span{:id => 'branch-delete-warning', :style => display_css} Warning: Kochiku will delete the branch from Git after merging.
+
   %fieldset
     %legend On a green build
     %div
@@ -47,3 +50,9 @@
 
 - unless @repository.new_record?
   = button_to "Delete", @repository, method: :delete, form_class: "delete-form", class: "danger-button", data: {confirm: "This is a permanent destructive action, are you sure?"}
+
+= content_for :javascript do
+  :javascript
+    $('#allows_kochiku_merges').change(function(){
+      $('#branch-delete-warning').toggle($("#allows_kochiku_merges").is(':checked'));
+    });
