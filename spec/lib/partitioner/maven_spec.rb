@@ -19,9 +19,9 @@ describe Partitioner::Maven do
       modules = ["a", "b", "b/1", "b/2", "b/1/2", "c/1"]
       partitions = subject.group_modules(modules)
       expect(partitions.size).to eq(3)
-      expect(partitions).to include({"type" => "maven", "files" => ["a"], "queue" => "ci", "retry_count" => 2})
-      expect(partitions).to include({"type" => "maven", "files" => ["b", "b/1", "b/1/2", "b/2"], "queue" => "ci", "retry_count" => 2})
-      expect(partitions).to include({"type" => "maven", "files" => ["c/1"], "queue" => "ci", "retry_count" => 2})
+      expect(partitions).to include(a_hash_including({ 'files' => ['a'] }))
+      expect(partitions).to include(a_hash_including({ 'files' => ['b', 'b/1', 'b/1/2', 'b/2'] }))
+      expect(partitions).to include(a_hash_including({ 'files' => ['c/1'] }))
     end
 
     context "with expand_directories" do
@@ -37,10 +37,10 @@ describe Partitioner::Maven do
         modules = ["a", "b", "b/elephant", "b/elephant/elephant-protos", "b/mint",]
         partitions = subject.group_modules(modules)
         expect(partitions.size).to eq(4)
-        expect(partitions).to include({"type" => "maven", "files" => ["a"], "queue" => "ci", "retry_count" => 2})
-        expect(partitions).to include({"type" => "maven", "files" => ["b"], "queue" => "ci", "retry_count" => 2})
-        expect(partitions).to include({"type" => "maven", "files" => ["b/elephant", "b/elephant/elephant-protos"], "queue" => "ci", "retry_count" => 2})
-        expect(partitions).to include({"type" => "maven", "files" => ["b/mint"], "queue" => "ci", "retry_count" => 2})
+        expect(partitions).to include(a_hash_including({ 'files' => ['a'] }))
+        expect(partitions).to include(a_hash_including({ 'files' => ['b'] }))
+        expect(partitions).to include(a_hash_including({ 'files' => ['b/elephant', 'b/elephant/elephant-protos'] }))
+        expect(partitions).to include(a_hash_including({ 'files' => ['b/mint'] }))
       end
     end
   end
@@ -71,11 +71,16 @@ describe Partitioner::Maven do
 
         it "should return the set of modules to build" do
           partitions = subject.partitions
+
+          expect(partitions.first['type']).to eq('maven') # This should be true for all partitioner actions
+          expect(partitions.first['options']).to_not include('log_file_globs') # Unless log_file_globs is set
+
           expect(partitions.size).to eq(4)
-          expect(partitions).to include({"type" => "maven", "files" => ["module-one"], "queue" => "ci", "retry_count" => 2})
-          expect(partitions).to include({"type" => "maven", "files" => ["module-two", "module-two/integration"], "queue" => "ci", "retry_count" => 2})
-          expect(partitions).to include({"type" => "maven", "files" => ["module-three"], "queue" => "ci", "retry_count" => 2})
-          expect(partitions).to include({"type" => "maven", "files" => ["module-four"], "queue" => "ci", "retry_count" => 2})
+          expect(partitions).to include(a_hash_including({ 'files' => ['module-one'] }))
+          expect(partitions).to include(a_hash_including({ 'files' => ['module-one'] }))
+          expect(partitions).to include(a_hash_including({ 'files' => ['module-two', 'module-two/integration'] }))
+          expect(partitions).to include(a_hash_including({ 'files' => ['module-three'] }))
+          expect(partitions).to include(a_hash_including({ 'files' => ['module-four'] }))
         end
 
         context "with always_build set" do
@@ -90,8 +95,29 @@ describe Partitioner::Maven do
           it "should always include the always_build in the partitions" do
             partitions = subject.partitions
             expect(partitions.size).to eq(5)
-            expect(partitions).to include({"type" => "maven", "files" => ["module-b"],
-                                           "queue" => "ci", "retry_count" => 2})
+            expect(partitions).to include(a_hash_including({ 'files' => ['module-b'] }))
+          end
+        end
+
+        context 'with log_file_globs' do
+          let(:kochiku_yml) {{ 'log_file_globs' => log_files }}
+
+          context 'that uses a single string' do
+            let(:log_files) { 'mylog.log' }
+
+            it 'puts an array into the options' do
+              partitions = subject.partitions
+              expect(partitions.first['options']['log_file_globs']).to eq(['mylog.log'])
+            end
+          end
+
+          context 'that uses an array' do
+            let(:log_files) { ['mylog.log', 'another.log'] }
+
+            it 'puts the array into the options' do
+              partitions = subject.partitions
+              expect(partitions.first['options']['log_file_globs']).to eq(['mylog.log', 'another.log'])
+            end
           end
         end
       end
@@ -106,8 +132,8 @@ describe Partitioner::Maven do
 
           partitions = subject.partitions
           expect(partitions.size).to eq(1)
-          expect(partitions).to include({"type" => "maven", "files" => build_part.paths,
-                                         "queue" => build_part.queue.to_s, "retry_count" => 2})
+          expect(partitions).to include(a_hash_including(
+            { "files" => build_part.paths, "queue" => build_part.queue.to_s }))
         end
 
         it "should not add all successful parts from the previous build" do
@@ -132,7 +158,7 @@ describe Partitioner::Maven do
         expect(subject).to receive(:all_partitions).and_return([{"type" => "maven", "files" => "ALL"}])
 
         partitions = subject.partitions
-        expect(partitions).to eq([{"type" => "maven", "files" => "ALL"}])
+        expect(partitions).to include({ 'type' => 'maven', 'files' => 'ALL' })
       end
 
       it "should not fail if a file is referenced in a top level module that is not in the top level pom" do
