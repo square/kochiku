@@ -6,6 +6,9 @@ class GitMergeExecutor
   class GitPushFailedError < StandardError; end
 
   def initialize(build)
+    if build.branch.blank?
+      raise "GitMergeExecutor requires a Build associated with a git branch"
+    end
     @build = build
   end
 
@@ -35,6 +38,14 @@ class GitMergeExecutor
     end
 
     [merge_log, push_log].join("\n")
+  end
+
+  def delete_branch
+    delete_log, status = Open3.capture2e("git push --porcelain --delete origin #{@build.branch}")
+    unless status.success?
+      Rails.logger.warn("Deletion of branch #{@build.branch} failed")
+      Rails.logger.warn(delete_log)
+    end
   end
 
   private

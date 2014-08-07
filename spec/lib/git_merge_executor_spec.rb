@@ -4,7 +4,7 @@ require 'git_merge_executor'
 describe GitMergeExecutor do
   describe "#merge_and_push" do
     let(:project) { FactoryGirl.create(:big_rails_project) }
-    let(:build) { FactoryGirl.create(:build, :project => project) }
+    let(:build) { FactoryGirl.create(:build, project: project, branch: 'funyuns') }
     let(:merger) { described_class.new(build) }
 
     subject { merger.merge_and_push }

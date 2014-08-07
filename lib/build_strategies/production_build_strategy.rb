@@ -43,6 +43,7 @@ class BuildStrategy
           merger = GitMergeExecutor.new(build)
           command_output = merger.merge_and_push
           MergeMailer.merge_successful(build, emails, command_output).deliver
+          merger.delete_branch
         rescue GitMergeExecutor::GitMergeFailedError => ex
           MergeMailer.merge_failed(build, emails, ex.message).deliver
         end

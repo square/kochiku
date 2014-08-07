@@ -4,7 +4,7 @@ require "#{Rails.root}/lib/build_strategies/production_build_strategy.rb"
 
 describe BuildStrategy do
   let(:project) { FactoryGirl.create(:big_rails_project) }
-  let(:build) { FactoryGirl.create(:build, :project => project) }
+  let(:build) { FactoryGirl.create(:build, :project => project, :branch => 'funyuns') }
 
   before(:each) do
     CommandStubber.new # ensure Open3 is stubbed
@@ -23,6 +23,7 @@ describe BuildStrategy do
         merger = object_double(GitMergeExecutor.new(build))
         expect(GitMergeExecutor).to receive(:new).and_return(merger)
         expect(merger).to receive(:merge_and_push)
+        expect(merger).to receive(:delete_branch)
         expect { BuildStrategy.merge_ref(build) }.not_to raise_error
       end
 
