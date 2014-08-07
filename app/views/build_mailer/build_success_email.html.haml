@@ -1,0 +1,29 @@
+%html(xmlns="http://www.w3.org/1999/html")
+  %head
+    %meta(content='text/html; charset=UTF-8' http-equiv='Content-Type')
+  %body
+    %h1 #{ @build.branch } build succeeded for #{ @build.project.name }
+    #{ link_to('Link to build.', project_build_url(@build.project, @build)) }
+    - if @build.build_parts.count > 1
+      The build was sharded into #{ @build.build_parts.count } parts and took #{ @build.elapsed_time.to_i/60 } minutes.
+      (#{ @build.idle_time.to_i/60 }m idle, #{ @build.longest_build_part.to_i/60 }m running#{ @build.retry_count > 0 ? ", requiring #{ @build.retry_count } retries.)": ".)"}
+      %br
+      Without sharding the build would have taken #{ (@build.linear_time.to_i/60) * (1 + @build.max_retries) } minutes.
+      %br
+      - if @build.retry_count > 0
+        (#{ @build.linear_time.to_i/60 }m building, requiring #{ @build.max_retries } retries.)
+    - else
+      The build took #{ @build.elapsed_time.to_i/60 } minutes.
+      (#{ @build.idle_time.to_i/60 }m idle, #{ @build.longest_build_part.to_i/60 }m running#{ @build.retry_count > 0? ", requiring #{ @build.retry_count } retries.)" : ".)"}
+      %br
+    %h2 Changes included in build
+    - @git_changes.each do |git_change|
+      %b SHA: #{ link_to(git_change[:hash], "#{@build.project.repository.remote_server.href_for_commit(git_change[:hash])}") }
+      %br
+      %b Committer:
+      =git_change[:author]
+      %b Date:
+      =git_change[:date]
+      %pre= git_change[:message]
+      %br
+      %br
