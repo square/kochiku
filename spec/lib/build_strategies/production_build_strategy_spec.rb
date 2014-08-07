@@ -16,22 +16,24 @@ describe BuildStrategy do
   describe "#merge_ref" do
     context "when auto_merge is enabled" do
       before do
-        expect(GitBlame).to receive(:emails_in_branch).with(build).and_return("the-committers@example.com")
+        expect(GitBlame).to receive(:emails_in_branch).with(an_instance_of(Build)).and_return("the-committers@example.com")
       end
 
       it "should merge to master" do
-        merger = GitMergeExecutor.new
+        merger = object_double(GitMergeExecutor.new(build))
         expect(GitMergeExecutor).to receive(:new).and_return(merger)
-        expect(merger).to receive(:merge).with(build)
-        expect(BuildStrategy.merge_ref(build)).not_to be_nil
+        expect(merger).to receive(:merge_and_push)
+        expect { BuildStrategy.merge_ref(build) }.not_to raise_error
       end
 
       it "should handle merge failure" do
-        merger = GitMergeExecutor.new
+        merger = object_double(GitMergeExecutor.new(build))
         expect(GitMergeExecutor).to receive(:new).and_return(merger)
-        expect(merger).to receive(:merge).with(build).and_raise(GitMergeExecutor::UnableToMergeError)
+        expect(merger).to receive(:merge_and_push).and_raise(GitMergeExecutor::GitMergeFailedError)
 
-        expect(BuildStrategy.merge_ref(build)).not_to be_nil
+        expect(MergeMailer).to receive(:merge_failed).once.
+          and_return(double('mailer', :deliver => nil))
+        expect { BuildStrategy.merge_ref(build) }.to_not raise_error
       end
     end
   end
