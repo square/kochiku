@@ -9,7 +9,11 @@ module Partitioner
 
     def initialize(build, kochiku_yml)
       @build = build
-      @settings = kochiku_yml.fetch('maven_settings', {}) if kochiku_yml
+      @options = {}
+      if kochiku_yml
+        @settings = kochiku_yml['maven_settings'] if kochiku_yml['maven_settings']
+        @options['log_file_globs'] = Array(kochiku_yml['log_file_globs']) if kochiku_yml['log_file_globs']
+      end
       @settings ||= {}
     end
 
@@ -39,7 +43,9 @@ module Partitioner
         end
       end
 
-      group_modules(modules_to_build)
+      group_modules(modules_to_build).map do |group|
+        group.merge('options' => @options)
+      end
     end
 
     def emails_for_commits_causing_failures

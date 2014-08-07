@@ -43,6 +43,7 @@ module Partitioner
       options = {}
       options['language'] = @kochiku_yml['language'] if @kochiku_yml['language']
       options['ruby'] = ruby_version if ruby_version
+      options['log_file_globs'] = Array(@kochiku_yml['log_file_globs']) if @kochiku_yml['log_file_globs']
 
       @kochiku_yml['targets'].flat_map do |subset|
         partitions_for(
@@ -57,7 +58,9 @@ module Partitioner
       workers = subset.fetch('workers', 1)
       manifest = subset['manifest']
       retry_count = subset['retry_count'] || 0
-      log_files = subset['log_file_globs']
+      if subset['log_file_globs']
+        subset['options']['log_file_globs'] = Array(subset['log_file_globs'])
+      end
 
       queue = @build.project.main? ? "ci" : "developer"
       queue_override = subset.fetch('queue_override', nil)
@@ -80,12 +83,8 @@ module Partitioner
       files -= balanced_partitions.flatten
 
       (Strategies.send(strategy, files, workers) + balanced_partitions).map do |part_files|
-        part = {'type' => type, 'files' => part_files.compact, 'queue' => queue,
-                'retry_count' => retry_count, 'log_file_globs' => log_files}
-        if subset['options']
-          part['options'] = subset['options']
-        end
-        part
+        {'type' => type, 'files' => part_files.compact, 'queue' => queue,
+         'retry_count' => retry_count, 'options' => subset['options']}
       end.select { |p| p['files'].present? }
     end
 
