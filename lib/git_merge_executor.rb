@@ -12,7 +12,7 @@ class GitMergeExecutor
   def merge(build)
     Rails.logger.info("Trying to merge branch: #{build.branch} to master after build id: #{build.id}")
 
-    checkout_log, status = Open3.capture2e("git checkout master && git pull")
+    checkout_log, status = Open3.capture2e("git fetch && git checkout master && git reset --hard origin/master")
     raise_and_log("Was unable checkout and pull master:\n\n#{checkout_log}") if status.exitstatus != 0
 
     commit_message = "Kochiku merge of branch #{build.branch} for build id: #{build.id} ref: #{build.ref}"
