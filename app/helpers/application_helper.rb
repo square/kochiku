@@ -49,7 +49,17 @@ module ApplicationHelper
   end
 
   def show_link_to_compare(build, first_commit_hash, second_commit_hash)
-    "#{build.repository.base_html_url}/compare/#{first_commit_hash}...#{second_commit_hash}#files_bucket"
+    repo = build.repository
+    attrs_from_remote_server = RemoteServer.for_url(repo.url)
+
+    if attrs_from_remote_server.class == RemoteServer::Stash
+      if repo.on_green_update.blank?
+        second_commit_hash = ""
+      else
+        second_commit_hash = repo.on_green_update.split(',').first
+      end
+    end
+    attrs_from_remote_server.url_for_compare(first_commit_hash, second_commit_hash)
   end
 
   def show_link_to_create_pull_request(build)

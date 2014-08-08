@@ -40,6 +40,10 @@ module RemoteServer
       "git@#{@settings.host}:#{attributes[:repository_namespace]}/#{attributes[:repository_name]}.git"
     end
 
+    def url_for_compare(first_commit_hash, second_commit_hash)
+      "#{base_html_url}/compare/#{first_commit_hash}...#{second_commit_hash}#files_bucket"
+    end
+
     # Where to fetch from: git mirror if defined,
     # otherwise the canonical url
     def url_for_fetching
