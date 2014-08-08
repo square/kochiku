@@ -45,6 +45,17 @@ module RemoteServer
       "https://#{@settings.host}/scm/#{attributes[:repository_namespace]}/#{attributes[:repository_name]}.git"
     end
 
+    # Currently, stash does not support comparison between two arbitrary hashes-- it only supports comparison
+    # between heads of branches.
+    # For now, we return the comparison of HEAD at refs/heads/master and the branch for the green_builds, if any
+    def url_for_compare(first_commit_branch, second_commit_branch)
+      if second_commit_branch.blank?
+        "#{base_html_url}/compare/commits?targetBranch=refs%2Fheads%2Fmaster" 
+      else
+        "#{base_html_url}/compare/commits?targetBranch=refs%2Fheads%2Fmaster&sourceBranch=#{second_commit_branch}"
+      end
+    end
+
     # Where to fetch from: git mirror if defined,
     # otherwise the canonical url
     def url_for_fetching
