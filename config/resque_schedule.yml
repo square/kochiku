@@ -7,6 +7,15 @@ poll_repositories_for_changes:
   args:
   description: "Fetches any missed changes from added repositories"
 
+enforce_timeouts_on_attempts:
+  every:
+    - "10m"
+    - :first_in: "30m"
+  class: "EnforceTimeoutsJob"
+  queue: low
+  args:
+  description: "Errors any attempts where the workers should have timed out"
+
 # These autoscale jobs are turned off by default. Uncomment and configure
 # worker_thresholds in application.yml if you would like to use them.
 #

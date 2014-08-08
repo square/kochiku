@@ -8,7 +8,7 @@ class PollRepositoriesJob
       head = repo.sha_for_branch(branch)
       unless repo.build_for_commit(head)
         proj.builds.create!(ref: head, state: :partitioning, branch: branch)
-        Resque.logger.info "Build created for #{repo.name} at #{head}"
+        Rails.logger.info "Build created for #{repo.name} at #{head}"
       end
     end
   end
