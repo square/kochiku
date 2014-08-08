@@ -40,10 +40,11 @@ class BuildStrategy
       GitRepo.inside_repo(build.repository) do
         begin
           emails = GitBlame.emails_in_branch(build)
-          merger = GitMergeExecutor.new
-          log = merger.merge(build)
-          MergeMailer.merge_successful(build, emails, log).deliver
-        rescue GitMergeExecutor::UnableToMergeError => ex
+          merger = GitMergeExecutor.new(build)
+          command_output = merger.merge_and_push
+          MergeMailer.merge_successful(build, emails, command_output).deliver
+          merger.delete_branch
+        rescue GitMergeExecutor::GitMergeFailedError => ex
           MergeMailer.merge_failed(build, emails, ex.message).deliver
         end
       end

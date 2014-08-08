@@ -1,7 +1,16 @@
 require 'open3'
 
 class GitMergeExecutor
-  class UnableToMergeError < StandardError; end
+  class GitFetchFailedError < StandardError; end
+  class GitMergeFailedError < StandardError; end
+  class GitPushFailedError < StandardError; end
+
+  def initialize(build)
+    if build.branch.blank?
+      raise "GitMergeExecutor requires a Build associated with a git branch"
+    end
+    @build = build
+  end
 
   # Public: Merges the branch associated with a build into the master branch
   # and pushes the result to remote git repo. If the merge is unsuccessful for
@@ -9,54 +18,77 @@ class GitMergeExecutor
   #
   # build - ActiveRecord object for a build
   #
-  def merge(build)
-    Rails.logger.info("Trying to merge branch: #{build.branch} to master after build id: #{build.id}")
+  def merge_and_push
+    Rails.logger.info("Trying to merge branch: #{@build.branch} to master after build id: #{@build.id}")
 
-    checkout_log, status = Open3.capture2e("git checkout master && git pull")
-    raise_and_log("Was unable checkout and pull master:\n\n#{checkout_log}") if status.exitstatus != 0
+    begin
+      git_fetch_and_reset
 
-    commit_message = "Kochiku merge of branch #{build.branch} for build id: #{build.id} ref: #{build.ref}"
-    merge_log, status = Open3.capture2e(merge_env, "git merge --no-ff -m '#{commit_message}' #{build.ref}")
-    abort_merge_and_raise("git merge --abort",
-      "Was unable to merge your branch:\n\n#{merge_log}") unless status.success?
+      merge_log = merge_to_master
 
-    push_log, status = Open3.capture2e("git push origin master")
-    rebase_log, second_push_log = recover_failed_push unless status.success?
+      push_log = push_to_remote
+    rescue GitFetchFailedError, GitPushFailedError
+      tries = (tries || 0) + 1
+      if tries < 3
+        sleep(10 * tries)
+        retry
+      else
+        raise
+      end
+    end
 
-    [checkout_log, merge_log, push_log, rebase_log, second_push_log].join("\n")
+    [merge_log, push_log].join("\n")
+  end
+
+  def delete_branch
+    delete_log, status = Open3.capture2e("git push --porcelain --delete origin #{@build.branch}")
+    unless status.success?
+      Rails.logger.warn("Deletion of branch #{@build.branch} failed")
+      Rails.logger.warn(delete_log)
+    end
   end
 
   private
+
+  def git_fetch_and_reset
+    checkout_log, status = Open3.capture2e("git fetch && git checkout master && git reset --hard origin/master")
+    unless status.success?
+      raise_and_log(GitFetchFailedError, "Error occurred while reseting to origin/master:", checkout_log)
+    end
+  end
+
+  def merge_to_master
+    commit_message = "Kochiku merge of branch #{@build.branch} for build id: #{@build.id} ref: #{@build.ref}"
+    merge_log, status = Open3.capture2e(merge_env, "git merge --no-ff -m '#{commit_message}' #{@build.ref}")
+
+    unless status.success?
+      Open3.capture2e("git merge --abort")
+      raise_and_log(GitMergeFailedError, "Was unable to merge your branch:", merge_log)
+    end
+
+    merge_log
+  end
+
+  def push_to_remote
+    push_log, status = Open3.capture2e("git push --porcelain origin master")
+
+    unless status.success?
+      raise_and_log(GitPushFailedError, "git push of branch #{@build.branch} failed:", push_log)
+    end
+
+    push_log
+  end
+
+  def raise_and_log(error_class, error_info, command_output)
+    message = "#{error_info}\n\n#{command_output}"
+    Rails.logger.error(message)
+    raise(error_class, message)
+  end
 
   def merge_env
     author_name  = "kochiku-merger"
     author_email = "noreply+kochiku-merger@#{Settings.domain_name}"
     {"GIT_AUTHOR_NAME" => author_name, "GIT_COMMITTER_NAME" => author_name,
      "GIT_AUTHOR_EMAIL" => author_email, "GIT_COMMITTER_EMAIL" => author_email}
-  end
-
-  def recover_failed_push
-    rebase_log, status = Open3.capture2e("git pull --rebase")
-    # Someone else pushed and we are conflicted, abort rebase and remove merges
-    abort_merge_and_raise("git rebase --abort; git reset --hard origin/master",
-                          "Was unable to merge your branch:\n\n#{rebase_log}") unless status.success?
-
-    # Try to push once more if it fails remove merges
-    second_push_log, status = Open3.capture2e("git push origin master")
-    abort_merge_and_raise("git reset --hard origin/master",
-                          "Was unable to push your branch:\n\n#{second_push_log}") unless status.success?
-
-    [rebase_log, second_push_log]
-  end
-
-  def raise_and_log(error)
-    Rails.logger.error(error)
-    raise UnableToMergeError, "Was unable checkout and pull master:\n\n#{error}"
-  end
-
-  # Merge failed, cleanup and abort
-  def abort_merge_and_raise(reset_command, std_err_out)
-    Open3.capture2e(reset_command)
-    raise_and_log("Was unable to merge --no-ff:\n\n#{std_err_out}")
   end
 end
