@@ -162,7 +162,7 @@ class Build < ActiveRecord::Base
   # This can be used as `building_time` under the assumption that
   # all parts executed in parallel.
   def longest_build_part
-    build_parts.max_by { |part| part.elapsed_time }.elapsed_time
+    build_parts.max_by { |part| part.elapsed_time || 0 }.elapsed_time
   end
 
   def idle_time
