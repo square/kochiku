@@ -220,34 +220,13 @@ describe BuildPart do
 
   describe "#should_reattempt?" do
     let(:build_part) { FactoryGirl.create(:build_part, retry_count: 1, build_instance: build) }
+    let(:project) { FactoryGirl.create(:project, repository: repository) }
 
-    context "for a main-branch build" do
-      let(:project) { FactoryGirl.create(:main_project, repository: repository) }
-
-      it "might reattempt" do
-        expect(build_part.should_reattempt?).to be true
-      end
-    end
-
-    context "for a merge_on_success branch build" do
-      let(:build) { FactoryGirl.create(:build, project: project, merge_on_success: true) }
-
-      it "might reattempt" do
-        expect(build_part.should_reattempt?).to be true
-      end
-    end
-
-    context "for a non merge_on_success branch build" do
-      before { expect(build.merge_on_success).to be_falsey }
-
-      it "will not reattempt" do
-        expect(build_part.should_reattempt?).to be false
-      end
+    it "should reattempt" do
+      expect(build_part.should_reattempt?).to be true
     end
 
     context "when we have already hit the retry count" do
-      let(:project) { FactoryGirl.create(:main_project, repository: repository) }
-
       before do
         FactoryGirl.create(:build_attempt, build_part: build_part, state: :failed)
         FactoryGirl.create(:build_attempt, build_part: build_part, state: :failed)
@@ -259,8 +238,6 @@ describe BuildPart do
     end
 
     context "when we are just one away from the retry count" do
-      let(:project) { FactoryGirl.create(:main_project, repository: repository) }
-
       before do
         FactoryGirl.create(:build_attempt, build_part: build_part, state: :failed)
       end

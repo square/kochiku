@@ -17,55 +17,16 @@ describe BuildAttempt do
     let!(:build_attempt) { FactoryGirl.create(:build_attempt, :state => :running, :build_part => build_part) }
 
     context "build auto-retries" do
-      [:failed, :errored].each do |state|
-        it "reattempts an mergeable cuke that #{state}" do
-          expect(build_part).to receive(:rebuild!)
-          build_attempt.finish!(state)
-        end
-
-        context "when there are already 3 failures" do
-          before do
-            3.times do
-              FactoryGirl.create(:build_attempt, :state => :errored, :build_part => build_part)
-            end
-          end
-
-          it "does not try again when it #{state}" do
-            expect(build_part).not_to receive(:rebuild!)
-            build_attempt.finish!(state)
-          end
-        end
-
-        context "specs" do
-          let(:build_part) { FactoryGirl.create(:build_part, :build_instance => build, :kind => "spec") }
-          it "does not attempt to re-run specs when it #{state}" do
-            expect(build_part).not_to receive(:rebuild!)
-            build_attempt.finish!(state)
-          end
-        end
-
-        context "non-mergeable builds" do
-          let(:build) { FactoryGirl.create(:build, :merge_on_success => false) }
-          it "does not attempt to re-run when it #{state}" do
-            expect(build_part).not_to receive(:rebuild!)
-            build_attempt.finish!(state)
-          end
-        end
-
-        context "non-mergeable main builds" do
-          let(:build) { FactoryGirl.create(:main_project_build, :merge_on_success => false) }
-          it "reattempts to re-run when it #{state}" do
-            expect(build_part).to receive(:rebuild!)
-            build_attempt.finish!(state)
-          end
-        end
+      it "requests a rebuild if should_reattempt? is true" do
+        allow(build_part).to receive(:should_reattempt?).and_return(true)
+        expect(build_part).to receive(:rebuild!)
+        build_attempt.finish!(:failed)
       end
 
-      [:runnable, :running, :passed, :aborted].each do |state|
-        it "does not reattempt an mergeable cuke that #{state}" do
-          expect(build_part).not_to receive(:rebuild!)
-          build_attempt.finish!(state)
-        end
+      it " does not request a rebuild if should_reattempt? is false" do
+        allow(build_part).to receive(:should_reattempt?).and_return(false)
+        expect(build_part).to_not receive(:rebuild!)
+        build_attempt.finish!(:failed)
       end
     end
 
