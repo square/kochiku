@@ -35,7 +35,7 @@ class PullRequestsController < ApplicationController
     project = @repository.projects.where(name: @repository.name + "-pull_requests").first_or_create
     if active_pull_request? && @repository.build_pull_requests
       sha = payload["pull_request"]["head"]["sha"]
-      branch = payload["pull_request"]["head"]["ref"]
+      branch = payload["pull_request"]["head"]["ref"].gsub(%r{^refs/heads/}, '')
 
       project.ensure_branch_build_exists(branch, sha)
     end
