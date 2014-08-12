@@ -1,5 +1,6 @@
 require 'nokogiri'
 require 'set'
+require 'partitioner/base'
 
 module Partitioner
 

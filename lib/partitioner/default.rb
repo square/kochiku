@@ -1,3 +1,4 @@
+require 'partitioner/base'
 
 module Partitioner
 
