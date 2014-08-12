@@ -24,6 +24,14 @@ class Repository < ActiveRecord::Base
                      name: repository_name).first
   end
 
+  def self.lookup(host:, namespace:, name:)
+    git_server_settings = Settings.git_server(host)
+
+    Repository.where(host: [git_server_settings.host, *git_server_settings.aliases].compact,
+                     namespace: namespace,
+                     name: name).first
+  end
+
   # Setting a URL will extract values for host, namespace, and name. This
   # should not overwrite values for those attributes that were set in the same
   # session.
