@@ -32,7 +32,7 @@ class BuildStateUpdateJob < JobBase
       if build.mergable_by_kochiku?
         build.merge_to_master!
       else
-        Rails.logger.info("Build #{build.id} has merge_on_success enabled but cannot be merged.")
+        Rails.logger.warn("Build #{build.id} has merge_on_success enabled but cannot be merged.")
       end
     end
 

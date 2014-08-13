@@ -3,7 +3,7 @@ require 'spec_helper'
 describe BuildStateUpdateJob do
   let(:repository) { FactoryGirl.create(:repository, url: 'git@github.com:square/test-repo.git') }
   let(:project) { FactoryGirl.create(:big_rails_project, :repository => repository, :name => name) }
-  let(:build) { FactoryGirl.create(:build, :state => :runnable, :project => project) }
+  let(:build) { FactoryGirl.create(:build, :state => :runnable, :project => project, :branch => 'featureX') }
   let(:name) { repository.name + "_pull_requests" }
   let(:current_repo_master) { build.ref }
 
@@ -123,7 +123,7 @@ describe BuildStateUpdateJob do
       end
 
       it "kochiku should merge the branch if eligible" do
-        build.update_attributes(:merge_on_success => true)
+        build.update!(merge_on_success: true)
         expect(BuildStrategy).to receive(:merge_ref).with(build)
         BuildStateUpdateJob.perform(build.id)
       end

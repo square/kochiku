@@ -228,10 +228,14 @@ describe Build do
   end
 
   describe "#abort!" do
-    let(:build) { FactoryGirl.create(:build, :state => :runnable) }
+    let(:build) { FactoryGirl.create(:build, :state => :runnable, :merge_on_success => true) }
 
     it "should mark the build as aborted" do
       expect{ build.abort! }.to change(build, :state).from(:runnable).to(:aborted)
+    end
+
+    it "should strip a true merge_on_success setting" do
+      expect{ build.abort! }.to change(build, :merge_on_success).to(false)
     end
 
     it "should mark all of the build's unstarted build_attempts as aborted" do
@@ -310,6 +314,8 @@ describe Build do
   end
 
   describe "#mergable_by_kochiku??" do
+    let(:build) { FactoryGirl.create(:build, :project => project, :branch => 'featureX') }
+
     before do
       expect(build.project.main?).to be false
       expect(build.repository.allows_kochiku_merges).to be true
@@ -355,6 +361,22 @@ describe Build do
         expect(build.mergable_by_kochiku?).to be false
       end
     end
+
+    context 'there is a newer build for the same branch' do
+      let(:build) {
+        FactoryGirl.create(:build, project: project, branch: 'featureX',
+                                   state: 'succeeded', merge_on_success: true)
+      }
+
+      before do
+        expect(build.mergable_by_kochiku?).to be true
+      end
+
+      it 'should no longer be mergable' do
+        expect(build).to receive(:newer_branch_build_exists?).and_return(true)
+        expect(build.mergable_by_kochiku?).to be false
+      end
+    end
   end
 
   describe "#merge_on_success_enabled?" do
@@ -375,6 +397,22 @@ describe Build do
         build.merge_on_success = true
         expect(build.merge_on_success_enabled?).to be false
       end
+    end
+  end
+
+  describe "#newer_branch_build_exists?" do
+    before do
+      project = FactoryGirl.create(:project)
+      @build1 = FactoryGirl.create(:build, project: project, branch: 'featureX')
+      @build2 = FactoryGirl.create(:build, project: project, branch: 'featureX')
+    end
+
+    it "should be true for the earlier build" do
+      expect(@build1.newer_branch_build_exists?).to be true
+    end
+
+    it "should be false for the later build" do
+      expect(@build2.newer_branch_build_exists?).to be false
     end
   end
 

@@ -186,11 +186,18 @@ class Build < ActiveRecord::Base
   end
 
   def mergable_by_kochiku?
-    succeeded? && merge_on_success_enabled? && repository.allows_kochiku_merges?
+    succeeded? && merge_on_success_enabled? && repository.allows_kochiku_merges? && !newer_branch_build_exists?
   end
 
   def merge_on_success_enabled?
-    !project.main? && self.merge_on_success
+    !project.main? && !!self.merge_on_success
+  end
+
+  def newer_branch_build_exists?
+    raise "current build is not associated with a branch!" if branch.blank?
+
+    most_recent_build = project.most_recent_build_for_branch(branch)
+    most_recent_build.id != self.id
   end
 
   def merge_to_master!
@@ -208,8 +215,11 @@ class Build < ActiveRecord::Base
     TERMINAL_STATES.include?(state)
   end
 
+  # Changes the build state to 'aborted'. Sets merge_on_success to false to
+  # protect against accidental merges. Updates the state of all of the build's
+  # build_parts to be 'aborted'.
   def abort!
-    update_attributes!(:state => :aborted)
+    update!(state: :aborted, merge_on_success: false)
 
     all_build_part_ids = build_parts.select([:id, :build_id]).collect(&:id)
     BuildAttempt.
