@@ -49,16 +49,15 @@ describe Project do
       build1 = project.ensure_branch_build_exists('mybranch', to_40('1'))
       build2 = project.ensure_branch_build_exists('mybranch', to_40('2'))
       build3 = project.ensure_branch_build_exists('mybranch', to_40('3'))
-      build1.state = :succeeded
-      build1.save!
+      build1.update!(state: :succeeded)
 
       expect(build2.state).to eq(:partitioning)
       expect(build3.state).to eq(:partitioning)
 
       project.abort_in_progress_builds_for_branch('mybranch', build3)
 
-      expect(build1.reload).to be_succeeded
-      expect(build2.reload).to be_aborted
+      expect(build1.reload.state).to eq(:succeeded)
+      expect(build2.reload.state).to eq(:aborted)
       expect(build3.reload.state).to eq(:partitioning)
     end
   end
