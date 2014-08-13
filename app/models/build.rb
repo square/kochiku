@@ -215,8 +215,11 @@ class Build < ActiveRecord::Base
     TERMINAL_STATES.include?(state)
   end
 
+  # Changes the build state to 'aborted'. Sets merge_on_success to false to
+  # protect against accidental merges. Updates the state of all of the build's
+  # build_parts to be 'aborted'.
   def abort!
-    update_attributes!(:state => :aborted)
+    update!(state: :aborted, merge_on_success: false)
 
     all_build_part_ids = build_parts.select([:id, :build_id]).collect(&:id)
     BuildAttempt.

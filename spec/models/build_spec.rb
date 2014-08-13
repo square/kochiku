@@ -228,10 +228,14 @@ describe Build do
   end
 
   describe "#abort!" do
-    let(:build) { FactoryGirl.create(:build, :state => :runnable) }
+    let(:build) { FactoryGirl.create(:build, :state => :runnable, :merge_on_success => true) }
 
     it "should mark the build as aborted" do
       expect{ build.abort! }.to change(build, :state).from(:runnable).to(:aborted)
+    end
+
+    it "should strip a true merge_on_success setting" do
+      expect{ build.abort! }.to change(build, :merge_on_success).to(false)
     end
 
     it "should mark all of the build's unstarted build_attempts as aborted" do
