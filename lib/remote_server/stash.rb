@@ -52,7 +52,7 @@ module RemoteServer
       if second_commit_branch.blank?
         "#{base_html_url}/compare/commits?targetBranch=refs%2Fheads%2Fmaster" 
       else
-        "#{base_html_url}/compare/commits?targetBranch=refs%2Fheads%2Fmaster&sourceBranch=#{second_commit_branch}"
+        "#{base_html_url}/compare/commits?targetBranch=#{second_commit_branch}&sourceBranch=refs%2Fheads%2Fmaster"
       end
     end
 
