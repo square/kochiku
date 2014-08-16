@@ -79,7 +79,7 @@ describe ApplicationHelper do
       expect(show_link_to_compare(@build, 'SHA1FORCOMMIT', 'SHA2FORCOMMIT')).to eq('https://git.example.com/square/web/compare/SHA1FORCOMMIT...SHA2FORCOMMIT#files_bucket')
     end
     it "creates a url to stash showing the diff between master and green branches" do
-      expect(show_link_to_compare(@build_stash, 'SHA1FORCOMMIT', 'SHA2FORCOMMIT')).to eq('https://stash.example.com/projects/square/repos/web2/compare/commits?targetBranch=refs%2Fheads%2Fmaster&sourceBranch=green')
+      expect(show_link_to_compare(@build_stash, 'SHA1FORCOMMIT', 'SHA2FORCOMMIT')).to eq('https://stash.example.com/projects/square/repos/web2/compare/commits?targetBranch=green&sourceBranch=refs%2Fheads%2Fmaster')
     end
     it "creates a url to stash showing a comparison with master if no green branch set" do
       expect(show_link_to_compare(@build_stash_no_greenupdate, 'SHA1FORCOMMIT', 'SHA2FORCOMMIT')).to eq('https://stash.example.com/projects/square/repos/web3/compare/commits?targetBranch=refs%2Fheads%2Fmaster')
