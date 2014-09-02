@@ -158,7 +158,8 @@ describe Partitioner::Maven do
         expect(subject).to receive(:all_partitions).and_return([{"type" => "maven", "files" => "ALL"}])
 
         partitions = subject.partitions
-        expect(partitions).to include({ 'type' => 'maven', 'files' => 'ALL' })
+        expect(partitions.size).to eq(1)
+        expect(partitions.first).to match('type' => 'maven', 'files' => 'ALL', 'options' => {})
       end
 
       it "should not fail if a file is referenced in a top level module that is not in the top level pom" do
@@ -178,6 +179,21 @@ describe Partitioner::Maven do
 
         partitions = subject.partitions
         expect(partitions.size).to eq(0)
+      end
+
+      context "with options" do
+        let(:kochiku_yml) {{ 'log_file_globs' => 'mylog.log' }}
+
+        it "should include options in the event of a partial build" do
+          allow(GitBlame).to receive(:files_changed_since_last_build).with(build)
+            .and_return([{:file => "toplevel/foo.xml", :emails => []}])
+
+          expect(subject).to receive(:all_partitions).and_return([{"type" => "maven", "files" => "ALL"}])
+
+          partitions = subject.partitions
+          expect(partitions.size).to be > 0
+          expect(partitions.first).to match a_hash_including('options' => {'log_file_globs' => ['mylog.log']})
+        end
       end
     end
 

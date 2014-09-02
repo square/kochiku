@@ -32,7 +32,7 @@ module Partitioner
 
           if module_affected_by_file.nil?
             if file_and_emails[:file] != "pom.xml"
-              return all_partitions
+              return add_options(all_partitions)
             end
           else
             modules_to_build.merge(depends_on_map[module_affected_by_file] || Set.new)
@@ -44,9 +44,7 @@ module Partitioner
         end
       end
 
-      group_modules(modules_to_build).map do |group|
-        group.merge('options' => @options)
-      end
+      add_options(group_modules(modules_to_build))
     end
 
     def emails_for_commits_causing_failures
@@ -94,6 +92,12 @@ module Partitioner
 
     def pom_for(mvn_module)
       Nokogiri::XML(File.read("#{mvn_module}/pom.xml"))
+    end
+
+    def add_options(group_modules)
+      group_modules.each do |group|
+        group['options'] = @options
+      end
     end
 
     def group_modules(mvn_modules)
