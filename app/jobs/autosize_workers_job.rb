@@ -9,6 +9,7 @@ class AutosizeWorkersJob < JobBase
     stat_list = REDIS.lrange(MonitorWorkersJob.REDIS_STATS_KEY, 0, -1)
     return if stat_list.length < worker_thresholds[:number_of_samples]
     current_workers = Resque.info[:workers]
+    Rails.logger.info "Current worker count: #{current_workers}"
     workers_to_shutdown = [worker_thresholds[:instance_chunk_size], current_workers-worker_thresholds[:minimum_total_workers]].min
     workers_to_spinup = [worker_thresholds[:instance_chunk_size], worker_thresholds[:maximum_total_workers]-current_workers].min
     most_recent_time = nil
@@ -36,10 +37,12 @@ class AutosizeWorkersJob < JobBase
   def self.adjust_worker_count(count)
     if count < 0
       # Enqueue N ShutdownInstanceJobs. ShutdownInstanceJob is defined inside kochiku-worker.
+      Rails.logger.info "#{caller[0]}: Shutting down #{count} idle workers"
       count.abs.times { Resque.enqueue_to(Settings.worker_thresholds[:autosize_queue], 'ShutdownInstanceJob') }
     else
       # Call script responsible for launching N workers
-      Cocaine::CommandLine.new(Settings.worker_thresholds[:spin_up_script], count.to_s).run
+      Rails.logger.info "#{caller[0]}: Spinning up #{count} workers via #{Settings.worker_thresholds[:spin_up_script]}"
+      Cocaine::CommandLine.new(Settings.worker_thresholds[:spin_up_script], count.to_s, :logger => Logger.new(STDOUT)).run
     end
   end
 end

@@ -132,7 +132,7 @@ describe AutosizeWorkersJob do
 
     it 'with a positive amount it executes spin up script' do
       expect(Resque).to_not receive(:enqueue_to)
-      expect(Cocaine::CommandLine).to receive(:new).with(a_string, "5").and_return(double(:run => nil))
+      expect(Cocaine::CommandLine).to receive(:new).with(a_string, "5", a_logger).and_return(double(:run => nil))
       AutosizeWorkersJob.adjust_worker_count(5)
     end
   end
