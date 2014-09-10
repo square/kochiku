@@ -149,4 +149,21 @@ describe RemoteServer::Stash do
       expect(result).to eq(https_url)
     end
   end
+
+  describe "#merge" do
+    it 'uses stash API' do
+      https_url = "https://stash.example.com/scm/foo/bar.git"
+      server = make_server(https_url)
+
+      allow(server).to receive(:get_pr_id_and_version).and_return([1, 5])
+      allow(server).to receive(:can_merge?).and_return(true)
+      allow(server).to receive(:perform_merge).and_return(true)
+
+      expect(server).to receive(:get_pr_id_and_version).once
+      expect(server).to receive(:can_merge?).once
+      expect(server).to receive(:perform_merge).once
+
+      expect { server.merge("abranch") }.to_not raise_error
+    end
+  end
 end

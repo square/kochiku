@@ -1,6 +1,8 @@
 require 'cgi'
+require 'stash_merge_executor'
 
 module RemoteServer
+  class StashAPIError < StandardError; end
 
   # All integration with Stash must go via this class.
   class Stash
@@ -39,6 +41,11 @@ module RemoteServer
       end
     end
 
+    # Class to use for merge methods
+    def merge_executor
+        StashMergeExecutor
+    end
+
     # Public: Returns a url for the remote repo in the format Kochiku prefers
     # for Stash, which is the HTTPS format.
     def canonical_repository_url
@@ -50,7 +57,7 @@ module RemoteServer
     # For now, we return the comparison of HEAD at refs/heads/master and the branch for the green_builds, if any
     def url_for_compare(first_commit_branch, second_commit_branch)
       if second_commit_branch.blank?
-        "#{base_html_url}/compare/commits?targetBranch=refs%2Fheads%2Fmaster" 
+        "#{base_html_url}/compare/commits?targetBranch=refs%2Fheads%2Fmaster"
       else
         "#{base_html_url}/compare/commits?targetBranch=#{second_commit_branch}&sourceBranch=refs%2Fheads%2Fmaster"
       end
@@ -111,7 +118,83 @@ module RemoteServer
       "#{base_html_url}/commits/#{sha}"
     end
 
+    # uses the stash REST api to merge a pull request
+    # raises StashAPIError if an error occurs and should git merge using traditional method
+    # otherwise returns true or false depending on whether merge succeeds
+    def merge(branch)
+      pr_id, pr_version = get_pr_id_and_version(branch)
+      success = can_merge?(pr_id) && perform_merge(pr_id, pr_version)
+
+      if success
+        Rails.logger.info("Request to stash to merge PR #{pr_id} for branch #{branch} succeeded.")
+      else
+        Rails.logger.info("Request to stash to merge PR #{pr_id} for branch #{branch} failed.")
+      end
+
+      success
+    end
+
+    # uses the stash REST api to delete a branch
+    # raises StashAPIError if error occurs, else return true
+    def delete_branch(branch, dryRun = false)
+      url = "https://#{attributes[:host]}/rest/branch-utils/1.0/projects/#{attributes[:repository_namespace]}/repos/#{attributes[:repository_name]}/branches"
+
+      delete_params = {
+        "name" => branch,
+        "dryRun" => dryRun
+      }
+
+      response = @stash_request.delete(url, delete_params)
+      jsonbody = JSON.parse(response)
+
+      raise StashAPIError, jsonbody["errors"].to_s if jsonbody["errors"]
+
+      true
+    end
+
     private
+
+    # return PR id, version number if a single PR exists for corresponding branch
+    # else raise StashAPIError
+    def get_pr_id_and_version(branch)
+      url = "#{base_api_url}/pull-requests?direction=outgoing&at=refs/heads/#{branch}&state=open&limit=25"
+      response = @stash_request.get(url)
+      jsonbody = JSON.parse(response)
+      raise StashAPIError if jsonbody["errors"].present? || jsonbody["size"] != 1
+
+      return jsonbody["values"][0]["id"], jsonbody["values"][0]["version"]
+    end
+
+    # use stash REST api to query if a merge is possible
+    # raise StashAPIError if an error in API response, else return true
+    def can_merge?(pr_id)
+      url = "#{base_api_url}/pull-requests/#{pr_id}/merge"
+      response = @stash_request.get(url)
+
+      jsonbody = JSON.parse(response)
+
+      raise StashAPIError if jsonbody["errors"]
+
+      if jsonbody["canMerge"] == false
+        Rails.logger.info("Could not merge PR #{pr_id}:")
+        Rails.logger.info("conflicted: #{jsonbody["conflicted"]}")
+        Rails.logger.info("vetoes: #{jsonbody["vetoes"]}")
+        return false
+      end
+
+      true
+    end
+
+    # use stash REST api to merge PR
+    # raise StashAPIError if an error in API response, else return true
+    def perform_merge(pr_id, pr_version)
+      url = "#{base_api_url}/pull-requests/#{pr_id}/merge?version=#{pr_version}"
+      response = @stash_request.post(url, nil)
+      jsonbody = JSON.parse(response)
+
+      raise StashAPIError if jsonbody["errors"]
+      true
+    end
 
     def stash_status_for(build)
       if build.succeeded?
@@ -143,12 +226,21 @@ module RemoteServer
         make_request(get, URI(uri))
       end
 
-      def post(uri, body)
+      def post(uri, body={})
         Rails.logger.info("Stash POST: #{uri}, #{body}")
         post = Net::HTTP::Post.new(uri, {'Content-Type' =>'application/json'})
         setup_auth! post
         post.body = body.to_json
         make_request(post, URI(uri))
+      end
+
+      def delete(uri, body)
+        Rails.logger.info("Stash DELETE: #{uri}, #{body}")
+        delete_request = Net::HTTP::Delete.new(uri, {'Content-Type' =>'application/json'})
+        setup_auth! delete_request
+        body ||= {}
+        delete_request.body = body.to_json
+        make_request(delete_request, URI(uri))
       end
 
       def make_request(method, uri, args = [])

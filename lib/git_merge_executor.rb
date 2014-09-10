@@ -41,10 +41,16 @@ class GitMergeExecutor
   end
 
   def delete_branch
-    delete_log, status = Open3.capture2e("git push --porcelain --delete origin #{@build.branch}")
-    unless status.success?
+    begin
+      git_fetch_and_reset
+
+      delete_log, status = Open3.capture2e("git push --porcelain --delete origin #{@build.branch}")
+      unless status.success?
+        Rails.logger.warn("Deletion of branch #{@build.branch} failed")
+        Rails.logger.warn(delete_log)
+      end
+    rescue GitFetchFailedError
       Rails.logger.warn("Deletion of branch #{@build.branch} failed")
-      Rails.logger.warn(delete_log)
     end
   end
 

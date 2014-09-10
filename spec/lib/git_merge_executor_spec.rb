@@ -2,6 +2,17 @@ require 'spec_helper'
 require 'git_merge_executor'
 
 describe GitMergeExecutor do
+  before do
+    settings = SettingsAccessor.new(<<-YAML)
+    git_servers:
+      github.com:
+        type: github
+      stash.example.com:
+        type: stash
+    YAML
+    stub_const "Settings", settings
+  end
+
   describe "#merge_and_push" do
     let(:project) { FactoryGirl.create(:big_rails_project) }
     let(:build) { FactoryGirl.create(:build, project: project, branch: 'funyuns') }
