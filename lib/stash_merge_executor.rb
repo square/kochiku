@@ -30,7 +30,7 @@ class StashMergeExecutor < GitMergeExecutor
     begin
       Rails.logger.info("Trying to delete branch using Stash REST api")
       remote_server.delete_branch(@build.branch)
-    rescue StashAPIError => e
+    rescue RemoteServer::StashAPIError => e
       Rails.logger.warn("Deletion of branch #{@build.branch} failed")
       Rails.logger.warn(e.message)
       super
