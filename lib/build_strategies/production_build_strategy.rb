@@ -1,5 +1,4 @@
 require 'git_blame'
-require 'git_merge_executor'
 
 class BuildStrategy
   class << self
@@ -40,7 +39,7 @@ class BuildStrategy
       GitRepo.inside_repo(build.repository) do
         begin
           emails = GitBlame.emails_in_branch(build)
-          merger = GitMergeExecutor.new(build)
+          merger = build.repository.remote_server.merge_executor.new(build)
           command_output = merger.merge_and_push
           MergeMailer.merge_successful(build, emails, command_output).deliver
           merger.delete_branch

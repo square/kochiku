@@ -19,24 +19,55 @@ describe BuildStrategy do
         expect(GitBlame).to receive(:emails_in_branch).with(an_instance_of(Build)).and_return("the-committers@example.com")
       end
 
-      it "should merge to master" do
-        merger = object_double(GitMergeExecutor.new(build))
-        expect(GitMergeExecutor).to receive(:new).and_return(merger)
-        expect(merger).to receive(:merge_and_push)
-        expect(merger).to receive(:delete_branch)
-        expect { BuildStrategy.merge_ref(build) }.not_to raise_error
-      end
+      context "Using a github build" do
+        it "should merge to master" do
+          merger = object_double(GitMergeExecutor.new(build))
+          expect(GitMergeExecutor).to receive(:new).and_return(merger)
+          expect(merger).to receive(:merge_and_push)
+          expect(merger).to receive(:delete_branch)
+          expect { BuildStrategy.merge_ref(build) }.not_to raise_error
+          $stderr.puts build.repository.remote_server.canonical_repository_url
+        end
 
-      it "should handle merge failure" do
-        merger = object_double(GitMergeExecutor.new(build))
-        expect(GitMergeExecutor).to receive(:new).and_return(merger)
-        expect(merger).to receive(:merge_and_push).and_raise(GitMergeExecutor::GitMergeFailedError)
+        it "should handle merge failure" do
+          merger = object_double(GitMergeExecutor.new(build))
+          expect(GitMergeExecutor).to receive(:new).and_return(merger)
+          expect(merger).to receive(:merge_and_push).and_raise(GitMergeExecutor::GitMergeFailedError)
 
-        expect(MergeMailer).to receive(:merge_failed).once.
-          and_return(double('mailer', :deliver => nil))
-        expect { BuildStrategy.merge_ref(build) }.to_not raise_error
+          expect(MergeMailer).to receive(:merge_failed).once.
+            and_return(double('mailer', :deliver => nil))
+          expect { BuildStrategy.merge_ref(build) }.to_not raise_error
+        end
       end
     end
+
+    context "Using a stash build" do
+        let(:stash_project) { FactoryGirl.create(:stash_project) }
+        let(:stash_build) { FactoryGirl.create(:build, :project => stash_project, :branch => 'funyuns') }
+
+        before do
+          settings = SettingsAccessor.new(<<-YAML)
+          sender_email_address: kochiku@example.com
+          kochiku_notifications_email_address: test@example.com
+          git_servers:
+            github.com:
+              type: github
+            stash.example.com:
+              type: stash
+          YAML
+          stub_const "Settings", settings
+        end
+
+        it "should merge to master using stash REST api" do
+          merger = object_double(GitMergeExecutor.new(build))
+          expect(GitMergeExecutor).to receive(:new).and_return(merger)
+          expect(merger).to receive(:merge_and_push)
+          expect(merger).to receive(:delete_branch)
+
+          expect { BuildStrategy.merge_ref(build) }.not_to raise_error
+        end
+    end
+
   end
 
   describe "#promote_build" do

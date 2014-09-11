@@ -1,6 +1,7 @@
 require 'github_commit_status'
 require 'github_post_receive_hook'
 require 'github_request'
+require 'git_merge_executor'
 
 module RemoteServer
 
@@ -32,6 +33,11 @@ module RemoteServer
           possible_hosts: [@settings.host, *@settings.aliases].compact,
         }.freeze
       end
+    end
+
+    # Class to use for merge methods
+    def merge_executor
+        GitMergeExecutor
     end
 
     # Public: Returns a url for the remote repo in the format Kochiku prefers

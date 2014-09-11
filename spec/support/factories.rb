@@ -12,6 +12,12 @@ FactoryGirl.define do
     factory :main_project do
       name { repository.name }
     end
+
+    factory :stash_project do
+      name "web"
+      branch "master"
+      association :repository, :factory => :stash_repository
+    end
   end
 
   factory :build do
@@ -46,5 +52,9 @@ FactoryGirl.define do
     test_command "script/ci worker"
     on_green_update 'last-green-build'
     allows_kochiku_merges true
+
+    factory :stash_repository do
+      sequence(:url) { |n| "git@stash.example.com:square/test-repo#{n}.git" }
+    end
   end
 end
