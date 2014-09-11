@@ -30,6 +30,8 @@ describe BuildMailer do
 
   describe "#build_break_email" do
     let(:build) { FactoryGirl.create(:main_project_build) }
+    let(:stash_project_pr) { FactoryGirl.create(:stash_project, :name => 'project_to_test-pull_requests') }
+    let(:stash_build_pr) { FactoryGirl.create(:build, :project => stash_project_pr, :branch => 'funyuns') }
 
     before do
       partitioner = instance_double('Partitioner::Base')
@@ -94,12 +96,27 @@ describe BuildMailer do
         expect(email.text_part.body).to include(build.project.name)
         expect(email.html_part.body).to include("http://")
         expect(email.text_part.body).to include("http://")
+        expect(email.html_part.body).to_not include("pull-requests/")
+      end
+
+      context "build is open pull request" do
+        it "includes link to PR" do
+          build_part = stash_build_pr.build_parts.create!(:paths => ["a", "b"], :kind => "cucumber", :queue => :ci)
+          build_part.build_attempts.create!(:state => :passed, :builder => "test-builder")
+          allow(stash_build_pr.repository.remote_server).to receive(:class).and_return(RemoteServer::Stash)
+          allow(stash_build_pr.repository.remote_server).to receive(:get_pr_id_and_version).and_return(3, 4)
+
+          email = BuildMailer.build_break_email(stash_build_pr)
+          expect(email.html_part.body).to include("pull-requests/3/overview")
+        end
       end
     end
   end
 
   describe '#build_success_email' do
     let(:build) { FactoryGirl.create(:build, :branch => "branch-of-master") }
+    let(:stash_project_pr) { FactoryGirl.create(:stash_project, :name => 'project_to_test-pull_requests') }
+    let(:stash_build_pr) { FactoryGirl.create(:build, :project => stash_project_pr, :branch => 'funyuns') }
 
     before do
       allow(GitBlame).to receive(:changes_in_branch).and_return([{:hash => "sha", :author => "Joe", :date => "some day", :message => "always be shipping it"}])
@@ -118,6 +135,19 @@ describe BuildMailer do
       expect(email.text_part.body).to include(build_part.project.name)
       expect(email.html_part.body).to include("http://")
       expect(email.text_part.body).to include("http://")
+      expect(email.html_part.body).to_not include("pull-requests/")
+    end
+
+    context "build is open pull request" do
+      it "includes link to PR" do
+        build_part = stash_build_pr.build_parts.create!(:paths => ["a", "b"], :kind => "cucumber", :queue => :ci)
+        build_part.build_attempts.create!(:state => :passed, :builder => "test-builder")
+        allow(stash_build_pr.repository.remote_server).to receive(:class).and_return(RemoteServer::Stash)
+        allow(stash_build_pr.repository.remote_server).to receive(:get_pr_id_and_version).and_return(3, 4)
+
+        email = BuildMailer.build_success_email(stash_build_pr)
+        expect(email.html_part.body).to include("pull-requests/3/overview")
+      end
     end
   end
 end

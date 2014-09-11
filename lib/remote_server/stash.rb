@@ -152,8 +152,6 @@ module RemoteServer
       true
     end
 
-    private
-
     # return PR id, version number if a single PR exists for corresponding branch
     # else raise StashAPIError
     def get_pr_id_and_version(branch)
@@ -164,6 +162,8 @@ module RemoteServer
 
       return jsonbody["values"][0]["id"], jsonbody["values"][0]["version"]
     end
+
+    private
 
     # use stash REST api to query if a merge is possible
     # raise StashAPIError if an error in API response, else return true
