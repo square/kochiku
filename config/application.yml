@@ -65,6 +65,8 @@ worker_thresholds:
   # idle_excess_count: 50
   # in order to adjust up, must have less than this many idle instances
   # idle_insufficient_count: 30
+  # Allow worker count to vary by this much during time window without cancelling autoscale
+  # worker_fluctuation_tolerance: 5
   # Hard-path to executable that spins up <n> instances
   # spin_up_script: /Users/square/Development/slave-driver/new-instance.rb
   # queue that auto-sizes.  Schedule the shutdown instance jobs on this queue.
