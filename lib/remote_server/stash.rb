@@ -145,9 +145,11 @@ module RemoteServer
       }
 
       response = @stash_request.delete(url, delete_params)
-      jsonbody = JSON.parse(response)
 
-      raise StashAPIError, jsonbody["errors"].to_s if jsonbody["errors"]
+      if response?
+        jsonbody = JSON.parse(response)
+        raise StashAPIError, jsonbody["errors"].to_s if jsonbody["errors"]
+      end
 
       true
     end
