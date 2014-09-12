@@ -20,13 +20,13 @@ class BuildStateUpdateJob < JobBase
       build.project.builds.create_new_build_for(sha)
     end
 
+    build.send_build_status_email!
+
     if build.succeeded?
       if build.on_success_script.present? && !build.on_success_script_log_file.present?
         BuildStrategy.run_success_script(build)
       end
     end
-
-    build.send_build_status_email!
 
     if build.promotable?
       build.promote!
