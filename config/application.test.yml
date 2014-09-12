@@ -45,5 +45,6 @@ worker_thresholds:
   number_of_samples: 30
   idle_excess_count: 50
   idle_insufficient_count: 30
+  worker_fluctuation_tolerance: 5
   spin_up_script: /Users/square/Development/slave-driver/new-instance.rb
   autosize_queue: developer-linux

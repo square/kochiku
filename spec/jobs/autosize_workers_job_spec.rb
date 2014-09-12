@@ -107,11 +107,19 @@ describe AutosizeWorkersJob do
       subject
     end
 
-    it "Does not expand the pool if worker count has changed" do
+    it "Does not expand the pool if worker count has changed more than allowed amount" do
       push(sample_count, busy_response)
-      busy_response[:workers] -= 1
+      busy_response[:workers] -= 10
       allow(Resque).to receive(:info).and_return(busy_response)
       expect(AutosizeWorkersJob).to_not receive(:adjust_worker_count)
+      subject
+    end
+
+    it "Does expand the pool if worker count changes less than allowed amount" do
+      push(sample_count, busy_response)
+      busy_response[:workers] -= 5
+      allow(Resque).to receive(:info).and_return(busy_response)
+      expect(AutosizeWorkersJob).to receive(:adjust_worker_count)
       subject
     end
   end

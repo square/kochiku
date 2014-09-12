@@ -15,10 +15,11 @@ class AutosizeWorkersJob < JobBase
     workers_to_spinup = [worker_thresholds[:instance_chunk_size], worker_thresholds[:maximum_total_workers]-current_workers].min
     Rails.logger.info "[AutosizeWorkersJob] workers_to_spinup => #{workers_to_spinup}"
     most_recent_time = nil
+    worker_fluctuation_tolerance = worker_thresholds[:worker_fluctuation_tolerance]
     stat_list.each do |json_stat|
       stat = JSON.parse(json_stat).symbolize_keys
 
-      if current_workers != stat[:workers] # make sure the number of workers is stable
+      if (current_workers - stat[:workers]).abs > worker_fluctuation_tolerance # make sure the number of workers is stable
         Rails.logger.info "[AutosizeWorkersJob] Number of workers is not stable."
         return
       end
