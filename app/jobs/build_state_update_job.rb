@@ -26,6 +26,8 @@ class BuildStateUpdateJob < JobBase
       end
     end
 
+    build.send_build_status_email!
+
     if build.promotable?
       build.promote!
     elsif build.merge_on_success_enabled?
@@ -35,7 +37,5 @@ class BuildStateUpdateJob < JobBase
         Rails.logger.warn("Build #{build.id} has merge_on_success enabled but cannot be merged.")
       end
     end
-
-    build.send_build_status_email!
   end
 end

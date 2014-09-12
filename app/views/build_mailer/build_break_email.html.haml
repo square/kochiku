@@ -4,6 +4,8 @@
   %body
     %h1 #{ @build.branch } build failed for #{ @build.project.name }
     = link_to('Link to build.', project_build_url(@build.project, @build))
+    - if @pr_link
+      = link_to('Link to PR.', @pr_link)
     - if @build.build_parts.count > 1
       The build was sharded into #{ @build.build_parts.count } parts and took #{ @build.elapsed_time.to_i/60 } minutes.
       (#{ @build.idle_time.to_i/60 }m idle, #{ @build.longest_build_part.to_i/60 }m running.)

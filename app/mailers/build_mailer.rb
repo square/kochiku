@@ -3,6 +3,21 @@ class BuildMailer < ActionMailer::Base
 
   default :from => Proc.new { Settings.sender_email_address }
 
+  def pull_request_link(build)
+    @build = build
+
+    remote_server = @build.repository.remote_server
+    if remote_server.class == RemoteServer::Stash && @build.project.name =~ /-pull_requests$/
+      begin
+        id, version = remote_server.get_pr_id_and_version(@build.branch)
+        return "#{remote_server.base_html_url}/pull-requests/#{id}/overview"
+      rescue RemoteServer::StashAPIError
+        return nil
+      end
+    end
+    nil
+  end
+
   def error_email(build_attempt, error_text = nil)
     @build_part = build_attempt.build_part
     @builder = build_attempt.builder
@@ -34,6 +49,7 @@ class BuildMailer < ActionMailer::Base
     end
 
     @failed_build_parts = @build.build_parts.failed_or_errored
+    @pr_link = pull_request_link(build)
 
     mail :to => @emails,
          :bcc => Settings.kochiku_notifications_email_address,
@@ -45,6 +61,7 @@ class BuildMailer < ActionMailer::Base
     @build = build
     @email = GitBlame.last_email_in_branch(@build)
     @git_changes = GitBlame.changes_in_branch(@build)
+    @pr_link = pull_request_link(build)
 
     mail :to => @email,
          :bcc => Settings.kochiku_notifications_email_address,
