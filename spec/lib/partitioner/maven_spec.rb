@@ -83,6 +83,26 @@ describe Partitioner::Maven do
           expect(partitions).to include(a_hash_including({ 'files' => ['module-four'] }))
         end
 
+        context "multiple workers are specified for a module" do
+          let(:kochiku_yml) {
+            {
+              'maven_settings' => {
+                'multiple_workers' => {'module-one' => 3}
+              }
+            }
+          }
+
+          it "should return set of modules to build, with separate entries for each test chunk" do
+            partitions = subject.partitions
+
+            expect(partitions.size).to eq(6)
+            expect(partitions).to include(a_hash_including({ 'files' => ['module-one'], 'options'=>{'total_workers' => 3, 'worker_chunk' => 1}}))
+            expect(partitions).to include(a_hash_including({ 'files' => ['module-one'], 'options'=>{'total_workers' => 3, 'worker_chunk' => 2}}))
+            expect(partitions).to include(a_hash_including({ 'files' => ['module-one'], 'options'=>{'total_workers' => 3, 'worker_chunk' => 3}}))
+            expect(partitions).to include(a_hash_including({ 'files' => ['module-three'], 'options'=>{}}))
+          end
+        end
+
         context "with always_build set" do
           let(:kochiku_yml) {
             {

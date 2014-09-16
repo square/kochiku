@@ -95,8 +95,33 @@ module Partitioner
     end
 
     def add_options(group_modules)
-      group_modules.each do |group|
-        group['options'] = @options
+      # create multiple entries for builds specifying multiple workers, assigning
+      # distinct test chunks to each
+      group_modules.flat_map do |group|
+        multiple_workers_list = @settings.fetch('multiple_workers', Hash.new)
+
+        multiple_workers_module = multiple_workers_list.keys.detect do |path|
+          group['files'].include? path
+        end
+
+        need_multiple_workers = multiple_workers_module.present?
+
+        if need_multiple_workers
+          total_workers = multiple_workers_list[multiple_workers_module]
+
+          (1..total_workers).map { |worker_chunk|
+            new_group = group.clone
+            new_options = @options.clone
+            new_options['total_workers'] = total_workers
+            new_options['worker_chunk'] = worker_chunk
+
+            new_group['options'] = new_options
+            new_group
+          }
+        else
+          group['options'] = @options
+          group
+        end
       end
     end
 
