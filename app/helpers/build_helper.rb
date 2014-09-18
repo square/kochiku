@@ -19,7 +19,9 @@ module BuildHelper
   end
 
   def format_paths(build_part)
-    if build_part.paths.size == 1
+    if (build_part.options['total_workers'] && build_part.options['worker_chunk'])
+      build_part.paths.first + " - Chunk #{build_part.options['worker_chunk']} of #{build_part.options['total_workers']}"
+    elsif build_part.paths.size == 1
       build_part.paths.first
     else
       first, *rest = build_part.paths

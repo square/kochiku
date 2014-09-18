@@ -58,6 +58,8 @@
             = link_to("Abandon", finish_build_attempt_path(attempt, :state => :aborted), :method => :post)
 
 %ol#build-paths
+  - if (@build_part.options['total_workers'] && @build_part.options['worker_chunk'])
+    %li="Chunk #{@build_part.options['worker_chunk']} of #{@build_part.options['total_workers']}"
   - @build_part.paths.each do |path|
     %li=path
 

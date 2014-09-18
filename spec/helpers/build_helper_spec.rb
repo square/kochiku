@@ -38,4 +38,13 @@ describe BuildHelper do
       expect(node.inner_html).to eq("(<b class=\"root\">a</b>, b)")
     end
   end
+
+  context "with a build with multiple chunks" do
+    let!(:build_part) { FactoryGirl.create(:build_part, :build_instance => build, :paths => ['a', 'b'],
+      :options => {'total_workers' => 5, 'worker_chunk' => 3}) }
+
+    it "displays worker chunk in paths" do
+      expect(format_paths(build_part)).to eq("a - Chunk 3 of 5")
+    end
+  end
 end
