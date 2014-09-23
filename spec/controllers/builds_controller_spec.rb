@@ -391,6 +391,9 @@ RESPONSE
 
   describe "#retry_partitioning" do
     let(:build) { FactoryGirl.create(:build) }
+    before do
+      allow(GitRepo).to receive(:load_kochiku_yml).and_return(nil)
+    end
 
     context "when there are no build parts" do
       it "enques a partitioning job" do
