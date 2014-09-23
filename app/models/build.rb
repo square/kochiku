@@ -75,6 +75,12 @@ class Build < ActiveRecord::Base
   end
 
   def enqueue_partitioning_job
+    if test_command.blank?
+      error_message = "No test_command specified in kochiku.yml."
+      update!(:error_details => { :message => error_message, :backtrace =>nil }, :state => :errored)
+      return
+    end
+
     Resque.enqueue(BuildPartitioningJob, self.id)
   end
 

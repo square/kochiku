@@ -41,7 +41,7 @@ class BuildsController < ApplicationController
   def retry_partitioning
     @build = @project.builds.find(params[:id])
     # This means there was an error with the partitioning job; redo it
-    if @build.build_parts.empty?
+    if @build.build_parts.empty? && @build.test_command.present?
       @build.enqueue_partitioning_job
       @build.update_attributes! :state => :partitioning, :error_details => nil
     end
