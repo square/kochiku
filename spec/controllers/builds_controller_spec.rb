@@ -411,35 +411,5 @@ RESPONSE
         expect(response).to redirect_to(project_build_path(build.project, build))
       end
     end
-
-    context "when there is no test_command" do
-      before do
-        build.repository.update!(test_command: nil)
-      end
-
-      it "does nothing" do
-        expect(Resque).to_not receive(:enqueue)
-        post :retry_partitioning, :project_id => build.project.to_param, :id => build.id
-        expect(response).to redirect_to(project_build_path(build.project, build))
-      end
-    end
-  end
-
-  describe "#enqueue_partitioning_job" do
-    let(:build) { FactoryGirl.create(:build) }
-    before do
-      allow(GitRepo).to receive(:load_kochiku_yml).and_return(nil)
-    end
-
-    context "when there is no test command" do
-      before do
-        build.repository.update!(test_command: nil)
-      end
-
-      it "raises error and does not enqueue job" do
-        expect(Resque).to_not receive(:enqueue)
-        build.enqueue_partitioning_job
-      end
-    end
   end
 end

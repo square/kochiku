@@ -6,6 +6,9 @@ describe BuildPartitioningJob do
     subject { BuildPartitioningJob.perform(id) }
     let(:id) { build.id }
     let(:build) { FactoryGirl.create(:build, :state => :runnable) }
+    before do
+      allow(GitRepo).to receive(:load_kochiku_yml).and_return(nil)
+    end
 
     context "with a job runs successfully" do
       before do
@@ -36,6 +39,19 @@ describe BuildPartitioningJob do
           true
         end
         subject
+      end
+    end
+
+    context "no test_command specified" do
+      before do
+        build.repository.update!(test_command: nil)
+      end
+
+      it "raises an error and fails build" do
+        subject
+        build.reload
+        expect(build.error_details[:message]).to include("No test_command")
+        expect(build.build_parts.size).to eq(0)
       end
     end
 
