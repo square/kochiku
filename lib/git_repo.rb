@@ -46,6 +46,15 @@ class GitRepo
       end
     end
 
+    def included_in_promotion_ref?(build_ref, promotion_ref)
+      # --is-ancestor was added in git 1.8.0
+      # exit ->   1: not an ancestor
+      # exit -> 128: the commit does not exist
+      ancestor_cmd = Cocaine::CommandLine.new("git merge-base", "--is-ancestor #{build_ref} origin/#{promotion_ref}", :expected_outcodes => [0, 1, 128])
+      ancestor_cmd.run
+      ancestor_cmd.exit_status == 0
+    end
+
     private
 
     KOCHIKU_YML_LOCS = [

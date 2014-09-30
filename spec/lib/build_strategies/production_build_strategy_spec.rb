@@ -75,7 +75,7 @@ describe BuildStrategy do
 
     context "when the ref is an ancestor" do
       before(:each) {
-        expect(described_class).to receive(:included_in_promotion_ref?).and_return(true)
+        expect(GitRepo).to receive(:included_in_promotion_ref?).and_return(true)
       }
       it "does not perform an update" do
         expect(described_class).to_not receive(:update_branch)
@@ -85,7 +85,7 @@ describe BuildStrategy do
 
     context "when the ref is not an ancestor" do
       before(:each) {
-        expect(described_class).to receive(:included_in_promotion_ref?).and_return(false)
+        expect(GitRepo).to receive(:included_in_promotion_ref?).and_return(false)
       }
       it "should update the promotion branch" do
         expect(described_class).to receive(:update_branch).with(project.repository.promotion_refs.first, build.ref)

@@ -16,7 +16,7 @@ class BuildStrategy
     def promote_build(build)
       GitRepo.inside_repo(build.repository) do
         build.repository.promotion_refs.each do |promotion_ref|
-          unless included_in_promotion_ref?(build.ref, promotion_ref)
+          unless GitRepo.included_in_promotion_ref?(build.ref, promotion_ref)
             update_branch(promotion_ref, build.ref)
           end
         end
@@ -51,17 +51,6 @@ class BuildStrategy
 
     def update_branch(branch_name, ref_to_promote)
       Cocaine::CommandLine.new("git push", "--force origin #{ref_to_promote}:refs/heads/#{branch_name}").run
-    end
-
-  private
-
-    def included_in_promotion_ref?(build_ref, promotion_ref)
-      # --is-ancestor was added in git 1.8.0
-      # exit ->   1: not an ancestor
-      # exit -> 128: the commit does not exist
-      ancestor_cmd = Cocaine::CommandLine.new("git merge-base", "--is-ancestor #{build_ref} origin/#{promotion_ref}", :expected_outcodes => [0, 1, 128])
-      ancestor_cmd.run
-      ancestor_cmd.exit_status == 0
     end
   end
 end
