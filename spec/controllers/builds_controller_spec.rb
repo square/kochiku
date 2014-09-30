@@ -424,22 +424,4 @@ RESPONSE
       end
     end
   end
-
-  describe "#enqueue_partitioning_job" do
-    let(:build) { FactoryGirl.create(:build) }
-    before do
-      allow(GitRepo).to receive(:load_kochiku_yml).and_return(nil)
-    end
-
-    context "when there is no test command" do
-      before do
-        build.repository.update!(test_command: nil)
-      end
-
-      it "raises error and does not enqueue job" do
-        expect(Resque).to_not receive(:enqueue)
-        build.enqueue_partitioning_job
-      end
-    end
-  end
 end
