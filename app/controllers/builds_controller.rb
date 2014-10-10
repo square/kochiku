@@ -133,6 +133,11 @@ class BuildsController < ApplicationController
     end
   end
 
+  def build_redirect
+    build_instance = Build.find(params[:id])
+    redirect_to project_build_path(build_instance.project, :id => params[:id])
+  end
+
   private
 
   def make_build
@@ -186,6 +191,5 @@ class BuildsController < ApplicationController
                             merge_on_success: merge_on_success,
                             branch: branch)
     end
-
   end
 end

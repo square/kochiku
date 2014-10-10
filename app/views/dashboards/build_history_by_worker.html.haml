@@ -1,5 +1,24 @@
 #worker-health-wrap
-  %table#worker-health
+  %table{:class => "worker-health"}
+    %thead
+      %th.right Worker
+      %th Partition Attempts
+    %tbody
+      %tr
+        %td.right= "Partition workers"
+        %td
+          - @partition_jobs.each do |partition_job|
+            = link_to build_redirect_path(partition_job) do
+              - if partition_job.build_parts.size > 0
+                %span.attempt-status{:class => :passed}
+                // ugly hack because in this table, partitioning means "in progress", whereas in
+                // the following build attempts table, it means not started yet
+              - elsif partition_job.state == :partitioning
+                %span.attempt-status{:class => :running}
+              - else
+                %span.attempt-status{:class => partition_job.state}
+  %br
+  %table{:class => "worker-health"}
     %thead
       %th.right Worker
       %th Build Attempts
