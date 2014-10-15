@@ -1,33 +1,20 @@
-# Email address to use in the 'from' field for emails sent by Kochiku.
+#########################################################################
+#                                                                       #
+# This version of the application.yml is used by the Kochiku test suite #
+#                                                                       #
+#########################################################################
+
+# The descriptions for these settings are in config/application.yml.
+
 sender_email_address: 'kochiku@example.com'
-
-# Email address where kochiku should send problems with the build system (for example, errors),
-# as distinct from failures in a particular test (which go to the people who committed code).
 kochiku_notifications_email_address: 'kochiku-notifications@example.com'
-
-# Domain name to use in constructing generic addresses. For example noreply@example.com in git commits.
 domain_name: 'example.com'
-
-# Set to true if Kochiku is served over https
 use_https: false
-
-# Host name where Kochiku is serving web pages.
 kochiku_host: 'kochiku.example.com'
-
-# If you commit with hitch/git-pair, etc, set this in order to send email to each person in the pair.
-# For example, github+joe+bob@example.com will turn into emails to joe@example.com and bob@example.com
-# if git_pair_email_prefix is set to 'github'.
 git_pair_email_prefix: 'github'
-
-# Mail server which will accept mail on port 25 (standard SMTP port). If you need to use another port,
-# or other settings, you currently need to edit the kochiku source (config.action_mailer settings in
-# config/environments/production.rb).
 smtp_server: 'localhost'
+redis_host: '127.0.0.1'
 
-# List your git servers (at least for now, they need to be either github, github enterprise, or
-# Atlassian Stash for things like constructing URLs to pages on those servers. Would be nice to
-# just turn off the fancy features for a vanilla git server instead, but that isn't yet possible).
-# possible values for type are: github or stash
 git_servers:
   github.com:
     type: github
@@ -46,5 +33,5 @@ worker_thresholds:
   idle_excess_count: 50
   idle_insufficient_count: 30
   worker_fluctuation_tolerance: 5
-  spin_up_script: /Users/square/Development/slave-driver/new-instance.rb
-  autosize_queue: developer-linux
+  spin_up_script: /path/to/new-instance.rb
+  autosize_queue: developer

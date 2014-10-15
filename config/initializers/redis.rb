@@ -1,1 +1,4 @@
-REDIS = Redis.new(host: "127.0.0.1")
+REDIS = Redis.new(
+  host: Settings.redis_host,
+  port: 6379,
+)
