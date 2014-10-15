@@ -13,6 +13,7 @@ use_https: false
 kochiku_host: 'kochiku.example.com'
 git_pair_email_prefix: 'github'
 smtp_server: 'localhost'
+redis_host: '127.0.0.1'
 
 git_servers:
   github.com:

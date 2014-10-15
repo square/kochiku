@@ -55,6 +55,10 @@ class SettingsAccessor
     @hash[:smtp_server]
   end
 
+  def redis_host
+    @hash[:redis_host]
+  end
+
   def git_pair_email_prefix
     @hash[:git_pair_email_prefix]
   end
