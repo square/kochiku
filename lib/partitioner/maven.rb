@@ -28,11 +28,11 @@ module Partitioner
 
         files_changed_method = @build.project.main? ? :files_changed_since_last_build : :files_changed_in_branch
         GitBlame.send(files_changed_method, @build).each do |file_and_emails|
-          next if @settings.fetch('ignore_directories', []).detect { |dir| file_and_emails[:file].start_with?(dir) }
+          next if @settings.fetch('ignore_paths', []).detect { |dir| file_and_emails[:file].start_with?(dir) }
 
           module_affected_by_file = file_to_module(file_and_emails[:file])
 
-          if module_affected_by_file.nil?
+          if module_affected_by_file.nil? || @settings.fetch('build_everything', []).detect { |dir| file_and_emails[:file].start_with?(dir) }
             return add_options(all_partitions)
           else
             modules_to_build.merge(depends_on_map[module_affected_by_file] || Set.new)
@@ -59,13 +59,11 @@ module Partitioner
 
       GitRepo.inside_copy(@build.repository, @build.ref) do
         GitBlame.files_changed_since_last_green(@build, :fetch_emails => true).each do |file_and_emails|
-          next if @settings.fetch('ignore_directories', []).detect { |dir| file_and_emails[:file].start_with?(dir) }
-
           file = file_and_emails[:file]
           emails = file_and_emails[:emails]
           module_affected_by_file = file_to_module(file_and_emails[:file])
 
-          if module_affected_by_file.nil?
+          if module_affected_by_file.nil? || @settings.fetch('build_everything', []).detect { |dir| file_and_emails[:file].start_with?(dir) }
             emails.each { |email| email_and_files[email] << file }
           elsif (set = depends_on_map[module_affected_by_file]) && !set.intersection(failed_modules).empty?
             emails.each { |email| email_and_files[email] << file }
