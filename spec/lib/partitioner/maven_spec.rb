@@ -187,21 +187,21 @@ describe Partitioner::Maven do
         let(:kochiku_yml) {
           {
               'maven_settings' => {
-                  'build_everything' => ['module-two'],
+                  'build_everything' => ['build-all'],
               }
           }
         }
 
-        it "should build everything if one of the changed file starts with build_everything" do
+        it "should build everything if one of the changed file starts with a path in build_everything" do
           allow(GitBlame).to receive(:files_changed_since_last_build).with(build)
-            .and_return([{:file => "module-two/src/main/java/com/lobsters/foo.java", :emails => []}])
+            .and_return([{:file => "build-all/src/main/java/com/lobsters/foo.java", :emails => []}])
           allow(File).to receive(:exists?).and_return(false)
-          allow(File).to receive(:exists?).with("module-two/pom.xml").and_return(true)
+          allow(File).to receive(:exists?).with("build-all/pom.xml").and_return(true)
 
-          allow(subject).to receive(:maven_modules).and_return(["module-one", "module-two"])
+          allow(subject).to receive(:maven_modules).and_return(["module-one", "build-all"])
           allow(subject).to receive(:depends_on_map).and_return({
-            "module-one" => ["module-one", "module-two"].to_set,
-            "module-two" => ["module-two"].to_set,
+            "module-one" => ["module-one", "build-all"].to_set,
+            "build-all" => ["build-all"].to_set,
           })
 
           expect(subject).to receive(:all_partitions).and_return([{"type" => "maven", "files" => "ALL"}])
@@ -292,127 +292,115 @@ describe Partitioner::Maven do
       expect(emails).to be_empty
     end
 
-    it "should return the emails for the modules that are failing" do
-      build_part = FactoryGirl.create(:build_part, :paths => ["module-four"], :build_instance => build)
-      FactoryGirl.create(:build_attempt, :state => :failed, :build_part => build_part)
-      expect(build.build_parts.failed_or_errored).to eq([build_part])
-
-      allow(GitRepo).to receive(:inside_copy).and_yield
-      allow(GitBlame).to receive(:files_changed_since_last_green).with(build, :fetch_emails => true)
-        .and_return([{:file => "module-one/src/main/java/com/lobsters/Foo.java", :emails => ["userone@example.com"]},
-                     {:file => "module-two/src/main/java/com/lobsters/Bar.java", :emails => ["usertwo@example.com"]},
-                     {:file => "module-four/src/main/java/com/lobsters/Baz.java", :emails => ["userfour@example.com"]},
-                     {:file => "module-four/src/main/java/com/lobsters/Bing.java", :emails => ["userfour@example.com"]}])
-      allow(File).to receive(:exists?).and_return(false)
-      allow(File).to receive(:exists?).with("module-one/pom.xml").and_return(true)
-      allow(File).to receive(:exists?).with("module-two/pom.xml").and_return(true)
-      allow(File).to receive(:exists?).with("module-four/pom.xml").and_return(true)
-
-      allow(subject).to receive(:depends_on_map).and_return({
-                                                   "module-one" => ["module-one", "module-three", "module-four"].to_set,
-                                                   "module-two" => ["module-two", "module-three"].to_set,
-                                                   "module-four" => ["module-four"].to_set
-                                               })
-      expect(subject).to_not receive(:all_partitions)
-
-      email_and_files = subject.emails_for_commits_causing_failures
-      expect(email_and_files.size).to eq(2)
-      expect(email_and_files["userone@example.com"]).to eq(["module-one/src/main/java/com/lobsters/Foo.java"])
-      expect(email_and_files["userfour@example.com"].size).to eq(2)
-      expect(email_and_files["userfour@example.com"]).to include("module-four/src/main/java/com/lobsters/Baz.java")
-      expect(email_and_files["userfour@example.com"]).to include("module-four/src/main/java/com/lobsters/Bing.java")
-    end
-
-    context "with ignore_paths set" do
-      let(:kochiku_yml) {
-        {
-            'maven_settings' => {
-                'ignore_paths' => ['module-one'],
-            }
-        }
-      }
-
-      it "should not return emails if changes are on an ignored path and not in the dependency map" do
-        build_part = FactoryGirl.create(:build_part, :paths => ["module-four"], :build_instance => build)
+    context "with a module that failed to build" do
+      before do
+        build_part = FactoryGirl.create(:build_part, :paths => ["failed-module"], :build_instance => build)
         FactoryGirl.create(:build_attempt, :state => :failed, :build_part => build_part)
         expect(build.build_parts.failed_or_errored).to eq([build_part])
 
         allow(GitRepo).to receive(:inside_copy).and_yield
-        allow(GitBlame).to receive(:files_changed_since_last_green).with(build, :fetch_emails => true)
-          .and_return([{:file => "module-one/src/main/java/com/lobsters/Foo.java", :emails => ["userone@example.com"]},
-                       {:file => "module-four/src/main/java/com/lobsters/Bing.java", :emails => ["userfour@example.com"]}])
-        allow(File).to receive(:exists?).and_return(false)
-        allow(File).to receive(:exists?).with("module-one/pom.xml").and_return(true)
-        allow(File).to receive(:exists?).with("module-four/pom.xml").and_return(true)
-
-        allow(subject).to receive(:depends_on_map).and_return({
-                                                     "module-one" => ["module-one"].to_set,
-                                                     "module-four" => ["module-four"].to_set
-                                                 })
         expect(subject).to_not receive(:all_partitions)
-
-        email_and_files = subject.emails_for_commits_causing_failures
-        expect(email_and_files.size).to eq(1)
-        expect(email_and_files["userfour@example.com"]).to eq(["module-four/src/main/java/com/lobsters/Bing.java"])
       end
 
-      it "should return emails if changes are on an ignored path but are in the dependency map" do
-        build_part = FactoryGirl.create(:build_part, :paths => ["module-four"], :build_instance => build)
-        FactoryGirl.create(:build_attempt, :state => :failed, :build_part => build_part)
-        expect(build.build_parts.failed_or_errored).to eq([build_part])
-
-        allow(GitRepo).to receive(:inside_copy).and_yield
+      it "should return the emails for the modules that are failing" do
         allow(GitBlame).to receive(:files_changed_since_last_green).with(build, :fetch_emails => true)
                            .and_return([{:file => "module-one/src/main/java/com/lobsters/Foo.java", :emails => ["userone@example.com"]},
-                                        {:file => "module-four/src/main/java/com/lobsters/Bing.java", :emails => ["userfour@example.com"]}])
+                                        {:file => "module-two/src/main/java/com/lobsters/Bar.java", :emails => ["usertwo@example.com"]},
+                                        {:file => "failed-module/src/main/java/com/lobsters/Baz.java", :emails => ["userfour@example.com"]},
+                                        {:file => "failed-module/src/main/java/com/lobsters/Bing.java", :emails => ["userfour@example.com"]}])
         allow(File).to receive(:exists?).and_return(false)
         allow(File).to receive(:exists?).with("module-one/pom.xml").and_return(true)
-        allow(File).to receive(:exists?).with("module-four/pom.xml").and_return(true)
+        allow(File).to receive(:exists?).with("module-two/pom.xml").and_return(true)
+        allow(File).to receive(:exists?).with("failed-module/pom.xml").and_return(true)
 
         allow(subject).to receive(:depends_on_map).and_return({
-                                                    "module-one" => ["module-one", "module-four"].to_set,
-                                                    "module-four" => ["module-four"].to_set
-                                                })
-        expect(subject).to_not receive(:all_partitions)
+                                                                  "module-one" => ["module-one", "module-three", "failed-module"].to_set,
+                                                                  "module-two" => ["module-two", "module-three"].to_set,
+                                                                  "failed-module" => ["failed-module"].to_set
+                                                              })
 
         email_and_files = subject.emails_for_commits_causing_failures
         expect(email_and_files.size).to eq(2)
         expect(email_and_files["userone@example.com"]).to eq(["module-one/src/main/java/com/lobsters/Foo.java"])
-        expect(email_and_files["userfour@example.com"]).to eq(["module-four/src/main/java/com/lobsters/Bing.java"])
+        expect(email_and_files["userfour@example.com"].size).to eq(2)
+        expect(email_and_files["userfour@example.com"]).to include("failed-module/src/main/java/com/lobsters/Baz.java")
+        expect(email_and_files["userfour@example.com"]).to include("failed-module/src/main/java/com/lobsters/Bing.java")
       end
-    end
 
-    context "with build_everything set" do
-      let(:kochiku_yml) {
-        {
-            'maven_settings' => {
-                'build_everything' => ['module-one'],
-            }
+      context "with ignore_paths set" do
+        let(:kochiku_yml) {
+          {
+              'maven_settings' => {
+                  'ignore_paths' => ['ignored-module'],
+              }
+          }
         }
-      }
 
-      it "should return email for change to build_everything even if build_everything module does not depend on changed file"  do
-        build_part = FactoryGirl.create(:build_part, :paths => ["module-four"], :build_instance => build)
-        FactoryGirl.create(:build_attempt, :state => :failed, :build_part => build_part)
-        expect(build.build_parts.failed_or_errored).to eq([build_part])
+        it "should not return emails if changes are on an ignored path and not in the dependency map" do
+          allow(GitBlame).to receive(:files_changed_since_last_green).with(build, :fetch_emails => true)
+                             .and_return([{:file => "ignored-module/src/main/java/com/lobsters/Foo.java", :emails => ["userone@example.com"]},
+                                          {:file => "failed-module/src/main/java/com/lobsters/Bing.java", :emails => ["userfour@example.com"]}])
+          allow(File).to receive(:exists?).and_return(false)
+          allow(File).to receive(:exists?).with("ignored-module/pom.xml").and_return(true)
+          allow(File).to receive(:exists?).with("failed-module/pom.xml").and_return(true)
 
-        allow(GitRepo).to receive(:inside_copy).and_yield
-        allow(GitBlame).to receive(:files_changed_since_last_green).with(build, :fetch_emails => true)
-          .and_return([{:file => "module-one/src/main/java/com/lobsters/Foo.java", :emails => ["userone@example.com"]},
-                       {:file => "module-four/src/main/java/com/lobsters/Bar.java", :emails => ["userfour@example.com"]}])
-        allow(File).to receive(:exists?).and_return(false)
-        allow(File).to receive(:exists?).with("module-one/pom.xml").and_return(true)
-        allow(File).to receive(:exists?).with("module-four/pom.xml").and_return(true)
+          allow(subject).to receive(:depends_on_map).and_return({
+                                                                    "ignored-module" => ["ignored-module"].to_set,
+                                                                    "failed-module" => ["failed-module"].to_set
+                                                                })
 
-        allow(subject).to receive(:depends_on_map).and_return({
-                                                             "module-one" => ["module-one"].to_set,
-                                                             "module-four" => ["module-four"].to_set
-                                                         })
+          email_and_files = subject.emails_for_commits_causing_failures
+          expect(email_and_files.size).to eq(1)
+          expect(email_and_files["userfour@example.com"]).to eq(["failed-module/src/main/java/com/lobsters/Bing.java"])
+        end
 
-        email_and_files = subject.emails_for_commits_causing_failures
-        expect(email_and_files.size).to eq(2)
-        expect(email_and_files["userone@example.com"]).to eq(["module-one/src/main/java/com/lobsters/Foo.java"])
-        expect(email_and_files["userfour@example.com"]).to eq(["module-four/src/main/java/com/lobsters/Bar.java"])
+        it "should return emails if changes are on an ignored path but are in the dependency map" do
+          allow(GitBlame).to receive(:files_changed_since_last_green).with(build, :fetch_emails => true)
+                             .and_return([{:file => "ignored-module/src/main/java/com/lobsters/Foo.java", :emails => ["userone@example.com"]},
+                                          {:file => "failed-module/src/main/java/com/lobsters/Bing.java", :emails => ["userfour@example.com"]}])
+          allow(File).to receive(:exists?).and_return(false)
+          allow(File).to receive(:exists?).with("ignored-module/pom.xml").and_return(true)
+          allow(File).to receive(:exists?).with("failed-module/pom.xml").and_return(true)
+
+          allow(subject).to receive(:depends_on_map).and_return({
+                                                                    "ignored-module" => ["ignored-module", "failed-module"].to_set,
+                                                                    "failed-module" => ["failed-module"].to_set
+                                                                })
+
+          email_and_files = subject.emails_for_commits_causing_failures
+          expect(email_and_files.size).to eq(2)
+          expect(email_and_files["userone@example.com"]).to eq(["ignored-module/src/main/java/com/lobsters/Foo.java"])
+          expect(email_and_files["userfour@example.com"]).to eq(["failed-module/src/main/java/com/lobsters/Bing.java"])
+        end
+      end
+
+      context "with build_everything set" do
+        let(:kochiku_yml) {
+          {
+              'maven_settings' => {
+                  'build_everything' => ['build-all'],
+              }
+          }
+        }
+
+        it "should return email for change to build_everything even if build_everything module does not depend on changed file" do
+          allow(GitBlame).to receive(:files_changed_since_last_green).with(build, :fetch_emails => true)
+                             .and_return([{:file => "build-all/src/main/java/com/lobsters/Foo.java", :emails => ["userone@example.com"]},
+                                          {:file => "module-four/src/main/java/com/lobsters/Bar.java", :emails => ["userfour@example.com"]}])
+          allow(File).to receive(:exists?).and_return(false)
+          allow(File).to receive(:exists?).with("build-all/pom.xml").and_return(true)
+          allow(File).to receive(:exists?).with("failed-module/pom.xml").and_return(true)
+
+          allow(subject).to receive(:depends_on_map).and_return({
+                                                                    "build-all" => ["build-all"].to_set,
+                                                                    "module-four" => ["module-four"].to_set
+                                                                })
+
+          email_and_files = subject.emails_for_commits_causing_failures
+          expect(email_and_files.size).to eq(2)
+          expect(email_and_files["userone@example.com"]).to eq(["build-all/src/main/java/com/lobsters/Foo.java"])
+          expect(email_and_files["userfour@example.com"]).to eq(["module-four/src/main/java/com/lobsters/Bar.java"])
+        end
       end
     end
   end
