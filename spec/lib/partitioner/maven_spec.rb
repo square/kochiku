@@ -140,11 +140,11 @@ describe Partitioner::Maven do
           end
         end
 
-        context "with ignore_directories set" do
+        context "with ignore_paths set" do
           let(:kochiku_yml) {
             {
               'maven_settings' => {
-                'ignore_directories' => ['module-two'],
+                'ignore_paths' => ['module-two'],
               }
             }
           }
@@ -294,11 +294,11 @@ describe Partitioner::Maven do
       expect(email_and_files["userfour@example.com"]).to include("module-four/src/main/java/com/lobsters/Bing.java")
     end
 
-    context "with ignore_directories set" do
+    context "with ignore_paths set" do
       let(:kochiku_yml) {
         {
             'maven_settings' => {
-                'ignore_directories' => ['module-four'],
+                'ignore_paths' => ['module-four'],
             }
         }
       }

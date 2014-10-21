@@ -28,7 +28,7 @@ module Partitioner
 
         files_changed_method = @build.project.main? ? :files_changed_since_last_build : :files_changed_in_branch
         GitBlame.send(files_changed_method, @build).each do |file_and_emails|
-          next if @settings.fetch('ignore_directories', []).detect { |dir| file_and_emails[:file].start_with?(dir) }
+          next if @settings.fetch('ignore_paths', []).detect { |dir| file_and_emails[:file].start_with?(dir) }
 
           module_affected_by_file = file_to_module(file_and_emails[:file])
 
@@ -59,7 +59,7 @@ module Partitioner
 
       GitRepo.inside_copy(@build.repository, @build.ref) do
         GitBlame.files_changed_since_last_green(@build, :fetch_emails => true).each do |file_and_emails|
-          next if @settings.fetch('ignore_directories', []).detect { |dir| file_and_emails[:file].start_with?(dir) }
+          next if @settings.fetch('ignore_paths', []).detect { |dir| file_and_emails[:file].start_with?(dir) }
 
           file = file_and_emails[:file]
           emails = file_and_emails[:emails]
