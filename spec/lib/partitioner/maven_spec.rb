@@ -77,7 +77,6 @@ describe Partitioner::Maven do
 
           expect(partitions.size).to eq(4)
           expect(partitions).to include(a_hash_including({ 'files' => ['module-one'] }))
-          expect(partitions).to include(a_hash_including({ 'files' => ['module-one'] }))
           expect(partitions).to include(a_hash_including({ 'files' => ['module-two', 'module-two/integration'] }))
           expect(partitions).to include(a_hash_including({ 'files' => ['module-three'] }))
           expect(partitions).to include(a_hash_including({ 'files' => ['module-four'] }))
@@ -138,6 +137,24 @@ describe Partitioner::Maven do
               partitions = subject.partitions
               expect(partitions.first['options']['log_file_globs']).to eq(['mylog.log', 'another.log'])
             end
+          end
+        end
+
+        context "with ignore_directories set" do
+          let(:kochiku_yml) {
+            {
+              'maven_settings' => {
+                'ignore_directories' => ['module-two'],
+              }
+            }
+          }
+
+          it "should not return partitions for an ignored directory" do
+            partitions = subject.partitions
+            expect(partitions.size).to eq(3)
+            expect(partitions).to include(a_hash_including({ 'files' => ['module-one'] }))
+            expect(partitions).to include(a_hash_including({ 'files' => ['module-three'] }))
+            expect(partitions).to include(a_hash_including({ 'files' => ['module-four'] }))
           end
         end
       end
@@ -436,21 +453,6 @@ describe Partitioner::Maven do
       expect(subject.file_to_module("pom.xml")).to be_nil
       expect(subject.file_to_module("Gemfile.lock")).to be_nil
       expect(subject.file_to_module("non_maven_dependencies/README")).to be_nil
-    end
-
-    context "with ignore_directories set" do
-      let(:kochiku_yml) {
-        {
-          'maven_settings' => {
-            'ignore_directories' => ['a'],
-          }
-        }
-      }
-
-      it "should return nil for changes in an ignored directory" do
-        allow(File).to receive(:exists?).with("a/base/pom.xml").and_return(true)
-        expect(subject.file_to_module("a/base/pom.xml")).to be_nil
-      end
     end
   end
 end

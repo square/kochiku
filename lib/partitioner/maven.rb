@@ -28,12 +28,12 @@ module Partitioner
 
         files_changed_method = @build.project.main? ? :files_changed_since_last_build : :files_changed_in_branch
         GitBlame.send(files_changed_method, @build).each do |file_and_emails|
+          next if @settings.fetch('ignore_directories', []).detect { |dir| file_and_emails[:file].start_with?(dir) }
+
           module_affected_by_file = file_to_module(file_and_emails[:file])
 
           if module_affected_by_file.nil?
-            if file_and_emails[:file] != "pom.xml"
-              return add_options(all_partitions)
-            end
+            return add_options(all_partitions)
           else
             modules_to_build.merge(depends_on_map[module_affected_by_file] || Set.new)
           end
@@ -223,7 +223,6 @@ module Partitioner
     end
 
     def file_to_module(file_path)
-      return nil if @settings.fetch('ignore_directories', []).detect { |dir| file_path.start_with?(dir) }
       dir_path = file_path
       while (dir_path = File.dirname(dir_path)) != "."
         if File.exists?("#{dir_path}/pom.xml")
