@@ -59,14 +59,14 @@ module Partitioner
 
       GitRepo.inside_copy(@build.repository, @build.ref) do
         GitBlame.files_changed_since_last_green(@build, :fetch_emails => true).each do |file_and_emails|
+          next if @settings.fetch('ignore_directories', []).detect { |dir| file_and_emails[:file].start_with?(dir) }
+
           file = file_and_emails[:file]
           emails = file_and_emails[:emails]
           module_affected_by_file = file_to_module(file_and_emails[:file])
 
           if module_affected_by_file.nil?
-            if file != "pom.xml"
-              emails.each { |email| email_and_files[email] << file }
-            end
+            emails.each { |email| email_and_files[email] << file }
           elsif (set = depends_on_map[module_affected_by_file]) && !set.intersection(failed_modules).empty?
             emails.each { |email| email_and_files[email] << file }
           end
