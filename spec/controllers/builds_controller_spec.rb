@@ -128,6 +128,11 @@ describe BuildsController do
         expect(Build.last.branch).to eq("sticky-buddy")
       end
 
+      it "sets does not set branch if an empty string is given" do
+        post @action, @params.merge(:project_id => project_param, :build => build_info.merge(:branch => ""))
+        expect(Build.last.branch).to eq(nil)
+      end
+
       it "should create a new build" do
         expect(Build.exists?(:ref => build_info[:ref])).to be false
         post @action, @params.merge(:project_id => project_param, :build => build_info)
