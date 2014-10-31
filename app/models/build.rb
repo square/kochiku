@@ -258,13 +258,20 @@ class Build < ActiveRecord::Base
 
     if completed?
       if failed? && !build_failure_email_sent? && repository.send_build_failure_email?
-        if Build.where(id: self.id, build_failure_email_sent: false).update_all(build_failure_email_sent: true) == 1
+        unless build_failure_email_sent?
           BuildMailer.build_break_email(self).deliver
+          update(build_failure_email_sent: true)
         end
       elsif succeeded? && !project.main? && !build_success_email_sent? && repository.send_build_success_email?
-        if Build.where(id: self.id, build_success_email_sent: false).update_all(build_success_email_sent: true) == 1
+        unless build_success_email_sent?
           BuildMailer.build_success_email(self).deliver
+          update(build_success_email_sent: true)
         end
+      end
+    elsif repository.email_on_first_failure && failed? && repository.send_build_failure_email?
+      unless build_failure_email_sent?
+        BuildMailer.build_break_email(self).deliver
+        update(build_failure_email_sent: true)
       end
     end
   end
