@@ -102,6 +102,7 @@ class RepositoriesController < ApplicationController
     params.require(:repository).
       permit(:url, :name, :timeout, :build_pull_requests,
              :run_ci, :on_green_update, :send_build_success_email,
-             :send_build_failure_email, :allows_kochiku_merges)
+             :send_build_failure_email, :allows_kochiku_merges,
+             :email_on_first_failure)
   end
 end

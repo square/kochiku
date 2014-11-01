@@ -45,6 +45,9 @@
     %div
       %label{:for => "send_build_failure_email"} Send email to build breakers:
       = f.check_box :send_build_failure_email, {:id => "send_build_failure_email"}
+    %div
+      %label{:for => "email_on_first_failure"} Email on first build part failure:
+      = f.check_box :email_on_first_failure, {:id => "email_on_first_failure"}
 
   = f.submit @repository.new_record? ? "Create" : "Update"
 

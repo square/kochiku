@@ -476,6 +476,28 @@ describe Build do
         build.send_build_status_email!
       end
 
+      context "when email_on_first_failure is false" do
+        before do
+          repository.update_attribute(:email_on_first_failure, false)
+        end
+        it "should not send email on first build part failure" do
+            build.update_attribute(:state, :doomed)
+            expect(BuildMailer).to_not receive(:build_break_email)
+            build.send_build_status_email!
+        end
+      end
+
+      context "when email_on_first_failure is true" do
+        before do
+          repository.update_attribute(:email_on_first_failure, true)
+        end
+        it "should send email on first build part failure" do
+          build.update_attribute(:state, :doomed)
+          expect(BuildMailer).to receive(:build_break_email).and_return(OpenStruct.new(:deliver => nil))
+          build.send_build_status_email!
+        end
+      end
+
       context "for a build of a project not on master" do
         let(:project) { FactoryGirl.create(:project, :branch => "other-branch")}
 
