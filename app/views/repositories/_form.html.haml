@@ -3,9 +3,6 @@
   %div
     %label{:for => "url"} Repository URL:
     = f.text_field :url, {:placeholder => '', :autocapitalize => 'off', :autocorrect => 'off', :spellcheck => 'false'}
-  %div
-    %label{:for => "name"} Repository Name:
-    = f.text_field :name, {:placeholder => '(default is based off url)', :autocapitalize => 'off', :autocorrect => 'off', :spellcheck => 'false'}
   - if @repository.test_command.present?
     %div{ title: 'Test command should now be specified in the kochiku.yml' }
       %label{:for => "test_command"} Test Command: (Deprecated)
