@@ -15,6 +15,15 @@ describe RepositoriesController do
       }.to change(Repository, :count).by(1)
       repository = Repository.where(url: "git@git.example.com:square/kochiku.git").first
       expect(repository).to be_present
+      expect(repository.name).to eq('kochiku')
+    end
+
+    it "sets host, namespace, and name based on the repo url" do
+      post :create, @params
+      repository = Repository.where(url: "git@git.example.com:square/kochiku.git").first
+      expect(repository.host).to eq('git.example.com')
+      expect(repository.namespace).to eq('square')
+      expect(repository.name).to eq('kochiku')
     end
 
     it "creates a ci and pull_requests project" do
@@ -25,19 +34,6 @@ describe RepositoriesController do
       repository = Repository.where(url: "git@git.example.com:square/kochiku.git").first
       expect(repository.projects.size).to eq(2)
       expect(repository.projects.map(&:name).sort).to eq(["kochiku", "kochiku-pull_requests"])
-    end
-
-    context "with repository name" do
-      it "creates a project with the specified name" do
-        @params[:repository][:name] = 'a-project-name'
-        expect{
-          post :create, @params
-          expect(response).to be_redirect
-        }.to change(Project, :count).by(2)
-        repository = Repository.where(url: "git@git.example.com:square/kochiku.git").first
-        expect(repository.projects.size).to eq(2)
-        expect(repository.projects.map(&:name).sort).to eq(["a-project-name", "a-project-name-pull_requests"])
-      end
     end
 
     context "with validation errors" do
@@ -120,7 +116,6 @@ describe RepositoriesController do
     # string attributes
     [
       :on_green_update,
-      :name
     ].each do |attribute|
       it "should successfully update the #{attribute} attribute" do
         new_value = "Keytar Intelligentsia artisan typewriter 3 wolf moon"
