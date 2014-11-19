@@ -52,10 +52,10 @@ describe Build do
     end
 
     it "creates parts with options" do
-      build.partition([{"type" => "cucumber", "files" => ['a'], 'queue' => 'developer', 'options' => {"ruby" => "ree", "language" => 'ruby'}}])
+      build.partition([{"type" => "cucumber", "files" => ['a'], 'queue' => 'developer', 'options' => {"ruby" => "ree"}}])
       build_part = build.build_parts.first
       build_part.reload
-      expect(build_part.options).to eq({"ruby" => "ree", "language" => 'ruby'})
+      expect(build_part.options).to eq({"ruby" => "ree"})
     end
 
     it "should set the queue" do

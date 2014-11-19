@@ -147,20 +147,6 @@ describe BuildPart do
     end
   end
 
-  context "#is_for?" do
-    it "is true for the same language" do
-      build_part = BuildPart.new(:options => {"language" => "ruby"})
-      expect(build_part.is_for?(:ruby)).to be true
-      expect(build_part.is_for?("ruby")).to be true
-      expect(build_part.is_for?("RuBy")).to be true
-    end
-
-    it "is false for the different languages" do
-      build_part = BuildPart.new(:options => {"language" => "python"})
-      expect(build_part.is_for?(:ruby)).to be false
-    end
-  end
-
   describe "#not_finished?" do
     subject { build_part.not_finished? }
     context "when not finished" do
