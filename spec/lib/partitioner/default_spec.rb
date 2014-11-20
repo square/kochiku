@@ -172,6 +172,32 @@ describe Partitioner::Default do
       end
     end
 
+    context 'with different log_file_globs specified for different targets' do
+      let(:kochiku_yml) do
+        {
+          'targets' => [
+            {
+              'type' => 'unit',
+              'glob' => 'spec/**/*_spec.rb',
+              'workers' => 1,
+              'log_file_globs' => "log1",
+            },
+            {
+              'type' => 'other',
+              'glob' => 'spec/**/*_spec.rb',
+              'workers' => 1,
+              'log_file_globs' => "log2"
+            }
+          ]
+        }
+      end
+
+      it "should parse log_file_globs properly" do
+        expect(subject.first['options']['log_file_globs']).to eq(['log1'])
+        expect(subject.second['options']['log_file_globs']).to eq(['log2'])
+      end
+    end
+
     context 'when the glob matches' do
       before { allow(Dir).to receive(:[]).and_return(matches) }
 

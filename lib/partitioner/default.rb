@@ -48,7 +48,7 @@ module Partitioner
 
       @kochiku_yml['targets'].flat_map do |subset|
         partitions_for(
-          subset.merge('options' => options)
+          subset.merge('options' => options.clone)
         )
       end
     end
