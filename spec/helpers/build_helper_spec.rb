@@ -7,28 +7,62 @@ describe BuildHelper do
   let(:project) { FactoryGirl.create(:project, :repository => repository) }
   let(:repository) { FactoryGirl.create(:repository, :url => "git@git.example.com:square/web.git")}
 
-  context "with a ruby build" do
+  describe "#multiple_ruby_versions?" do
+    context "with a ruby build with multiple ruby versions" do
+      let!(:build_part) { FactoryGirl.create(:build_part, :build_instance => build, :options => options) }
+      let!(:build_part2) { FactoryGirl.create(:build_part, :build_instance => build, :options => options2) }
+      let(:options) { {"ruby" => "1.9.3-p194"} }
+      let(:options2) { {"ruby" => "2.0"} }
+
+      it "returns true" do
+        expect(multiple_ruby_versions?(build)).to equal(true)
+      end
+    end
+
+    context "with a ruby build with only one ruby version" do
+      let!(:build_part) { FactoryGirl.create(:build_part, :build_instance => build, :options => options) }
+      let(:options) { {"ruby" => "1.9.3-p194"} }
+
+      it "returns false" do
+        expect(multiple_ruby_versions?(build)).to equal(false)
+      end
+    end
+
+    context "with a non-ruby build" do
+      let!(:build_part) { FactoryGirl.create(:build_part, :build_instance => build, :options => options) }
+      let(:options) { {} }
+
+      it "returns false" do
+        expect(multiple_ruby_versions?(build)).to equal(false)
+      end
+    end
+  end
+
+  context "with a ruby build with multiple ruby versions" do
     let!(:build_part) { FactoryGirl.create(:build_part, :build_instance => build, :options => options) }
-    let(:options) { {"language" => "ruby", "ruby" => "1.9.3-p194"} }
+    let!(:build_part2) { FactoryGirl.create(:build_part, :build_instance => build, :options => options2) }
+    let(:options) { {"ruby" => "1.9.3-p194"} }
+    let(:options2) { {"ruby" => "2.0"} }
+
     it "returns the ruby version info" do
-      expect(build_metadata_headers(build)).to include("Ruby Version")
-      expect(build_metadata_values(build, build_part)).to include("1.9.3-p194")
+      expect(build_metadata_headers(build, true)).to include("Ruby Version")
+      expect(build_metadata_values(build, build_part, true)).to include("1.9.3-p194")
     end
   end
 
   context "with a build only having one target" do
     let!(:build_part) { FactoryGirl.create(:build_part, :build_instance => build, :paths => ['a']) }
     it "returns the info" do
-      expect(build_metadata_headers(build)).to eq(["Target"])
-      expect(build_metadata_values(build, build_part)).to include("a")
+      expect(build_metadata_headers(build, false)).to eq(["Target"])
+      expect(build_metadata_values(build, build_part, false)).to include("a")
     end
   end
 
   context "with a build with paths" do
     let!(:build_part) { FactoryGirl.create(:build_part, :build_instance => build, :paths => ['a', 'b']) }
     it "returns the info" do
-      expect(build_metadata_headers(build)).to include("Paths")
-      metadata_values = build_metadata_values(build, build_part).first
+      expect(build_metadata_headers(build, false)).to include("Paths")
+      metadata_values = build_metadata_values(build, build_part, false).first
 
       expect(metadata_values).to start_with(build_part.paths.size.to_s)
 

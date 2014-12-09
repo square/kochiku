@@ -63,7 +63,8 @@
     %tr
       %th.right.id Part
       %th.status Status
-      - build_metadata_headers(@build).each do |header|
+      - display_ruby_version = multiple_ruby_versions?(@build)
+      - build_metadata_headers(@build, display_ruby_version).each do |header|
         %th{ class: header.downcase.gsub(/\W+/, '-') }= header
       %th.type Type
       %th.right.worker Worker
@@ -81,7 +82,7 @@
               =link_to(text, artifact.log_file.url, :title => 'Last completed stdout.log')
             - else
               =text
-        - build_metadata_values(@build, part).each do |value|
+        - build_metadata_values(@build, part, display_ruby_version).each do |value|
           %td= value
         %td= part.kind.to_s.capitalize
         %td.right

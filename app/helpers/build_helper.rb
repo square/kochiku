@@ -1,7 +1,7 @@
 module BuildHelper
-  def build_metadata_headers(build)
+  def build_metadata_headers(build, display_ruby_version)
     [].tap do |headers|
-      headers << "Ruby Version" if is_a_ruby_build?(build)
+      headers << "Ruby Version" if display_ruby_version
 
       if is_a_build_with_one_part?(build)
         headers << "Target"
@@ -11,9 +11,9 @@ module BuildHelper
     end
   end
 
-  def build_metadata_values(build, build_part)
+  def build_metadata_values(build, build_part, display_ruby_version)
     [].tap do |values|
-      values << build_part.options["ruby"] if is_a_ruby_build?(build)
+      values << build_part.options["ruby"] if display_ruby_version
       values << format_paths(build_part)
     end
   end
@@ -31,8 +31,10 @@ module BuildHelper
     end
   end
 
-  def is_a_ruby_build?(build)
-    build.build_parts.first.try :is_for?, :ruby
+  def multiple_ruby_versions?(build)
+    build.build_parts.map { |bp|
+      bp.options['ruby']
+    }.compact.uniq.size > 1
   end
 
   def is_a_build_with_one_part?(build)

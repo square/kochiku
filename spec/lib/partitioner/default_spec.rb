@@ -77,7 +77,6 @@ describe Partitioner::Default do
       let(:kochiku_yml) do
         {
           "ruby" => ["ree-1.8.7-2011.12"],
-          "language" => "ruby",
           "targets" => [
             {
               'type' => 'rspec',
@@ -94,7 +93,6 @@ describe Partitioner::Default do
 
       it "parses options from kochiku yml" do
         partitions = subject
-        expect(partitions.first["options"]["language"]).to eq("ruby")
         expect(partitions.first["options"]["ruby"]).to eq("ree-1.8.7-2011.12")
         expect(partitions.first["type"]).to eq("rspec")
         expect(partitions.first["files"]).not_to be_empty

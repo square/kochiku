@@ -97,10 +97,6 @@ class BuildPart < ActiveRecord::Base
     end
   end
 
-  def is_for?(language)
-    options['language'].to_s.downcase == language.to_s.downcase
-  end
-
   def should_reattempt?
     if (build_attempts.unsuccessful.count - 1) < retry_count
       true
