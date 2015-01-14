@@ -485,16 +485,38 @@ describe Build do
             expect(BuildMailer).to_not receive(:build_break_email)
             build.send_build_status_email!
         end
+
+        context "retries enabled" do
+          let!(:build_part_1) { FactoryGirl.create(:build_part, :build_instance => build, :retry_count => 3) }
+          let!(:build_part_2) { FactoryGirl.create(:build_part, :build_instance => build, :retry_count => 3) }
+
+          it "should not send email before retry" do
+            ba1 = FactoryGirl.create(:build_attempt, build_part: build_part_1, state: :running)
+            ba2_1 = FactoryGirl.create(:build_attempt, build_part: build_part_2, state: :running)
+
+            expect(BuildMailer).to_not receive(:build_break_email)
+
+            ba2_1.finish!(:failed)
+          end
+        end
       end
 
       context "when email_on_first_failure is true" do
         before do
           repository.update_attribute(:email_on_first_failure, true)
         end
-        it "should send email on first build part failure" do
-          build.update_attribute(:state, :doomed)
-          expect(BuildMailer).to receive(:build_break_email).and_return(OpenStruct.new(:deliver => nil))
-          build.send_build_status_email!
+        context "first build part fails and will retry" do
+          let!(:build_part_1) { FactoryGirl.create(:build_part, :build_instance => build, :retry_count => 3) }
+          let!(:build_part_2) { FactoryGirl.create(:build_part, :build_instance => build, :retry_count => 3) }
+
+          it "should send email prior to retry" do
+            ba1 = FactoryGirl.create(:build_attempt, build_part: build_part_1, state: :passed)
+            ba2_1 = FactoryGirl.create(:build_attempt, build_part: build_part_2, state: :running)
+
+            expect(BuildMailer).to receive(:build_break_email).once.and_return(OpenStruct.new(:deliver => nil))
+
+            ba2_1.finish!(:failed)
+          end
         end
       end
 
