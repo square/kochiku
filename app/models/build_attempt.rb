@@ -39,6 +39,8 @@ class BuildAttempt < ActiveRecord::Base
     return false unless update_attributes(:state => state, :finished_at => Time.now)
 
     if should_reattempt?
+      # Will only send email if email_on_first_failure is enabled.
+      build_part.build_instance.send_build_status_email!
       build_part.rebuild!
     elsif state == :errored
       BuildMailer.error_email(self, error_txt).deliver

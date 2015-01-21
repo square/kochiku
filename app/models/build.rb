@@ -177,6 +177,10 @@ class Build < ActiveRecord::Base
     FAILED_STATES.include?(state)
   end
 
+  def failed_once?
+    build_parts.any? { |part| part.build_attempts.unsuccessful.exists? }
+  end
+
   def aborted?
     state == :aborted
   end
@@ -268,7 +272,7 @@ class Build < ActiveRecord::Base
           update(build_success_email_sent: true)
         end
       end
-    elsif repository.email_on_first_failure && failed? && repository.send_build_failure_email?
+    elsif repository.email_on_first_failure && failed_once? && repository.send_build_failure_email?
       unless build_failure_email_sent?
         BuildMailer.build_break_email(self).deliver
         update(build_failure_email_sent: true)
