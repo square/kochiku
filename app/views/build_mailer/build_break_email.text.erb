@@ -3,7 +3,7 @@
 <% if @build.build_parts.count > 1 %>
   The build was sharded into <%= @build.build_parts.count %> parts and took <%= @build.elapsed_time.to_i/60 %> minutes.
   (<%= @build.idle_time.to_i/60 %>m idle, <%= @build.longest_build_part.to_i/60 %>m running.)
-  Without sharding the build would have taken <%= @build.linear_time.to_i/60 %> minutes.
+  Without sharding the build would have taken <%= @build.linear_time.to_i/60 %> minutes to run.
 <% else %>
   The build took <%= @build.elapsed_time.to_i/60 %> minutes.
   (<%= @build.idle_time.to_i/60 %>m idle, <%= @build.longest_build_part.to_i/60 %>m running.)
