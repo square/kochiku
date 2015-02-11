@@ -248,7 +248,7 @@ describe Partitioner::Maven do
       end
 
       context "with options" do
-        let(:kochiku_yml) {{ 'log_file_globs' => 'mylog.log' }}
+        let(:kochiku_yml) {{ 'log_file_globs' => 'mylog.log', 'retry_count' => 5 }}
 
         it "should include options in the event of a partial build" do
           allow(GitBlame).to receive(:files_changed_since_last_build).with(build)
@@ -258,7 +258,8 @@ describe Partitioner::Maven do
 
           partitions = subject.partitions
           expect(partitions.size).to be > 0
-          expect(partitions.first).to match a_hash_including('options' => {'log_file_globs' => ['mylog.log']})
+          expect(partitions.first).to match a_hash_including('options' =>
+              {'log_file_globs' => ['mylog.log'], 'retry_count' => 5})
         end
       end
     end

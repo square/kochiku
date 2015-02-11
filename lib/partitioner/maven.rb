@@ -14,6 +14,7 @@ module Partitioner
       if kochiku_yml
         @settings = kochiku_yml['maven_settings'] if kochiku_yml['maven_settings']
         @options['log_file_globs'] = Array(kochiku_yml['log_file_globs']) if kochiku_yml['log_file_globs']
+        @options['retry_count'] = kochiku_yml['retry_count'] if kochiku_yml['retry_count']
       end
       @settings ||= {}
     end
@@ -145,7 +146,7 @@ module Partitioner
         'type' => 'maven',
         'files' => mvn_modules.sort!,
         'queue' => queue,
-        'retry_count' => 2
+        'retry_count' => @options.fetch('retry_count', 2)
       }
     end
 
