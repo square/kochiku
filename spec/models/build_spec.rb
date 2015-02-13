@@ -427,6 +427,21 @@ describe Build do
     end
   end
 
+  describe "#already_failed?" do
+    let!(:build_part_1) { FactoryGirl.create(:build_part, :build_instance => build, :retry_count => 3) }
+    it "returns false when there exists successful build attempt" do
+      ba1 = FactoryGirl.create(:build_attempt, build_part: build_part_1, state: :failed)
+      ba2_1 = FactoryGirl.create(:build_attempt, build_part: build_part_1, state: :passed)
+      expect(build.already_failed?).to eq(false)
+    end
+
+    it "returns true when there exists no successful build attempt" do
+      ba1 = FactoryGirl.create(:build_attempt, build_part: build_part_1, state: :failed)
+      ba2_1 = FactoryGirl.create(:build_attempt, build_part: build_part_1, state: :running)
+      expect(build.already_failed?).to eq(true)
+    end
+  end
+
   describe "#send_build_status_email!" do
     let(:project) { FactoryGirl.create(:big_rails_project, :repository => repository, :name => name) }
     let(:repository) { FactoryGirl.create(:repository)}
