@@ -177,8 +177,9 @@ class Build < ActiveRecord::Base
     FAILED_STATES.include?(state)
   end
 
-  def failed_once?
-    build_parts.any? { |part| part.build_attempts.unsuccessful.exists? }
+  # has a build part with failed attempts but no successful ones yet
+  def already_failed?
+    build_parts.any? { |part| part.build_attempts.unsuccessful.exists? && !part.build_attempts.where(state: :passed).exists? }
   end
 
   def aborted?
@@ -272,10 +273,11 @@ class Build < ActiveRecord::Base
           update(build_success_email_sent: true)
         end
       end
-    elsif repository.email_on_first_failure && failed_once? && repository.send_build_failure_email?
+    elsif repository.email_on_first_failure && already_failed? && repository.send_build_failure_email?
       unless build_failure_email_sent?
-        BuildMailer.build_break_email(self).deliver
+        # due to race condition, update attribute before sending email
         update(build_failure_email_sent: true)
+        BuildMailer.build_break_email(self).deliver
       end
     end
   end
