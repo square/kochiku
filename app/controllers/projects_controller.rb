@@ -10,7 +10,9 @@ class ProjectsController < ApplicationController
 
   def ci_projects
     @repositories = Repository.select(:name)
-    @projects = Project.includes(:repository).
+    @projects = Project.
+      includes(:repository).
+      order("name ASC").
       where(:name => @repositories.map(&:name)).decorate
   end
 
