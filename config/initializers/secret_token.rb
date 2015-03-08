@@ -6,6 +6,6 @@
 # Make sure the secret is at least 30 characters and all random,
 # no regular words or you'll be exposed to dictionary attacks.
 
-# Use a random hex since so we don't have a secret stored in git
-# and we don't use cookies for anything in kochiku
+# Use a random hex since so we don't currently use cookies for anything in
+# Kochiku
 Kochiku::Application.config.secret_key_base = SecureRandom.hex(64)
