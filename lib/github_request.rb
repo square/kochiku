@@ -1,9 +1,8 @@
 require 'uri'
 require 'net/http'
-require 'secrets'
 
 class GithubRequest
-  OAUTH_TOKEN = Secrets.github_oauth
+  OAUTH_TOKEN = Rails.application.secrets.github_oauth
   AUTH = {"Authorization" => "token #{OAUTH_TOKEN}"}
 
   class ResponseError < Exception
