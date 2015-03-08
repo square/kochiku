@@ -2,7 +2,7 @@ require 'spec_helper'
 require 'github_post_receive_hook'
 
 describe GithubPostReceiveHook do
-  subject { GithubPostReceiveHook.new(repository) }
+  subject { GithubPostReceiveHook.new(repository, 'github_oauth_token_test') }
   let(:repository) { FactoryGirl.create(:repository, :url => "git@git.example.com:square/web.git") }
 
   before do
@@ -15,20 +15,15 @@ describe GithubPostReceiveHook do
   end
 
   it "does not recreate the hook if it already exists" do
-    stub_request(:get, "https://git.example.com/api/v3/repos/square/web/hooks").with do |request|
-      expect(request.headers["Authorization"]).to eq("token #{GithubRequest::OAUTH_TOKEN}")
-      true
-    end.to_return(:body => github_hooks)
+    stub_request(:get, "https://git.example.com/api/v3/repos/square/web/hooks").
+        to_return(:body => github_hooks)
     subject.subscribe!
   end
 
   it "creates the hook" do
-    stub_request(:get, "https://git.example.com/api/v3/repos/square/web/hooks").with do |request|
-      expect(request.headers["Authorization"]).to eq("token #{GithubRequest::OAUTH_TOKEN}")
-      true
-    end.to_return(:body => '[]')
+    stub_request(:get, "https://git.example.com/api/v3/repos/square/web/hooks").
+        to_return(:body => '[]')
     stub_request(:post, "https://git.example.com/api/v3/repos/square/web/hooks").with do |request|
-      expect(request.headers["Authorization"]).to eq("token #{GithubRequest::OAUTH_TOKEN}")
       body = JSON.parse(request.body)
       expect(body["name"]).to eq("web")
       expect(body["events"]).to eq(['pull_request'])
@@ -41,10 +36,8 @@ describe GithubPostReceiveHook do
 
   it "updates a repositories github_post_receive_hook_id" do
     expect(repository.github_post_receive_hook_id).to eq(nil)
-    stub_request(:get, "https://git.example.com/api/v3/repos/square/web/hooks").with do |request|
-      expect(request.headers["Authorization"]).to eq("token #{GithubRequest::OAUTH_TOKEN}")
-      true
-    end.to_return(:body => github_hooks)
+    stub_request(:get, "https://git.example.com/api/v3/repos/square/web/hooks").
+        to_return(:body => github_hooks)
     subject.subscribe!
     expect(repository.github_post_receive_hook_id).to eq(78)
   end
@@ -53,7 +46,6 @@ describe GithubPostReceiveHook do
     repository.update_attributes!(:github_post_receive_hook_id => 78)
     called = false
     stub_request(:patch, "https://git.example.com/api/v3/repos/square/web/hooks/78").with do |request|
-      expect(request.headers["Authorization"]).to eq("token #{GithubRequest::OAUTH_TOKEN}")
       body = JSON.parse(request.body)
       expect(body["name"]).to eq("web")
       expect(body["events"]).to eq(['pull_request'])

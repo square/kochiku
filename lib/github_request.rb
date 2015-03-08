@@ -1,34 +1,46 @@
 require 'uri'
 require 'net/http'
-require 'secrets'
 
 class GithubRequest
-  OAUTH_TOKEN = Secrets.github_oauth
-  AUTH = {"Authorization" => "token #{OAUTH_TOKEN}"}
-
   class ResponseError < Exception
     attr_accessor :response
   end
 
-  def self.post(uri, args)
-    make_request(:post, uri, [args.to_json, AUTH])
+  def self.get(url, oauth_token)
+    uri = URI(url)
+    request = Net::HTTP::Get.new(uri.request_uri)
+    request["Authorization"] = "token #{oauth_token}"
+    request["Accept"] = "application/vnd.github.v3+json"
+    make_request(uri, request)
   end
 
-  def self.patch(uri, args)
-    make_request(:patch, uri, [args.to_json, AUTH])
+  def self.post(url, data, oauth_token)
+    uri = URI(url)
+    request = Net::HTTP::Post.new(uri.request_uri)
+    request.body = data.to_json
+    request["Authorization"] = "token #{oauth_token}"
+    request["Accept"] = "application/vnd.github.v3+json"
+    request["Content-Type"] = "application/json; charset=utf-8"
+    make_request(uri, request)
   end
 
-  def self.get(uri)
-    make_request(:get, uri, [AUTH])
+  def self.patch(url, data, oauth_token)
+    uri = URI(url)
+    request = Net::HTTP::Patch.new(uri.request_uri)
+    request.body = data.to_json
+    request["Authorization"] = "token #{oauth_token}"
+    request["Accept"] = "application/vnd.github.v3+json"
+    request["Content-Type"] = "application/json; charset=utf-8"
+    make_request(uri, request)
   end
 
   private
 
-  def self.make_request(method, uri, args)
-    Rails.logger.info("Github request: #{method}, #{uri}")
+  def self.make_request(uri, request_object)
+    Rails.logger.info("Github request: #{request_object.method}, #{uri}")
     body = nil
     Net::HTTP.start(uri.host, uri.port, :use_ssl => uri.scheme == 'https') do |http|
-      response = http.send(method, uri.path, *args)
+      response = http.request(request_object)
       body = response.body
       Rails.logger.info("Github response: #{response.inspect}")
       Rails.logger.info("Github response body: #{body.inspect}")

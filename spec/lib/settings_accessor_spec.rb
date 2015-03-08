@@ -18,7 +18,7 @@ describe SettingsAccessor do
     end
   end
 
-  it "can list git servers" do
+  it "should support multiple git servers" do
     settings = SettingsAccessor.new(<<-YAML)
     git_servers:
       stash.example.com:
@@ -34,11 +34,7 @@ describe SettingsAccessor do
     expect(settings.git_servers.keys).
       to match_array(%w{stash.example.com github.com github-enterprise.example.com})
     expect(settings.git_servers['stash.example.com'].type). to eq('stash')
-    expect(settings.git_servers['stash.example.com'].username). to eq('robot')
-    expect(settings.git_servers['stash.example.com'].password_file). to eq('/secrets/stash')
-
-    expect(settings.git_servers['github-enterprise.example.com'].mirror).
-      to eq('git://git-mirror.example.com/')
+    expect(settings.git_servers['github-enterprise.example.com'].type).to eq('github')
   end
 
   it "can look up git servers" do
@@ -90,15 +86,5 @@ describe SettingsAccessor do
       git.example.com:
     YAML
     expect(settings.git_server('git@git.example.com:square/kochiku.git').type).to eq(nil)
-  end
-
-  it 'respects relative paths for stash password file' do
-    settings = SettingsAccessor.new(<<-YAML)
-    git_servers:
-      stash.example.com:
-        password_file: secrets/stash
-    YAML
-    expect(settings.git_servers['stash.example.com'].password_file).
-      to match(%r{/.*/secrets/stash\Z})
   end
 end

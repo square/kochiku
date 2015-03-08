@@ -61,7 +61,7 @@ module RemoteServer
     end
 
     def sha_for_branch(branch)
-      response_body = GithubRequest.get(URI("#{base_api_url}/git/refs/heads/#{branch}"))
+      response_body = GithubRequest.get("#{base_api_url}/git/refs/heads/#{branch}", @settings.oauth_token)
       branch_info = JSON.parse(response_body)
       sha = nil
       if branch_info['object'] && branch_info['object']['sha'].present?
@@ -73,11 +73,11 @@ module RemoteServer
     end
 
     def update_commit_status!(build)
-      GithubCommitStatus.new(build).update_commit_status!
+      GithubCommitStatus.new(build, @settings.oauth_token).update_commit_status!
     end
 
     def install_post_receive_hook!(repo)
-      GithubPostReceiveHook.new(repo).subscribe!
+      GithubPostReceiveHook.new(repo, @settings.oauth_token).subscribe!
     end
 
     def base_api_url

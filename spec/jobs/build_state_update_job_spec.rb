@@ -21,7 +21,7 @@ describe BuildStateUpdateJob do
     allow(RemoteServer).to receive(:for_url).with(repository.url).and_return(mocked_remote_server)
     allow(GitBlame).to receive(:last_email_in_branch).and_return("example@email.com")
     allow(BuildStrategy).to receive(:update_branch)
-    stub_request(:post, %r{#{repository.base_api_url}/statuses})
+    allow(GithubRequest).to receive(:post)
   end
 
   shared_examples "a non promotable state" do
@@ -33,13 +33,11 @@ describe BuildStateUpdateJob do
 
   describe "#perform" do
     it "updates github when a build passes" do
-      states = []
-      stub_request(:post, "#{repository.base_api_url}/statuses/#{build.ref}").with do |request|
-        expect(request.headers["Authorization"]).to eq("token #{GithubRequest::OAUTH_TOKEN}")
-        body = JSON.parse(request.body)
-        states << body["state"]
-        true
-      end
+      expect(GithubRequest).to receive(:post).
+        with(%r|/statuses/#{build.ref}|,
+             hash_including(:state => 'pending'),
+             anything
+            )
 
       BuildStateUpdateJob.perform(build.id)
 
@@ -48,8 +46,13 @@ describe BuildStateUpdateJob do
         build_attempt.finish!(:passed)
       end
 
+      expect(GithubRequest).to receive(:post).
+        with(%r|/statuses/#{build.ref}|,
+             hash_including(:state => 'success'),
+             anything
+            )
+
       BuildStateUpdateJob.perform(build.id)
-      expect(states).to eq(["pending", "success"])
     end
 
 
