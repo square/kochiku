@@ -31,6 +31,8 @@ RSpec.describe ServerSettings do
 
   context "stash settings" do
     it 'should work' do
+      allow(File).to receive(:read).with('/secrets/stash').and_return("some_password\n")
+
       options = {
         :type => 'stash',
         :username => 'kochiku',
@@ -39,8 +41,8 @@ RSpec.describe ServerSettings do
       settings = ServerSettings.new(options, 'stash.example.com')
 
       expect(settings.type).to eq('stash')
-      expect(settings.username).to eq('kochiku')
-      expect(settings.password_file).to eq('/secrets/stash')
+      expect(settings.stash_username).to eq('kochiku')
+      expect(settings.stash_password).to eq('some_password')
     end
 
     describe "stash password file" do
@@ -53,7 +55,7 @@ RSpec.describe ServerSettings do
 
       it 'will work with a relative path' do
         settings = ServerSettings.new({ password_file: 'spec/fixtures/stash-pass.txt' }, 'stash.example.com')
-        expect(File.read(settings.password_file)).to eq("fake-stash-password")
+        expect(settings.stash_password).to eq("fake-stash-password")
       end
     end
   end

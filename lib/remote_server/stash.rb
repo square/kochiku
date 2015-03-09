@@ -216,9 +216,7 @@ module RemoteServer
       # TODO: Configure OAuth
 
       def setup_auth!(req)
-        req.basic_auth \
-          @settings.username,
-          File.read(@settings.password_file).chomp
+        req.basic_auth(@settings.stash_username, @settings.stash_password)
       end
 
       def get(url)

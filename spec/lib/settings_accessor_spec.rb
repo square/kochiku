@@ -24,7 +24,6 @@ describe SettingsAccessor do
       stash.example.com:
         type: stash
         username: robot
-        password_file: /secrets/stash
       github.com:
         type: github
       github-enterprise.example.com:

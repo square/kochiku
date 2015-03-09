@@ -1,6 +1,6 @@
 class ServerSettings
 
-  attr_reader :type, :oauth_token, :username, :password_file, :mirror, :host, :aliases
+  attr_reader :type, :oauth_token, :stash_username, :stash_password, :mirror, :host, :aliases
 
   def initialize(raw_settings, host)
     @host = host
@@ -15,15 +15,17 @@ class ServerSettings
       end
 
       # specific to Stash
-      @username = raw_settings[:username]
-      @password_file = raw_settings[:password_file]
+      @stash_username = raw_settings[:username]
+      if raw_settings[:password_file]
+        @stash_password = File.read(raw_settings[:password_file]).chomp
+      end
     else
       @type = nil
       @mirror = nil
       @aliases = nil
       @oauth_token = nil
-      @username = nil
-      @password_file = nil
+      @stash_username = nil
+      @stash_password = nil
     end
   end
 end
