@@ -1,8 +1,9 @@
 require 'github_request'
 
 class GithubCommitStatus
-  def initialize(build)
-    @uri = URI("#{build.repository.base_api_url}/statuses/#{build.ref}")
+  def initialize(build, oauth_token)
+    @oauth_token = oauth_token
+    @url = "#{build.repository.base_api_url}/statuses/#{build.ref}"
     @build = build
     @build_url = Rails.application.routes.url_helpers.project_build_url(build.project, build)
   end
@@ -20,6 +21,6 @@ class GithubCommitStatus
   private
 
   def mark_as(state, description)
-    GithubRequest.post(@uri, {:state => state, :target_url => @build_url, :description => description})
+    GithubRequest.post(@url, {:state => state, :target_url => @build_url, :description => description}, @oauth_token)
   end
 end

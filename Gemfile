@@ -35,7 +35,6 @@ gem 'posix-spawn'  # used by cocaine
 gem 'cocaine'
 gem 'awesome_print', require: false
 gem 'nokogiri'
-gem 'httparty'
 
 gem 'bullet'
 gem 'pry-rails'

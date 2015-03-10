@@ -216,36 +216,35 @@ module RemoteServer
       # TODO: Configure OAuth
 
       def setup_auth!(req)
-        req.basic_auth \
-          @settings.username,
-          File.read(@settings.password_file).chomp
+        req.basic_auth(@settings.stash_username, @settings.stash_password)
       end
 
-      def get(uri)
-        Rails.logger.info("Stash GET: #{uri}")
-        get = Net::HTTP::Get.new(uri)
+      def get(url)
+        Rails.logger.info("Stash GET: #{url}")
+        get = Net::HTTP::Get.new(url)
         setup_auth! get
-        make_request(get, URI(uri))
+        make_request(get, URI(url))
       end
 
-      def post(uri, body={})
-        Rails.logger.info("Stash POST: #{uri}, #{body}")
-        post = Net::HTTP::Post.new(uri, {'Content-Type' =>'application/json'})
+      def post(url, body={})
+        Rails.logger.info("Stash POST: #{url}, #{body}")
+        post = Net::HTTP::Post.new(url, {'Content-Type' =>'application/json'})
         setup_auth! post
         post.body = body.to_json
-        make_request(post, URI(uri))
+        make_request(post, URI(url))
       end
 
-      def delete(uri, body)
-        Rails.logger.info("Stash DELETE: #{uri}, #{body}")
-        delete_request = Net::HTTP::Delete.new(uri, {'Content-Type' =>'application/json'})
+      def delete(url, body)
+        Rails.logger.info("Stash DELETE: #{url}, #{body}")
+        delete_request = Net::HTTP::Delete.new(url, {'Content-Type' =>'application/json'})
         setup_auth! delete_request
         body ||= {}
         delete_request.body = body.to_json
-        make_request(delete_request, URI(uri))
+        make_request(delete_request, URI(url))
       end
 
-      def make_request(method, uri, args = [])
+      def make_request(method, url, args = [])
+        uri = URI(url)
         body = nil
         Net::HTTP.start(uri.host, uri.port, :use_ssl => true) do |http|
           response = http.request(method, *args)

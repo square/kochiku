@@ -22,7 +22,7 @@ describe BuildPartitioningJob do
       let(:partitioner) { double }
 
       it "uses the partitioner to partition the build" do
-        stub_request(:post, %r{#{build.repository.base_api_url}/statuses/})
+        allow(build).to receive(:update_commit_status!)
         expect(partitioner).to receive(:partitions).and_return('PARTITIONS')
         expect(build).to receive(:partition).with('PARTITIONS')
 
@@ -30,14 +30,12 @@ describe BuildPartitioningJob do
       end
 
       it "with a pull request marks a build as pending" do
-        stub_request(:post, "#{build.repository.base_api_url}/statuses/#{build.ref}").with do |request|
-          expect(request.headers["Authorization"]).to eq("token #{GithubRequest::OAUTH_TOKEN}")
-          body = JSON.parse(request.body)
-          expect(body["state"]).to eq("pending")
-          expect(body["description"]).not_to be_blank
-          expect(body["target_url"]).not_to be_blank
-          true
-        end
+        expect(GithubRequest).to receive(:post).
+          with("#{build.repository.base_api_url}/statuses/#{build.ref}",
+               hash_including(:state => 'pending'),
+               anything
+              )
+
         subject
       end
     end

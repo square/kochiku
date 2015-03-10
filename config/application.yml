@@ -35,16 +35,23 @@ git_servers:
   github.com:
     type: github
 
+# It is highly recommended that you create an OAuth token for Kochiku on
+# Github. This will allow Kochiku to do many things including display build
+# status on pull requests.
+#  github.com:
+#    type: github
+#    oauth_token_file: /path/to/github_oauth_token
+
 # If you would like Kochiku to clone and fetch repositories from a git mirror
 # define the repository and fill in the url to your mirror.
 #  git.example.com:
 #    mirror: 'git://git-mirror.example.com/'
 
 # If you have multiple domains pointing at your git server then define them as aliases
-# git.example.com:
-#   aliases:
-#     - alias.example
-#     - git.alias.com
+#  git.example.com:
+#    aliases:
+#      - alias.example
+#      - git.alias.com
 
 # Example of Atlassian Stash integration.
 #  stash.example.com:
