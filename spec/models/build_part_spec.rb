@@ -43,6 +43,7 @@ describe BuildPart do
         expect(arg_hash["test_command"]).not_to be_blank
         expect(arg_hash["repo_url"]).not_to be_blank
         expect(arg_hash["options"]).to eq({"ruby" => "ree"})
+        expect(arg_hash["kochiku_env"]).to eq("test")
       end
       build_part.create_and_enqueue_new_build_attempt!
     end
