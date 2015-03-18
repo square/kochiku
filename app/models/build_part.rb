@@ -37,6 +37,7 @@ class BuildPart < ActiveRecord::Base
         "remote_name" => "origin",
         "timeout" => project.repository.timeout.minutes,
         "options" => options,
+        "kochiku_env" => Rails.env,
     }
   end
 
