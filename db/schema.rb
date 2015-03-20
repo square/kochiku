@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150324001246) do
+ActiveRecord::Schema.define(version: 20150331160909) do
 
   create_table "build_artifacts", force: true do |t|
     t.integer  "build_attempt_id"
@@ -95,6 +95,7 @@ ActiveRecord::Schema.define(version: 20150324001246) do
     t.string   "namespace"
     t.boolean  "send_build_success_email",    default: true,  null: false
     t.boolean  "email_on_first_failure",      default: false, null: false
+    t.boolean  "send_merge_successful_email", default: true,  null: false
   end
 
   add_index "repositories", ["host", "namespace", "name"], name: "index_repositories_on_host_and_namespace_and_name", unique: true, using: :btree

@@ -103,6 +103,6 @@ class RepositoriesController < ApplicationController
       permit(:url, :timeout, :build_pull_requests,
              :run_ci, :on_green_update, :send_build_success_email,
              :send_build_failure_email, :allows_kochiku_merges,
-             :email_on_first_failure)
+             :email_on_first_failure, :send_merge_successful_email)
   end
 end

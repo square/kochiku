@@ -14,15 +14,22 @@
   %div
     %label{:for => "run_ci"} Trigger build on push to master:
     = f.check_box :run_ci, {:id => "run_ci"}
-  %div
-    %label{:for => "build_pull_requests"} Build pull requests:
-    = f.check_box :build_pull_requests, {:id => "build_pull_requests"}
-  %div
-    %label{:for => "allows_kochiku_merges"} Allow developers to request branches be merged into master on success:
-    = f.check_box :allows_kochiku_merges, {:id => "allows_kochiku_merges"}
 
-    - display_css = @repository.allows_kochiku_merges ? '' : 'display: none'
-    %span{:id => 'branch-delete-warning', :style => display_css} Warning: Kochiku will delete the branch from Git after merging.
+
+  %fieldset
+    %legend Pull Requests
+    %div
+      %label{:for => "build_pull_requests"} Build pull requests:
+      = f.check_box :build_pull_requests, {:id => "build_pull_requests"}
+    %div
+      %label{:for => "allows_kochiku_merges"} Allow developers to request branches be merged into master on success:
+      = f.check_box :allows_kochiku_merges, {:id => "allows_kochiku_merges"}
+
+      - display_css = @repository.allows_kochiku_merges ? '' : 'display: none'
+      %span{:id => 'branch-delete-warning', :style => display_css} Warning: Kochiku will delete the branch from Git after merging.
+    %div
+      %label{:for => "send_merge_successful_email"} Send email on automatic merge success:
+      = f.check_box :send_merge_successful_email, {:id => "send_merge_successful_email", :disabled => @repository.allows_kochiku_merges ? nil : true}
 
   %fieldset
     %legend On a green build

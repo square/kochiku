@@ -92,6 +92,7 @@ describe RepositoriesController do
       :build_pull_requests,
       :send_build_failure_email,
       :send_build_success_email,
+      :send_merge_successful_email,
       :allows_kochiku_merges
     ].each do |attribute|
       it "should successfully update the #{attribute} attribute" do
