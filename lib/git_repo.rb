@@ -85,6 +85,7 @@ class GitRepo
       cached_repo_path
     end
 
+    # Update the remote url for the git repository if it has changed
     def harmonize_remote_url(cached_repo_path, expected_url)
       Dir.chdir(cached_repo_path) do
         remote_url = Cocaine::CommandLine.new("git config", "--get remote.origin.url").run.chomp
