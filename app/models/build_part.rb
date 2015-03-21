@@ -18,11 +18,19 @@ class BuildPart < ActiveRecord::Base
   end
 
   def create_and_enqueue_new_build_attempt!
-    build_attempt = build_attempts.create!(:state => :runnable)
-    build_instance.running!
-    BuildAttemptJob.enqueue_on(queue.to_s, job_args(build_attempt))
-    build_attempt
+    begin
+      build_attempt = build_attempts.create!(:state => :runnable)
+      build_instance.running!
+      BuildAttemptJob.enqueue_on(queue.to_s, job_args(build_attempt))
+      build_attempt
+    rescue GitRepo::RefNotFoundError
+      # delete the dud build_attempt and re-raise
+      build_attempt.destroy if build_attempt
+
+      raise
+    end
   end
+  alias_method :rebuild!, :create_and_enqueue_new_build_attempt!
 
   def job_args(build_attempt)
     {
@@ -38,10 +46,6 @@ class BuildPart < ActiveRecord::Base
         "timeout" => project.repository.timeout.minutes,
         "options" => options,
     }
-  end
-
-  def rebuild!
-    create_and_enqueue_new_build_attempt!
   end
 
   def status

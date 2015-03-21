@@ -8,7 +8,12 @@ class BuildPartsController < ApplicationController
   end
 
   def rebuild
-    @build_part.rebuild!
+    begin
+      @build_part.rebuild!
+    rescue GitRepo::RefNotFoundError
+      flash[:error] = "It appears the commit #{@build.ref} no longer exists."
+    end
+
     redirect_to [@project, @build]
   end
 
