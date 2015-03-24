@@ -29,10 +29,6 @@
     %div
       %label{:for => "on_green_update"} Update branches to last green commit:
       = f.text_field :on_green_update, {:id => "on_green_update", :placeholder => "Comma separated list of branches"}
-    - if @repository.on_success_script.present?
-      %div{ title: 'On success script should now be specified in the kochiku.yml' }
-        %label{:for => "on_success_script"} Run: (Deprecated)
-        = f.text_field :on_success_script, {:id => "on_success_script", :disabled => true}
     %div
       %label{:for => "send_build_success_email"} Send email to contributers:
       = f.check_box :send_build_success_email, {:id => "send_build_success_email"}

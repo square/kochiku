@@ -115,9 +115,8 @@ describe BuildStrategy do
     }
 
     before do
-      repository.update_attribute(:on_success_script, "./this_is_a_triumph")
       allow(GitRepo).to receive(:inside_copy).and_yield
-      allow(GitRepo).to receive(:load_kochiku_yml).and_return(nil)
+      expect(build).to receive(:on_success_script).and_return("./this_is_a_triumph")
     end
 
     it "run success script only once" do

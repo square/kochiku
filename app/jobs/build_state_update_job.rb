@@ -23,7 +23,7 @@ class BuildStateUpdateJob < JobBase
     build.send_build_status_email!
 
     if build.succeeded?
-      if build.on_success_script.present? && !build.on_success_script_log_file.present?
+      if !build.on_success_script_log_file.present? && build.on_success_script.present?
         BuildStrategy.run_success_script(build)
       end
     end

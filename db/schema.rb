@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20141031234747) do
+ActiveRecord::Schema.define(version: 20150324001246) do
 
   create_table "build_artifacts", force: true do |t|
     t.integer  "build_attempt_id"
@@ -88,7 +88,6 @@ ActiveRecord::Schema.define(version: 20141031234747) do
     t.string   "on_green_update"
     t.string   "repo_cache_dir"
     t.boolean  "send_build_failure_email",    default: true,  null: false
-    t.string   "on_success_script"
     t.integer  "timeout",                     default: 40
     t.string   "name",                                        null: false
     t.boolean  "allows_kochiku_merges",       default: true

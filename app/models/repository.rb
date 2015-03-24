@@ -71,10 +71,6 @@ class Repository < ActiveRecord::Base
     event_types
   end
 
-  def has_on_success_script?
-    on_success_script.to_s.strip.present?
-  end
-
   # Public: attempts to lookup a build for the commit under any of the
   # repository's projects. This is done as an optimization since the contents
   # of the commit are guaranteed to not have changed.

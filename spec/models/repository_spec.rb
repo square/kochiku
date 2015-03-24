@@ -224,19 +224,6 @@ describe Repository do
     expect(repository.on_green_update).to eq("1,2,3")
   end
 
-  context "has_on_success_script?" do
-    it "is false if the script is blank" do
-      expect(Repository.new(:on_success_script => "").has_on_success_script?).to be false
-      expect(Repository.new(:on_success_script => nil).has_on_success_script?).to be false
-      expect(Repository.new(:on_success_script => "  ").has_on_success_script?).to be false
-      expect(Repository.new(:on_success_script => " \n ").has_on_success_script?).to be false
-    end
-
-    it "is true if there is a script" do
-      expect(Repository.new(:on_success_script => "hi").has_on_success_script?).to be true
-    end
-  end
-
   describe '#build_for_commit' do
     let!(:repositoryA) { FactoryGirl.create(:repository) }
     let!(:projectA1) { FactoryGirl.create(:project, repository: repositoryA) }

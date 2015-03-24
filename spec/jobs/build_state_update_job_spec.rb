@@ -136,7 +136,8 @@ describe BuildStateUpdateJob do
       let(:build) { FactoryGirl.create(:build, :state => :succeeded, :project => project) }
 
       before do
-        repository.update_attribute(:on_success_script, "./this_is_a_triumph")
+        kochiku_yaml_config = { 'on_success_script' => 'echo hip hip hooray' }
+        allow(GitRepo).to receive(:load_kochiku_yml).and_return(kochiku_yaml_config)
       end
 
       it "runs the success script" do
@@ -161,7 +162,8 @@ describe BuildStateUpdateJob do
       let(:build) { FactoryGirl.create(:build, :state => :succeeded, :project => project) }
 
       before do
-        expect(repository.on_success_script).to_not be_present
+        kochiku_yaml_config = { }
+        allow(GitRepo).to receive(:load_kochiku_yml).and_return(kochiku_yaml_config)
       end
 
       it "does not try to execute a success script" do
