@@ -36,7 +36,8 @@ Kochiku::Application.routes.draw do
   match '/XmlStatusReport.aspx', to: "projects#status_report", defaults: {:format => 'xml'}, via: :get
   match '/worker_health', to: "dashboards#build_history_by_worker", via: :get, as: :build_history_by_worker
 
-  match 'builds/:id' => "builds#build_redirect", :via => :get, :as => :build_redirect
+  match 'builds/:id' => "builds#build_redirect", :via => :get, :as => :build_redirect, :id => /\d+/
+  match 'builds/:ref' => "builds#build_ref_redirect", :via => :get, :as => :build_ref_redirect
   match '/build_attempts/:build_attempt_id/build_artifacts' => "build_artifacts#create", :via => :post
   match '/build_attempts/:id/start' => "build_attempts#start", :via => :post
   match '/build_attempts/:id/finish' => "build_attempts#finish", :via => :post, :as => :finish_build_attempt

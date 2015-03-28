@@ -42,6 +42,11 @@
   = @project.name
 
 #plot
+
+.select_commit
+  %input{:type=>"text", :id=>"build_ref_input", :placeholder=>"Commit Revision" }
+  %button{:onClick=>"goto_ref();"}Lookup Commit
+
 = content_for :javascript do
   :javascript
     $(document).ready(Kochiku.graphBuildTimes("#{escape_javascript @project.name}"));
@@ -55,6 +60,10 @@
           whisker.text('Previous');
         });
     });
+
+    var goto_ref = function() {
+      window.location.href = "//" + location.host + "/builds/" + $('#build_ref_input').val();
+    };
 
 - if @current_build
   %table.project-part-info
