@@ -63,7 +63,7 @@ class Build < ActiveRecord::Base
   end
 
   def on_success_script
-    (kochiku_yml && kochiku_yml.has_key?('on_success_script')) ? kochiku_yml['on_success_script'] : repository.on_success_script
+    (kochiku_yml && kochiku_yml.has_key?('on_success_script')) ? kochiku_yml['on_success_script'] : nil
   end
 
   def previous_build
