@@ -138,6 +138,12 @@ class BuildsController < ApplicationController
     redirect_to project_build_path(build_instance.project, :id => params[:id])
   end
 
+  def build_ref_redirect
+    # search prefix so that entire git ref does not have to be provided.
+    build_instance = Build.where("ref LIKE ?", "#{params[:ref]}%").first
+    redirect_to project_build_path(build_instance.project, :id => build_instance.id)
+  end
+
   private
 
   def make_build
