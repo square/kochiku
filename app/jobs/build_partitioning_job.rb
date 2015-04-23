@@ -18,6 +18,7 @@ class BuildPartitioningJob < JobBase
     if @build.test_command.blank?
       error_message = "No test_command specified in kochiku.yml."
       @build.update!(:error_details => { :message => error_message, :backtrace =>nil }, :state => :errored)
+      @build.update_commit_status!
       return
     end
     @build.partition(Partitioner.for_build(@build).partitions)
@@ -32,6 +33,7 @@ class BuildPartitioningJob < JobBase
           :state => :errored,
           :error_details => { :message => e.to_s, :backtrace => e.backtrace.join("\n") }
       )
+      @build.update_commit_status!
     end
     super
   end
