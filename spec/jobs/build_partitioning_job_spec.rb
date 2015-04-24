@@ -46,6 +46,11 @@ describe BuildPartitioningJob do
       end
 
       it "raises an error and fails build" do
+        expect(GithubRequest).to receive(:post).
+          with("#{build.repository.base_api_url}/statuses/#{build.ref}",
+               hash_including(:state => 'failure'),
+               anything
+              )
         subject
         build.reload
         expect(build.error_details[:message]).to include("No test_command")
@@ -58,6 +63,11 @@ describe BuildPartitioningJob do
       before { allow(GitRepo).to receive(:load_kochiku_yml).and_raise(NameError.new(error_message)) }
 
       it "should re-raise the error and set the build state to errored" do
+        expect(GithubRequest).to receive(:post).
+          with("#{build.repository.base_api_url}/statuses/#{build.ref}",
+               hash_including(:state => 'failure'),
+               anything
+              )
         expect { subject }.to raise_error(NameError)
         build.reload
         expect(build.state).to eq(:errored)
