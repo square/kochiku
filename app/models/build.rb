@@ -273,7 +273,7 @@ class Build < ActiveRecord::Base
           update(build_success_email_sent: true)
         end
       end
-    elsif repository.email_on_first_failure && already_failed? && repository.send_build_failure_email?
+    elsif !project.main? && repository.email_on_first_failure && already_failed? && repository.send_build_failure_email?
       unless build_failure_email_sent?
         # due to race condition, update attribute before sending email
         update(build_failure_email_sent: true)
