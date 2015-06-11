@@ -520,9 +520,26 @@ describe Build do
         before do
           repository.update_attribute(:email_on_first_failure, true)
         end
-        context "first build part fails and will retry" do
+
+        context "master branch build" do
           let!(:build_part_1) { FactoryGirl.create(:build_part, :build_instance => build, :retry_count => 3) }
           let!(:build_part_2) { FactoryGirl.create(:build_part, :build_instance => build, :retry_count => 3) }
+
+          it "should not send email prior to retry" do
+            ba1 = FactoryGirl.create(:build_attempt, build_part: build_part_1, state: :passed)
+            ba2_1 = FactoryGirl.create(:build_attempt, build_part: build_part_2, state: :running)
+
+            expect(BuildMailer).to_not receive(:build_break_email)
+
+            ba2_1.finish!(:failed)
+          end
+        end
+
+        context "branch build" do
+          let(:branch_project) { FactoryGirl.create(:big_rails_project, :repository => repository, :name => "#{name}-branch") }
+          let(:branch_build) { FactoryGirl.create(:build, :state => :runnable, :project => branch_project) }
+          let!(:build_part_1) { FactoryGirl.create(:build_part, :build_instance => branch_build, :retry_count => 3) }
+          let!(:build_part_2) { FactoryGirl.create(:build_part, :build_instance => branch_build, :retry_count => 3) }
 
           it "should send email prior to retry" do
             ba1 = FactoryGirl.create(:build_attempt, build_part: build_part_1, state: :passed)
