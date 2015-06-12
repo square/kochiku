@@ -158,9 +158,13 @@ class GitRepo
 
     def synchronize_submodules_from_cached_repo(repo, cached_repo_path)
       with_submodules do |submodules|
-        cached_submodules = nil
+        cached_submodules = ""
         inside_repo(repo, sync: false) do
-          cached_submodules = Cocaine::CommandLine.new('git config', '--get-regexp "^submodule\\..*\\.url$"').run
+          begin
+            cached_submodules = Cocaine::CommandLine.new('git config', '--get-regexp "^submodule\\..*\\.url$"').run
+          rescue Cocaine::ExitStatusError
+            Rails.logger.info "Failed to find any initialized submodules in the cache repo."
+          end
         end
 
         # Redirect the submodules to the cached_repo
