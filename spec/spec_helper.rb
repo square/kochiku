@@ -48,6 +48,9 @@ RSpec.configure do |config|
   # `post` in specs under `spec/controllers`.
   config.infer_spec_type_from_file_location!
 
+  # lil speed increase because we are not spawning threads in our tests
+  config.threadsafe = false
+
   config.before :each do
     WebMock.disable_net_connect!
     allow(JobBase).to receive(:enqueue_in)

@@ -23,7 +23,7 @@ gem 'uglifier'
 # by uglifier. therubyracer is not the fastest option but it is the most portable.
 gem 'therubyracer'
 
-gem 'resque'
+gem 'resque', '~> 1.25'
 gem 'resque-scheduler'
 gem 'resque-retry'
 gem 'resque-web', '>= 0.0.6', require: 'resque_web'
@@ -43,7 +43,7 @@ gem 'pry-byebug'
 gem 'colorize', require: false
 
 group :test, :development do
-  gem 'rspec-rails', '~> 3.0.0'
+  gem 'rspec-rails', '~> 3.0'
   gem 'rspec-collection_matchers'
   gem 'factory_girl_rails'
 end
