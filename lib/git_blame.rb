@@ -18,7 +18,7 @@ class GitBlame
     def changes_since_last_green(build)
       output = GitRepo.inside_repo(build.repository) do
         # TODO: Push this down into GitRepo and integration test it.
-        Cocaine::CommandLine.new("git log --no-merges --format='::!::%H|%cn <%ce>|%cd|%B::!::' '#{build.previous_successful_build.try(:ref)}...#{build.ref}'").run
+        Cocaine::CommandLine.new("git log --cc --format='::!::%H|%cn <%ce>|%cd|%B::!::' '#{build.previous_successful_build.try(:ref)}...#{build.ref}'").run
       end
       parse_git_changes(output)
     end
@@ -26,14 +26,14 @@ class GitBlame
     def changes_in_branch(build)
       output = GitRepo.inside_repo(build.repository) do
         # TODO: Push this down into GitRepo and integration test it.
-        Cocaine::CommandLine.new("git log --no-merges --format='::!::%H|%cn <%ce>|%cd|%B::!::' 'origin/master..origin/#{build.branch}'").run
+        Cocaine::CommandLine.new("git log --cc --format='::!::%H|%cn <%ce>|%cd|%B::!::' 'origin/master..origin/#{build.branch}'").run
       end
       parse_git_changes(output)
     end
 
     def files_changed_since_last_build(build, fetch_emails: false, sync: true)
       output = GitRepo.inside_repo(build.repository, sync: sync) do
-        Cocaine::CommandLine.new("git log --no-merges --format='::!::%an:%ae::!::' --name-only '#{build.previous_build.try(:ref)}...#{build.ref}'").run
+        Cocaine::CommandLine.new("git log --cc --format='::!::%an:%ae::!::' --name-only '#{build.previous_build.try(:ref)}...#{build.ref}'").run
       end
       parse_git_files_changes(output, fetch_emails: fetch_emails)
     end
@@ -41,7 +41,7 @@ class GitBlame
     def files_changed_since_last_green(build, fetch_emails: false)
       output = GitRepo.inside_repo(build.repository) do
         # TODO: Push this down into GitRepo and integration test it.
-        Cocaine::CommandLine.new("git log --no-merges --format='::!::%cn:%ce::!::' --name-only '#{build.previous_successful_build.try(:ref)}...#{build.ref}'").run
+        Cocaine::CommandLine.new("git log --cc --format='::!::%cn:%ce::!::' --name-only '#{build.previous_successful_build.try(:ref)}...#{build.ref}'").run
       end
       parse_git_files_changes(output, fetch_emails: fetch_emails)
     end
@@ -49,7 +49,7 @@ class GitBlame
     def files_changed_in_branch(build, fetch_emails: false, sync: true)
       output = GitRepo.inside_repo(build.repository, sync: sync) do
         # TODO: Push this down into GitRepo and integration test it.
-        Cocaine::CommandLine.new("git log --no-merges --format='::!::%cn:%ce::!::' --name-only 'origin/master..origin/#{build.branch}'").run
+        Cocaine::CommandLine.new("git log --cc --format='::!::%cn:%ce::!::' --name-only 'origin/master..origin/#{build.branch}'").run
       end
       parse_git_files_changes(output, fetch_emails: fetch_emails)
     end
@@ -68,13 +68,13 @@ class GitBlame
 
     def git_names_and_emails_since_last_green(build)
       GitRepo.inside_repo(build.repository) do
-        Cocaine::CommandLine.new("git log --format='%cn:%ce' --no-merges '#{build.previous_successful_build.try(:ref)}...#{build.ref}'").run.split("\n")
+        Cocaine::CommandLine.new("git log --format='%cn:%ce' --cc '#{build.previous_successful_build.try(:ref)}...#{build.ref}'").run.split("\n")
       end
     end
 
     def git_names_and_emails_in_branch(build)
       GitRepo.inside_repo(build.repository) do
-        Cocaine::CommandLine.new("git log --format='%cn:%ce' --no-merges 'origin/master..origin/#{build.branch}'").run.split("\n")
+        Cocaine::CommandLine.new("git log --format='%cn:%ce' --cc 'origin/master..origin/#{build.branch}'").run.split("\n")
       end
     end
 

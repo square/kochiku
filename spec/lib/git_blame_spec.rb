@@ -135,6 +135,45 @@ describe GitBlame do
       expect(git_file_changes).to include({:file => "path/one/file.java", :emails => []})
       expect(git_file_changes).to include({:file => "path/two/file.java", :emails => []})
     end
+
+    context "includes merge commit modifying files that aren't changed in parent commits" do
+      # [hack] the git-sha's are not stable on test runs, so we need to use git tags to mark commits
+      let(:previous_build) { instance_double('Build', :ref => "a") }
+      before do
+        build.update(:ref => "d")
+        allow(build).to receive(:previous_build).and_return previous_build
+        allow(GitRepo).to receive(:inside_repo) do |build, sync_repo, &block|
+          Dir.mktmpdir do |directory|
+            Dir.chdir(directory) do
+              `git init`
+              `git config user.email "test@example.com" && git config user.name "test"`
+              FileUtils.touch("TESTFILE")
+              `git add -A && git commit -m "commit 1" && git tag a`
+              `git checkout -b branch`
+              FileUtils.touch("TESTFILE2")
+              `git add -A && git commit -m "commit 2" && git tag b`
+              `git checkout -`
+              FileUtils.touch("TESTFILE3")
+              `git add -A && git commit -m "commit 3" && git tag c`
+              # --no-commit allows us to change arbitrary files, like in merge conflict resolution
+              `git merge branch --no-ff --no-commit`
+              # modify a new file during the merge not modified by parents
+              FileUtils.touch("NEWFILE")
+              `git add -A && git commit -m "merge commit" && git tag d`
+              block.call
+            end
+          end
+        end
+      end
+
+      it "should include all files modified in merge commit" do
+        git_file_changes = subject
+        expect(git_file_changes).to_not include({:file=>"TESTFILE", :emails=>[]})
+        expect(git_file_changes).to include({:file=>"TESTFILE2", :emails=>[]})
+        expect(git_file_changes).to include({:file=>"TESTFILE3", :emails=>[]})
+        expect(git_file_changes).to include({:file=>"NEWFILE", :emails=>[]})
+      end
+    end
   end
 
   describe "#files_changed_since_last_green" do
