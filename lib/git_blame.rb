@@ -31,27 +31,27 @@ class GitBlame
       parse_git_changes(output)
     end
 
-    def files_changed_since_last_build(build, options = {})
-      output = GitRepo.inside_repo(build.repository) do
+    def files_changed_since_last_build(build, fetch_emails: false, sync: true)
+      output = GitRepo.inside_repo(build.repository, sync: sync) do
         Cocaine::CommandLine.new("git log --no-merges --format='::!::%an:%ae::!::' --name-only '#{build.previous_build.try(:ref)}...#{build.ref}'").run
       end
-      parse_git_files_changes(output, options)
+      parse_git_files_changes(output, fetch_emails: fetch_emails)
     end
 
-    def files_changed_since_last_green(build, options = {})
+    def files_changed_since_last_green(build, fetch_emails: false)
       output = GitRepo.inside_repo(build.repository) do
         # TODO: Push this down into GitRepo and integration test it.
         Cocaine::CommandLine.new("git log --no-merges --format='::!::%cn:%ce::!::' --name-only '#{build.previous_successful_build.try(:ref)}...#{build.ref}'").run
       end
-      parse_git_files_changes(output, options)
+      parse_git_files_changes(output, fetch_emails: fetch_emails)
     end
 
-    def files_changed_in_branch(build, options = {})
-      output = GitRepo.inside_repo(build.repository) do
+    def files_changed_in_branch(build, fetch_emails: false, sync: true)
+      output = GitRepo.inside_repo(build.repository, sync: sync) do
         # TODO: Push this down into GitRepo and integration test it.
         Cocaine::CommandLine.new("git log --no-merges --format='::!::%cn:%ce::!::' --name-only 'origin/master..origin/#{build.branch}'").run
       end
-      parse_git_files_changes(output, options)
+      parse_git_files_changes(output, fetch_emails: fetch_emails)
     end
 
     private
@@ -99,13 +99,13 @@ class GitBlame
       end
     end
 
-    def parse_git_files_changes(output, options)
+    def parse_git_files_changes(output, fetch_emails: false)
       email_addresses = []
       output.split("\n").each_with_object([]) do |line, file_changes|
         next if line.empty?
         if line.start_with?("::!::")
           email_addresses = []
-          if options[:fetch_emails]
+          if fetch_emails
             line.split("::!::").each do |line_part|
               next if line_part.nil? || line_part.empty?
               name, email = line_part.split(":")

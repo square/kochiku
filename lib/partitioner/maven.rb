@@ -1,6 +1,7 @@
 require 'nokogiri'
 require 'set'
 require 'partitioner/base'
+require 'partitioner/topological_sorter'
 
 module Partitioner
 
@@ -28,7 +29,7 @@ module Partitioner
         end
 
         files_changed_method = @build.project.main? ? :files_changed_since_last_build : :files_changed_in_branch
-        GitBlame.send(files_changed_method, @build).each do |file_and_emails|
+        GitBlame.public_send(files_changed_method, @build, sync: false).each do |file_and_emails|
           next if @settings.fetch('ignore_paths', []).detect { |dir| file_and_emails[:file].start_with?(dir) }
 
           module_affected_by_file = file_to_module(file_and_emails[:file])
@@ -43,9 +44,9 @@ module Partitioner
         if @build.project.main? && @build.previous_build
           modules_to_build.merge(@build.previous_build.build_parts.select(&:unsuccessful?).map(&:paths).flatten.uniq)
         end
-      end
 
-      add_options(group_modules(modules_to_build))
+        add_options(group_modules(sort_modules(modules_to_build)))
+      end
     end
 
     def emails_for_commits_causing_failures
@@ -59,9 +60,10 @@ module Partitioner
       email_and_files = Hash.new { |hash, key| hash[key] = [] }
 
       GitRepo.inside_copy(@build.repository, @build.ref) do
-        GitBlame.files_changed_since_last_green(@build, :fetch_emails => true).each do |file_and_emails|
+        GitBlame.files_changed_since_last_green(@build, fetch_emails: true).each do |file_and_emails|
           file = file_and_emails[:file]
           emails = file_and_emails[:emails]
+
           module_affected_by_file = file_to_module(file_and_emails[:file])
 
           if module_affected_by_file.nil? || @settings.fetch('build_everything', []).detect { |dir| file_and_emails[:file].start_with?(dir) }
@@ -86,7 +88,7 @@ module Partitioner
     end
 
     def all_partitions
-      group_modules(maven_modules)
+      group_modules(sort_modules(maven_modules))
     end
 
     def pom_for(mvn_module)
@@ -136,6 +138,11 @@ module Partitioner
       end.values.map { |modules| partition_info(modules) }
     end
 
+    def sort_modules(mvn_modules)
+      sorted_modules = Partitioner::TopologicalSorter.new(module_dependency_map).tsort
+      sorted_modules.delete_if { |mvn_module| !mvn_modules.include?(mvn_module) }
+    end
+
     def partition_info(mvn_modules)
       queue = @build.project.main? ? 'ci' : 'developer'
       queue_override = @settings.fetch('queue_overrides', []).detect do |override|
@@ -154,7 +161,7 @@ module Partitioner
       return @depends_on_map if @depends_on_map
 
       module_depends_on_map = {}
-      module_dependency_map.each do |mvn_module, dep_set|
+      transitive_dependency_map.each do |mvn_module, dep_set|
         module_depends_on_map[mvn_module] ||= Set.new
         module_depends_on_map[mvn_module].add(mvn_module)
         dep_set.each do |dep|
@@ -183,29 +190,33 @@ module Partitioner
         group_artifact_map["#{group_id}:#{artifact_id}"] = "#{mvn_module}"
       end
 
-      module_dependency_map = {}
+      @module_dependency_map = {}
 
       maven_modules.each do |mvn_module|
         module_pom = pom_for(mvn_module)
-        module_dependency_map[mvn_module] ||= Set.new
+        @module_dependency_map[mvn_module] ||= Set.new
 
         module_pom.css('project>dependencies>dependency').each do |dep|
-          group_id = dep.css('groupId').first.text
-          artifact_id = dep.css('artifactId').first.text
+          group_id = dep.css('groupId').first
+          artifact_id = dep.css('artifactId').first
 
-          if mod = group_artifact_map["#{group_id}:#{artifact_id}"]
+          raise "dependency in #{mvn_module}/pom.xml is missing an artifactId or groupId" unless group_id && artifact_id
+
+          if mod = group_artifact_map["#{group_id.text}:#{artifact_id.text}"]
             module_dependency_map[mvn_module].add(mod)
           end
         end
       end
 
-      transitive_dependency_map = {}
+      @module_dependency_map
+    end
 
-      module_dependency_map.keys.each do |mvn_module|
-        transitive_dependency_map[mvn_module] = transitive_dependencies(mvn_module, module_dependency_map)
+    def transitive_dependency_map
+      @transitive_dependency_map ||= begin
+        module_dependency_map.each_with_object({}) do |(mvn_module, _), dep_map|
+          dep_map[mvn_module] = transitive_dependencies(mvn_module, module_dependency_map)
+        end
       end
-
-      @module_dependency_map = transitive_dependency_map
     end
 
     def transitive_dependencies(mvn_module, dependency_map)
