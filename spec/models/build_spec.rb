@@ -87,7 +87,7 @@ describe Build do
       expect(build.build_parts).to be_empty
       expect(build.state).to eq(:partitioning)
 
-      expect { build.partition(parts) }.to raise_error
+      expect { build.partition(parts) }.to raise_error(ActiveRecord::ActiveRecordError)
 
       expect(build.build_parts(true)).to be_empty
       expect(build.state).to eq(:runnable)
