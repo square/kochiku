@@ -1,0 +1,90 @@
+%h2.subheader
+  = link_to(@build.project.name, project_path(@build.project))
+  &ndash;
+  = link_to project_build_path(@project, @build) do
+    %code.build-status{ class: @build.state, title: @build.ref }
+      = @build.ref[0, 7]
+  &ndash; Part #{@build_part.id}
+.flash.error{'id' => 'errorMessage', 'style' => "display: none;" }
+  Error streaming logs
+%label
+  = check_box_tag :refresh, true, true
+  Refresh
+%div{'id' => 'loadFull', 'style' => 'display: none;'}
+  (skipping n bytes)
+
+%br
+
+.log_contents{ 'id' => 'log_content_display' }
+%img(src="#{image_url('loader.gif')}"){'id' => "loading_img"}
+
+= content_for :javascript do
+  :javascript
+    var currentPos = -1;
+    var finished = false;
+    var refreshIntervalId;
+    var refreshInterval = 5000;
+    var badRequests = 0;
+    var startPos = -1;
+
+    // autoscroll to the bottom to follow tail of log
+    var scrolled_to_bottom = function() {
+      return ((window.innerHeight + window.scrollY) >= document.body.scrollHeight);
+    }
+
+    var get_logs_chunk = function() {
+      if($('input#refresh').is(':checked') && !finished) {
+        $.getJSON("#{stream_logs_chunk_path(@build_attempt.id)}?start=" + currentPos, function( data ) {
+          log_entry = data['Contents'];
+          current_value = $('#log_content_display').text();
+          var scrolled = scrolled_to_bottom();
+          $('#log_content_display').text(current_value + log_entry);
+          if (scrolled) {
+            window.scrollTo(0,document.body.scrollHeight);
+          }
+
+          // first request: use it to determine whether any bytes have been skipped
+          if (currentPos == -1) {
+            startPos = data['Start'];
+            if (data['Start'] > 0) {
+              $('#loadFull').text("(skipping " + startPos + " bytes)");
+              $('#loadFull').show();
+            }
+          }
+          currentPos = data['Start'] + data['BytesRead'];
+
+          if (data['state'] != 'running' && data['BytesRead'] == 0) {
+            finished = true;
+            $('#loading_img').hide();
+          }
+        })
+          .fail(function() {
+            clearInterval(refreshIntervalId);
+            badRequests += 1;
+            if (badRequests < 3) {
+              refreshInterval *= 1.25;
+              refreshIntervalId = window.setInterval(get_logs_chunk, refreshInterval);
+            }
+            else {
+              $('#errorMessage').show();
+              $('#loading_img').hide();
+            }
+          });
+      }
+    };
+
+    $('input#refresh').click(function () {
+      if ($('input#refresh').is(':checked')) {
+        if (!finished) {
+          $('#loading_img').show();
+        }
+      } else {
+        $('#loading_img').hide();
+      }
+    });
+
+    $(document).ready(function() {
+      window.scrollTo(0,document.body.scrollHeight);
+      get_logs_chunk();
+      refreshIntervalId = window.setInterval(get_logs_chunk, refreshInterval);
+    });

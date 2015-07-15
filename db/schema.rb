@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150331160909) do
+ActiveRecord::Schema.define(version: 20150714234635) do
 
   create_table "build_artifacts", force: :cascade do |t|
     t.integer  "build_attempt_id", limit: 4
@@ -23,13 +23,14 @@ ActiveRecord::Schema.define(version: 20150331160909) do
   add_index "build_artifacts", ["build_attempt_id"], name: "index_build_artifacts_on_build_attempt_id", using: :btree
 
   create_table "build_attempts", force: :cascade do |t|
-    t.integer  "build_part_id", limit: 4
+    t.integer  "build_part_id",     limit: 4
     t.datetime "started_at"
     t.datetime "finished_at"
-    t.string   "builder",       limit: 255
-    t.string   "state",         limit: 255
-    t.datetime "created_at",                null: false
-    t.datetime "updated_at",                null: false
+    t.string   "builder",           limit: 255
+    t.string   "state",             limit: 255
+    t.datetime "created_at",                    null: false
+    t.datetime "updated_at",                    null: false
+    t.integer  "log_streamer_port", limit: 4
   end
 
   add_index "build_attempts", ["build_part_id"], name: "index_build_attempts_on_build_part_id", using: :btree
