@@ -35,7 +35,7 @@ describe BuildStrategy do
           expect(merger).to receive(:merge_and_push).and_raise(GitMergeExecutor::GitMergeFailedError)
 
           expect(MergeMailer).to receive(:merge_failed).once.
-            and_return(double('mailer', :deliver => nil))
+            and_return(double('mailer', :deliver_now => nil))
           expect { BuildStrategy.merge_ref(build) }.to_not raise_error
         end
       end

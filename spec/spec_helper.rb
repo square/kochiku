@@ -51,6 +51,8 @@ RSpec.configure do |config|
   # lil speed increase because we are not spawning threads in our tests
   config.threadsafe = false
 
+  config.example_status_persistence_file_path = "./spec/examples.txt"
+
   config.before :each do
     WebMock.disable_net_connect!
     allow(JobBase).to receive(:enqueue_in)

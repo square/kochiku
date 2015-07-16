@@ -12,7 +12,5 @@ vendor/ruby
 /config/application.yml
 robot-password
 
-#intellij
-.idea/*
-*.iml
-
+# rspec
+/spec/examples.txt

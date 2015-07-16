@@ -1,20 +1,18 @@
 source 'https://rubygems.org'
 
-gem 'rails', '~> 4.1.3'
+gem 'rails', '~> 4.2.3'
 gem 'passenger', '~> 4.0.41', group: :production
 gem 'dynamic_form'
 gem 'rails-observers'
 gem 'actionpack-action_caching'
 
 gem 'carrierwave'
-gem 'draper', '~> 1.3', github: 'drapergem/draper', ref: 'c44894373c2ecbec41c5f3a84c83a2c21cf36aee'
+gem 'draper', '~> 2.1'
 gem 'mysql2'
 gem 'symbolize'
 
 gem 'haml-rails'
-gem 'sass'
-gem 'sass-rails', '4.0.3'  # locked for https://github.com/sstephenson/sprockets/issues/540
-gem 'compass'
+gem 'sass-rails'
 gem 'compass-rails'
 gem 'jquery-rails'
 gem 'uglifier'
@@ -22,11 +20,13 @@ gem 'uglifier'
 # therubyracer is a JS runtime required by execjs, which is in turn required
 # by uglifier. therubyracer is not the fastest option but it is the most portable.
 gem 'therubyracer'
+gem 'libv8', '3.16.14.7', require: false  # 3.16.14.11 has a compilation error on OSX 10.10.4
 
 gem 'resque', '~> 1.25'
-gem 'resque-scheduler'
+gem 'resque-scheduler', require: false
 gem 'resque-retry'
-gem 'resque-web', '>= 0.0.6', require: 'resque_web'
+gem 'resque-web', '~> 0.0.6', require: 'resque_web'
+gem 'twitter-bootstrap-rails', '2.2.8' # not a direct dependency. resque-web 0.0.6 does not work with 3.X versions of this gem.
 
 gem 'json' # used by resque
 

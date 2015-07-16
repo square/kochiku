@@ -43,7 +43,7 @@ class BuildAttempt < ActiveRecord::Base
       build_part.build_instance.send_build_status_email!
       build_part.rebuild!
     elsif state == :errored
-      BuildMailer.error_email(self, error_txt).deliver
+      BuildMailer.error_email(self, error_txt).deliver_now
     end
 
     build = build_part.build_instance
