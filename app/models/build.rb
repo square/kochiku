@@ -264,12 +264,12 @@ class Build < ActiveRecord::Base
     if completed?
       if failed? && !build_failure_email_sent? && repository.send_build_failure_email?
         unless build_failure_email_sent?
-          BuildMailer.build_break_email(self).deliver
+          BuildMailer.build_break_email(self).deliver_now
           update(build_failure_email_sent: true)
         end
       elsif succeeded? && !project.main? && !build_success_email_sent? && repository.send_build_success_email?
         unless build_success_email_sent?
-          BuildMailer.build_success_email(self).deliver
+          BuildMailer.build_success_email(self).deliver_now
           update(build_success_email_sent: true)
         end
       end
@@ -277,7 +277,7 @@ class Build < ActiveRecord::Base
       unless build_failure_email_sent?
         # due to race condition, update attribute before sending email
         update(build_failure_email_sent: true)
-        BuildMailer.build_break_email(self).deliver
+        BuildMailer.build_break_email(self).deliver_now
       end
     end
   end

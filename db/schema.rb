@@ -13,89 +13,89 @@
 
 ActiveRecord::Schema.define(version: 20150331160909) do
 
-  create_table "build_artifacts", force: true do |t|
-    t.integer  "build_attempt_id"
-    t.string   "log_file"
-    t.datetime "created_at",       null: false
-    t.datetime "updated_at",       null: false
+  create_table "build_artifacts", force: :cascade do |t|
+    t.integer  "build_attempt_id", limit: 4
+    t.string   "log_file",         limit: 255
+    t.datetime "created_at",                   null: false
+    t.datetime "updated_at",                   null: false
   end
 
   add_index "build_artifacts", ["build_attempt_id"], name: "index_build_artifacts_on_build_attempt_id", using: :btree
 
-  create_table "build_attempts", force: true do |t|
-    t.integer  "build_part_id"
+  create_table "build_attempts", force: :cascade do |t|
+    t.integer  "build_part_id", limit: 4
     t.datetime "started_at"
     t.datetime "finished_at"
-    t.string   "builder"
-    t.string   "state"
-    t.datetime "created_at",    null: false
-    t.datetime "updated_at",    null: false
+    t.string   "builder",       limit: 255
+    t.string   "state",         limit: 255
+    t.datetime "created_at",                null: false
+    t.datetime "updated_at",                null: false
   end
 
   add_index "build_attempts", ["build_part_id"], name: "index_build_attempts_on_build_part_id", using: :btree
 
-  create_table "build_parts", force: true do |t|
-    t.integer  "build_id"
-    t.string   "kind"
-    t.text     "paths"
-    t.datetime "created_at",              null: false
-    t.datetime "updated_at",              null: false
-    t.text     "options"
-    t.string   "queue"
-    t.integer  "retry_count", default: 0
+  create_table "build_parts", force: :cascade do |t|
+    t.integer  "build_id",    limit: 4
+    t.string   "kind",        limit: 255
+    t.text     "paths",       limit: 65535
+    t.datetime "created_at",                            null: false
+    t.datetime "updated_at",                            null: false
+    t.text     "options",     limit: 65535
+    t.string   "queue",       limit: 255
+    t.integer  "retry_count", limit: 4,     default: 0
   end
 
   add_index "build_parts", ["build_id"], name: "index_build_parts_on_build_id", using: :btree
   add_index "build_parts", ["paths"], name: "index_build_parts_on_paths", length: {"paths"=>255}, using: :btree
 
-  create_table "builds", force: true do |t|
-    t.string   "ref",                        limit: 40,                 null: false
-    t.string   "state"
-    t.datetime "created_at",                                            null: false
-    t.datetime "updated_at",                                            null: false
-    t.integer  "project_id"
+  create_table "builds", force: :cascade do |t|
+    t.string   "ref",                        limit: 40,                    null: false
+    t.string   "state",                      limit: 255
+    t.datetime "created_at",                                               null: false
+    t.datetime "updated_at",                                               null: false
+    t.integer  "project_id",                 limit: 4
     t.boolean  "merge_on_success"
-    t.string   "branch"
-    t.boolean  "build_failure_email_sent",              default: false, null: false
+    t.string   "branch",                     limit: 255
+    t.boolean  "build_failure_email_sent",                 default: false, null: false
     t.boolean  "promoted"
-    t.string   "on_success_script_log_file"
-    t.text     "error_details"
-    t.boolean  "build_success_email_sent",              default: false, null: false
+    t.string   "on_success_script_log_file", limit: 255
+    t.text     "error_details",              limit: 65535
+    t.boolean  "build_success_email_sent",                 default: false, null: false
   end
 
   add_index "builds", ["project_id"], name: "index_builds_on_project_id", using: :btree
   add_index "builds", ["ref", "project_id"], name: "index_builds_on_ref_and_project_id", unique: true, using: :btree
 
-  create_table "projects", force: true do |t|
-    t.string   "name"
-    t.string   "branch"
-    t.datetime "created_at",    null: false
-    t.datetime "updated_at",    null: false
-    t.integer  "repository_id"
+  create_table "projects", force: :cascade do |t|
+    t.string   "name",          limit: 255
+    t.string   "branch",        limit: 255
+    t.datetime "created_at",                null: false
+    t.datetime "updated_at",                null: false
+    t.integer  "repository_id", limit: 4
   end
 
   add_index "projects", ["name", "branch"], name: "index_projects_on_name_and_branch", using: :btree
   add_index "projects", ["repository_id"], name: "index_projects_on_repository_id", using: :btree
 
-  create_table "repositories", force: true do |t|
-    t.string   "url"
-    t.string   "test_command"
-    t.datetime "created_at",                                  null: false
-    t.datetime "updated_at",                                  null: false
-    t.integer  "github_post_receive_hook_id"
+  create_table "repositories", force: :cascade do |t|
+    t.string   "url",                         limit: 255
+    t.string   "test_command",                limit: 255
+    t.datetime "created_at",                                              null: false
+    t.datetime "updated_at",                                              null: false
+    t.integer  "github_post_receive_hook_id", limit: 4
     t.boolean  "run_ci"
     t.boolean  "build_pull_requests"
-    t.string   "on_green_update"
-    t.string   "repo_cache_dir"
-    t.boolean  "send_build_failure_email",    default: true,  null: false
-    t.integer  "timeout",                     default: 40
-    t.string   "name",                                        null: false
-    t.boolean  "allows_kochiku_merges",       default: true
-    t.string   "host",                                        null: false
-    t.string   "namespace"
-    t.boolean  "send_build_success_email",    default: true,  null: false
-    t.boolean  "email_on_first_failure",      default: false, null: false
-    t.boolean  "send_merge_successful_email", default: true,  null: false
+    t.string   "on_green_update",             limit: 255
+    t.string   "repo_cache_dir",              limit: 255
+    t.boolean  "send_build_failure_email",                default: true,  null: false
+    t.integer  "timeout",                     limit: 4,   default: 40
+    t.string   "name",                        limit: 255,                 null: false
+    t.boolean  "allows_kochiku_merges",                   default: true
+    t.string   "host",                        limit: 255,                 null: false
+    t.string   "namespace",                   limit: 255
+    t.boolean  "send_build_success_email",                default: true,  null: false
+    t.boolean  "email_on_first_failure",                  default: false, null: false
+    t.boolean  "send_merge_successful_email",             default: true,  null: false
   end
 
   add_index "repositories", ["host", "namespace", "name"], name: "index_repositories_on_host_and_namespace_and_name", unique: true, using: :btree

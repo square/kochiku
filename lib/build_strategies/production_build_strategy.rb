@@ -42,11 +42,11 @@ class BuildStrategy
           merger = build.repository.remote_server.merge_executor.new(build)
           command_output = merger.merge_and_push
           if build.repository.send_merge_successful_email?
-            MergeMailer.merge_successful(build, emails, command_output).deliver
+            MergeMailer.merge_successful(build, emails, command_output).deliver_now
           end
           merger.delete_branch
         rescue GitMergeExecutor::GitMergeFailedError => ex
-          MergeMailer.merge_failed(build, emails, ex.message).deliver
+          MergeMailer.merge_failed(build, emails, ex.message).deliver_now
         end
       end
     end
