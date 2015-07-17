@@ -1,6 +1,6 @@
 # Lock version to protect against cap command being called without bundle exec
 # and executing with another version
-lock '3.2.1'
+lock '3.4.0'
 
 set :application, "Kochiku"
 set :repo_url, "https://github.com/square/kochiku.git"
