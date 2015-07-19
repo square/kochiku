@@ -1,8 +1,11 @@
-= form_for @repository, :url => @url, :html => { :id => 'repository-form' } do |f|
+= form_for @repository, :url => form_url, :html => { :id => 'repository-form' } do |f|
   = f.error_messages
   %div
     %label{:for => "url"} Repository URL:
     = f.text_field :url, {:placeholder => '', :autocapitalize => 'off', :autocorrect => 'off', :spellcheck => 'false'}
+  %div
+    %label{:for => "convergence_branches"} Convergence Branches:
+    = text_field_tag :convergence_branches, @current_convergence_branches.join(', '), {placeholder: "master", autocapitalize: 'off', autocorrect: 'off', spellcheck: 'false'}
   - if @repository.test_command.present?
     %div{ title: 'Test command should now be specified in the kochiku.yml' }
       %label{:for => "test_command"} Test Command: (Deprecated)
@@ -35,7 +38,7 @@
     %legend On a green build
     %div
       %label{:for => "on_green_update"} Update branches to last green commit:
-      = f.text_field :on_green_update, {:id => "on_green_update", :placeholder => "Comma separated list of branches"}
+      = f.text_field :on_green_update, {:id => "on_green_update", :placeholder => "Comma separated list of branch names"}
     %div
       %label{:for => "send_build_success_email"} Send email to contributers:
       = f.check_box :send_build_success_email, {:id => "send_build_success_email"}
@@ -52,7 +55,7 @@
   = f.submit @repository.new_record? ? "Create" : "Update"
 
 - unless @repository.new_record?
-  = button_to "Delete", @repository, method: :delete, form_class: "delete-form", class: "danger-button", data: {confirm: "This is a permanent destructive action, are you sure?"}
+  = button_to "Delete", repository_path(@repository.id), method: :delete, form_class: "delete-form", class: "danger-button", data: {confirm: "This is a permanent destructive action, are you sure?"}
 
 = content_for :javascript do
   :javascript

@@ -5,7 +5,7 @@ class GithubCommitStatus
     @oauth_token = oauth_token
     @url = "#{build.repository.base_api_url}/statuses/#{build.ref}"
     @build = build
-    @build_url = Rails.application.routes.url_helpers.project_build_url(build.project, build)
+    @build_url = Rails.application.routes.url_helpers.repository_build_url(build.repository, build)
   end
 
   def update_commit_status!

@@ -1,7 +1,7 @@
 class BuildAttempt < ActiveRecord::Base
   has_many :build_artifacts, :dependent => :destroy, :inverse_of => :build_attempt
   belongs_to :build_part, :inverse_of => :build_attempts, :touch => true
-  delegate :build_instance, to: :build_part
+  has_one :build_instance, through: :build_part
 
   FAILED_BUILD_STATES = [:failed, :errored]
   COMPLETED_BUILD_STATES = [:passed, :aborted] + FAILED_BUILD_STATES

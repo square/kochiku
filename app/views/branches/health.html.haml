@@ -1,20 +1,20 @@
-= content_for :title, @project.name
+= content_for :title, "Health of #{@branch.name} branch of #{@repository.name_with_namespace}"
 = content_for :favicon do
   - if @current_build
     = favicon_link_tag image_path("#{@current_build.to_color}.png"), type: 'image/png'
 
 - content_for :header do
   %ul.links
-    %li= link_to("Settings", edit_repository_path(@project.repository), class: "info")
-    %li= link_to("Developer Builds", projects_repository_path(@project.repository))
+    %li= link_to("Settings", repository_edit_path(@repository), class: "info")
+    %li= link_to("Branches", repository_branches_path(@repository))
 
-- cache(@project) do
+- cache(@branch) do
   - rate = error_free_pass_rate(@builds)
   - avg_rebuilds = average_number_of_rebuilds(@builds)
   - median_seconds_to_success = median_elapsed_time(@builds)
   .performance
     - if median_seconds_to_success
-      %div{ title: "Median elapsed time for successful builds on #{@project.name}" }
+      %div{ title: "Median elapsed time for successful builds on #{@branch.name}" }
         %span.label Median time:
         %span.number= "#{seconds_to_minutes(median_seconds_to_success)} minutes"
 
@@ -27,7 +27,7 @@
       %span.label pass rate on first try
 
 - if @part_climate.count > 0
-  %h2.subheader= "#{@project.name} part failure stats over #{@builds.count} builds"
+  %h2.subheader= "#{@repository.name}/#{@branch.name} part failure stats over #{@builds.count} builds"
   %table.project-part-info
     %thead
       %tr
@@ -41,7 +41,7 @@
         %td
         %td
           - parts_with_failures.each do |part|
-            = link_to "/projects/#{@project.to_param}/builds/#{part.build_instance.to_param}/parts/#{part.to_param}" do
+            = link_to repository_build_part_path(@repository, part.build_instance, part) do
               %span.part-status{class: [part.status, "attempt-#{part.build_attempts.size}"]}
 - else
-  %h2.subheader= "#{@project.name} hasn't failed in #{@builds.count} builds"
+  %h2.subheader= "#{@repository.name}/#{@branch.name} hasn't failed in #{@builds.count} builds"

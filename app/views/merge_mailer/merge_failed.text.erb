@@ -1,4 +1,4 @@
-Kochiku build automatically merged build: <%= [@build.project.name, @build.id, @build.branch].join(", ") %>.
+Kochiku build automatically merged build: <%= [@build.repository.to_param, @build.id, @build.branch_record.name].join(", ") %>.
 
 stdout & stderr:
 

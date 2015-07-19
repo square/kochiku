@@ -1,7 +1,9 @@
 %h2.subheader
-  = link_to(@build.project.name, project_path(@build.project))
+  = @repository.name_with_namespace
   &ndash;
-  = link_to project_build_path(@project, @build) do
+  = link_to @build.branch_record.name, repository_branch_path(@repository, @build.branch_record)
+  &ndash;
+  = link_to repository_build_path(@repository, @build) do
     %code.build-status{ class: @build.state, title: @build.ref }
       = @build.ref[0, 7]
   &ndash; Part #{@build_part.id}

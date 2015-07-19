@@ -2,8 +2,8 @@ require 'spec_helper'
 
 describe BuildStateUpdateJob do
   let(:repository) { FactoryGirl.create(:repository, url: 'git@github.com:square/test-repo.git') }
-  let(:project) { FactoryGirl.create(:big_rails_project, :repository => repository, :name => name) }
-  let(:build) { FactoryGirl.create(:build, :state => :runnable, :project => project, :branch => 'featureX') }
+  let(:branch) { FactoryGirl.create(:branch, :repository => repository) }
+  let(:build) { FactoryGirl.create(:build, :state => :runnable, :branch_record => branch) }
   let(:name) { repository.name + "_pull_requests" }
   let(:current_repo_master) { build.ref }
 
@@ -55,73 +55,78 @@ describe BuildStateUpdateJob do
       BuildStateUpdateJob.perform(build.id)
     end
 
+    context "when a build part is still in progress" do
+      it "does not kick off a new build unless finished" do
+        (build.build_parts - [build.build_parts.last]).each do |part|
+          part.build_attempts.create!(state: :passed)
+        end
+        build.build_parts.last.build_attempts.create!(state: :running)
+        build.update_state_from_parts!
+
+        expect {
+          BuildStateUpdateJob.perform(build.id)
+        }.to_not change(branch.builds, :count)
+      end
+    end
 
     context "when all parts have passed" do
       before do
         build.build_parts.each do |part|
-          attempt = part.build_attempts.create!(:state => :running)
-          attempt.finish!(:passed)
+          part.build_attempts.create!(state: :passed)
         end
+        build.update_state_from_parts!
       end
 
-      describe "checking for newer sha's after finish" do
+      describe "checking for a new commit after finish" do
         subject { BuildStateUpdateJob.perform(build.id) }
-        it "doesn't kick off a new build for normal porjects" do
-          expect { subject }.to_not change(project.builds, :count)
+
+        it "doesn't kick off a new build for non convergence branch" do
+          expect(branch.convergence?).to be(false)
+          expect { subject }.to_not change(branch.builds, :count)
         end
 
-        context "with ci project" do
-          let(:name) { repository.name }
+        context "with a build on a convergence branch" do
+          let(:branch) { FactoryGirl.create(:convergence_branch, repository: repository)  }
+
+          it "should promote the build" do
+            expect(BuildStrategy).to receive(:promote_build).with(build)
+            expect(BuildStrategy).not_to receive(:run_success_script)
+            subject
+          end
 
           context "new sha is available" do
             let(:current_repo_master) { "new-sha-11111111111111111111111111111111" }
 
             it "builds when there is a new sha to build" do
-              expect { subject }.to change(project.builds, :count).by(1)
-              build = project.builds.last
-              expect(build.ref).to eq(current_repo_master)
-            end
-
-            # TODO: this shouldn't be under the "when all parts have passed" context
-            it "does not kick off a new build unless finished" do
-              build.build_parts.first.build_attempts.last.finish!(:running)
-              expect { subject }.to_not change(project.builds, :count)
+              expect { subject }.to change(branch.builds, :count).by(1)
+              last_build = branch.builds.last
+              expect(last_build.ref).to eq(current_repo_master)
             end
 
             it "kicks off a new build if attempts are running on a part that passed" do
               build.build_parts.first.create_and_enqueue_new_build_attempt!
-              expect { subject }.to change(project.builds, :count).by(1)
-              build = project.builds.last
-              expect(build.ref).to eq(current_repo_master)
+              expect { subject }.to change(branch.builds, :count).by(1)
+              last_build = branch.builds.last
+              expect(last_build.ref).to eq(current_repo_master)
             end
 
             it "does not kick off a new build if one is already running" do
-              project.builds.create!(:ref => 'some-other-sha-1111111111111111111111111', :state => :partitioning, :branch => 'master')
-              expect { subject }.to_not change(project.builds, :count)
+              branch.builds.create!(ref: 'some-other-sha-1111111111111111111111111', state: :partitioning)
+              expect { subject }.to_not change(branch.builds, :count)
             end
 
-            it "does not roll back a builds state" do
-              new_build = project.builds.create!(:ref => current_repo_master, :state => :failed, :branch => 'master')
-              expect { subject }.to_not change(project.builds, :count)
+            it "does not roll back a build's state" do
+              new_build = branch.builds.create!(ref: current_repo_master, state: :failed)
+              expect { subject }.to_not change(branch.builds, :count)
               expect(new_build.reload.state).to eq(:failed)
             end
           end
 
           context "no new sha" do
             it "does not build" do
-              expect { subject }.to_not change(project.builds, :count)
+              expect { subject }.to_not change(branch.builds, :count)
             end
           end
-        end
-      end
-
-      context "on main project" do
-        let(:project) { FactoryGirl.create(:project, :repository => repository, :name => repository.name) }
-
-        it "should promote the build" do
-          expect(BuildStrategy).to receive(:promote_build).with(build)
-          expect(BuildStrategy).not_to receive(:run_success_script)
-          BuildStateUpdateJob.perform(build.id)
         end
       end
 
@@ -133,7 +138,7 @@ describe BuildStateUpdateJob do
     end
 
     context "when there is a success script" do
-      let(:build) { FactoryGirl.create(:build, :state => :succeeded, :project => project) }
+      let(:build) { FactoryGirl.create(:build, state: :succeeded, branch_record: branch) }
 
       before do
         kochiku_yaml_config = { 'on_success_script' => 'echo hip hip hooray' }
@@ -159,7 +164,7 @@ describe BuildStateUpdateJob do
     end
 
     context "where this is no success script" do
-      let(:build) { FactoryGirl.create(:build, :state => :succeeded, :project => project) }
+      let(:build) { FactoryGirl.create(:build, state: :succeeded, branch_record: branch) }
 
       before do
         kochiku_yaml_config = { }
@@ -175,6 +180,7 @@ describe BuildStateUpdateJob do
     context "when a part has failed but some are still running" do
       before do
         build.build_parts.first.build_attempts.create!(:state => :failed)
+        build.update_state_from_parts!
       end
 
       it_behaves_like "a non promotable state"
@@ -183,9 +189,14 @@ describe BuildStateUpdateJob do
     context "when all parts have run and some have failed" do
       before do
         (build.build_parts - [build.build_parts.first]).each do |part|
-          part.build_attempts.create!(:state => :passed)
+          ba = part.build_attempts.create!(:state => :passed)
+          FactoryGirl.create(:stdout_build_artifact, build_attempt: ba)
         end
-        build.build_parts.first.build_attempts.create!(:state => :failed)
+
+        failed_build_attempt = build.build_parts.first.build_attempts.create!(:state => :failed)
+        FactoryGirl.create(:stdout_build_artifact, build_attempt: failed_build_attempt)
+
+        build.update_state_from_parts!
       end
 
       it_behaves_like "a non promotable state"

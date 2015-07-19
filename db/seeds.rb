@@ -13,21 +13,22 @@ def artifact_directory
   Rails.root.join('tmp')
 end
 
-def write_the_sample_file
-  name = artifact_directory.join('build_artifact.log')
+def write_the_sample_stdout_log_file
+  FileUtils.mkdir_p(artifact_directory)
+  name = artifact_directory.join('stdout.log')
   File.open(name, 'w') do |file|
     75.times { |i| file.puts "Line #{i}" }
   end
   name
 end
 
-def sample_file
-  @sample_file ||= artifact_directory.join('build_artifact.log')
+def sample_stdout_log_file
+  @sample_file ||= artifact_directory.join('stdout.log')
 end
 
 def create_build_artifact(attempt)
   BuildArtifact.create!(
-    log_file: sample_file.open,
+    log_file: sample_stdout_log_file.open,
     build_attempt: attempt
   )
 end
@@ -54,8 +55,8 @@ def create_build_part(build, kind, paths, build_attempt_state)
   bp
 end
 
-def create_build(project, test_types, build_attempt_state: :passed)
-  build = Build.create!(:project => project,
+def create_build(branch, test_types, build_attempt_state: :passed)
+  build = Build.create!(:branch_record => branch,
                         :ref => SecureRandom.hex(20),
                         :state => :runnable)
 
@@ -75,13 +76,13 @@ def create_build(project, test_types, build_attempt_state: :passed)
   build.update_state_from_parts!
 end
 
-def populate_builds_for(project, repo_info)
+def populate_builds_for(branch, repo_info)
   thread_list = []
 
   10.times do
     thread_list << Thread.new do
       ActiveRecord::Base.connection_pool.with_connection do
-        create_build(project, repo_info[:types], build_attempt_state: repo_info[:build_attempt_state])
+        create_build(branch, repo_info[:types], build_attempt_state: repo_info[:build_attempt_state])
       end
     end
   end
@@ -89,16 +90,19 @@ def populate_builds_for(project, repo_info)
   thread_list.each { |t| t.join }
 end
 
-write_the_sample_file
+write_the_sample_stdout_log_file
 
+repos = {}
 repo_infos.each do |repo_info|
-  repo_name = repo_info[:name]
   repository = Repository.create!({:url => repo_info[:location], :test_command => "script/ci", :run_ci => true})
-  master_project = Project.create!({:name => repo_name, :branch => 'master', :repository => repository})
-  populate_builds_for(master_project, repo_info)
-  developer_project = Project.create!({:name => "johnny-#{repo_name}", :branch => 'topic-branch', :repository => repository})
-  populate_builds_for(developer_project, repo_info)
+  repos[repo_info[:name]] = repository
+  master_branch = Branch.create!(:name => 'master', :convergence => true, :repository => repository)
+  populate_builds_for(master_branch, repo_info)
+  developer_branch = Branch.create!(:name => 'feature-branch', :convergence => false, :repository => repository)
+  populate_builds_for(developer_branch, repo_info)
 end
 
+
 # create an extra running build for copycopter-server to show something that is in progress
-create_build(Project.find_by_name("copycopter-server"), %w(spec), build_attempt_state: :running)
+copycopter_branch = Branch.where(repository: repos['copycopter-server'], name: 'master').first
+create_build(copycopter_branch, %w(spec), build_attempt_state: :running)

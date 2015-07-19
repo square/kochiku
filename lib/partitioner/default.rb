@@ -62,7 +62,7 @@ module Partitioner
         subset['options']['log_file_globs'] = Array(subset['log_file_globs'])
       end
 
-      queue = @build.project.main? ? "ci" : "developer"
+      queue = @build.branch_record.convergence? ? "ci" : "developer"
       queue_override = subset.fetch('queue_override', nil)
       queue = "#{queue}-#{queue_override}" if queue_override.present?
 

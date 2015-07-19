@@ -1,9 +1,7 @@
 require 'spec_helper'
 
 describe GitBlame do
-  let(:repository) { FactoryGirl.create(:repository, url: 'git@github.com:square/test-repo.git') }
-  let(:project) { FactoryGirl.create(:big_rails_project, repository: repository) }
-  let(:build) { FactoryGirl.create(:build, :project => project) }
+  let(:build) { FactoryGirl.create(:build) }
 
   describe "#emails_since_last_green" do
     subject { GitBlame.emails_since_last_green(build) }

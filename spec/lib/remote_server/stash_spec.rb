@@ -31,7 +31,7 @@ describe 'stash integration test' do
   describe "#update_commit_status!" do
     let(:build) { double('build',
       ref:        'abc123',
-      project:    double('project'),
+      repository: double('repository', to_param: 'my_namespace/my_repo_name'),
       succeeded?: true,
       id:         123
     ) }

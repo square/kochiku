@@ -1,9 +1,11 @@
 require 'on_success_uploader'
 require 'fileless_io'
+require 'build_partitioning_job'
 
 class Build < ActiveRecord::Base
-  belongs_to :project, :inverse_of => :builds, :touch => true
-  has_one :repository, :through => :project
+  # using 'branch_record' instead of 'branch' because Build has a legacy 'branch' string type column. The legacy column will be removed soon.
+  belongs_to :branch_record, :class_name => "Branch", :foreign_key => "branch_id", :inverse_of => :builds, :touch => true
+  has_one :repository, :through => :branch_record
   has_many :build_parts, :dependent => :destroy, :inverse_of => :build_instance do
     def not_passed_and_last_attempt_in_state(*state)
       joins(:build_attempts).joins(<<-EOSQL).where("build_attempts.state" => state, "passed_attempt.id" => nil, "newer_attempt.id" => nil)
@@ -46,17 +48,16 @@ class Build < ActiveRecord::Base
   symbolize :state, :in => STATES
   serialize :error_details, Hash
 
-  validates :project_id, presence: true
+  validates :branch_id, presence: true
   validates :ref, presence: true,
                   length: { is: 40, allow_blank: true },
-                  uniqueness: { scope: :project_id, allow_blank: true }
+                  uniqueness: { scope: :branch_id, allow_blank: true }
 
   mount_uploader :on_success_script_log_file, OnSuccessUploader
 
   after_commit :enqueue_partitioning_job, :on => :create
 
   scope :completed, -> { where(state: TERMINAL_STATES) }
-  scope :successful_for_project, lambda { |project_id| where(:project_id => project_id, :state => :succeeded) }
 
   def test_command
     (kochiku_yml && kochiku_yml.has_key?('test_command')) ? kochiku_yml['test_command'] : repository.test_command
@@ -67,11 +68,11 @@ class Build < ActiveRecord::Base
   end
 
   def previous_build
-    project.builds.order("id DESC").where("id < ?", self.id).first
+    branch_record.builds.where("id < ?", self.id).order("id DESC").first
   end
 
   def previous_successful_build
-    Build.successful_for_project(project_id).order("id DESC").where("id < ?", self.id).first
+    Build.where(branch_id: self.branch_id, state: :succeeded).where("id < ?", self.id).order("id DESC").first
   end
 
   def enqueue_partitioning_job
@@ -187,7 +188,7 @@ class Build < ActiveRecord::Base
   end
 
   def promotable?
-    succeeded? && project.main?
+    succeeded? && branch_record.convergence?
   end
 
   def mergable_by_kochiku?
@@ -195,13 +196,11 @@ class Build < ActiveRecord::Base
   end
 
   def merge_on_success_enabled?
-    !project.main? && !!self.merge_on_success
+    !branch_record.convergence? && !!self.merge_on_success
   end
 
   def newer_branch_build_exists?
-    raise "current build is not associated with a branch!" if branch.blank?
-
-    most_recent_build = project.most_recent_build_for_branch(branch)
+    most_recent_build = branch_record.most_recent_build
     most_recent_build.id != self.id
   end
 
@@ -254,12 +253,8 @@ class Build < ActiveRecord::Base
     end
   end
 
-  def branch_or_ref
-    branch.blank? ? ref : branch
-  end
-
   def send_build_status_email!
-    return if project.main? && !previous_successful_build
+    return if branch_record.convergence? && !previous_successful_build
 
     if completed?
       if failed? && !build_failure_email_sent? && repository.send_build_failure_email?
@@ -267,13 +262,11 @@ class Build < ActiveRecord::Base
           BuildMailer.build_break_email(self).deliver_now
           update(build_failure_email_sent: true)
         end
-      elsif succeeded? && !project.main? && !build_success_email_sent? && repository.send_build_success_email?
-        unless build_success_email_sent?
-          BuildMailer.build_success_email(self).deliver_now
-          update(build_success_email_sent: true)
-        end
+      elsif succeeded? && !branch_record.convergence? && !build_success_email_sent? && repository.send_build_success_email?
+        BuildMailer.build_success_email(self).deliver_now
+        update(build_success_email_sent: true)
       end
-    elsif !project.main? && repository.email_on_first_failure && already_failed? && repository.send_build_failure_email?
+    elsif !branch_record.convergence? && repository.email_on_first_failure && already_failed? && repository.send_build_failure_email?
       unless build_failure_email_sent?
         # due to race condition, update attribute before sending email
         update(build_failure_email_sent: true)

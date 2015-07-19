@@ -10,7 +10,7 @@ module Partitioner
         {
           'type' => 'test',
           'files' => ['no-manifest'],
-          'queue' => @build.project.main? ? 'ci' : 'developer',
+          'queue' => @build.branch_record.convergence? ? 'ci' : 'developer',
           'retry_count' => 0
         }
       ]

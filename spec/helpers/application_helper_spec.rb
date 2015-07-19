@@ -3,15 +3,9 @@ require 'spec_helper'
 describe ApplicationHelper do
   include ActionView::Helpers
   include Haml::Helpers
-  let(:project) { FactoryGirl.create(:project, :repository => repository)}
-  let(:repository) { FactoryGirl.create(:repository, :url => "git@git.example.com:square/web.git")}
-  let(:project_stash) { FactoryGirl.create(:project, :repository => repository_stash)}
-  let(:project_stash_no_greenupdate) { FactoryGirl.create(:project, :repository => repository_stash_no_greenupdate)}
-  let(:repository_stash) { FactoryGirl.create(:repository, :url => "https://stash.example.com/scm/square/web2.git", 
-    :host => "stash.example.com", :namespace => "square", :on_green_update => "green,red")}
-  let(:repository_stash_no_greenupdate) { FactoryGirl.create(:repository, :url => "https://stash.example.com/scm/square/web3.git", 
-    :host => "stash.example.com", :namespace => "square", :on_green_update => "")}
 
+  let(:repository) { FactoryGirl.create(:repository, :url => "git@git.example.com:square/web.git") }
+  let(:branch) { FactoryGirl.create(:branch, repository: repository, name: "nomnomnom") }
 
   before do
     settings = SettingsAccessor.new(<<-YAML)
@@ -25,7 +19,7 @@ describe ApplicationHelper do
   end
 
   before do
-    @build = Build.new(:ref => "SHA1FORCOMMIT", :project => project, :branch => "nomnomnom")
+    @build = Build.new(ref: "SHA1FORCOMMIT", branch_record: branch)
   end
 
   describe "#build_success_in_words" do
@@ -65,24 +59,30 @@ describe ApplicationHelper do
 
   describe "#show_link_to_branch" do
     it "should create a url to github based on config" do
-      expect(show_link_to_branch(@build)).to eq('https://git.example.com/square/web/tree/nomnomnom')
+      expect(show_link_to_branch(@build.branch_record)).to eq('https://git.example.com/square/web/tree/nomnomnom')
     end
   end
 
   describe "#show_link_to_compare" do
-    before do
-      @build_stash = Build.new(:ref =>"SHA1FORCOMMIT", :project => project_stash, :branch => "okay")
-      @build_stash_no_greenupdate = Build.new(:ref =>"SHA1FORCOMMIT", :project => project_stash_no_greenupdate, :branch => "okay")
-    end
+    let(:branch_stash) { FactoryGirl.create(:branch, repository: repository_stash, name: "okay") }
+    let(:branch_stash_no_greenupdate) { FactoryGirl.create(:branch, repository: repository_stash_no_greenupdate, name: "okay") }
+    let(:repository_stash) { FactoryGirl.create(:stash_repository, url: "https://stash.example.com/scm/square/web2.git",
+      host: "stash.example.com", namespace: "square", on_green_update: "green,red") }
+    let(:repository_stash_no_greenupdate) { FactoryGirl.create(:stash_repository, url: "https://stash.example.com/scm/square/web3.git",
+      host: "stash.example.com", namespace: "square", on_green_update: "") }
 
     it "creates a url to github showing the diff between 2 SHAs" do
       expect(show_link_to_compare(@build, 'SHA1FORCOMMIT', 'SHA2FORCOMMIT')).to eq('https://git.example.com/square/web/compare/SHA1FORCOMMIT...SHA2FORCOMMIT#files_bucket')
     end
+
     it "creates a url to stash showing the diff between master and green branches" do
-      expect(show_link_to_compare(@build_stash, 'SHA1FORCOMMIT', 'SHA2FORCOMMIT')).to eq('https://stash.example.com/projects/square/repos/web2/compare/commits?targetBranch=green&sourceBranch=refs%2Fheads%2Fmaster')
+      build_stash = Build.new(ref: "SHA1FORCOMMIT", branch_record: branch_stash)
+      expect(show_link_to_compare(build_stash, 'SHA1FORCOMMIT', 'SHA2FORCOMMIT')).to eq('https://stash.example.com/projects/square/repos/web2/compare/commits?targetBranch=green&sourceBranch=refs%2Fheads%2Fmaster')
     end
+
     it "creates a url to stash showing a comparison with master if no green branch set" do
-      expect(show_link_to_compare(@build_stash_no_greenupdate, 'SHA1FORCOMMIT', 'SHA2FORCOMMIT')).to eq('https://stash.example.com/projects/square/repos/web3/compare/commits?targetBranch=refs%2Fheads%2Fmaster')
+      build_stash_no_greenupdate = Build.new(ref: "SHA1FORCOMMIT", branch_record: branch_stash_no_greenupdate)
+      expect(show_link_to_compare(build_stash_no_greenupdate, 'SHA1FORCOMMIT', 'SHA2FORCOMMIT')).to eq('https://stash.example.com/projects/square/repos/web3/compare/commits?targetBranch=refs%2Fheads%2Fmaster')
     end
   end
 

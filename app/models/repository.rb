@@ -4,7 +4,7 @@ require 'remote_server'
 # Repository records in the database. All non-database operations should go
 # through the RemoteServer classes.
 class Repository < ActiveRecord::Base
-  has_many :projects, :dependent => :destroy
+  has_many :branches, :dependent => :destroy
   validates_presence_of :host, :name, :url
   validates_uniqueness_of :name
   validates_numericality_of :timeout, :only_integer => true
@@ -53,10 +53,6 @@ class Repository < ActiveRecord::Base
 
   delegate :base_html_url, :base_api_url, :sha_for_branch, :url_for_fetching, to: :remote_server
 
-  def main_project
-    projects.where(name: name).first
-  end
-
   def repo_cache_name
     repo_cache_dir || "#{name}-cache"
   end
@@ -72,13 +68,33 @@ class Repository < ActiveRecord::Base
   end
 
   # Public: attempts to lookup a build for the commit under any of the
-  # repository's projects. This is done as an optimization since the contents
+  # repository's branches. This is done as an optimization since the contents
   # of the commit are guaranteed to not have changed.
   #
   # Returns: Build AR object or nil
   def build_for_commit(sha)
-    Build.joins(:project).where(:ref => sha, 'projects.repository_id' => self.id).first
+    Build.joins(:branch_record).where(:ref => sha, 'branches.repository_id' => self.id).first
   end
+
+  # Public: looks across all of a repository's builds for one with the given
+  # SHA. If one does not exist it creates one on the branch given
+  #
+  # sha    - String: git sha of the commit in question
+  # branch - String or AR Branch: if an existing build is not found a new one will be created on this branch
+  #
+  # Returns: Build AR object
+  def ensure_build_exists(sha, branch)
+    build = build_for_commit(sha)
+    unless build.present?
+      build = branch.builds.create!(ref: sha, state: :partitioning)
+    end
+    build
+  end
+
+  def name_with_namespace
+    "#{namespace}/#{name}"
+  end
+  alias_method :to_param, :name_with_namespace
 
   private
 

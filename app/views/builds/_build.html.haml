@@ -1,5 +1,5 @@
 .build
-  %a{:href => project_build_path(build.project, build), :class => "build-wrapper"}
+  %a{:href => repository_build_path(build.repository, build), :class => "build-wrapper"}
     .build-info
       .ref= build.ref
     %h3.build-id{:class => build.state}= build.id
@@ -18,7 +18,7 @@
       %span.state{:class => 'build-' + build.state.to_s}= build.state.to_s.capitalize
       on
       %span.queue= build.queue.to_s.capitalize
-    - if @project.main?
+    - if build.branch_record.convergence?
       %a.info{:href => show_link_to_compare(build, build.previous_successful_build.try(:ref), build.ref), :title => 'show changes since last green build'}
         Compare to last green build
     - elsif build.succeeded?

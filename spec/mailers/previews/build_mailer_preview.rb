@@ -1,3 +1,7 @@
+require 'git_blame'
+require 'partitioner'
+
+# Stub GitBlame behavior for mailer preview
 class GitBlame
   class << self
     def emails_since_last_green(build)
@@ -46,7 +50,8 @@ class GitBlame
   end
 end
 
-class Partitioner
+# Stub Partitioner behavior for mailer preview
+module Partitioner
   def self.for_build(build)
     Base.new(build, nil)
   end
@@ -55,17 +60,6 @@ class Partitioner
     def initialize(build, kochiku_yml)
       @build = build
       @kochiku_yml = kochiku_yml
-    end
-
-    def partitions
-      [
-        {
-          'type' => 'test',
-          'files' => ['no-manifest'],
-          'queue' => @build.project.main? ? 'ci' : 'developer',
-          'retry_count' => 0
-        }
-      ]
     end
 
     def emails_for_commits_causing_failures

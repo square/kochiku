@@ -5,7 +5,8 @@ describe RepositoriesController do
   describe "create action" do
     before do
       @params = {
-        repository: { url: "git@git.example.com:square/kochiku.git", test_command: "script/something" }
+        repository: { url: "git@git.example.com:square/kochiku.git", test_command: "script/something" },
+        convergence_branches: "",
       }
     end
     it "should perform a basic create" do
@@ -26,14 +27,11 @@ describe RepositoriesController do
       expect(repository.name).to eq('kochiku')
     end
 
-    it "creates a ci and pull_requests project" do
-      expect{
-        post :create, @params
-        expect(response).to be_redirect
-      }.to change(Project, :count).by(2)
-      repository = Repository.where(url: "git@git.example.com:square/kochiku.git").first
-      expect(repository.projects.size).to eq(2)
-      expect(repository.projects.map(&:name).sort).to eq(["kochiku", "kochiku-pull_requests"])
+    it "creates a branch_record for the convergence branches" do
+      post :create, @params.merge(convergence_branches: "master, release-1-x")
+      expect(response).to be_redirect
+      expect(Branch.exists?(name: 'master', convergence: true)).to be(true)
+      expect(Branch.exists?(name: 'release-1-x', convergence: true)).to be(true)
     end
 
     context "with validation errors" do
@@ -47,19 +45,6 @@ describe RepositoriesController do
           to include("The maximum timeout allowed is 1440 minutes")
         expect(response).to render_template('new')
       end
-    end
-  end
-
-  describe "get /repositories/:id/projects" do
-    let!(:repository) { FactoryGirl.create(:repository)}
-    let!(:project) { FactoryGirl.create(:project, :repository => repository)}
-    let!(:project2) { FactoryGirl.create(:project)}
-    it "shows only a repositories projects" do
-      get :projects, :id => repository.id
-      expect(response).to be_success
-      doc = Nokogiri::HTML(response.body)
-      elements = doc.css(".projects .build-info")
-      expect(elements.size).to eq(1)
     end
   end
 
@@ -125,6 +110,39 @@ describe RepositoriesController do
         expect(repository.send(attribute)).to eq(new_value)
       end
     end
+
+    describe "of convergence branches" do
+      it "should set convergence on new branches in the list" do
+        # branchA already has convergence
+        branchA = FactoryGirl.create(:branch, repository: repository, name: 'branchA', convergence: true)
+        # branchB does not have convergence
+        branchB = FactoryGirl.create(:branch, repository: repository, name: 'branchB', convergence: false)
+        # branchC does not have convergence
+        branchC = FactoryGirl.create(:branch, repository: repository, name: 'branchC', convergence: false)
+        # branchD does not yet exist
+
+        patch :update, id: repository.id, repository: {timeout:10}, convergence_branches: "branchA,branchB,branchD"
+        expect(branchA.reload).to be_convergence
+        expect(branchB.reload).to be_convergence
+        expect(branchC.reload).to_not be_convergence
+        branchD = repository.branches.where(name: 'branchD').first!
+        expect(branchD).to be_convergence
+      end
+
+      it "should remove convergence from branches no longer in the list" do
+        # branchA has convergence
+        branchA = FactoryGirl.create(:branch, repository: repository, name: 'branchA', convergence: true)
+        # branchB has convergence
+        branchB = FactoryGirl.create(:branch, repository: repository, name: 'branchB', convergence: true)
+        # branchC does not have convergence
+        branchC = FactoryGirl.create(:branch, repository: repository, name: 'branchC', convergence: false)
+
+        patch :update, id: repository.id, repository: {timeout:10}, convergence_branches: "branchA"
+        expect(branchA.reload).to be_convergence
+        expect(branchB.reload).to_not be_convergence
+        expect(branchC.reload).to_not be_convergence
+      end
+    end
   end
 
   describe "delete /repositories/:id" do
@@ -144,9 +162,9 @@ describe RepositoriesController do
     end
   end
 
-  describe "get /repositories/:id/edit" do
+  describe "get /:namespace/:name/edit" do
     it "responds with success" do
-      get :edit, :id => FactoryGirl.create(:repository).id
+      get :edit, repository_path: FactoryGirl.create(:repository).to_param
       expect(response).to be_success
     end
   end
@@ -158,42 +176,55 @@ describe RepositoriesController do
     end
   end
 
+  describe "get /dashboard" do
+    let(:repository) { FactoryGirl.create(:repository) }
+    let!(:master_branch) { FactoryGirl.create(:master_branch, repository: repository) }
+    let!(:non_master_branch) { FactoryGirl.create(:branch, :name => 'feature-branch', repository: repository) }
+
+    it "displays the build status of only the master branches" do
+      get :dashboard
+      expect(response).to be_success
+      doc = Nokogiri::HTML(response.body)
+      elements = doc.css(".projects .ci-build-info")
+      expect(elements.size).to eq(1)
+    end
+  end
+
   describe 'post /build-ref' do
     let(:repository) { FactoryGirl.create(:repository) }
-    let(:repo_name) { repository.name }
     let(:fake_sha) { to_40('1') }
 
     it "creates a master build with query string parameters" do
-      post :build_ref, id: repository.to_param, ref: 'master', sha: fake_sha
+      post :build_ref, id: repository.id, ref: 'master', sha: fake_sha
 
-      verify_response_creates_build response, 'master', fake_sha, repo_name
+      verify_response_creates_build response, 'master', fake_sha
     end
 
     it "creates a master build with payload" do
-      post :build_ref, id: repository.to_param, refChanges: [{refId: 'refs/heads/master', toHash: fake_sha}]
+      post :build_ref, id: repository.id, refChanges: [{refId: 'refs/heads/master', toHash: fake_sha}]
 
-      verify_response_creates_build response, 'master', fake_sha, repo_name
+      verify_response_creates_build response, 'master', fake_sha
     end
 
-    it "creates a PR build with query string parameters" do
-      post :build_ref, id: repository.to_param, ref: 'blah', sha: fake_sha
+    it "creates a branch build with query string parameters" do
+      post :build_ref, id: repository.id, ref: 'blah', sha: fake_sha
 
-      verify_response_creates_build response, 'blah', fake_sha, repo_name + "-pull_requests"
+      verify_response_creates_build response, 'blah', fake_sha
     end
 
-    it "creates a PR build with payload" do
-      post :build_ref, id: repository.to_param, refChanges: [{refId: 'refs/heads/blah', toHash: fake_sha}]
+    it "creates a branch build with payload" do
+      post :build_ref, id: repository.id, refChanges: [{refId: 'refs/heads/blah', toHash: fake_sha}]
 
-      verify_response_creates_build response, 'blah', fake_sha, repo_name + "-pull_requests"
+      verify_response_creates_build response, 'blah', fake_sha
     end
 
-    it "creates a PR build with payload" do
-      post :build_ref, id: repository.to_param, refChanges: [{refId: 'refs/heads/blah/with/a/slash', toHash: fake_sha}]
+    it "creates a branch build for a branch name with slashes" do
+      post :build_ref, id: repository.id, refChanges: [{refId: 'refs/heads/blah/with/a/slash', toHash: fake_sha}]
 
-      verify_response_creates_build response, 'blah/with/a/slash', fake_sha, repo_name + "-pull_requests"
+      verify_response_creates_build response, 'blah/with/a/slash', fake_sha
     end
 
-    def verify_response_creates_build(response, branch, ref, repo_name)
+    def verify_response_creates_build(response, branch_name, ref)
       expect(response).to be_success
       json       = JSON.parse(response.body)
       build_hash = json['builds'][0]
@@ -201,9 +232,30 @@ describe RepositoriesController do
 
       expect(build_hash['build_url']).not_to be_nil
 
-      expect(build.branch).to eq(branch)
+      expect(build.branch_record.name).to eq(branch_name)
       expect(build.ref).to eq(ref)
-      expect(build.project.name).to eq(repo_name)
+    end
+
+    context "a convergence branch" do
+      let(:branch) { FactoryGirl.create(:convergence_branch, repository: repository) }
+
+      it "should not abort previous in-progress builds" do
+        earlier_build = FactoryGirl.create(:build, state: :runnable, branch_record: branch)
+
+        post :build_ref, id: repository.id, ref: branch.name, sha: fake_sha
+        expect(earlier_build.reload.state).to eq(:runnable)
+      end
+    end
+
+    context "not a convergence branch" do
+      let(:branch) { FactoryGirl.create(:branch, repository: repository) }
+
+      it "should abort all previous in-progress builds" do
+        earlier_build = FactoryGirl.create(:build, state: :runnable, branch_record: branch)
+
+        post :build_ref, id: repository.id, ref: branch.name, sha: fake_sha
+        expect(earlier_build.reload.state).to eq(:aborted)
+      end
     end
   end
 end

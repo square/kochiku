@@ -1,54 +1,24 @@
-class Project < ActiveRecord::Base
-  has_many :builds, :dependent => :destroy, :inverse_of => :project do
-    def create_new_build_for(sha)
-      last_build = last
-      return last_build if last_build && !last_build.completed?
-      build = where(ref: sha).first_or_initialize(state: :partitioning, branch: 'master')
-      build.save!
-      build
-    end
-
-    def for_branch(branch, state = nil)
-      relation = joins(:project).where(
-        "projects.repository_id" => proxy_association.owner.repository_id,
-        "builds.branch" => branch)
-      if state.present?
-        relation = relation.where("builds.state" => state)
-      end
-      relation
-    end
-  end
+class Branch < ActiveRecord::Base
   belongs_to :repository
-
-  validates_uniqueness_of :name
-
-  def ensure_master_build_exists(sha)
-    builds.create_new_build_for(sha)
-  end
-
-  def ensure_branch_build_exists(branch, sha)
-    existing_build = repository.build_for_commit(sha)
-    if existing_build
-      existing_build
-    else
-      build = builds.create!(ref: sha, branch: branch, state: :partitioning)
-      abort_in_progress_builds_for_branch(branch, build)
-      build
-    end
-  end
-
-  def abort_in_progress_builds_for_branch(branch, current_build)
-    builds.for_branch(branch, Build::IN_PROGRESS_STATES).readonly(false).
-      reject { |build| build == current_build }.
-      each { |build| build.abort! }
-  end
+  has_many :builds, :dependent => :destroy, :inverse_of => :branch_record
 
   def to_param
-    self.name.downcase
+    self.name
   end
 
-  def main?
-    self.name == repository.name
+  def kickoff_new_build_unless_currently_busy(ref)
+    last_build = builds.last
+    if last_build && !last_build.completed?
+      last_build
+    else
+      builds.create_with(state: :partitioning).find_or_create_by!(ref: ref)
+    end
+  end
+
+  def abort_in_progress_builds_behind_build(current_build)
+    builds.where(state: Build::IN_PROGRESS_STATES).readonly(false).
+      reject { |build| build.id >= current_build.id }.
+      each { |build| build.abort! }
   end
 
   def most_recent_build
@@ -57,10 +27,6 @@ class Project < ActiveRecord::Base
 
   def last_completed_build
     @last_completed_build ||= builds.completed.last
-  end
-
-  def most_recent_build_for_branch(branch_name)
-    builds.for_branch(branch_name).last
   end
 
   # The fuzzy_limit is used to set a upper bound on the amount of time that the
@@ -86,7 +52,7 @@ class Project < ActiveRecord::Base
         FROM builds
    LEFT JOIN build_parts ON build_parts.build_id = builds.id
    LEFT JOIN build_attempts ON build_attempts.build_part_id = build_parts.id
-       WHERE builds.project_id = #{id}
+       WHERE builds.branch_id = #{id}
          AND builds.id >= #{min_build_id}
          AND (build_attempts.id IS NULL OR build_attempts.id = (
                SELECT id
