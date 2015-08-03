@@ -1,16 +1,16 @@
 = content_for :title do
   = @build.ref[0, 7]
   &ndash;
-  = @build.project.name
+  = @project.name
 = content_for :favicon do
   = favicon_link_tag image_path("#{@build_part.to_color}.png"), :type => 'image/png'
 
 %h2.subheader
-  - unless @build.project.main?
-    - if main_project = @build.project.repository.main_project
+  - unless @project.main?
+    - if main_project = @project.repository.main_project
       = link_to main_project.name, main_project
       &ndash;
-  = link_to(@build.project.name, project_path(@build.project))
+  = link_to(@project.name, project_path(@project))
   &ndash;
   = link_to project_build_path(@project, @build) do
     %code.build-status{ class: @build.state, title: @build.ref }
@@ -48,9 +48,12 @@
         %td.right.elapsed= duration_strftime(attempt.elapsed_time)
         %td.right= attempt.builder ? attempt.builder.sub(".#{Settings.domain_name}", '') : "pending"
         %td
-          - attempt.build_artifacts.each do |artifact|
-            = link_to File.basename(artifact.log_file.to_s), artifact.log_file.url
-            %br
+          - if (attempt.running? && attempt.log_streamer_port.present?)
+            = link_to("stdout.log (in progress)", stream_logs_path(attempt.id))
+          - else
+            - attempt.build_artifacts.each do |artifact|
+              = link_to File.basename(artifact.log_file.to_s), artifact.log_file.url
+              %br
         %td
           - if (attempt.unsuccessful? || attempt.aborted?) && @build_part.unsuccessful?
             = link_to("Rebuild", rebuild_project_build_part_path(@project, @build, @build_part), :method => :post)
