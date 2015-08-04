@@ -119,7 +119,7 @@ module RemoteServer
     end
 
     # uses the stash REST api to merge a pull request
-    # raises StashAPIError if an error occurs and should git merge using traditional method
+    # raises StashAPIError if an error occurs
     # otherwise returns true or false depending on whether merge succeeds
     def merge(branch)
       pr_id, pr_version = get_pr_id_and_version(branch)

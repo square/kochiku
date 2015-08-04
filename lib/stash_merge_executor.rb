@@ -4,27 +4,20 @@ require 'git_merge_executor'
 class StashMergeExecutor < GitMergeExecutor
 
   # Merges the branch associated with a build using the Stash REST api.
-  # If an API error is raised, falls back on traditional method.
   def merge_and_push
     remote_server = @build.repository.remote_server
     if @build.project.name =~ /-pull_requests$/
-      begin
-        Rails.logger.info("Trying to merge branch #{@build.branch} to master after build id #{@build.id} using Stash REST api")
-        merge_success = remote_server.merge(@build.branch)
-        unless merge_success
-          raise GitMergeFailedError
-        end
-        return "Successfully merged #{@build.branch}"
-      rescue RemoteServer::StashAPIError
-        Rails.logger.info("Error using StashAPI, falling back on old merge method")
+      Rails.logger.info("Trying to merge branch #{@build.branch} after build id #{@build.id} using Stash REST api")
+      merge_success = remote_server.merge(@build.branch)
+      unless merge_success
+        Rails.logger.info("Merge of #{@build.branch} failed.")
+        raise GitMergeFailedError
       end
+      return "Successfully merged #{@build.branch}"
     end
-
-    super
   end
 
   # Delete branch associated with a build using Stash REST api.
-  # If method fails, falls back on traditional method.
   def delete_branch
     remote_server = @build.repository.remote_server
     begin
@@ -33,7 +26,6 @@ class StashMergeExecutor < GitMergeExecutor
     rescue RemoteServer::StashAPIError => e
       Rails.logger.warn("Deletion of branch #{@build.branch} failed")
       Rails.logger.warn(e.message)
-      super
     end
   end
 end
