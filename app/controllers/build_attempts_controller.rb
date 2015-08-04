@@ -53,7 +53,7 @@ class BuildAttemptsController < ApplicationController
 
     # if full log has already been uploaded, redirect there
     if stdout_log = @build_attempt.build_artifacts.stdout_log.try(:first)
-      redirect_to stdout_log.log_file.url
+      redirect_to stdout_log
       return
     end
 

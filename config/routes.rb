@@ -45,5 +45,7 @@ Kochiku::Application.routes.draw do
   match '/build_attempts/:id/stream_logs' => "build_attempts#stream_logs", :via => :get, :as => :stream_logs
   match '/build_attempts/:id/stream_logs_chunk' => "build_attempts#stream_logs_chunk", :via => :get, :as => :stream_logs_chunk
   match '/pull-request-builder' => "pull_requests#build", :via => :post, :as => :pull_request_build
+
+  resources :build_artifacts, :only => [:show]
 end
 # TODO routing specs

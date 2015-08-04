@@ -81,7 +81,7 @@
             - if (part.status == :running && part.last_attempt.log_streamer_port.present?)
               = link_to(text, stream_logs_path(part.last_attempt.id))
             - elsif artifact = part.last_stdout_artifact
-              =link_to(text, artifact.log_file.url, :title => 'Last completed stdout.log')
+              =link_to(text, artifact, :title => 'Last completed stdout.log')
             - else
               =text
         - build_metadata_values(@build, part, display_ruby_version).each do |value|

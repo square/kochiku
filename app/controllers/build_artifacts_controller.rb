@@ -14,4 +14,10 @@ class BuildArtifactsController < ApplicationController
     end
   end
 
+  # A redirect is preferable to direct linking if logs are stored remotely with expiring urls.
+  def show
+    build_artifact = BuildArtifact.find(params[:id])
+
+    redirect_to build_artifact.log_file.url
+  end
 end
