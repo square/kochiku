@@ -22,7 +22,7 @@ feature "viewing an in process build" do
     within("table.build-summary") do
       expect(find("td:nth-child(1)")).to have_content(build_part.id)
       expect(find("td:nth-child(2)")).to have_content("Runnable")
-      expect(find("td:nth-child(4)")).to have_content("Test")
+      expect(find("td:nth-child(4)")).to have_content("test")
       click_link("#{build_part.id}")
     end
 
