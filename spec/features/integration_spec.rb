@@ -26,7 +26,7 @@ feature "viewing an in process build" do
       click_link("#{build_part.id}")
     end
 
-    expect(find(".subheader")).to have_content("#{build.ref[0, 7]} – Part #{build_part.id}")
+    expect(find(".subheader")).to have_content("#{build.ref[0, 7]} – #{build_part.kind} (part #{build_part.id})")
 
     expect(all(".build-part-info tbody tr").size).to eq(1)
   end

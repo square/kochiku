@@ -8,7 +8,7 @@
       - when "cucumber"
         Cukes
       - else
-        = build_part.kind.capitalize
+        = build_part.kind
     - if build_part.build_attempts.any?
       .attempts
         = render build_part.last_attempt
