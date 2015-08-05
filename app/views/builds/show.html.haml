@@ -86,7 +86,7 @@
               =text
         - build_metadata_values(@build, part, display_ruby_version).each do |value|
           %td= value
-        %td= part.kind.to_s.capitalize
+        %td= part.kind.to_s
         %td.right
           - builder = part.last_attempt.try(:builder)
           = builder ? builder.sub(".#{Settings.domain_name}", '') : "pending"
