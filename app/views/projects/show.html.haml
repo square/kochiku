@@ -101,7 +101,7 @@
                 = link_to build_part.status.to_s.capitalize, "/projects/#{@project.to_param}/builds/#{@current_build.to_param}/parts/#{build_part.to_param}"
           - build_metadata_values(@current_build, part, display_ruby_version).each do |value|
             %td= value
-          %td= part.kind.to_s.capitalize
+          %td= part.kind.to_s
           %td.right.elapsed= build_part.elapsed_time ? duration_strftime(build_part.elapsed_time) : '' if build_part
           %td.right
             = build_part.build_attempts.size if build_part

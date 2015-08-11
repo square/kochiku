@@ -15,7 +15,7 @@
   = link_to project_build_path(@project, @build) do
     %code.build-status{ class: @build.state, title: @build.ref }
       = @build.ref[0, 7]
-  &ndash; Part #{@build_part.id}
+  &ndash; #{@build_part.kind} (part #{@build_part.id})
 
   .actions
     %label
