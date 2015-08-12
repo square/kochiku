@@ -87,7 +87,7 @@ class BuildAttempt < ActiveRecord::Base
 
   def error_txt
     if error_artifact = build_artifacts.error_txt.first
-      File.read(error_artifact.log_file.path)
+      error_artifact.log_file.read
     end
   end
 end

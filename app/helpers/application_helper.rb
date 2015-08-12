@@ -69,6 +69,7 @@ module ApplicationHelper
   def failed_build_stdout(failed_build_part)
     build = failed_build_part.build_instance
     failed_build_attempt = failed_build_part.build_attempts.unsuccessful.last
-    "#{Settings.kochiku_host_with_protocol}/log_files/#{build.project.to_param}/build_#{build.id}/part_#{failed_build_part.id}/attempt_#{failed_build_attempt.id}/stdout.log.gz"
+    stdout_build_artifact_id = failed_build_attempt.build_artifacts.stdout_log.first.id
+    "#{Settings.kochiku_host_with_protocol}/build_artifacts/#{stdout_build_artifact_id}"
   end
 end
