@@ -9,6 +9,8 @@ require 'factory_girl'
 require 'capybara/rspec'
 require 'git_blame'
 
+include ActionDispatch::TestProcess
+
 FIXTURE_PATH = Rails.root.join('spec', 'fixtures')
 
 # Requires supporting ruby files with custom matchers and macros, etc,

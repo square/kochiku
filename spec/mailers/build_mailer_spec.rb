@@ -32,6 +32,7 @@ describe BuildMailer do
     let(:build) { FactoryGirl.create(:main_project_build) }
     let(:stash_project_pr) { FactoryGirl.create(:stash_project, :name => 'project_to_test-pull_requests') }
     let(:stash_build_pr) { FactoryGirl.create(:build, :project => stash_project_pr, :branch => 'funyuns') }
+    let(:log_file) { fixture_file_upload('/stdout.log', 'text/plain') }
 
     before do
       partitioner = instance_double('Partitioner::Base')
@@ -39,7 +40,8 @@ describe BuildMailer do
       allow(Partitioner).to receive(:for_build).and_return(partitioner)
 
       build_part = build.build_parts.create!(:paths => ["a", "b"], :kind => "cucumber", :queue => :ci)
-      build_part.build_attempts.create!(:state => :failed, :builder => "test-builder")
+      build_attempt = build_part.build_attempts.create!(:state => :failed, :builder => "test-builder")
+      build_attempt.build_artifacts.create!(:log_file => log_file)
     end
 
     context "on master as the main build for the project" do
