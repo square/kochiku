@@ -47,8 +47,8 @@ jQuery(document).ready(function() {
   jQuery("abbr.timeago").timeago();
 });
 
-Kochiku.graphBuildTimes = function(projectName) {
-  var url = '/projects/' + projectName + '/build-time-history.json',
+Kochiku.graphBuildTimes = function(repositoryPath, branchName) {
+  var url = '/' + repositoryPath + '/' + branchName + '/build-time-history.json',
     colors = {
       cucumber:     'hsl(87,  63%, 47%)',
       spec:         'hsl(187, 63%, 47%)',

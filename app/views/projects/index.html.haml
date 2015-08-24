@@ -1,9 +1,0 @@
-- content_for :header do
-  %ul.links
-    %li= link_to("Repositories", repositories_path)
-
-.projects
-  %ul
-    - @projects.each do |project|
-      %li.build-info
-        = link_to(project.name, project_path(project))

@@ -3,8 +3,8 @@ require 'partitioner/maven'
 
 describe Partitioner::Maven do
   let(:repository) { FactoryGirl.create(:repository) }
-  let(:project) { FactoryGirl.create(:project, :repository => repository, :name => repository.name) }
-  let(:build) { FactoryGirl.create(:build, :project => project, :branch => "master") }
+  let(:branch) { FactoryGirl.create(:master_branch, repository: repository, name: "master") }
+  let(:build) { FactoryGirl.create(:build, branch_record: branch) }
   let(:kochiku_yml) { nil }
 
   subject { Partitioner::Maven.new(build, kochiku_yml) }
@@ -44,9 +44,9 @@ describe Partitioner::Maven do
   end
 
   describe "#partitions" do
-    context "on master as the main build for the project" do
+    context "on a convergence branch" do
       before do
-        expect(build.project).to be_main
+        expect(build.branch_record).to be_convergence
         allow(subject).to receive(:sort_modules) { |mvn_modules| mvn_modules }
       end
 
@@ -157,8 +157,8 @@ describe Partitioner::Maven do
         end
       end
 
-      context "with a previous build" do
-        let(:build2) { FactoryGirl.create(:build, :project => project, :branch => "master") }
+      context "with a previous build on the same branch" do
+        let(:build2) { FactoryGirl.create(:build, branch_record: branch) }
         subject { Partitioner::Maven.new(build2, kochiku_yml) }
 
         it "should add all the non-successful parts from the previous build" do
@@ -261,15 +261,16 @@ describe Partitioner::Maven do
       end
     end
 
-    context "on a branch" do
-      let(:build) { FactoryGirl.create(:build, :branch => "branch-of-master") }
+    context "on a non-convergence branch" do
+      let(:branch) { FactoryGirl.create(:branch, convergence: false) }
+      # let(:build) { FactoryGirl.create(:build, :branch => "branch-of-master") }
 
       before do
-        expect(build.project).to_not be_main
+        expect(build.branch_record).to_not be_convergence
       end
 
       context "with a previous build" do
-        let(:build2) { FactoryGirl.create(:build, :project => project, :branch => "master") }
+        let(:build2) { FactoryGirl.create(:build, branch_record: FactoryGirl.create(:master_branch)) }
         subject { Partitioner::Maven.new(build2, kochiku_yml) }
 
         it "should NOT add all the non-successful parts from the previous build" do

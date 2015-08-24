@@ -2,7 +2,6 @@ class BuildPart < ActiveRecord::Base
   # using 'build_instance' instead of 'build' because AR defines `build` for associations, and it wins
   belongs_to :build_instance, :class_name => "Build", :foreign_key => "build_id", :inverse_of => :build_parts, :touch => true
   has_many :build_attempts, :dependent => :destroy, :inverse_of => :build_part
-  has_one :project, :through => :build_instance
   symbolize :queue
   validates_presence_of :kind, :paths, :queue
 
@@ -33,17 +32,18 @@ class BuildPart < ActiveRecord::Base
   alias_method :rebuild!, :create_and_enqueue_new_build_attempt!
 
   def job_args(build_attempt)
+    repository = build_instance.repository
     {
         "build_attempt_id" => build_attempt.id,
         "build_kind" => kind,
         "build_ref" => build_instance.ref,
-        "branch" => build_instance.branch,
+        "branch" => build_instance.branch_record.name,
         "test_files" => paths,
-        "repo_name" => project.repository.repo_cache_name,
+        "repo_name" => repository.repo_cache_name,
         "test_command" => build_instance.test_command,
-        "repo_url" => project.repository.url_for_fetching,
+        "repo_url" => repository.url_for_fetching,
         "remote_name" => "origin",
-        "timeout" => project.repository.timeout.minutes,
+        "timeout" => repository.timeout.minutes,
         "options" => options,
         "kochiku_env" => Rails.env,
     }

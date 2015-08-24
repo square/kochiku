@@ -91,7 +91,7 @@ module RemoteServer
     end
 
     def update_commit_status!(build)
-      build_url = Rails.application.routes.url_helpers.project_build_url(build.project, build)
+      build_url = Rails.application.routes.url_helpers.repository_build_url(build.repository.to_param, build)
 
       @stash_request.post "https://#{@settings.host}/rest/build-status/1.0/commits/#{build.ref}", {
         state:       stash_status_for(build),
@@ -121,6 +121,9 @@ module RemoteServer
     # uses the stash REST api to merge a pull request
     # raises StashAPIError if an error occurs
     # otherwise returns true or false depending on whether merge succeeds
+    #
+    # TODO pass in expected SHA for head to branch to prevent merging a branch
+    # that is in an unexpected state
     def merge(branch)
       pr_id, pr_version = get_pr_id_and_version(branch)
       success = can_merge?(pr_id) && perform_merge(pr_id, pr_version)

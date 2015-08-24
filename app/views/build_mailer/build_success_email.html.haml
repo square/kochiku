@@ -2,8 +2,8 @@
   %head
     %meta(content='text/html; charset=UTF-8' http-equiv='Content-Type')
   %body
-    %h1 #{ @build.branch } build succeeded for #{ @build.project.name }
-    = link_to('Link to build.', project_build_url(@build.project, @build))
+    %h1 #{ @build.branch_record.name } build succeeded for #{ @build.repository.name }
+    = link_to('Link to build.', repository_build_url(@build.repository, @build))
     - if @pr_link
       = link_to('Link to PR.', @pr_link)
     - if @build.build_parts.count > 1
@@ -20,7 +20,7 @@
       %br
     %h2 Changes included in build
     - @git_changes.each do |git_change|
-      %b SHA: #{ link_to(git_change[:hash], "#{@build.project.repository.remote_server.href_for_commit(git_change[:hash])}") }
+      %b SHA: #{ link_to(git_change[:hash], "#{@build.repository.remote_server.href_for_commit(git_change[:hash])}") }
       %br
       %b Committer:
       =git_change[:author]

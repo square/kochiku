@@ -1,29 +1,27 @@
-= content_for :title, @project.name
+= content_for :title, "#{@repository.name} : #{@branch.name}"
 = content_for :favicon do
   - if @current_build
     = favicon_link_tag image_path("#{@current_build.to_color}.png"), type: 'image/png'
 
 - content_for :header do
   %ul.links
-    %li= link_to("Settings", edit_repository_path(@project.repository), class: "info")
-    %li= link_to("Developer Builds", projects_repository_path(@project.repository))
-  = form_for @build, url: request_project_builds_path(@project) do |f|
-    - if !@project.main?
-      = f.text_field :branch, {placeholder: 'Branch to build', class: 'sha', autocapitalize: 'off', autocorrect: 'off', spellcheck: 'false'}
+    %li= link_to("Settings", repository_edit_path(@repository), class: "info")
+    %li= link_to("Branches", repository_branches_path(@repository))
+  = form_for @build, url: request_new_build_repository_branch_path(@repository, @branch) do |f|
     = f.submit "Build", {class: 'build-button'}
 
-- cache(@project) do
-  %div{class: 'health button'}= link_to('Health', url_for([:health, @project])+'?count=12', {:style => 'color: white'})
+- cache(@branch) do
+  %div{class: 'health button'}= link_to('Health', health_repository_branch_path(@repository, @branch, 'count' => 12), {:style => 'color: white'})
   - rate = error_free_pass_rate(@builds)
   - avg_rebuilds = average_number_of_rebuilds(@builds)
   - median_seconds_to_success = median_elapsed_time(@builds)
   .performance
     - if median_seconds_to_success
-      %div{ title: "Median elapsed time for successful builds on #{@project.name}" }
+      %div{ title: "Median elapsed time for successful builds on #{@branch.name}" }
         %span.label Median time:
         %span.number= "#{seconds_to_minutes(median_seconds_to_success)} minutes"
     - else
-      %div{ title: "Median elapsed time for successful builds on #{@project.name}" }
+      %div{ title: "Median elapsed time for successful builds on #{@branch.name}" }
         %span.label Never built
 
     %div{ title: "Average number of build parts reattempted to get to a successful build", class: rebuild_count_css_class(avg_rebuilds) }
@@ -35,11 +33,9 @@
       %span.label completion rate on first try
 
 %h2.subheader
-  - unless @build.project.main?
-    - if main_project = @build.project.repository.main_project
-      = link_to main_project.name, main_project
-      &ndash;
-  = @project.name
+  = "#{@repository.namespace}/#{@repository.name}"
+  &ndash;
+  = @branch.name
 
 #plot
 
@@ -49,7 +45,7 @@
 
 = content_for :javascript do
   :javascript
-    $(document).ready(Kochiku.graphBuildTimes("#{escape_javascript @project.name}"));
+    $(document).ready(Kochiku.graphBuildTimes("#{escape_javascript(@repository.to_param)}", "#{escape_javascript(@branch.name)}"));
     $(function() {
       var whisker = $('th.whisker');
       $('table')
@@ -72,7 +68,7 @@
         %th.right.whisker Previous
         %th.status
           %code.build-status{ class: @current_build.state }
-            = link_to @current_build.ref[0, 5], [@project, @current_build]
+            = link_to @current_build.ref[0, 5], repository_build_path(@repository, @current_build)
         - display_ruby_version = multiple_ruby_versions?(@current_build)
         - build_metadata_headers(@current_build, display_ruby_version).each do |header|
           %th{ class: header.downcase.gsub(/\W+/, '-') }= header
@@ -91,14 +87,14 @@
               - if previous_part = build_parts_by_build[previous_build]
                 - attempts = previous_part.build_attempts.size
                 - total_attempts += attempts
-                = link_to "/projects/#{@project.to_param}/builds/#{previous_build.to_param}/parts/#{previous_part.to_param}" do
+                = link_to "/#{@repository.to_param}/builds/#{previous_build.to_param}/parts/#{previous_part.to_param}" do
                   %span.part-status{class: [previous_part.status, "attempt-#{attempts}"], title: pluralize(attempts, 'attempt'), data: { ref: previous_build.ref[0, 5] }}
               - else
                 %span.part-status.attempt-0
           %td
             - if build_part
               %span.part-status{class: build_part.status}
-                = link_to build_part.status.to_s.capitalize, "/projects/#{@project.to_param}/builds/#{@current_build.to_param}/parts/#{build_part.to_param}"
+                = link_to build_part.status.to_s.capitalize, "/#{@repository.to_param}/builds/#{@current_build.to_param}/parts/#{build_part.to_param}"
           - build_metadata_values(@current_build, part, display_ruby_version).each do |value|
             %td= value
           %td= part.kind.to_s
@@ -110,7 +106,7 @@
               %span{ title: 'Average' } / #{average}
           %td.right
             - if build_part && build_part.unsuccessful?
-              = link_to "Rebuild", "/projects/#{@project.to_param}/builds/#{@current_build.to_param}/parts/#{build_part.to_param}/rebuild", method: :post
+              = link_to "Rebuild", "/#{@repository.to_param}/builds/#{@current_build.to_param}/parts/#{build_part.to_param}/rebuild", method: :post
 
 - if @current_build
   = content_for :javascript do

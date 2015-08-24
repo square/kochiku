@@ -1,7 +1,7 @@
 class EnforceTimeoutsJob
   def self.perform
     BuildAttempt.where(:state => 'running').each do |attempt|
-      lenient_timeout = attempt.build_instance.project.repository.timeout + 15
+      lenient_timeout = attempt.build_instance.repository.timeout + 15
       if attempt.elapsed_time > lenient_timeout.minutes
         # Error artifact creation taken from kochiku-worker
         message = StringIO.new

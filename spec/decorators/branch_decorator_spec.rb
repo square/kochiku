@@ -1,66 +1,66 @@
 require 'spec_helper'
 require 'build'
 
-describe ProjectDecorator do
+describe BranchDecorator do
   describe "#most_recent_build_state" do
-    let(:project) { instance_double("Project") }
-    let(:decorated_project) { ProjectDecorator.new(project) }
+    let(:branch) { instance_double("Branch") }
+    let(:decorated_branch) { BranchDecorator.new(branch) }
 
     context "when at least one build is present" do
       before do
-        allow(project).to receive(:most_recent_build) {
+        allow(branch).to receive(:most_recent_build) {
           instance_double("Build", state: :running)
         }
       end
 
       it "returns the state of the most recent build" do
-        expect(decorated_project.most_recent_build_state).to be(:running)
+        expect(decorated_branch.most_recent_build_state).to be(:running)
       end
     end
 
-    context "there are no builds for the project" do
+    context "there are no builds for the branch" do
       before do
-        allow(project).to receive(:most_recent_build).and_return(nil)
+        allow(branch).to receive(:most_recent_build).and_return(nil)
       end
 
       it "returns :unknown" do
-        expect(decorated_project.most_recent_build_state).to be(:unknown)
+        expect(decorated_branch.most_recent_build_state).to be(:unknown)
       end
     end
   end
 
   describe "#last_build_duration" do
-    let(:project) { instance_double("Project") }
-    let(:decorated_project) { ProjectDecorator.new(project) }
+    let(:branch) { instance_double("Branch") }
+    let(:decorated_branch) { BranchDecorator.new(branch) }
 
     context "with a completed build" do
       before do
-        allow(project).to receive(:last_completed_build) {
+        allow(branch).to receive(:last_completed_build) {
           instance_double("Build", state: :succeeded, elapsed_time: 60)
         }
       end
 
       it "gets the duration of the last completed build" do
-        expect(decorated_project.last_build_duration).to eq(60)
+        expect(decorated_branch.last_build_duration).to eq(60)
       end
     end
 
     context "without a completed build" do
       before do
-        allow(project).to receive(:last_completed_build).and_return(nil)
+        allow(branch).to receive(:last_completed_build).and_return(nil)
       end
 
       it "returns nil" do
-        expect(decorated_project.last_build_duration).to be_nil
+        expect(decorated_branch.last_build_duration).to be_nil
       end
     end
   end
 
   describe '#build_time_history' do
-    subject { decorated_project.build_time_history }
+    subject { decorated_branch.build_time_history }
 
-    let(:project) do
-      proj = instance_double("Project")
+    let(:branch) do
+      proj = instance_double("Branch")
       allow(proj).to receive(:timing_data_for_recent_builds) {
         [
           @cucumber1 = ["cucumber", "fb25a", 55, 43, 0, 72550, "succeeded", "2014-03-01 22:45:39 UTC"],
@@ -73,7 +73,7 @@ describe ProjectDecorator do
       }
       proj
     end
-    let(:decorated_project) { ProjectDecorator.new(project) }
+    let(:decorated_branch) { BranchDecorator.new(branch) }
 
     it "should bucket the builds by type" do
       should == {
@@ -83,8 +83,8 @@ describe ProjectDecorator do
       }
     end
 
-    context 'when the project has never been built' do
-      let(:project) { instance_double("Project", :timing_data_for_recent_builds => []) }
+    context 'when the branch has never been built' do
+      let(:branch) { instance_double("Branch", :timing_data_for_recent_builds => []) }
 
       it { should == {} }
     end

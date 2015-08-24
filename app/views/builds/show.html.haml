@@ -1,28 +1,26 @@
 = content_for :title do
   = @build.ref[0, 7]
   &ndash;
-  = @build.project.name
+  = @build.repository.name
 = content_for :favicon do
   = favicon_link_tag image_path("#{@build.to_color}.png"), :type => 'image/png'
 
 %h2.subheader
-  - unless @build.project.main?
-    - if main_project = @build.project.repository.main_project
-      = link_to main_project.name, main_project
-      &ndash;
-  = link_to(@build.project.name, project_path(@build.project))
+  = @build.repository.name
+  &ndash;
+  = link_to(@build.branch_record.name, repository_branch_path(@build.repository, @build.branch_record))
   &ndash;
   %code.build-status{ class: @build.state, title: @build.ref }
     = @build.ref[0, 7]
   %a.info{:href => show_link_to_commit(@build)}
     Show
-  - if @project.main?
+  - if @build.branch_record.convergence?
     %a.info{:href => show_link_to_compare(@build, @build.previous_successful_build.try(:ref), @build.ref), :title => 'show changes since last green build'}
       Compare to last green build
 
   .actions
     - if @build.repository.allows_kochiku_merges?
-      %form{action: toggle_merge_on_success_project_build_path(@build.project, @build), method: :post}
+      %form{action: toggle_merge_on_success_repository_build_path(@build.repository, @build), method: :post}
         %label
           = check_box_tag :merge_on_success, true, @build.merge_on_success_enabled?, disabled: !eligible_for_merge_on_success?(@build), onchange: 'this.form.submit()'
           Merge on Success
@@ -32,7 +30,7 @@
       Refresh
 
 .build-info.build-info-subheader
-  - if @build.succeeded? && !@project.main?
+  - if @build.succeeded? && !@build.branch_record.convergence?
     %a.info{:href => show_link_to_create_pull_request(@build), :title => 'create a pull request against master'}
       Create pull request
   %span.info
@@ -46,13 +44,13 @@
       = "Built in #{duration_strftime(@build.elapsed_time, "%Hh %Mm %Ss")}"
   - if @build.is_running?
     %span.info
-      = button_to "Abort Build", abort_project_build_path(@build.project, @build), method: :patch, class: "abort-build"
+      = button_to "Abort Build", abort_repository_build_path(@build.repository, @build), method: :patch, class: "abort-build"
   - if @build.failed? || @build.aborted?
     %span.info
       - if @build.build_parts.empty? || !@build.error_details.empty?
-        = button_to "Retry Partitioning", retry_partitioning_project_build_path(@project, @build), :method => :post, :form_class => "retry-partitioning"
+        = button_to "Retry Partitioning", retry_partitioning_repository_build_path(@build.repository, @build), :method => :post, :form_class => "retry-partitioning"
       - else
-        = button_to "Rebuild failed parts", rebuild_failed_parts_project_build_path(@project, @build), :method => :post, :form_class => "rebuild-parts"
+        = button_to "Rebuild failed parts", rebuild_failed_parts_repository_build_path(@build.repository, @build), :method => :post, :form_class => "rebuild-parts"
 
 - if @build.error_details.present?
   .build-error
@@ -74,7 +72,7 @@
   %tbody
     - @build.build_parts.each do |part|
       %tr{:"data-id" => part.id}
-        %td.right= link_to(part.id, project_build_part_path(@project, @build, part))
+        %td.right= link_to(part.id, repository_build_part_path(@build.repository, @build, part))
         %td
           %span.part-status{:class => part.status}
             - text = part.status.to_s.capitalize
@@ -94,7 +92,7 @@
         %td.right= part.build_attempts.size
         %td.right
           - if part.unsuccessful?
-            = link_to("Rebuild", rebuild_project_build_part_path(@project, @build, part), :method => :post)
+            = link_to("Rebuild", rebuild_repository_build_part_path(@build.repository, @build, part), :method => :post)
 
 = content_for :javascript do
   :javascript

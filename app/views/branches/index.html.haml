@@ -1,0 +1,9 @@
+- content_for :header do
+  %ul.links
+    %li= link_to("Repositories", repositories_path)
+
+.projects
+  %ul
+    - @branches.each do |branch|
+      %li.build-info{:class => ("bold" if branch.convergence?)}
+        = link_to(branch.name, repository_branch_path(branch.repository, branch))

@@ -42,6 +42,6 @@ module BuildHelper
   end
 
   def eligible_for_merge_on_success?(build)
-    !build.succeeded? && !build.project.main? && build.repository.allows_kochiku_merges?
+    !build.succeeded? && !build.branch_record.convergence? && build.repository.allows_kochiku_merges?
   end
 end

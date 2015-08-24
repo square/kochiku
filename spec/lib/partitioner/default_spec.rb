@@ -102,10 +102,10 @@ describe Partitioner::Default do
       end
 
       context "with a master build" do
-        let(:build) { FactoryGirl.create(:main_project_build) }
+        let(:build) { FactoryGirl.create(:convergence_branch_build) }
 
         it "should use the ci queue" do
-          expect(build.project).to be_main
+          expect(build.branch_record).to be_convergence
           expect(subject.first["queue"]).to eq("ci")
         end
 
@@ -119,7 +119,7 @@ describe Partitioner::Default do
 
       context "with a branch build" do
         it "should use the developer queue" do
-          expect(build.project).to_not be_main
+          expect(build.branch_record).to_not be_convergence
           expect(subject.first["queue"]).to eq("developer")
         end
 

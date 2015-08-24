@@ -13,13 +13,9 @@ require 'net/https'
 require 'uri'
 require 'shellwords'
 
-# chop off everything after the first period in the hostname (eg. ganymede.sfo -> ganymede)
-hostname = `hostname`.strip.sub(/\..*/, '')
-
-# assume the web project for the moment
-# Auto merge requested?
+# Merge on success requested?
 if ARGV.delete("--merge")
-  auto_merge = "1"
+  merge_on_success = "1"
 end
 
 # If a ref is given as an argument, use that. Otherwise use the current commit
@@ -45,14 +41,12 @@ end
 
 repo_url = `git config --get remote.origin.url`.strip
 
-project = repo_url.split("/").last.split(".").first
-uri = URI.parse("#{KOCHIKU_HOST}/projects/#{hostname}-#{project}/builds")
+uri = URI.parse("#{KOCHIKU_HOST}/builds")
 
 params = {
-  'build[hostname]' => hostname,
-  'build[ref]' => ref,
-  'build[branch]' => branch,
-  'auto_merge' => auto_merge,
+  'git_sha' => ref,
+  'git_branch' => branch,
+  'merge_on_success' => merge_on_success,
   'repo_url' => repo_url,
 }
 

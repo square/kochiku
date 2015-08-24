@@ -3,8 +3,8 @@ require "spec_helper"
 require "#{Rails.root}/lib/build_strategies/production_build_strategy.rb"
 
 describe BuildStrategy do
-  let(:project) { FactoryGirl.create(:big_rails_project) }
-  let(:build) { FactoryGirl.create(:build, :project => project, :branch => 'funyuns') }
+  let(:branch) { FactoryGirl.create(:branch, name: 'funyuns') }
+  let(:build) { FactoryGirl.create(:build, branch_record: branch) }
 
   before(:each) do
     CommandStubber.new # ensure Open3 is stubbed
@@ -42,8 +42,8 @@ describe BuildStrategy do
     end
 
     context "Using a stash build" do
-        let(:stash_project) { FactoryGirl.create(:stash_project) }
-        let(:stash_build) { FactoryGirl.create(:build, :project => stash_project, :branch => 'funyuns') }
+        let(:stash_branch) { FactoryGirl.create(:branch, repository: FactoryGirl.create(:stash_repository)) }
+        let(:stash_build) { FactoryGirl.create(:build, branch_record: stash_branch) }
 
         before do
           settings = SettingsAccessor.new(<<-YAML)
@@ -59,7 +59,7 @@ describe BuildStrategy do
         end
 
         it "should merge to master using stash REST api" do
-          merger = object_double(GitMergeExecutor.new(build))
+          merger = object_double(GitMergeExecutor.new(stash_build))
           expect(GitMergeExecutor).to receive(:new).and_return(merger)
           expect(merger).to receive(:merge_and_push)
           expect(merger).to receive(:delete_branch)
@@ -88,7 +88,7 @@ describe BuildStrategy do
         expect(GitRepo).to receive(:included_in_promotion_ref?).and_return(false)
       }
       it "should update the promotion branch" do
-        expect(described_class).to receive(:update_branch).with(project.repository.promotion_refs.first, build.ref)
+        expect(described_class).to receive(:update_branch).with(branch.repository.promotion_refs.first, build.ref)
         subject
       end
     end
@@ -109,7 +109,7 @@ describe BuildStrategy do
   end
 
   describe "#run_success_script" do
-    let (:repository) { project.repository }
+    let (:repository) { branch.repository }
     subject {
       described_class.run_success_script(build)
     }

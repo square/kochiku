@@ -3,20 +3,25 @@ class BuildMailer < ActionMailer::Base
 
   default :from => Proc.new { Settings.sender_email_address }
 
+  private
+
   def pull_request_link(build)
     @build = build
 
     remote_server = @build.repository.remote_server
-    if remote_server.class == RemoteServer::Stash && @build.project.name =~ /-pull_requests$/
+    if remote_server.class == RemoteServer::Stash && !@build.branch_record.convergence?
       begin
-        id, version = remote_server.get_pr_id_and_version(@build.branch)
+        id, _ = remote_server.get_pr_id_and_version(@build.branch_record.name)
         return "#{remote_server.base_html_url}/pull-requests/#{id}/overview"
       rescue RemoteServer::StashAPIError
+        # not all branches will have an open pull request
         return nil
       end
     end
     nil
   end
+
+  public
 
   def error_email(build_attempt, error_text = nil)
     @build_part = build_attempt.build_part
@@ -35,14 +40,14 @@ class BuildMailer < ActionMailer::Base
     @responsible_email_and_files = partitioner.emails_for_commits_causing_failures
     @emails = @responsible_email_and_files.keys
     if @emails.empty?
-      if @build.project.main?
+      if @build.branch_record.convergence?
         @emails = GitBlame.emails_since_last_green(@build)
       else
         @emails = GitBlame.emails_in_branch(@build)
       end
     end
 
-    if @build.project.main?
+    if @build.branch_record.convergence?
       @git_changes = GitBlame.changes_since_last_green(@build)
     else
       @git_changes = GitBlame.changes_in_branch(@build)
@@ -53,7 +58,7 @@ class BuildMailer < ActionMailer::Base
 
     mail :to => @emails,
          :bcc => Settings.kochiku_notifications_email_address,
-         :subject => "[kochiku] Failure - #{@build.branch} build for #{@build.project.name}",
+         :subject => "[kochiku] Failure - #{@build.branch_record.name} build for #{@build.repository.name}",
          :from => Settings.sender_email_address
   end
 
@@ -65,7 +70,7 @@ class BuildMailer < ActionMailer::Base
 
     mail :to => @email,
          :bcc => Settings.kochiku_notifications_email_address,
-         :subject => "[kochiku] Success - #{@build.branch} build for #{@build.project.name}",
+         :subject => "[kochiku] Success - #{@build.branch_record.name} build for #{@build.repository.name}",
          :from => Settings.sender_email_address
   end
 end

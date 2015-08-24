@@ -10,9 +10,7 @@ describe BuildAttempt do
   end
 
   describe "finish!" do
-    let(:repository) { FactoryGirl.create(:repository, :timeout => 20) }
-    let(:project) { FactoryGirl.create(:project, :branch => "master", :repository => repository) }
-    let(:build) { FactoryGirl.create(:build, :state => :runnable, :project => project, :merge_on_success => true) }
+    let(:build) { FactoryGirl.create(:build, :state => :runnable, :merge_on_success => true) }
     let(:build_part) { FactoryGirl.create(:build_part, :build_instance => build, retry_count: 2) }
     let!(:build_attempt) { FactoryGirl.create(:build_attempt, :state => :running, :build_part => build_part) }
 

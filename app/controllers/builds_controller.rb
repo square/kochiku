@@ -1,15 +1,17 @@
 require 'git_repo'
 
 class BuildsController < ApplicationController
-  before_filter :load_project, :only => [:show, :abort, :build_status, :toggle_merge_on_success, :rebuild_failed_parts, :retry_partitioning, :request_build, :modified_time]
+  before_filter :load_repository, :only => [:show, :retry_partitioning, :rebuild_failed_parts, :request_build, :abort, :toggle_merge_on_success, :build_status, :modified_time]
 
   caches_action :show, :cache_path => proc { |c|
-    updated_at = @project.builds.select(:updated_at).find(params[:id]).updated_at
+    updated_at = Build.select(:updated_at).find(params[:id]).updated_at
     { :modified => updated_at.to_i }
   }
 
   def show
-    @build = @project.builds.includes(build_parts: :build_attempts).find(params[:id])
+    @build = Build.includes(build_parts: :build_attempts).
+                   joins(:branch_record).where('branches.repository_id' => @repository.id).
+                   find(params[:id])
 
     respond_to do |format|
       format.html
@@ -22,35 +24,62 @@ class BuildsController < ApplicationController
     end
   end
 
+  # Public: Kickoff a build from the kochiku CLI script
+  #
+  # repo_url         - The remote url for the git repository
+  # git_sha          - (optional) the SHA of the specific git commit the user is requesting to build
+  # git_branch       - String name of the git branch to perform the build of. If
+  #                    'git_sha' is not specified then it will use HEAD of the git branch.
+  # merge_on_success - Bool. Request kochiku automatically merge the branch if the build succeeds.
+  #
   def create
-    build = make_build
+    merge_on_success = (params[:merge_on_success] || false)
+    repository = Repository.lookup_by_url(params[:repo_url])
+    unless repository
+      raise ActiveRecord::RecordNotFound, "Repository for #{params[:repo_url]} not found"
+    end
 
-    if build
-      if !build.new_record? || build.save
-        head :ok, :location => project_build_url(build.project, build)
-      else
-        render :plain => build.errors.full_messages.join('\n'), :status => :unprocessable_entity
+    if params[:git_sha].present?
+      build = repository.build_for_commit(params[:git_sha])
+      if build
+        head :ok, :location => repository_build_url(repository, build)
+        return
       end
+    end
+
+    branch = repository.branches.where(name: params[:git_branch]).first_or_create!
+
+    if params[:git_sha].present?
+      ref_to_build = params[:git_sha]
     else
-      # requested branch does not match project branch for Github request
-      # FIXME handle this differently, probably with a rescue_from
-      head :ok
+      ref_to_build = repository.sha_for_branch(branch.name)
+    end
+
+    build = branch.builds.build(ref: ref_to_build, state: :partitioning, merge_on_success: merge_on_success)
+
+    if build.save
+      head :ok, :location => repository_build_url(repository, build)
+    else
+      render :plain => build.errors.full_messages.join('\n'), :status => :unprocessable_entity
     end
   end
 
   def retry_partitioning
-    @build = @project.builds.find(params[:id])
+    @build = Build.joins(:branch_record).where('branches.repository_id' => @repository.id).find(params[:id])
+
     # This means there was an error with the partitioning job; redo it
     if @build.build_parts.empty?
       @build.update_attributes! :state => :partitioning, :error_details => nil
       @build.enqueue_partitioning_job
     end
 
-    redirect_to [@project, @build]
+    redirect_to [@repository, @build]
   end
 
   def rebuild_failed_parts
-    @build = @project.builds.includes(:build_parts => :build_attempts).find(params[:id])
+    @build = Build.includes(build_parts: :build_attempts).
+                   joins(:branch_record).where('branches.repository_id' => @repository.id).
+                   find(params[:id])
     @build.build_parts.failed_errored_or_aborted.each do |part|
       # There is an exceptional case in Kochiku where a build part's prior attempt may have
       # passed but the latest attempt failed. We do not want to rebuild those parts.
@@ -58,65 +87,23 @@ class BuildsController < ApplicationController
     end
     @build.update_attributes! state: :running
 
-    redirect_to [@project, @build]
-  end
-
-  # Used to request a build through the Web UI
-  def request_build
-    build = nil
-
-    if @project.main?
-      build = project_build('HEAD', branch: 'master', merge_on_success: false) # Arguments ignored
-    else
-      unless params[:build] && params[:build][:branch].present?
-        flash[:error] = "Error adding build! branch can't be blank"
-      else
-        begin
-          sha = @project.repository.sha_for_branch(params[:build][:branch])
-          build = project_build(sha, branch: params[:build][:branch], merge_on_success: false)
-        rescue RemoteServer::RefDoesNotExist
-          flash[:error] = "Error adding build! branch #{params[:build][:branch]} not found on remote server."
-        end
-      end
-    end
-
-    if build
-      if build.new_record?
-        if build.save
-          flash[:message] = "Build added!"
-          redirect_to project_build_path(params[:project_id], build)
-          return
-        else
-          flash[:error] = "Error adding build! #{build.errors.full_messages.to_sentence}"
-        end
-      elsif @project.main?
-        # did not find a newer revision on the main branch
-        flash[:warn] = "Did not find a new commit on the master branch to build"
-      else
-        # did not find a new unbuilt commit. redirect to most recent build
-        flash[:warn] = "#{build.ref[0...8]} is the most recent commit on #{params[:build][:branch]}"
-        redirect_to project_build_path(params[:project_id], build)
-        return
-      end
-    end
-
-    redirect_to project_path(params[:project_id])
+    redirect_to [@repository, @build]
   end
 
   def abort
-    @build = @project.builds.find(params[:id])
+    @build = Build.joins(:branch_record).where('branches.repository_id' => @repository.id).find(params[:id])
     @build.abort!
-    redirect_to project_build_path(@project, @build)
+    redirect_to repository_build_path(@repository, @build)
   end
 
   def toggle_merge_on_success
-    @build = @project.builds.find(params[:id])
+    @build = Build.joins(:branch_record).where('branches.repository_id' => @repository.id).find(params[:id])
     @build.update_attributes!(:merge_on_success => params[:merge_on_success])
-    redirect_to project_build_path(@project, @build)
+    redirect_to repository_build_path(@repository, @build)
   end
 
   def build_status
-    @build = @project.builds.find(params[:id])
+    @build = Build.joins(:branch_record).where('branches.repository_id' => @repository.id).find(params[:id])
     respond_to do |format|
       format.json do
         render :json => @build
@@ -125,7 +112,8 @@ class BuildsController < ApplicationController
   end
 
   def modified_time
-    updated_at = @project.builds.select(:updated_at).find(params[:id]).updated_at
+    updated_at = Build.joins(:branch_record).where('branches.repository_id' => @repository.id).
+                       find(params[:id]).updated_at
     respond_to do |format|
       format.json do
         render :json => updated_at
@@ -135,68 +123,19 @@ class BuildsController < ApplicationController
 
   def build_redirect
     build_instance = Build.find(params[:id])
-    redirect_to project_build_path(build_instance.project, :id => params[:id])
+    redirect_to repository_build_path(build_instance.repository, build_instance)
   end
 
   def build_ref_redirect
     # search prefix so that entire git ref does not have to be provided.
     build_instance = Build.where("ref LIKE ?", "#{params[:ref]}%").first
-    redirect_to project_build_path(build_instance.project, :id => build_instance.id)
+    redirect_to repository_build_path(build_instance.repository, build_instance)
   end
 
   private
 
-  def make_build
-    if params['payload']
-      build_from_github
-    elsif params['build']
-      @project = Project.where(:name => params[:project_id]).first
-      unless @project
-        repository = Repository.lookup_by_url(params[:repo_url])
-        raise ActiveRecord::RecordNotFound, "Repository for #{params[:repo_url]} not found" unless repository
-        @project = repository.projects.create!(:name => params[:project_id])
-      end
-      project_build(params[:build][:ref], branch: params[:build][:branch], merge_on_success: (params[:merge_on_success] || false))
-    end
-  end
-
-  def load_project
-    @project = Project.find_by_name!(params[:project_id])
-  end
-
-  def build_from_github
-    load_project
-    payload = params.fetch('payload')
-    sha1 = payload.fetch('after')
-
-    requested_branch = payload.fetch('ref', '').split('/').last
-
-    if @project.branch == requested_branch
-      existing_build = @project.repository.build_for_commit(sha1)
-      if existing_build
-        existing_build
-      else
-        @project.builds.build(ref: sha1, state: :partitioning, branch: @project.branch)
-      end
-    end
-  end
-
-  def project_build(ref, branch: nil, merge_on_success: false)
-    branch = nil if branch.blank?
-
-    if @project.main?
-      ref = @project.repository.sha_for_branch("master")
-      branch = "master"
-    end
-
-    existing_build = @project.repository.build_for_commit(ref)
-    if existing_build
-      existing_build
-    else
-      @project.builds.build(ref: ref,
-                            state: :partitioning,
-                            merge_on_success: merge_on_success,
-                            branch: branch)
-    end
+  def load_repository
+    r_namespace, r_name = params[:repository_path].split('/')
+    @repository = Repository.where(namespace: r_namespace, name: r_name).first!
   end
 end

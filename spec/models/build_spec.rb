@@ -1,8 +1,8 @@
 require 'spec_helper'
 
 describe Build do
-  let(:project) { FactoryGirl.create(:big_rails_project) }
-  let(:build) { FactoryGirl.create(:build, :project => project) }
+  let(:branch) { FactoryGirl.create(:branch) }
+  let(:build) { FactoryGirl.create(:build, branch_record: branch) }
   let(:parts) { [{'type' => 'cucumber', 'files' => ['a', 'b'], 'queue' => 'ci'}, {'type' => 'rspec', 'files' => ['c', 'd'], 'queue' => 'ci'}] }
 
   before do
@@ -16,14 +16,14 @@ describe Build do
       expect(build).to have(1).error_on(:ref)
     end
 
-    it "requires a project_id to be set" do
-      build.project_id = nil
+    it "requires a branch_id to be set" do
+      build.branch_id = nil
       expect(build).not_to be_valid
-      expect(build).to have(1).error_on(:project_id)
+      expect(build).to have(1).error_on(:branch_id)
     end
 
     it "should force uniqueness on ref" do
-      build2 = FactoryGirl.build(:build, :project => project, :ref => build.ref)
+      build2 = FactoryGirl.build(:build, branch_record: branch, ref: build.ref)
       expect(build2).not_to be_valid
       expect(build2).to have(1).error_on(:ref)
     end
@@ -111,7 +111,7 @@ describe Build do
   end
 
   describe "#update_state_from_parts!" do
-    let(:build) { FactoryGirl.create(:build, :project => project, :state => :running) }
+    let(:build) { FactoryGirl.create(:build, branch_record: branch, :state => :running) }
     let!(:build_part_1) { FactoryGirl.create(:build_part, :build_instance => build) }
     let!(:build_part_2) { FactoryGirl.create(:build_part, :build_instance => build) }
 
@@ -193,7 +193,7 @@ describe Build do
     end
 
     context "when the build is aborted" do
-      let(:build) { FactoryGirl.create(:build, :project => project, :state => :aborted) }
+      let(:build) { FactoryGirl.create(:build, branch_record: branch, state: :aborted) }
 
       it "should set state to succeeded if a build is aborted, but all of its parts passed" do
         # scenario is applicable if a build is aborted only after its build parts are already running
@@ -297,9 +297,9 @@ describe Build do
       build
     }
 
-    it "returns nil when there are no previous successful builds for the project" do
+    it "returns nil when there are no previous successful builds for the branch" do
       expect(build.succeeded?).to be false
-      build2 = FactoryGirl.create(:build, :project => project)
+      build2 = FactoryGirl.create(:build, branch_record: branch)
 
       expect(build.previous_successful_build).to be_nil
       expect(build2.previous_successful_build).to be_nil
@@ -308,16 +308,16 @@ describe Build do
     it "returns the most recent build in state == :succeeded prior to this build" do
       stub_request(:post, /https:\/\/git\.squareup\.com\/api\/v3\/repos\/square\/kochiku\/statuses\//)
       expect(successful_build.succeeded?).to be true
-      build2 = FactoryGirl.create(:build, :project => project)
+      build2 = FactoryGirl.create(:build, branch_record: branch)
       expect(build2.previous_successful_build).to eq(successful_build)
     end
   end
 
   describe "#mergable_by_kochiku??" do
-    let(:build) { FactoryGirl.create(:build, :project => project, :branch => 'featureX') }
+    let(:build) { FactoryGirl.create(:build, branch_record: branch) }
 
     before do
-      expect(build.project.main?).to be false
+      expect(build.branch_record).to_not be_convergence
       expect(build.repository.allows_kochiku_merges).to be true
     end
 
@@ -364,7 +364,7 @@ describe Build do
 
     context 'there is a newer build for the same branch' do
       let(:build) {
-        FactoryGirl.create(:build, project: project, branch: 'featureX',
+        FactoryGirl.create(:build, branch_record: branch,
                                    state: 'succeeded', merge_on_success: true)
       }
 
@@ -390,10 +390,10 @@ describe Build do
       expect(build.merge_on_success_enabled?).to be false
     end
 
-    context "for a build on the main project" do
-      let(:build) { FactoryGirl.create(:main_project_build) }
+    context "for a build on a convergence branch" do
+      let(:build) { FactoryGirl.create(:convergence_branch_build) }
 
-      it "is false if it is a main build" do
+      it "should be false" do
         build.merge_on_success = true
         expect(build.merge_on_success_enabled?).to be false
       end
@@ -402,9 +402,8 @@ describe Build do
 
   describe "#newer_branch_build_exists?" do
     before do
-      project = FactoryGirl.create(:project)
-      @build1 = FactoryGirl.create(:build, project: project, branch: 'featureX')
-      @build2 = FactoryGirl.create(:build, project: project, branch: 'featureX')
+      @build1 = FactoryGirl.create(:build, branch_record: branch)
+      @build2 = FactoryGirl.create(:build, branch_record: branch)
     end
 
     it "should be true for the earlier build" do
@@ -413,17 +412,6 @@ describe Build do
 
     it "should be false for the later build" do
       expect(@build2.newer_branch_build_exists?).to be false
-    end
-  end
-
-  describe "#branch_or_ref" do
-    it "returns the ref when there is no branch" do
-      expect(Build.new(:branch => nil, :ref => "ref").branch_or_ref).to eq("ref")
-      expect(Build.new(:branch => "", :ref => "ref").branch_or_ref).to eq("ref")
-    end
-
-    it "returns the ref when there is no branch" do
-      expect(Build.new(:branch => "some-branch", :ref => "ref").branch_or_ref).to eq("some-branch")
     end
   end
 
@@ -443,30 +431,31 @@ describe Build do
   end
 
   describe "#send_build_status_email!" do
-    let(:project) { FactoryGirl.create(:big_rails_project, :repository => repository, :name => name) }
-    let(:repository) { FactoryGirl.create(:repository)}
-    let(:build) { FactoryGirl.create(:build, :state => :runnable, :project => project) }
-    let(:name) { repository.name + "_pull_requests" }
-    let(:current_repo_master) { build.ref }
-    let(:name) { repository.name }
-    let(:build_attempt) { build.build_parts.first.build_attempts.create!(:state => :failed) }
+    let(:repository) { FactoryGirl.create(:repository) }
+    let(:branch) { FactoryGirl.create(:branch, repository: repository) }
+    let(:build) { FactoryGirl.create(:build, state: :runnable, branch_record: branch) }
+    let(:build_attempt) { build.build_parts.first.build_attempts.create!(state: :failed) }
 
-    it "should not send a failure email if the project has never had a successful build" do
+    it "should not send a failure email if the branch has never had a successful build" do
       expect(BuildMailer).not_to receive(:build_break_email)
       build.send_build_status_email!
     end
 
-    context "for a build that has had a successful build" do
-      let(:build) { FactoryGirl.create(:build, :state => :succeeded, :project => project); FactoryGirl.create(:build, :state => :runnable, :project => project) }
+    context "for a branch that has had a successful build" do
+      let(:build) {
+        FactoryGirl.create(:build, state: :succeeded, branch_record: branch)
+        FactoryGirl.create(:build, state: :runnable, branch_record: branch)
+      }
 
       it "should not send the email if the build is not completed" do
         expect(BuildMailer).not_to receive(:build_break_email)
         build.send_build_status_email!
       end
 
-      it "should not send the email if the build passed" do
+      it "should not send the failure email if the build passed" do
         build.update_attribute(:state, :succeeded)
         expect(BuildMailer).not_to receive(:build_break_email)
+        expect(BuildMailer).to receive(:build_success_email).and_return(OpenStruct.new(:deliver => nil))
         build.send_build_status_email!
       end
 
@@ -483,7 +472,7 @@ describe Build do
         build.send_build_status_email!
       end
 
-      it "does not send a email if the project setting is disabled" do
+      it "does not send a email if the repository setting is disabled" do
         build.update_attribute(:state, :failed)
         repository.update_attributes!(:send_build_failure_email => false)
         build.reload
@@ -521,7 +510,8 @@ describe Build do
           repository.update_attribute(:email_on_first_failure, true)
         end
 
-        context "master branch build" do
+        context "on a convergence branch build" do
+          let(:branch) { FactoryGirl.create(:convergence_branch, repository: repository) }
           let!(:build_part_1) { FactoryGirl.create(:build_part, :build_instance => build, :retry_count => 3) }
           let!(:build_part_2) { FactoryGirl.create(:build_part, :build_instance => build, :retry_count => 3) }
 
@@ -536,8 +526,8 @@ describe Build do
         end
 
         context "branch build" do
-          let(:branch_project) { FactoryGirl.create(:big_rails_project, :repository => repository, :name => "#{name}-branch") }
-          let(:branch_build) { FactoryGirl.create(:build, :state => :runnable, :project => branch_project) }
+          let(:branch) { FactoryGirl.create(:branch, repository: repository) }
+          let(:branch_build) { FactoryGirl.create(:build, :state => :runnable, :branch_record => branch) }
           let!(:build_part_1) { FactoryGirl.create(:build_part, :build_instance => branch_build, :retry_count => 3) }
           let!(:build_part_2) { FactoryGirl.create(:build_part, :build_instance => branch_build, :retry_count => 3) }
 
@@ -552,8 +542,10 @@ describe Build do
         end
       end
 
-      context "for a build of a project not on master" do
-        let(:project) { FactoryGirl.create(:project, :branch => "other-branch")}
+      context "for a build not on a convergence branch" do
+        before do
+          expect(branch).to_not be_convergence
+        end
 
         it "should not send a failure email" do
           expect(BuildMailer).not_to receive(:build_break_email)

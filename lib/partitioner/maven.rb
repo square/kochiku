@@ -28,7 +28,7 @@ module Partitioner
           modules_to_build.add(maven_module)
         end
 
-        files_changed_method = @build.project.main? ? :files_changed_since_last_build : :files_changed_in_branch
+        files_changed_method = @build.branch_record.convergence? ? :files_changed_since_last_build : :files_changed_in_branch
         GitBlame.public_send(files_changed_method, @build, sync: false).each do |file_and_emails|
           next if @settings.fetch('ignore_paths', []).detect { |dir| file_and_emails[:file].start_with?(dir) }
 
@@ -41,7 +41,7 @@ module Partitioner
           end
         end
 
-        if @build.project.main? && @build.previous_build
+        if @build.branch_record.convergence? && @build.previous_build
           modules_to_build.merge(@build.previous_build.build_parts.select(&:unsuccessful?).map(&:paths).flatten.uniq)
         end
 
@@ -50,7 +50,7 @@ module Partitioner
     end
 
     def emails_for_commits_causing_failures
-      return {} unless @build.project.main?
+      return {} unless @build.branch_record.convergence?
 
       failed_modules = @build.build_parts.failed_or_errored.inject(Set.new) do |failed_set, build_part|
         build_part.paths.each { |path| failed_set.add(path) }
@@ -144,7 +144,7 @@ module Partitioner
     end
 
     def partition_info(mvn_modules)
-      queue = @build.project.main? ? 'ci' : 'developer'
+      queue = @build.branch_record.convergence? ? 'ci' : 'developer'
       queue_override = @settings.fetch('queue_overrides', []).detect do |override|
         override['queue'] if override['paths'].detect { |path| mvn_modules.include? path }
       end

@@ -3,9 +3,7 @@ require 'spec_helper'
 describe BuildHelper do
   include ActionView::Helpers
   include Haml::Helpers
-  let(:build) { FactoryGirl.create(:build, :project => project) }
-  let(:project) { FactoryGirl.create(:project, :repository => repository) }
-  let(:repository) { FactoryGirl.create(:repository, :url => "git@git.example.com:square/web.git")}
+  let(:build) { FactoryGirl.create(:build) }
 
   describe "#multiple_ruby_versions?" do
     context "with a ruby build with multiple ruby versions" do

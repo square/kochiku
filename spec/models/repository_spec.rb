@@ -73,9 +73,9 @@ describe Repository do
       context "is set" do
         it "leaves it as is" do
           repo = Repository.new(url: "git://git.example.com/square/kochiku-name.git",
-              name: "another_project")
+              name: "another_repo")
           repo.valid?
-          expect(repo.name).to eq("another_project")
+          expect(repo.name).to eq("another_repo")
         end
       end
 
@@ -99,28 +99,6 @@ describe Repository do
 
   end
 
-
-  describe '#main_project' do
-    let(:repository) { project.repository }
-    let(:project) { FactoryGirl.create :project }
-    subject { repository.main_project }
-
-    context 'without a main project' do
-      it 'returns nil' do
-        expect(subject).to be_nil
-      end
-    end
-
-    context 'with a matching main project name' do
-      let!(:main_project) do
-        repository.projects.create name: repository.name
-      end
-
-      it 'returns the main project' do
-        expect(subject).to eq(main_project)
-      end
-    end
-  end
 
   context "#interested_github_events" do
     it 'includes push if run_ci is enabled' do
@@ -226,21 +204,37 @@ describe Repository do
 
   describe '#build_for_commit' do
     let!(:repositoryA) { FactoryGirl.create(:repository) }
-    let!(:projectA1) { FactoryGirl.create(:project, repository: repositoryA) }
     let!(:repositoryB) { FactoryGirl.create(:repository) }
-    let!(:buildA1) { FactoryGirl.create(:build, project: projectA1, ref: sha) }
+    let!(:branchA1) { FactoryGirl.create(:branch, repository: repositoryA) }
+    let!(:branchB1) { FactoryGirl.create(:branch, repository: repositoryB) }
     let(:sha) { to_40('a') }
 
-    context 'a build for the sha exists under this repository' do
-      it 'should return an existing build with the same sha' do
-        expect(repositoryA.build_for_commit(sha)).to eq(buildA1)
-      end
-    end
+    it "should return the build associated with the repository" do
+      buildA1 = FactoryGirl.create(:build, branch_record: branchA1, ref: sha)
+      expect(repositoryA.build_for_commit(sha)).to eq(buildA1)
+      expect(repositoryB.build_for_commit(sha)).to be_nil
 
-    context 'a build exists under a different repository' do
-      it 'should return nil' do
-        expect(repositoryB.build_for_commit(sha)).to be_nil
-      end
+      buildB1 = FactoryGirl.create(:build, branch_record: branchB1, ref: sha)
+      expect(repositoryA.build_for_commit(sha)).to eq(buildA1)
+      expect(repositoryB.build_for_commit(sha)).to eq(buildB1)
+    end
+  end
+
+  describe '#ensure_build_exists' do
+    let(:repository) { FactoryGirl.create(:repository) }
+    let(:branch) { FactoryGirl.create(:branch, repository: repository) }
+
+    it 'creates a new build only if one does not exist' do
+      sha = to_40('abcdef')
+      build1 = repository.ensure_build_exists(sha, branch)
+      build2 = repository.ensure_build_exists(sha, branch)
+
+      expect(build1).not_to eq(nil)
+      expect(build1).to eq(build2)
+
+      expect(build1.branch_record).to eq(branch)
+      expect(build1.ref).to eq(sha)
+      expect(build1.state).to eq(:partitioning)
     end
   end
 end

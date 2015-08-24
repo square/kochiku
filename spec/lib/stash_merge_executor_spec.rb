@@ -13,11 +13,12 @@ describe StashMergeExecutor do
     stub_const "Settings", settings
   end
 
-  context "Using stash repository" do
-    let(:stash_project) { FactoryGirl.create(:stash_project, :name => "web-pull_requests") }
-    let(:stash_build) { FactoryGirl.create(:build, :project => stash_project, :branch => 'funyuns') }
-    let(:stash_merger) { described_class.new(stash_build) }
+  let(:repository) { FactoryGirl.create(:stash_repository) }
+  let(:branch) { FactoryGirl.create(:branch, repository: repository, name: 'funyuns') }
+  let(:stash_build) { FactoryGirl.create(:build, branch_record: branch) }
+  let(:stash_merger) { described_class.new(stash_build) }
 
+  context "Using stash repository" do
     subject { stash_merger.merge_and_push }
 
     it "should use stash REST api" do
@@ -33,13 +34,18 @@ describe StashMergeExecutor do
 
       expect { subject }.to raise_error(StashMergeExecutor::GitMergeFailedError)
     end
+
+    context "for a build on a convergence branch" do
+      let(:branch) { FactoryGirl.create(:convergence_branch, repository: repository) }
+
+      it "should do nothing" do
+        expect(stash_build.repository.remote_server).to_not receive(:merge)
+        subject
+      end
+    end
   end
 
   describe "#delete" do
-    let(:stash_project) { FactoryGirl.create(:stash_project, :name => "web-pull_requests") }
-    let(:stash_build) { FactoryGirl.create(:build, :project => stash_project, :branch => 'funyuns') }
-    let(:stash_merger) { described_class.new(stash_build) }
-
     context "Using stash repository" do
       it "should use stash REST api" do
         expect(stash_build.repository.remote_server).to receive(:delete_branch).once

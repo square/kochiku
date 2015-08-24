@@ -1,0 +1,25 @@
+- content_for :header do
+  %ul.links
+    %li= link_to("Repositories", repositories_path)
+
+.projects.projects-grid
+  - @branches.each do |branch|
+    - cache(branch) do
+      %div.ci-build-info{:class => "ci-#{branch.most_recent_build_state}" }
+        %div.project-name
+          = link_to(branch.repository.name, repository_branch_path(branch.repository, branch))
+        - if branch.most_recent_build.try(:is_running?)
+          %div.state{:class => "build-#{branch.most_recent_build_state}" }
+            = branch.most_recent_build_state.to_s.capitalize
+        - if branch.last_completed_build && branch.last_completed_build.finished_at
+          %div.state
+            Last built
+            %abbr.timeago.state{:title => branch.last_completed_build.finished_at.to_json} a while ago
+        - else
+          %div.state Never built
+        - if branch.last_completed_build
+          %div.state{:class => "build-#{branch.last_completed_build.state}" }
+            = branch.last_completed_build.state.to_s.capitalize
+            = "in " + distance_of_time_in_words(branch.last_build_duration) if branch.last_build_duration
+        %div.project-link
+          = link_to("all branches", repository_branches_path(branch.repository))

@@ -5,4 +5,4 @@
   %ul
     - @repositories.each do |repository|
       %li.build-info
-        = link_to(repository.url, edit_repository_path(repository))
+        = link_to(repository.url, repository_edit_path(repository))

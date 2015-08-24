@@ -6,7 +6,7 @@ class GitMergeExecutor
   class GitPushFailedError < StandardError; end
 
   def initialize(build)
-    if build.branch.blank?
+    if build.branch_record.blank?
       raise "GitMergeExecutor requires a Build associated with a git branch"
     end
     @build = build
@@ -19,7 +19,7 @@ class GitMergeExecutor
   # build - ActiveRecord object for a build
   #
   def merge_and_push
-    Rails.logger.info("Trying to merge branch: #{@build.branch} to master after build id: #{@build.id}")
+    Rails.logger.info("Trying to merge branch: #{@build.branch_record.name} to master after build id: #{@build.id}")
 
     begin
       git_fetch_and_reset
@@ -44,13 +44,13 @@ class GitMergeExecutor
     begin
       git_fetch_and_reset
 
-      delete_log, status = Open3.capture2e("git push --porcelain --delete origin #{@build.branch}")
+      delete_log, status = Open3.capture2e("git push --porcelain --delete origin #{@build.branch_record.name}")
       unless status.success?
-        Rails.logger.warn("Deletion of branch #{@build.branch} failed")
+        Rails.logger.warn("Deletion of branch #{@build.branch_record.name} failed")
         Rails.logger.warn(delete_log)
       end
     rescue GitFetchFailedError
-      Rails.logger.warn("Deletion of branch #{@build.branch} failed")
+      Rails.logger.warn("Deletion of branch #{@build.branch_record.name} failed")
     end
   end
 
@@ -64,7 +64,7 @@ class GitMergeExecutor
   end
 
   def merge_to_master
-    commit_message = "Kochiku merge of branch #{@build.branch} for build id: #{@build.id} ref: #{@build.ref}"
+    commit_message = "Kochiku merge of branch #{@build.branch_record.name} for build id: #{@build.id} ref: #{@build.ref}"
     merge_log, status = Open3.capture2e(merge_env, "git merge --no-ff -m '#{commit_message}' #{@build.ref}")
 
     unless status.success?
@@ -79,7 +79,7 @@ class GitMergeExecutor
     push_log, status = Open3.capture2e("git push --porcelain origin master")
 
     unless status.success?
-      raise_and_log(GitPushFailedError, "git push of branch #{@build.branch} failed:", push_log)
+      raise_and_log(GitPushFailedError, "git push of branch #{@build.branch_record.name} failed:", push_log)
     end
 
     push_log

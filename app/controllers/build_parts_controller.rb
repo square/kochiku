@@ -1,5 +1,5 @@
 class BuildPartsController < ApplicationController
-  before_filter :load_project_build_and_part, :only => [:rebuild, :show, :modified_time]
+  before_filter :load_repository_build_and_part, :only => [:rebuild, :show, :modified_time]
   caches_action :show, :cache_path => proc { |c|
     { :modified => @build_part.updated_at.to_i }
   }
@@ -14,7 +14,7 @@ class BuildPartsController < ApplicationController
       flash[:error] = "It appears the commit #{@build.ref} no longer exists."
     end
 
-    redirect_to [@project, @build]
+    redirect_to [@repository, @build]
   end
 
   def modified_time
@@ -27,9 +27,10 @@ class BuildPartsController < ApplicationController
 
 private
 
-  def load_project_build_and_part
-    @project = Project.find_by_name!(params[:project_id])
-    @build = @project.builds.find(params[:build_id])
+  def load_repository_build_and_part
+    r_namespace, r_name = params[:repository_path].split('/')
+    @repository = Repository.where(namespace: r_namespace, name: r_name).first!
+    @build = Build.joins(:branch_record).where('branches.repository_id' => @repository.id).find(params[:build_id])
     @build_part = @build.build_parts.find(params[:id])
   end
 end

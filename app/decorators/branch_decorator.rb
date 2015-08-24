@@ -1,4 +1,4 @@
-class ProjectDecorator < Draper::Decorator
+class BranchDecorator < Draper::Decorator
   delegate_all
 
   def most_recent_build_state

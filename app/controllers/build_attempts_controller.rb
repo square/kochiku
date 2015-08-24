@@ -25,9 +25,9 @@ class BuildAttemptsController < ApplicationController
     respond_to do |format|
       if @build_attempt.finish!(params[:state])
         format.json  { head :ok }
-        format.html  { redirect_to project_build_part_url(@build_attempt.build_part.project,
-                                                          @build_attempt.build_part.build_instance,
-                                                          @build_attempt.build_part) }
+        format.html  { redirect_to repository_build_part_url(@build_attempt.build_part.build_instance.repository,
+                                                             @build_attempt.build_part.build_instance,
+                                                             @build_attempt.build_part) }
       else
         format.json  { render :json => @build_attempt.errors, :status => :unprocessable_entity }
       end
@@ -39,8 +39,8 @@ class BuildAttemptsController < ApplicationController
   def build_part
     @build_attempt = BuildAttempt.find(params[:id])
 
-    redirect_to project_build_part_path(
-      @build_attempt.build_part.build_instance.project,
+    redirect_to repository_build_part_path(
+      @build_attempt.build_part.build_instance.repository,
       @build_attempt.build_part.build_instance,
       @build_attempt.build_part)
   end
@@ -58,7 +58,7 @@ class BuildAttemptsController < ApplicationController
     end
 
     @build = @build_attempt.build_instance
-    @project = @build.project
+    @repository = @build.repository
     @build_part = @build_attempt.build_part
   end
 

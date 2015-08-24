@@ -14,10 +14,10 @@ class BuildStateUpdateJob < JobBase
     build = Build.find(@build_id)
     build.update_commit_status!
 
-    # trigger another build if there are new commits to build
-    if build.project.main? && build.completed?
-      sha = build.repository.sha_for_branch("master")
-      build.project.builds.create_new_build_for(sha)
+    # trigger another build for this branch if there is unbuilt commits
+    if build.branch_record.convergence? && build.completed?
+      sha = build.repository.sha_for_branch(build.branch_record.name)
+      build.branch_record.kickoff_new_build_unless_currently_busy(sha)
     end
 
     build.send_build_status_email!
@@ -32,6 +32,7 @@ class BuildStateUpdateJob < JobBase
       build.promote!
     elsif build.merge_on_success_enabled?
       if build.mergable_by_kochiku?
+        # ACHTUNG merge to master isn't right anymore. This part my have been changed by shenil
         build.merge_to_master!
       else
         Rails.logger.warn("Build #{build.id} has merge_on_success enabled but cannot be merged.")

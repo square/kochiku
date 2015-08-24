@@ -2,8 +2,8 @@ require 'spec_helper'
 
 describe BuildPart do
   let(:repository) { FactoryGirl.create(:repository) }
-  let(:project) { FactoryGirl.create(:project, :repository => repository) }
-  let(:build) { FactoryGirl.create(:build, :project => project) }
+  let(:branch) { FactoryGirl.create(:branch, :repository => repository) }
+  let(:build) { FactoryGirl.create(:build, :branch_record => branch) }
   let(:build_part) { FactoryGirl.create(:build_part, :paths => ["a", "b"], :kind => "spec", :build_instance => build, :queue => 'ci') }
 
   before do
@@ -207,7 +207,6 @@ describe BuildPart do
 
   describe "#should_reattempt?" do
     let(:build_part) { FactoryGirl.create(:build_part, retry_count: 1, build_instance: build) }
-    let(:project) { FactoryGirl.create(:project, repository: repository) }
 
     it "should reattempt" do
       expect(build_part.should_reattempt?).to be true

@@ -3,8 +3,8 @@ class OnSuccessUploader < CarrierWave::Uploader::Base
 
   def store_dir
     build_id = model.id
-    project_param = model.project.to_param
-    Rails.root.join("public", "log_files", project_param, "build_#{build_id}")
+    repository_param = model.repository.to_param
+    Rails.root.join("public", "log_files", repository_param, "build_#{build_id}")
   end
 
   def cache_dir

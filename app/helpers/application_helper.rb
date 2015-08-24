@@ -36,7 +36,7 @@ module ApplicationHelper
   end
 
   def link_to_branch(build)
-    link_to build.branch, show_link_to_branch(build)
+    link_to build.branch_record.name, show_link_to_branch(build.branch_record)
   end
 
   def show_link_to_commit(build)
@@ -44,8 +44,8 @@ module ApplicationHelper
   end
 
   # TODO: Extract these links into RemoteServer
-  def show_link_to_branch(build)
-    "#{build.repository.base_html_url}/tree/#{build.branch}"
+  def show_link_to_branch(branch_record)
+    "#{branch_record.repository.base_html_url}/tree/#{branch_record.name}"
   end
 
   def show_link_to_compare(build, first_commit_hash, second_commit_hash)
@@ -67,7 +67,6 @@ module ApplicationHelper
   end
 
   def failed_build_stdout(failed_build_part)
-    build = failed_build_part.build_instance
     failed_build_attempt = failed_build_part.build_attempts.unsuccessful.last
     stdout_build_artifact_id = failed_build_attempt.build_artifacts.stdout_log.first.id
     "#{Settings.kochiku_host_with_protocol}/build_artifacts/#{stdout_build_artifact_id}"

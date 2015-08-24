@@ -11,7 +11,18 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150714234635) do
+ActiveRecord::Schema.define(version: 20150719130110) do
+
+  create_table "branches", force: :cascade do |t|
+    t.integer  "repository_id", limit: 4,                   null: false
+    t.string   "name",          limit: 255,                 null: false
+    t.boolean  "convergence",               default: false, null: false
+    t.datetime "created_at",                                null: false
+    t.datetime "updated_at",                                null: false
+  end
+
+  add_index "branches", ["convergence"], name: "index_branches_on_convergence", using: :btree
+  add_index "branches", ["repository_id", "name"], name: "index_branches_on_repository_id_and_name", unique: true, using: :btree
 
   create_table "build_artifacts", force: :cascade do |t|
     t.integer  "build_attempt_id", limit: 4
@@ -56,15 +67,17 @@ ActiveRecord::Schema.define(version: 20150714234635) do
     t.datetime "updated_at",                                               null: false
     t.integer  "project_id",                 limit: 4
     t.boolean  "merge_on_success"
-    t.string   "branch",                     limit: 255
     t.boolean  "build_failure_email_sent",                 default: false, null: false
     t.boolean  "promoted"
     t.string   "on_success_script_log_file", limit: 255
     t.text     "error_details",              limit: 65535
     t.boolean  "build_success_email_sent",                 default: false, null: false
+    t.integer  "branch_id",                  limit: 4
   end
 
+  add_index "builds", ["branch_id"], name: "index_builds_on_branch_id", using: :btree
   add_index "builds", ["project_id"], name: "index_builds_on_project_id", using: :btree
+  add_index "builds", ["ref", "branch_id"], name: "index_builds_on_ref_and_branch_id", unique: true, using: :btree
   add_index "builds", ["ref", "project_id"], name: "index_builds_on_ref_and_project_id", unique: true, using: :btree
 
   create_table "projects", force: :cascade do |t|
@@ -100,6 +113,7 @@ ActiveRecord::Schema.define(version: 20150714234635) do
   end
 
   add_index "repositories", ["host", "namespace", "name"], name: "index_repositories_on_host_and_namespace_and_name", unique: true, using: :btree
+  add_index "repositories", ["namespace", "name"], name: "index_repositories_on_namespace_and_name", unique: true, using: :btree
   add_index "repositories", ["url"], name: "index_repositories_on_url", using: :btree
 
 end
