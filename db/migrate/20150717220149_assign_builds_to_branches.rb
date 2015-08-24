@@ -26,13 +26,9 @@ class AssignBuildsToBranches < ActiveRecord::Migration
     # previous behavior.
     Branch.where(name: 'master').update_all(convergence: true)
 
-    # Now that a relationship has been established between the Build and a
-    # Branch record, the string branch column can be removed from Build.
-    remove_column :builds, :branch, :string
+    # the 'branch' column is removed from builds in the next migration
   end
 
-  # Warning: this will add the column back but it will not recover the data.
   def down
-    add_column :builds, :branch, :string
   end
 end
