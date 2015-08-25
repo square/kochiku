@@ -31,6 +31,9 @@ Kochiku::Application.routes.draw do
   match '/build_attempts/:id/stream_logs_chunk' => "build_attempts#stream_logs_chunk", :via => :get, :as => :stream_logs_chunk
   match '/pull-request-builder' => "pull_requests#build", :via => :post, :as => :pull_request_build
 
+  # Redirects for legacy urls
+  get '/projects/:project_id/builds/:build_id', to: redirect('/builds/%{build_id}')
+
   resources :build_artifacts, :only => [:show]
   resources :builds, only: [:create]
 
