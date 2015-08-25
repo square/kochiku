@@ -48,7 +48,7 @@ jQuery(document).ready(function() {
 });
 
 Kochiku.graphBuildTimes = function(repositoryPath, branchName) {
-  var url = '/' + repositoryPath + '/' + branchName + '/build-time-history.json',
+  var url = '/' + repositoryPath + '/' + branchName + '/build-time-history',
     colors = {
       cucumber:     'hsl(87,  63%, 47%)',
       spec:         'hsl(187, 63%, 47%)',
@@ -67,7 +67,7 @@ Kochiku.graphBuildTimes = function(repositoryPath, branchName) {
         lastTime = null;
       for (var i = 0; i < points.length; i++) {
         var ref = $('<a>')
-              .attr('href', location + '/builds/' + points[i][4])
+              .attr('href', '/' + repositoryPath + '/builds/' + points[i][4])
               .attr('class', 'build-status ' + points[i][5])
               .text(points[i][0]).wrap('<div>'),
                 time = moment(points[i][6]).calendar().replace(/m$/,'');
