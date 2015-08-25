@@ -45,7 +45,7 @@ Kochiku::Application.configure do
     Bullet.console = true
     Bullet.rails_logger = true
 
-    # Added because Projects#show.rss does not use the build_attempts but Projects#show.html does use them
+    # Added because Branches#show.rss does not use the build_attempts but Branches#show.html does use them
     Bullet.add_whitelist :type => :unused_eager_loading, :class_name => "BuildPart", :association => :build_attempts
   end
 end
