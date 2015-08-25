@@ -33,6 +33,9 @@ class BranchesController < ApplicationController
 
     respond_to do |format|
       format.html
+      # Note: appending .rss to the end of the url will not return RSS format
+      # due to the very permissive branch id constraint. Instead users will
+      # have to specify a query param of format=rss to receive the RSS feed.
       format.rss { @builds = @builds.reverse } # most recent first
     end
   end
