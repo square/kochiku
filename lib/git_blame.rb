@@ -26,7 +26,7 @@ class GitBlame
     def changes_in_branch(build)
       output = GitRepo.inside_repo(build.repository) do
         # TODO: Push this down into GitRepo and integration test it.
-        Cocaine::CommandLine.new("git log --cc --format='::!::%H|%cn <%ce>|%cd|%B::!::' 'origin/master..origin/#{build.branch}'").run
+        Cocaine::CommandLine.new("git log --cc --format='::!::%H|%cn <%ce>|%cd|%B::!::' 'origin/master..origin/#{build.branch_record.name}'").run
       end
       parse_git_changes(output)
     end
@@ -49,7 +49,7 @@ class GitBlame
     def files_changed_in_branch(build, fetch_emails: false, sync: true)
       output = GitRepo.inside_repo(build.repository, sync: sync) do
         # TODO: Push this down into GitRepo and integration test it.
-        Cocaine::CommandLine.new("git log --cc --format='::!::%cn:%ce::!::' --name-only 'origin/master..origin/#{build.branch}'").run
+        Cocaine::CommandLine.new("git log --cc --format='::!::%cn:%ce::!::' --name-only 'origin/master..origin/#{build.branch_record.name}'").run
       end
       parse_git_files_changes(output, fetch_emails: fetch_emails)
     end
@@ -74,13 +74,13 @@ class GitBlame
 
     def git_names_and_emails_in_branch(build)
       GitRepo.inside_repo(build.repository) do
-        Cocaine::CommandLine.new("git log --format='%cn:%ce' --cc 'origin/master..origin/#{build.branch}'").run.split("\n")
+        Cocaine::CommandLine.new("git log --format='%cn:%ce' --cc 'origin/master..origin/#{build.branch_record.name}'").run.split("\n")
       end
     end
 
     def last_git_name_and_email_in_branch(build)
       GitRepo.inside_repo(build.repository) do
-        Cocaine::CommandLine.new("git log --format='%cn:%ce' -1 'origin/#{build.branch}'").run.strip
+        Cocaine::CommandLine.new("git log --format='%cn:%ce' -1 'origin/#{build.branch_record.name}'").run.strip
       end
     end
 
