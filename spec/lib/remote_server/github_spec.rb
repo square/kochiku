@@ -79,7 +79,7 @@ describe RemoteServer::Github do
     end
 
     it 'should not allow characters disallowed by Github in repository names' do
-      %w(! @ # $ % ^ & * ( ) = + \ | ` ~ [ ] { } : ; ' " ?).each do |symbol|
+      %w(! @ # $ % ^ & * ( ) = + \ | ` ~ [ ] { } : ; ' " ? /).each do |symbol|
         expect {
           make_server("git@github.com:angular/bad#{symbol}name.git")
         }.to raise_error(RemoteServer::UnknownUrlFormat)
