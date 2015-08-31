@@ -139,6 +139,41 @@ describe BuildsController do
     end
   end
 
+  describe "#on_success_log_file link" do
+    render_views
+    let(:build) { FactoryGirl.create(:build, state: :succeeded) }
+    before do
+      @action = :show
+      @params = {:id => build.id, :repository_path => build.repository}
+    end
+
+    context "has on_success_log_file" do
+      before do
+        output = "Exited with status: 0"
+        script_log = FilelessIO.new(output)
+        script_log.original_filename = "on_success_script.log"
+        build.on_success_script_log_file = script_log
+        build.save
+      end
+
+      it "displays link to on_success_log_file" do
+        get @action, @params
+        doc = Nokogiri::HTML(response.body)
+        elements = doc.search("[text()*='on_success_script.log']")
+        expect(elements.size).to eq(1)
+      end
+    end
+
+    context "does not have on_success_log_file" do
+      it "does not display link to on_success_log_file" do
+        get @action, @params
+        doc = Nokogiri::HTML(response.body)
+        elements = doc.search("[text()*='on_success_script.log']")
+        expect(elements.size).to eq(0)
+      end
+    end
+  end
+
   describe "#toggle_merge_on_success" do
     before do
       @build = FactoryGirl.create(:build, :merge_on_success => true)

@@ -105,3 +105,6 @@
       };
     }
     Kochiku.delayedRefresh({table: '.build-summary tbody', renderTime: Date.parse(#{@build.updated_at.to_json})});
+
+- if @build.on_success_script_log_file.url
+  = link_to(File.basename(@build.on_success_script_log_file.path), @build.on_success_script_log_file.url)
