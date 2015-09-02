@@ -25,7 +25,7 @@ class BuildStrategy
 
     def run_success_script(build)
       GitRepo.inside_copy(build.repository, build.ref) do
-        command = Cocaine::CommandLine.new(build.on_success_script, "", :expected_outcodes => 0..255)
+        command = Cocaine::CommandLine.new(on_success_command(build), "", :expected_outcodes => 0..255)
         output = command.run
         output += "\nExited with status: #{command.exit_status}"
         script_log = FilelessIO.new(output)
@@ -53,6 +53,12 @@ class BuildStrategy
 
     def update_branch(branch_name, ref_to_promote)
       Cocaine::CommandLine.new("git push", "--force origin #{ref_to_promote}:refs/heads/#{branch_name}").run
+    end
+
+    def on_success_command(build)
+      git_commit = build.ref
+      git_branch = build.branch_record.name
+      "GIT_BRANCH=#{git_branch} GIT_COMMIT=#{git_commit} #{build.on_success_script}"
     end
   end
 end

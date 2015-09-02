@@ -126,4 +126,20 @@ describe BuildStrategy do
       expect(build.reload.on_success_script_log_file.read).to eq("this is some output\n\nExited with status: 255")
     end
   end
+
+  describe "#on_success_command" do
+    let (:repository) { branch.repository }
+
+    before do
+      allow(GitRepo).to receive(:inside_copy).and_yield
+      expect(build).to receive(:on_success_script).and_return("./this_is_a_triumph")
+    end
+
+    it "sets GIT_BRANCH and GIT_COMMIT" do
+      command = described_class.on_success_command(build)
+      expect(command).to include("./this_is_a_triumph")
+      expect(command).to include("GIT_BRANCH=")
+      expect(command).to include("GIT_COMMIT=")
+    end
+  end
 end
