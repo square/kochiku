@@ -114,7 +114,7 @@ class BranchesController < ApplicationController
   # This action returns the current build status for all of the master branches
   # in the system
   def status_report
-    @branches = Branch.includes(:repository).where(name: 'master').decorate
+    @branches = Branch.includes(:repository).where(convergence: true).decorate
   end
 
   private

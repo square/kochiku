@@ -156,5 +156,25 @@ describe BranchesController do
         expect(element['activity']).to eq('CheckingModifications')
       end
     end
+
+    context "with extra convergence branch and one non-convergence" do
+      before do 
+        FactoryGirl.create(:branch, :name => 'feature-branch', convergence: false, repository: repository)
+        FactoryGirl.create(:branch, :name => 'convergence', convergence: true, repository: repository)
+      end
+
+      it "should include all of the convergence branches" do
+        branch ## Explicitly reference the branch to cause it to load
+
+        get :status_report, format: :xml
+
+        expect(response).to be_success
+
+        doc = Nokogiri::XML(response.body)
+        elements = doc.xpath("/Projects/Project[@name='#{repository.to_param}']")
+
+        expect(elements).to have(2).items
+      end
+    end
   end
 end
