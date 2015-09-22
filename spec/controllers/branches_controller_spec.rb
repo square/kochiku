@@ -171,9 +171,13 @@ describe BranchesController do
         expect(response).to be_success
 
         doc = Nokogiri::XML(response.body)
-        elements = doc.xpath("/Projects/Project[@name='#{repository.to_param}']")
+        elements = doc.xpath("/Projects/Project")
 
         expect(elements).to have(2).items
+
+        names = elements.map{ |e| e.attribute("name").to_s }
+
+        expect(names).to match_array(["#{repository.to_param}", "#{repository.to_param}/convergence"])
       end
     end
   end
