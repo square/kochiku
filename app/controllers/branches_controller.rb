@@ -25,11 +25,6 @@ class BranchesController < ApplicationController
       end
     end
 
-    if params[:format] == 'rss'
-      # remove recent builds that are pending or in progress (cimonitor expects this)
-      @builds = @builds.drop_while {|build| [:partitioning, :runnable, :running].include?(build.state) }
-    end
-
     @branch = @branch.decorate
 
     respond_to do |format|
