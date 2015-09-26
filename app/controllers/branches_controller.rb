@@ -1,6 +1,7 @@
 class BranchesController < ApplicationController
   caches_action :show, :cache_path => proc { |c|
-    updated_at = Branch.where(:name => params[:id]).select(:updated_at).first!.updated_at
+    load_repository_and_branch
+    updated_at = @branch.updated_at
     { :modified => updated_at.to_i }
   }
 
@@ -111,7 +112,7 @@ class BranchesController < ApplicationController
 
   # GET /XmlStatusReport.aspx
   #
-  # This action returns the current build status for all of the master branches
+  # This action returns the current build status for all of the convergence branches
   # in the system
   def status_report
     @branches = Branch.includes(:repository).where(convergence: true).decorate
@@ -126,6 +127,6 @@ class BranchesController < ApplicationController
 
   def load_repository_and_branch
     @repository || load_repository
-    @branch = @repository.branches.where(name: params[:id]).first!
+    @branch ||= @repository.branches.where(name: params[:id]).first!
   end
 end
