@@ -109,7 +109,7 @@ describe BuildStrategy do
   end
 
   describe "#run_success_script" do
-    let (:repository) { branch.repository }
+    let(:repository) { branch.repository }
     subject {
       described_class.run_success_script(build)
     }
@@ -128,7 +128,7 @@ describe BuildStrategy do
   end
 
   describe "#on_success_command" do
-    let (:repository) { branch.repository }
+    let(:repository) { branch.repository }
 
     before do
       allow(GitRepo).to receive(:inside_copy).and_yield

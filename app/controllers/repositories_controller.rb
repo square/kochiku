@@ -71,15 +71,15 @@ class RepositoriesController < ApplicationController
     # Query string parameters are provided for easy integrations, since it the
     # simplest to implement.
     changes = if params[:refChanges]
-      params[:refChanges].map do |change|
-        [
-          change[:refId].gsub(/^refs\/heads\//,''),
-          change[:toHash]
-        ]
-      end
-    else
-      [params.values_at(:ref, :sha)]
-    end
+                params[:refChanges].map do |change|
+                  [
+                    change[:refId].gsub(/^refs\/heads\//,''),
+                    change[:toHash]
+                  ]
+                end
+              else
+                [params.values_at(:ref, :sha)]
+              end
 
     result = changes.map do |ref, sha|
       ensure_build(repository, ref, sha)
@@ -125,8 +125,9 @@ class RepositoriesController < ApplicationController
     add_convergence_to = new_branch_names - current_branch_names
 
     remove_convergence_from.each do |name|
-      branch = current_convergence_branches.detect { |branch| branch.name == name }
-      branch.update!(convergence: false)
+      current_convergence_branches.detect { |branch|
+        branch.name == name
+      }.update!(convergence: false)
     end
 
     add_convergence_to.each do |name|

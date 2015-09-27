@@ -110,17 +110,17 @@ class Build < ActiveRecord::Base
     failed = build_parts.failed
 
     next_state = case
-      when (build_parts - passed).empty?
-        :succeeded
-      when self.state == :aborted
-        :aborted
-      when errored.any?
-        :errored
-      when (passed | failed).count == build_parts.count
-        :failed
-      else
-        failed.empty? ? :running : :doomed
-      end
+                 when (build_parts - passed).empty?
+                   :succeeded
+                 when self.state == :aborted
+                   :aborted
+                 when errored.any?
+                   :errored
+                 when (passed | failed).count == build_parts.count
+                   :failed
+                 else
+                   failed.empty? ? :running : :doomed
+                 end
 
     previous_state = self.state
     update_attributes!(:state => next_state) unless previous_state == next_state

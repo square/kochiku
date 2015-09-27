@@ -11,49 +11,6 @@
 Lint/AssignmentInCondition:
   Exclude:
     - 'app/decorators/branch_decorator.rb'
-    - 'lib/partitioner/maven.rb'
-
-# Offense count: 3
-# Cop supports --auto-correct.
-Lint/DeprecatedClassMethods:
-  Exclude:
-    - 'config/boot.rb'
-    - 'lib/git_repo.rb'
-    - 'lib/partitioner/maven.rb'
-
-# Offense count: 2
-# Cop supports --auto-correct.
-# Configuration parameters: AlignWith, SupportedStyles, AutoCorrect.
-Lint/EndAlignment:
-  Enabled: false
-
-# Offense count: 2
-Lint/HandleExceptions:
-  Exclude:
-    - 'lib/git_repo.rb'
-
-# Offense count: 2
-Lint/NonLocalExitFromIterator:
-  Exclude:
-    - 'app/jobs/autosize_workers_job.rb'
-
-# Offense count: 8
-Lint/ParenthesesAsGroupedExpression:
-  Exclude:
-    - 'spec/controllers/build_attempts_controller_spec.rb'
-    - 'spec/lib/build_strategies/production_build_strategy_spec.rb'
-    - 'spec/lib/github_request_spec.rb'
-
-# Offense count: 1
-Lint/ShadowingOuterLocalVariable:
-  Exclude:
-    - 'app/controllers/repositories_controller.rb'
-
-# Offense count: 1
-# Cop supports --auto-correct.
-Lint/StringConversionInInterpolation:
-  Exclude:
-    - 'app/jobs/poll_repositories_job.rb'
 
 # Offense count: 10
 # Cop supports --auto-correct.
@@ -81,21 +38,6 @@ Lint/UnusedMethodArgument:
     - 'lib/remote_server/stash.rb'
     - 'spec/mailers/previews/build_mailer_preview.rb'
 
-# Offense count: 1
-Lint/UselessAccessModifier:
-  Exclude:
-    - 'lib/github_request.rb'
-
-# Offense count: 28
-Lint/UselessAssignment:
-  Exclude:
-    - 'app/controllers/build_attempts_controller.rb'
-    - 'config/compass.rb'
-    - 'lib/git_blame.rb'
-    - 'lib/partitioner/default.rb'
-    - 'spec/lib/partitioner/maven_spec.rb'
-    - 'spec/models/build_spec.rb'
-
 # Offense count: 50
 Metrics/AbcSize:
   Max: 62
@@ -122,24 +64,6 @@ Metrics/MethodLength:
 # Offense count: 7
 Metrics/PerceivedComplexity:
   Max: 19
-
-# Offense count: 1
-# Cop supports --auto-correct.
-Performance/Count:
-  Exclude:
-    - 'app/helpers/project_stats_helper.rb'
-
-# Offense count: 1
-# Cop supports --auto-correct.
-Performance/Detect:
-  Exclude:
-    - 'app/models/build_part.rb'
-
-# Offense count: 1
-# Cop supports --auto-correct.
-Performance/StringReplacement:
-  Exclude:
-    - 'lib/git_blame.rb'
 
 # Offense count: 1
 # Cop supports --auto-correct.

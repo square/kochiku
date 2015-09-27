@@ -34,8 +34,6 @@ class GithubRequest
     make_request(uri, request)
   end
 
-  private
-
   def self.make_request(uri, request_object)
     Rails.logger.info("Github request: #{request_object.method}, #{uri}")
     body = nil
@@ -52,4 +50,5 @@ class GithubRequest
     end
     body
   end
+  private_class_method :make_request
 end

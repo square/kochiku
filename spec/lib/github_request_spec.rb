@@ -39,7 +39,7 @@ describe GithubRequest do
   end
 
   describe ".get" do
-    let (:http_verb) { :get }
+    let(:http_verb) { :get }
     subject {
       GithubRequest.get(url, oauth_token)
     }
@@ -48,8 +48,8 @@ describe GithubRequest do
   end
 
   describe ".post" do
-    let (:http_verb) { :post }
-    let (:request_data) { {"arg1" => {"arg2" => "value1"}} }
+    let(:http_verb) { :post }
+    let(:request_data) { {"arg1" => {"arg2" => "value1"}} }
     subject {
       GithubRequest.post(url, request_data, oauth_token)
     }
@@ -59,8 +59,8 @@ describe GithubRequest do
   end
 
   describe ".patch" do
-    let (:http_verb) { :patch }
-    let (:request_data) { {"arg1" => {"arg2" => "value1"}} }
+    let(:http_verb) { :patch }
+    let(:request_data) { {"arg1" => {"arg2" => "value1"}} }
     subject {
       GithubRequest.patch(url, request_data, oauth_token)
     }

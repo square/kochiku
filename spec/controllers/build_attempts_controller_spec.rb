@@ -120,7 +120,8 @@ describe BuildAttemptsController do
     end
 
     context "logstreamer successful" do
-      let (:logstreamer_body) { '{"Start" : 0, "Contents" : "This is a test\n", "BytesRead": 15, "LogName": "stdout.log"}' }
+      let(:logstreamer_body) { '{"Start" : 0, "Contents" : "This is a test\n", "BytesRead": 15, "LogName": "stdout.log"}' }
+
       before do
         stub_request(:get, "http://worker.example.com:10000/build_attempts/100/log/stdout.log?maxBytes=250000&start=0").to_return(:status => 200, :body => logstreamer_body, :headers => {})
       end

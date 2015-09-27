@@ -128,7 +128,7 @@ class GitRepo
     end
 
     def with_submodules
-      return unless File.exists?('.gitmodules')
+      return unless File.exist?('.gitmodules')
 
       Cocaine::CommandLine.new("git submodule", "--quiet init").run
       submodules = Cocaine::CommandLine.new('git config', '--get-regexp "^submodule\\..*\\.url$"').run

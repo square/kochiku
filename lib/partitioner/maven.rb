@@ -202,7 +202,7 @@ module Partitioner
 
           raise "dependency in #{mvn_module}/pom.xml is missing an artifactId or groupId" unless group_id && artifact_id
 
-          if mod = group_artifact_map["#{group_id.text}:#{artifact_id.text}"]
+          if (mod = group_artifact_map["#{group_id.text}:#{artifact_id.text}"])
             module_dependency_map[mvn_module].add(mod)
           end
         end
@@ -223,7 +223,7 @@ module Partitioner
       result_set = Set.new
       to_process = [mvn_module]
 
-      while dep_module = to_process.shift
+      while (dep_module = to_process.shift)
         deps = dependency_map[dep_module].to_a
         to_process += (deps - result_set.to_a)
         result_set << dep_module
@@ -235,7 +235,7 @@ module Partitioner
     def file_to_module(file_path)
       dir_path = file_path
       while (dir_path = File.dirname(dir_path)) != "."
-        if File.exists?("#{dir_path}/pom.xml")
+        if File.exist?("#{dir_path}/pom.xml")
           return dir_path
         end
       end

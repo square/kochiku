@@ -13,7 +13,7 @@ class BuildPart < ActiveRecord::Base
   end
 
   def last_completed_attempt
-    build_attempts.select { |bp| BuildAttempt::COMPLETED_BUILD_STATES.include?(bp.state) }.last
+    build_attempts.reverse.find { |bp| BuildAttempt::COMPLETED_BUILD_STATES.include?(bp.state) }
   end
 
   def create_and_enqueue_new_build_attempt!
@@ -115,19 +115,18 @@ class BuildPart < ActiveRecord::Base
   end
 
   def last_stdout_artifact
-    if artifacts = last_completed_attempt.try(:build_artifacts)
-      artifacts.stdout_log.first
-    end
+    artifacts = last_completed_attempt.try(:build_artifacts)
+    artifacts ? artifacts.stdout_log.first : nil
   end
 
   def last_junit_artifact
-    if artifacts = last_completed_attempt.try(:build_artifacts)
-      artifacts.junit_log.first
-    end
+    artifacts = last_completed_attempt.try(:build_artifacts)
+    artifacts ? artifacts.junit_log.first : nil
   end
 
   def last_junit_failures
-    if junit_artifact = last_junit_artifact
+    junit_artifact = last_junit_artifact
+    if junit_artifact
       Zlib::GzipReader.open(junit_artifact.log_file.path) do |gz|
         xml = Nokogiri::XML.parse(gz)
         xml.xpath('//testcase[failure]')

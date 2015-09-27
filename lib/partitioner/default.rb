@@ -109,7 +109,7 @@ module Partitioner
           files_by_worker << [file]
           runtimes_by_worker << file_runtime
         else
-          fastest_worker_time, fastest_worker_index = runtimes_by_worker.each_with_index.min
+          _fastest_worker_time, fastest_worker_index = runtimes_by_worker.each_with_index.min
           files_by_worker[fastest_worker_index] << file
           runtimes_by_worker[fastest_worker_index] += file_runtime - setup_time
         end

@@ -5,3 +5,19 @@ AllCops:
     - config.ru
   Exclude:
     - db/schema.rb
+
+# Lint/EndAlignment:
+#   Enabled: true
+
+Lint/HandleExceptions:
+  Exclude:
+    - 'lib/git_repo.rb'
+
+Lint/NonLocalExitFromIterator:
+  Exclude:
+    - 'app/jobs/autosize_workers_job.rb'
+
+Lint/UselessAssignment:
+  Exclude:
+    - 'config/compass.rb'
+    - 'spec/models/build_spec.rb'

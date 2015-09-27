@@ -52,7 +52,7 @@ class BuildAttemptsController < ApplicationController
     end
 
     # if full log has already been uploaded, redirect there
-    if stdout_log = @build_attempt.build_artifacts.stdout_log.try(:first)
+    if (stdout_log = @build_attempt.build_artifacts.stdout_log.try(:first))
       redirect_to stdout_log
       return
     end
@@ -75,7 +75,7 @@ class BuildAttemptsController < ApplicationController
       return
     end
 
-    logstreamer_base_url = "http://#{builder}:#{port}"
+    # logstreamer_base_url = "http://#{builder}:#{port}"
 
     http = Net::HTTP.new(builder, port)
     http.read_timeout = 5

@@ -86,7 +86,7 @@ class GitBlame
 
     def lookup_git_names_and_emails(git_names_and_emails)
       Array(git_names_and_emails).map do |git_name_and_email|
-        name, email = git_name_and_email.split(":")
+        _name, email = git_name_and_email.split(":")
         Array(email_from_git_email(email))
       end.flatten.compact.uniq
     end
@@ -95,7 +95,7 @@ class GitBlame
       output.split("::!::").each_with_object([]) do |line, git_changes|
         commit_hash, author, commit_date, commit_message = line.chomp.split("|")
         next if commit_hash.nil?
-        git_changes << {:hash => commit_hash, :author => author, :date => commit_date, :message => commit_message.gsub("\n", " ")}
+        git_changes << {:hash => commit_hash, :author => author, :date => commit_date, :message => commit_message.tr("\n", " ")}
       end
     end
 
@@ -108,7 +108,7 @@ class GitBlame
           if fetch_emails
             line.split("::!::").each do |line_part|
               next if line_part.nil? || line_part.empty?
-              name, email = line_part.split(":")
+              _name, email = line_part.split(":")
               email_addresses = email_addresses + Array(email_from_git_email(email))
             end
             email_addresses.compact!

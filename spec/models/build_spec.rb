@@ -151,7 +151,7 @@ describe Build do
       build.update_state_from_parts!
       expect(build.state).to eq(:doomed)
 
-      ba2.update_attributes!(state: :passed)
+      ba2.update!(state: :passed)
       build.update_state_from_parts!
       expect(build.state).to eq(:failed)
     end
