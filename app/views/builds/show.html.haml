@@ -106,5 +106,12 @@
     }
     Kochiku.delayedRefresh({table: '.build-summary tbody', renderTime: Date.parse(#{@build.updated_at.to_json})});
 
+    $('abbr.timeago').click(function() {
+      // swap the relative time with the absolute time
+      var originalText = $(this).text();
+      $(this).text($(this).attr('title'));
+      $(this).attr('title', originalText);
+    });
+
 - if @build.on_success_script_log_file.url
   = link_to(File.basename(@build.on_success_script_log_file.path), @build.on_success_script_log_file.url)
