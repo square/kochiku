@@ -6,8 +6,8 @@ class AddHostAndNamespaceToRepositories < ActiveRecord::Migration
     add_column :repositories, :namespace, :string, null: true  # generic git servers will not have a namespace
 
     add_index :repositories, [:host, :namespace, :name],
-      name: 'index_repositories_on_host_and_namespace_and_name',
-      unique: true
+              name: 'index_repositories_on_host_and_namespace_and_name',
+              unique: true
 
     Repository.all.each do |repository|
       attributes = RemoteServer.for_url(repository.url).attributes

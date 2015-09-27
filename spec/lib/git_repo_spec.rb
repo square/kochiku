@@ -38,20 +38,18 @@ describe GitRepo do
           end
 
           repository = double('Repository',
-            repo_cache_name:  'test-repo',
-            url:              'push-url',
-            url_for_fetching: old_remote
-          )
+                              repo_cache_name:  'test-repo',
+                              url:              'push-url',
+                              url_for_fetching: old_remote)
           # Clone the repo first time, prime the cache.
           GitRepo.inside_repo(repository) {}
 
           `git clone -q #{old_remote} #{new_remote}`
 
           repository = double('Repository',
-            repo_cache_name:  'test-repo',
-            url:              'push-url',
-            url_for_fetching: new_remote
-          )
+                              repo_cache_name:  'test-repo',
+                              url:              'push-url',
+                              url_for_fetching: new_remote)
 
           actual_remote = nil
 

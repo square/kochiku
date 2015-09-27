@@ -25,7 +25,7 @@ class BuildPartsController < ApplicationController
     end
   end
 
-private
+  private
 
   def load_repository_build_and_part
     r_namespace, r_name = params[:repository_path].split('/')

@@ -65,54 +65,11 @@ Metrics/MethodLength:
 Metrics/PerceivedComplexity:
   Max: 19
 
-# Offense count: 1
-# Cop supports --auto-correct.
-# Configuration parameters: EnforcedStyle, SupportedStyles.
-Style/AccessModifierIndentation:
-  Enabled: false
-
-# Offense count: 4
-# Cop supports --auto-correct.
-Style/AlignArray:
-  Exclude:
-    - 'spec/mailers/previews/build_mailer_preview.rb'
-
-# Offense count: 5
-# Cop supports --auto-correct.
-# Configuration parameters: EnforcedHashRocketStyle, EnforcedColonStyle, EnforcedLastArgumentHashStyle, SupportedLastArgumentHashStyles.
-Style/AlignHash:
-  Exclude:
-    - 'app/jobs/build_partitioning_job.rb'
-    - 'spec/helpers/application_helper_spec.rb'
-    - 'spec/helpers/build_helper_spec.rb'
-    - 'spec/models/repository_spec.rb'
-
-# Offense count: 7
-# Cop supports --auto-correct.
-# Configuration parameters: EnforcedStyle, SupportedStyles.
-Style/AlignParameters:
-  Exclude:
-    - 'bin/cap'
-    - 'bin/rake'
-    - 'bin/rspec'
-    - 'db/migrate/20140507184819_add_host_and_namespace_to_repositories.rb'
-    - 'spec/lib/git_repo_spec.rb'
-    - 'spec/lib/remote_server/stash_spec.rb'
-
 # Offense count: 86
 # Cop supports --auto-correct.
 # Configuration parameters: EnforcedStyle, SupportedStyles, ProceduralMethods, FunctionalMethods, IgnoredMethods.
 Style/BlockDelimiters:
   Enabled: false
-
-# Offense count: 5
-# Cop supports --auto-correct.
-Style/BlockEndNewline:
-  Exclude:
-    - 'app/controllers/build_attempts_controller.rb'
-    - 'spec/helpers/application_helper_spec.rb'
-    - 'spec/helpers/build_helper_spec.rb'
-    - 'spec/lib/remote_server/stash_spec.rb'
 
 # Offense count: 88
 # Cop supports --auto-correct.
@@ -130,19 +87,6 @@ Style/BracesAroundHashParameters:
     - 'spec/mailers/build_mailer_spec.rb'
     - 'spec/models/build_part_spec.rb'
     - 'spec/models/build_spec.rb'
-
-# Offense count: 6
-# Cop supports --auto-correct.
-# Configuration parameters: IndentWhenRelativeTo, SupportedStyles, IndentOneStep.
-Style/CaseIndentation:
-  Enabled: false
-
-# Offense count: 3
-# Cop supports --auto-correct.
-Style/ClosingParenthesisIndentation:
-  Exclude:
-    - 'spec/lib/git_repo_spec.rb'
-    - 'spec/lib/remote_server/stash_spec.rb'
 
 # Offense count: 1
 # Cop supports --auto-correct.

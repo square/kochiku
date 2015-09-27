@@ -8,7 +8,7 @@ class BuildPartitioningJob < JobBase
 
   @retry_limit = 5
   @retry_exceptions = {GitRepo::RefNotFoundError => [60, 60, 60, 180, 360],
-      Cocaine::ExitStatusError => [30, 60, 60, 60, 60] }
+                       Cocaine::ExitStatusError => [30, 60, 60, 60, 60] }
 
   def initialize(build_id)
     @build = Build.find(build_id)

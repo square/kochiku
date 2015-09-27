@@ -12,12 +12,12 @@ module RemoteServer
     raise UnknownGitServer, url unless server
 
     case server.type
-      when 'stash'
-        RemoteServer::Stash.new(url, server)
-      when 'github'
-        RemoteServer::Github.new(url, server)
-      else
-        raise UnknownGitServer, "No implementation for server type #{type}"
+    when 'stash'
+      RemoteServer::Stash.new(url, server)
+    when 'github'
+      RemoteServer::Github.new(url, server)
+    else
+      raise UnknownGitServer, "No implementation for server type #{type}"
     end
   end
 

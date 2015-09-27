@@ -29,12 +29,13 @@ describe 'stash integration test' do
   end
 
   describe "#update_commit_status!" do
-    let(:build) { double('build',
-      ref:        'abc123',
-      repository: double('repository', to_param: 'my_namespace/my_repo_name'),
-      succeeded?: true,
-      id:         123
-    ) }
+    let(:build) {
+      double('build',
+             ref:        'abc123',
+             repository: double('repository', to_param: 'my_namespace/my_repo_name'),
+             succeeded?: true,
+             id:         123)
+    }
 
     it "should post to stash" do
       stub_request(:post, "https://stashuser:stashpassword@stash.example.com/rest/build-status/1.0/commits/#{build.ref}")
