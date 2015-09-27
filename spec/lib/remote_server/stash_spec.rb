@@ -22,7 +22,7 @@ describe 'stash integration test' do
 
   describe ".setup_auth!" do
     it "should send username and password on" do
-      request = double()
+      request = double
       expect(request).to receive(:basic_auth).with("stashuser", "stashpassword")
       stash_request.setup_auth!(request)
     end

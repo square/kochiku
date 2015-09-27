@@ -30,8 +30,8 @@ class BuildPartitioningJob < JobBase
       @build.update_attributes!(:state => :waiting_for_sync)
     else
       @build.update_attributes!(
-          :state => :errored,
-          :error_details => { :message => e.to_s, :backtrace => e.backtrace.join("\n") }
+        :state => :errored,
+        :error_details => { :message => e.to_s, :backtrace => e.backtrace.join("\n") }
       )
       @build.update_commit_status!
     end

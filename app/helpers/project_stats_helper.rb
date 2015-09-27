@@ -1,5 +1,4 @@
 module ProjectStatsHelper
-
   def pass_rate_css_class(rate)
     case rate.to_i
     when 0..39 then 'bad'
@@ -31,7 +30,7 @@ module ProjectStatsHelper
   end
 
   def pass_rate_text(number)
-    "%1.0f%" % (100 * number)
+    format("%1.0f%", 100 * number)
   end
 
   # Calculates the average number of rebuilds required before builds succeed.

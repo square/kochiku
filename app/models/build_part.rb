@@ -97,8 +97,6 @@ class BuildPart < ActiveRecord::Base
       finished_at - started_at
     elsif started_at
       Time.now - started_at
-    else
-      nil
     end
   end
 

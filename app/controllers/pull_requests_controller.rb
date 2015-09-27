@@ -36,7 +36,7 @@ class PullRequestsController < ApplicationController
   end
 
   def handle_pull_request
-     return unless @repository
+    return unless @repository
 
     if active_pull_request? && @repository.build_pull_requests
       sha = payload["pull_request"]["head"]["sha"]

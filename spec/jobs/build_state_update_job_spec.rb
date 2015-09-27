@@ -86,7 +86,7 @@ describe BuildStateUpdateJob do
         end
 
         context "with a build on a convergence branch" do
-          let(:branch) { FactoryGirl.create(:convergence_branch, repository: repository)  }
+          let(:branch) { FactoryGirl.create(:convergence_branch, repository: repository) }
 
           it "should promote the build" do
             expect(BuildStrategy).to receive(:promote_build).with(build)

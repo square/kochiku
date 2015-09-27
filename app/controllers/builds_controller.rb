@@ -3,7 +3,7 @@ require 'git_repo'
 class BuildsController < ApplicationController
   before_filter :load_repository, :only => [:show, :retry_partitioning, :rebuild_failed_parts, :request_build, :abort, :toggle_merge_on_success, :build_status, :modified_time]
 
-  caches_action :show, :cache_path => proc { |c|
+  caches_action :show, cache_path: proc {
     updated_at = Build.select(:updated_at).find(params[:id]).updated_at
     { :modified => updated_at.to_i }
   }

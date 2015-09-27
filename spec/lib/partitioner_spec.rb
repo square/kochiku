@@ -6,8 +6,8 @@ describe Partitioner do
 
   before do
     allow(GitRepo).to receive(:load_kochiku_yml).and_return(kochiku_yml)
-    allow(GitRepo).to receive(:inside_repo).and_yield()
-    allow(GitRepo).to receive(:inside_copy).and_yield()
+    allow(GitRepo).to receive(:inside_repo).and_yield
+    allow(GitRepo).to receive(:inside_copy).and_yield
   end
 
   describe "#for_build" do

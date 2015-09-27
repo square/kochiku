@@ -1,5 +1,5 @@
 class BranchesController < ApplicationController
-  caches_action :show, :cache_path => proc { |c|
+  caches_action :show, cache_path: proc {
     load_repository_and_branch
     updated_at = @branch.updated_at
     { :modified => updated_at.to_i }
@@ -17,11 +17,11 @@ class BranchesController < ApplicationController
     @builds = @branch.builds.includes(build_parts: :build_attempts).last(12)
     @current_build = @builds.last
 
-    @build_parts = Hash.new
+    @build_parts = {}
     @builds.reverse_each do |build|
       build.build_parts.each do |build_part|
         key = [build_part.paths.first, build_part.kind, build_part.options['ruby']]
-        (@build_parts[key] ||= Hash.new)[build] = build_part
+        (@build_parts[key] ||= {})[build] = build_part
       end
     end
 
@@ -66,7 +66,7 @@ class BranchesController < ApplicationController
 
     build_part_attempts = Hash.new(0)
     build_part_failures = Hash.new(0)
-    failed_parts = Hash.new
+    failed_parts = {}
     @builds.each do |build|
       build.build_parts.each do |build_part|
         key = [build_part.paths.sort, build_part.kind]
@@ -82,7 +82,7 @@ class BranchesController < ApplicationController
       end
     end
 
-    @part_climate = Hash.new
+    @part_climate = {}
     failed_parts.each do |key, parts|
       part_error_rate = (build_part_failures[key] * 100 / build_part_attempts[key])
       @part_climate[[part_error_rate, key]] = parts.uniq

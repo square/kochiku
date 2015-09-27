@@ -33,7 +33,7 @@ Kochiku::Application.configure do
   config.assets.debug = true
 
   # Generate digests for assets URLs
-  #config.assets.digest = false
+  # config.assets.digest = false
 
   config.sass.preferred_syntax = :sass
   Rails.application.routes.default_url_options[:host] = "localhost:3000"

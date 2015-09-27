@@ -6,9 +6,6 @@ AllCops:
   Exclude:
     - db/schema.rb
 
-# Lint/EndAlignment:
-#   Enabled: true
-
 Lint/HandleExceptions:
   Exclude:
     - 'lib/git_repo.rb'
@@ -21,3 +18,22 @@ Lint/UselessAssignment:
   Exclude:
     - 'config/compass.rb'
     - 'spec/models/build_spec.rb'
+
+Style/BlockDelimiters:
+  Enabled: false
+
+Style/EmptyLinesAroundBlockBody:
+  Enabled: false
+
+Style/EmptyLinesAroundClassBody:
+  Enabled: false
+
+Style/ExtraSpacing:
+  Enabled: false
+
+Style/GuardClause:
+  # Permit this for reasonably sized methods
+  MinBodyLength: 7
+
+Style/MultilineBlockChain:
+  Enabled: false

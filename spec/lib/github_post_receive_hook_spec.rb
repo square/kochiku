@@ -59,6 +59,6 @@ describe GithubPostReceiveHook do
   end
 
   def github_hooks
-"[{\"active\":true,\"updated_at\":\"2012-10-09T19:02:47Z\",\"last_response\":{\"status\":\"unused\",\"message\":null,\"code\":null},\"events\":[\"pull_request\"],\"created_at\":\"2012-10-09T19:02:47Z\",\"url\":\"https://git.example.com/api/v3/repos/square/kochiku/hooks/78\",\"name\":\"web\",\"config\":{\"url\":\"http://localhost:3001/pull-request-builder\"},\"id\":78}]"
+    "[{\"active\":true,\"updated_at\":\"2012-10-09T19:02:47Z\",\"last_response\":{\"status\":\"unused\",\"message\":null,\"code\":null},\"events\":[\"pull_request\"],\"created_at\":\"2012-10-09T19:02:47Z\",\"url\":\"https://git.example.com/api/v3/repos/square/kochiku/hooks/78\",\"name\":\"web\",\"config\":{\"url\":\"http://localhost:3001/pull-request-builder\"},\"id\":78}]"
   end
 end

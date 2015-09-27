@@ -485,9 +485,9 @@ describe Build do
           repository.update_attribute(:email_on_first_failure, false)
         end
         it "should not send email on first build part failure" do
-            build.update_attribute(:state, :doomed)
-            expect(BuildMailer).to_not receive(:build_break_email)
-            build.send_build_status_email!
+          build.update_attribute(:state, :doomed)
+          expect(BuildMailer).to_not receive(:build_break_email)
+          build.send_build_status_email!
         end
 
         context "retries enabled" do

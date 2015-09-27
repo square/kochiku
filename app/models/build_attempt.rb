@@ -17,8 +17,6 @@ class BuildAttempt < ActiveRecord::Base
       finished_at - started_at
     elsif started_at
       Time.now - started_at
-    else
-      nil
     end
   end
 
@@ -28,9 +26,7 @@ class BuildAttempt < ActiveRecord::Base
     build = build_part.build_instance
     previous_state, new_state = build.update_state_from_parts!
     Rails.logger.info("Build #{build.id} state is now #{build.state}")
-    if previous_state != new_state
-      BuildStateUpdateJob.enqueue(build.id)
-    end
+    BuildStateUpdateJob.enqueue(build.id) if previous_state != new_state
 
     true
   end
@@ -50,9 +46,7 @@ class BuildAttempt < ActiveRecord::Base
 
     previous_state, new_state = build.update_state_from_parts!
     Rails.logger.info("Build #{build.id} state is now #{build.state}")
-    if previous_state != new_state
-      BuildStateUpdateJob.enqueue(build.id)
-    end
+    BuildStateUpdateJob.enqueue(build.id) if previous_state != new_state
 
     true
   end
@@ -87,8 +81,6 @@ class BuildAttempt < ActiveRecord::Base
 
   def error_txt
     error_artifact = build_artifacts.error_txt.first
-    if error_artifact
-      error_artifact.log_file.read
-    end
+    error_artifact.log_file.read if error_artifact
   end
 end

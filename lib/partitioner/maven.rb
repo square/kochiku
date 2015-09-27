@@ -4,7 +4,6 @@ require 'partitioner/base'
 require 'partitioner/topological_sorter'
 
 module Partitioner
-
   # This partitioner uses knowledge of Maven to shard large java repos
   class Maven < Base
     POM_XML = 'pom.xml'
@@ -52,9 +51,8 @@ module Partitioner
     def emails_for_commits_causing_failures
       return {} unless @build.branch_record.convergence?
 
-      failed_modules = @build.build_parts.failed_or_errored.inject(Set.new) do |failed_set, build_part|
+      failed_modules = @build.build_parts.failed_or_errored.each_with_object(Set.new) do |build_part, failed_set|
         build_part.paths.each { |path| failed_set.add(path) }
-        failed_set
       end
 
       email_and_files = Hash.new { |hash, key| hash[key] = [] }
@@ -99,7 +97,7 @@ module Partitioner
       # create multiple entries for builds specifying multiple workers, assigning
       # distinct test chunks to each
       group_modules.flat_map do |group|
-        multiple_workers_list = @settings.fetch('multiple_workers', Hash.new)
+        multiple_workers_list = @settings.fetch('multiple_workers', {})
 
         multiple_workers_module = multiple_workers_list.keys.detect do |path|
           group['files'].include? path
@@ -235,9 +233,7 @@ module Partitioner
     def file_to_module(file_path)
       dir_path = file_path
       while (dir_path = File.dirname(dir_path)) != "."
-        if File.exist?("#{dir_path}/pom.xml")
-          return dir_path
-        end
+        return dir_path if File.exist?("#{dir_path}/pom.xml")
       end
       nil
     end

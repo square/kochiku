@@ -42,11 +42,11 @@ describe BuildStrategy do
     end
 
     context "Using a stash build" do
-        let(:stash_branch) { FactoryGirl.create(:branch, repository: FactoryGirl.create(:stash_repository)) }
-        let(:stash_build) { FactoryGirl.create(:build, branch_record: stash_branch) }
+      let(:stash_branch) { FactoryGirl.create(:branch, repository: FactoryGirl.create(:stash_repository)) }
+      let(:stash_build) { FactoryGirl.create(:build, branch_record: stash_branch) }
 
-        before do
-          settings = SettingsAccessor.new(<<-YAML)
+      before do
+        settings = SettingsAccessor.new(<<-YAML)
           sender_email_address: kochiku@example.com
           kochiku_notifications_email_address: test@example.com
           git_servers:
@@ -55,17 +55,17 @@ describe BuildStrategy do
             stash.example.com:
               type: stash
           YAML
-          stub_const "Settings", settings
-        end
+        stub_const "Settings", settings
+      end
 
-        it "should merge to master using stash REST api" do
-          merger = object_double(GitMergeExecutor.new(stash_build))
-          expect(GitMergeExecutor).to receive(:new).and_return(merger)
-          expect(merger).to receive(:merge_and_push)
-          expect(merger).to receive(:delete_branch)
+      it "should merge to master using stash REST api" do
+        merger = object_double(GitMergeExecutor.new(stash_build))
+        expect(GitMergeExecutor).to receive(:new).and_return(merger)
+        expect(merger).to receive(:merge_and_push)
+        expect(merger).to receive(:delete_branch)
 
-          expect { BuildStrategy.merge_ref(build) }.not_to raise_error
-        end
+        expect { BuildStrategy.merge_ref(build) }.not_to raise_error
+      end
     end
 
   end

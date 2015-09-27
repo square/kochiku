@@ -7,7 +7,7 @@ describe Partitioner::Default do
 
   before do
     allow(GitRepo).to receive(:load_kochiku_yml).and_return(kochiku_yml)
-    allow(GitRepo).to receive(:inside_copy).and_yield()
+    allow(GitRepo).to receive(:inside_copy).and_yield
   end
 
   let(:kochiku_yml) {
@@ -69,7 +69,6 @@ describe Partitioner::Default do
         expect(partitions.first["options"]).not_to have_key("ruby")
       end
     end
-
 
     context "with a ruby-based kochiku.yml" do
       let(:queue_override) { nil }

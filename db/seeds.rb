@@ -62,10 +62,10 @@ def create_build(branch, test_types, build_attempt_state: :passed)
 
   Array(test_types).each do |kind|
     paths = %w(
-            spec/controllers/admin/users_controller_spec.rb
-            spec/jobs/merchant_location_update_job_spec.rb
-            spec/models/loyalty/payer_spec.rb
-            spec/views/mailers/application_mailer/interval_sales_report.text.plain.erb_spec.rb
+      spec/controllers/admin/users_controller_spec.rb
+      spec/jobs/merchant_location_update_job_spec.rb
+      spec/models/loyalty/payer_spec.rb
+      spec/views/mailers/application_mailer/interval_sales_report.text.plain.erb_spec.rb
     )
 
     5.times do
@@ -101,7 +101,6 @@ repo_infos.each do |repo_info|
   developer_branch = Branch.create!(:name => 'feature-branch', :convergence => false, :repository => repository)
   populate_builds_for(developer_branch, repo_info)
 end
-
 
 # create an extra running build for copycopter-server to show something that is in progress
 copycopter_branch = Branch.where(repository: repos['copycopter-server'], name: 'master').first

@@ -43,7 +43,7 @@ module RemoteServer
 
     # Class to use for merge methods
     def merge_executor
-        StashMergeExecutor
+      StashMergeExecutor
     end
 
     # Public: Returns a url for the remote repo in the format Kochiku prefers

@@ -20,11 +20,15 @@ class CommandStubber
 
   def stub_capture2e_failure(fail_on_cmd)
     allow(Open3).to receive(:capture2e) do |*cmd|
+      # cmd is an Array in the format: [{'env' => 'variable'}, 'echo baz']
+      # where the hash with environment variables is optional
       @executed_commands << cmd
-      exitstatus = 0
-      if fail_on_cmd && cmd.any? { |a| a =~ /^#{fail_on_cmd}/ }
-        exitstatus = 1
-      end
+      exitstatus =
+        if fail_on_cmd && cmd.any? { |a| a.is_a?(String) && a.start_with?(fail_on_cmd) }
+          1
+        else
+          0
+        end
       [@fake_command_output, create_stubbed_process_status(exitstatus)]
     end
   end

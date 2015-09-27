@@ -33,7 +33,6 @@ class CreateSchema < ActiveRecord::Migration
 
       t.timestamps(null: false)
     end
-
   end
 
   def self.down

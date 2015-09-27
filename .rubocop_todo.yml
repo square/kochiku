@@ -65,12 +65,6 @@ Metrics/MethodLength:
 Metrics/PerceivedComplexity:
   Max: 19
 
-# Offense count: 86
-# Cop supports --auto-correct.
-# Configuration parameters: EnforcedStyle, SupportedStyles, ProceduralMethods, FunctionalMethods, IgnoredMethods.
-Style/BlockDelimiters:
-  Enabled: false
-
 # Offense count: 88
 # Cop supports --auto-correct.
 # Configuration parameters: EnforcedStyle, SupportedStyles.
@@ -88,19 +82,6 @@ Style/BracesAroundHashParameters:
     - 'spec/models/build_part_spec.rb'
     - 'spec/models/build_spec.rb'
 
-# Offense count: 1
-# Cop supports --auto-correct.
-# Configuration parameters: Keywords.
-Style/CommentAnnotation:
-  Exclude:
-    - 'app/models/build.rb'
-
-# Offense count: 2
-# Cop supports --auto-correct.
-Style/DeprecatedHashMethods:
-  Exclude:
-    - 'app/models/build.rb'
-
 # Offense count: 100
 # Configuration parameters: Exclude.
 Style/Documentation:
@@ -112,223 +93,17 @@ Style/Documentation:
 Style/DotPosition:
   Enabled: false
 
-# Offense count: 1
-Style/DoubleNegation:
-  Exclude:
-    - 'app/models/build.rb'
-
-# Offense count: 1
-Style/EachWithObject:
-  Exclude:
-    - 'lib/partitioner/maven.rb'
-
-# Offense count: 1
-# Cop supports --auto-correct.
-Style/ElseAlignment:
-  Exclude:
-    - 'app/controllers/repositories_controller.rb'
-
-# Offense count: 2
-# Cop supports --auto-correct.
-# Configuration parameters: EnforcedStyle, SupportedStyles.
-Style/EmptyElse:
-  Exclude:
-    - 'app/models/build_attempt.rb'
-    - 'app/models/build_part.rb'
-
-# Offense count: 9
-# Cop supports --auto-correct.
-# Configuration parameters: AllowAdjacentOneLineDefs.
-Style/EmptyLineBetweenDefs:
-  Exclude:
-    - 'app/models/build.rb'
-    - 'lib/build_strategies/no_op_build_strategy.rb'
-    - 'spec/mailers/previews/build_mailer_preview.rb'
-
-# Offense count: 5
-# Cop supports --auto-correct.
-Style/EmptyLines:
-  Exclude:
-    - 'Capfile'
-    - 'db/seeds.rb'
-    - 'spec/features/integration_spec.rb'
-    - 'spec/lib/partitioner/default_spec.rb'
-    - 'spec/models/repository_spec.rb'
-
-# Offense count: 22
-# Cop supports --auto-correct.
-# Configuration parameters: EnforcedStyle, SupportedStyles.
-Style/EmptyLinesAroundBlockBody:
-  Enabled: false
-
-# Offense count: 11
-# Cop supports --auto-correct.
-# Configuration parameters: EnforcedStyle, SupportedStyles.
-Style/EmptyLinesAroundClassBody:
-  Exclude:
-    - 'app/controllers/build_artifacts_controller.rb'
-    - 'app/controllers/build_attempts_controller.rb'
-    - 'app/controllers/dashboards_controller.rb'
-    - 'app/controllers/pull_requests_controller.rb'
-    - 'app/controllers/repositories_controller.rb'
-    - 'config/application.rb'
-    - 'lib/remote_server/stash.rb'
-    - 'lib/server_settings.rb'
-    - 'lib/stash_merge_executor.rb'
-
-# Offense count: 1
-# Cop supports --auto-correct.
-Style/EmptyLinesAroundMethodBody:
-  Exclude:
-    - 'db/migrate/20110621212000_create_schema.rb'
-
-# Offense count: 5
-# Cop supports --auto-correct.
-# Configuration parameters: EnforcedStyle, SupportedStyles.
-Style/EmptyLinesAroundModuleBody:
-  Exclude:
-    - 'app/helpers/project_stats_helper.rb'
-    - 'lib/partitioner/default.rb'
-    - 'lib/partitioner/maven.rb'
-    - 'lib/remote_server/github.rb'
-
-# Offense count: 5
-# Cop supports --auto-correct.
-Style/EmptyLiteral:
-  Exclude:
-    - 'app/controllers/branches_controller.rb'
-    - 'lib/partitioner/maven.rb'
-
-# Offense count: 29
-# Cop supports --auto-correct.
-# Configuration parameters: AllowForAlignment.
-Style/ExtraSpacing:
-  Exclude:
-    - 'Gemfile'
-    - 'app/controllers/build_attempts_controller.rb'
-    - 'app/decorators/branch_decorator.rb'
-    - 'config.ru'
-    - 'config/environments/production.rb'
-    - 'config/environments/staging.rb'
-    - 'config/routes.rb'
-    - 'db/migrate/20140507184819_add_host_and_namespace_to_repositories.rb'
-    - 'db/schema.rb'
-    - 'script/rails'
-    - 'spec/controllers/build_parts_controller_spec.rb'
-    - 'spec/controllers/builds_controller_spec.rb'
-    - 'spec/controllers/pull_requests_controller_spec.rb'
-    - 'spec/jobs/build_state_update_job_spec.rb'
-
-# Offense count: 3
-# Cop supports --auto-correct.
-# Configuration parameters: EnforcedStyle, SupportedStyles.
-Style/FirstParameterIndentation:
-  Exclude:
-    - 'app/jobs/build_partitioning_job.rb'
-    - 'lib/git_repo.rb'
-    - 'spec/lib/partitioner/maven_spec.rb'
-
-# Offense count: 1
-# Configuration parameters: EnforcedStyle, SupportedStyles.
-Style/FormatString:
-  Exclude:
-    - 'app/helpers/project_stats_helper.rb'
-
-# Offense count: 11
-# Configuration parameters: MinBodyLength.
-Style/GuardClause:
-  Exclude:
-    - 'app/controllers/pull_requests_controller.rb'
-    - 'app/models/build.rb'
-    - 'app/models/build_attempt.rb'
-    - 'app/models/build_part.rb'
-    - 'app/models/repository.rb'
-    - 'app/models/repository_observer.rb'
-    - 'lib/git_merge_executor.rb'
-
 # Offense count: 760
 # Cop supports --auto-correct.
 # Configuration parameters: EnforcedStyle, SupportedStyles, UseHashRocketsWithSymbolValues.
 Style/HashSyntax:
   Enabled: false
 
-# Offense count: 6
-# Cop supports --auto-correct.
-# Configuration parameters: MaxLineLength.
-Style/IfUnlessModifier:
-  Exclude:
-    - 'app/models/build_attempt.rb'
-    - 'app/models/repository_observer.rb'
-    - 'lib/partitioner/default.rb'
-    - 'lib/partitioner/maven.rb'
-    - 'spec/support/command_stubber.rb'
-
-# Offense count: 1
-# Cop supports --auto-correct.
-Style/IndentArray:
-  Exclude:
-    - 'db/seeds.rb'
-
 # Offense count: 34
 # Cop supports --auto-correct.
 # Configuration parameters: EnforcedStyle, SupportedStyles.
 Style/IndentHash:
   Enabled: false
-
-# Offense count: 1
-# Cop supports --auto-correct.
-# Configuration parameters: EnforcedStyle, SupportedStyles.
-Style/IndentationConsistency:
-  Exclude:
-    - 'app/controllers/pull_requests_controller.rb'
-
-# Offense count: 9
-# Cop supports --auto-correct.
-# Configuration parameters: Width.
-Style/IndentationWidth:
-  Exclude:
-    - 'app/controllers/pull_requests_controller.rb'
-    - 'app/controllers/repositories_controller.rb'
-    - 'db/migrate/20130823231854_remove_java_specific_stuff.rb'
-    - 'lib/remote_server/github.rb'
-    - 'lib/remote_server/stash.rb'
-    - 'spec/lib/build_strategies/production_build_strategy_spec.rb'
-    - 'spec/lib/git_blame_spec.rb'
-    - 'spec/lib/github_post_receive_hook_spec.rb'
-    - 'spec/models/build_spec.rb'
-
-# Offense count: 2
-# Cop supports --auto-correct.
-Style/LeadingCommentSpace:
-  Exclude:
-    - 'config/application.rb'
-    - 'config/environments/development.rb'
-
-# Offense count: 1
-# Cop supports --auto-correct.
-Style/LineEndConcatenation:
-  Exclude:
-    - 'app/jobs/enforce_timeouts_job.rb'
-
-# Offense count: 4
-# Cop supports --auto-correct.
-Style/MethodCallParentheses:
-  Exclude:
-    - 'spec/lib/partitioner/default_spec.rb'
-    - 'spec/lib/partitioner_spec.rb'
-    - 'spec/lib/remote_server/stash_spec.rb'
-
-# Offense count: 1
-# Configuration parameters: EnforcedStyle, SupportedStyles.
-Style/MethodName:
-  Enabled: false
-
-# Offense count: 3
-Style/MultilineBlockChain:
-  Exclude:
-    - 'lib/partitioner/default.rb'
-    - 'lib/partitioner/maven.rb'
-    - 'lib/tasks/kochiku.rake'
 
 # Offense count: 12
 # Cop supports --auto-correct.

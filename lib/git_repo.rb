@@ -108,9 +108,9 @@ class GitRepo
     def clone_repo(repo, cached_repo_path)
       # Note: the --config option was added in git 1.7.7
       Cocaine::CommandLine.new(
-          "git clone",
-          "--recursive --config remote.origin.pushurl=#{repo.url} #{repo.url_for_fetching} #{cached_repo_path}").
-          run
+        "git clone",
+        "--recursive --config remote.origin.pushurl=#{repo.url} #{repo.url_for_fetching} #{cached_repo_path}"
+      ).run
     end
 
     def synchronize_with_remote(name)

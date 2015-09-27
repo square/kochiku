@@ -60,7 +60,6 @@ feature "a failed build" do
   end
 end
 
-
 feature "requesting a new build of a branch" do
   before :each do
     @repository = FactoryGirl.create(:repository, url: "git@github.com:square/kochiku.git")

@@ -167,8 +167,9 @@ describe Partitioner::Maven do
 
           partitions = subject.partitions
           expect(partitions.size).to eq(1)
-          expect(partitions).to include(a_hash_including(
-            { "files" => build_part.paths, "queue" => build_part.queue.to_s }))
+          expect(partitions).to include(
+            a_hash_including("files" => build_part.paths, "queue" => build_part.queue.to_s)
+          )
         end
 
         it "should not add all successful parts from the previous build" do

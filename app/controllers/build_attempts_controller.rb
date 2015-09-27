@@ -8,13 +8,13 @@ class BuildAttemptsController < ApplicationController
 
     respond_to do |format|
       if @build_attempt.aborted?
-        format.json  { render :json => @build_attempt }
+        format.json { render :json => @build_attempt }
       elsif @build_attempt.start!(params[:builder])
         @build_attempt.log_streamer_port = params[:logstreamer_port]
         @build_attempt.save
-        format.json  { render :json => @build_attempt }
+        format.json { render :json => @build_attempt }
       else
-        format.json  { render :json => @build_attempt.errors, :status => :unprocessable_entity }
+        format.json { render :json => @build_attempt.errors, :status => :unprocessable_entity }
       end
     end
   end
@@ -24,14 +24,14 @@ class BuildAttemptsController < ApplicationController
 
     respond_to do |format|
       if @build_attempt.finish!(params[:state])
-        format.json  { head :ok }
-        format.html  {
+        format.json { head :ok }
+        format.html do
           redirect_to repository_build_part_url(@build_attempt.build_part.build_instance.repository,
                                                 @build_attempt.build_part.build_instance,
                                                 @build_attempt.build_part)
-        }
+        end
       else
-        format.json  { render :json => @build_attempt.errors, :status => :unprocessable_entity }
+        format.json { render :json => @build_attempt.errors, :status => :unprocessable_entity }
       end
     end
   end

@@ -99,7 +99,6 @@ describe Repository do
 
   end
 
-
   context "#interested_github_events" do
     it 'includes push if run_ci is enabled' do
       expect(Repository.new(:run_ci => true).interested_github_events).to eq(['pull_request', 'push'])
