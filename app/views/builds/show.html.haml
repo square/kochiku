@@ -35,10 +35,10 @@
       Create pull request
   %span.info
     Created
-    %abbr.timeago{:title => @build.created_at.to_json} recently
+    = timeago(@build.created_at)
   %span.info
     Updated
-    %abbr.timeago{:title => @build.updated_at.to_json} at some point
+    = timeago(@build.updated_at)
   - if @build.completed?
     %span.info
       = "Built in #{duration_strftime(@build.elapsed_time, "%Hh %Mm %Ss")}"

@@ -14,7 +14,7 @@
         - if branch.last_completed_build && branch.last_completed_build.finished_at
           %div.state
             Last built
-            %abbr.timeago.state{:title => branch.last_completed_build.finished_at.to_json} a while ago
+            = timeago(branch.last_completed_build.finished_at)
         - else
           %div.state Never built
         - if branch.last_completed_build
