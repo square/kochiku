@@ -5,3 +5,4 @@ rvm:
 script:
   - RAILS_ENV=test bundle exec rake --trace db:create
   - bundle exec rspec
+  - bundle exec rubocop

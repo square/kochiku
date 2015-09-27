@@ -56,6 +56,8 @@ group :development do
   gem 'capistrano-rvm', '~> 0.1', require: false
   gem 'thin'
   gem 'rails-erd'
+  gem 'rubocop', require: false
+  gem 'haml_lint', require: false
 end
 
 group :test do
