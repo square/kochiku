@@ -91,4 +91,14 @@ describe ApplicationHelper do
       expect(show_link_to_create_pull_request(@build)).to eq('https://git.example.com/square/web/pull/new/master...SHA1FORCOMMIT')
     end
   end
+
+  describe "timeago" do
+    it "should generate the correct abbr tag" do
+      timestamp = Time.at(0)
+      expect(timeago(timestamp)).to eq(
+        %{<abbr class="timeago" title="1970-01-01T00:00:00Z">#{timestamp}</abbr>}
+      )
+      # the inner_html is not hardcoded because it is timezone dependent
+    end
+  end
 end

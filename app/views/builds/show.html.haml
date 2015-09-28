@@ -35,10 +35,10 @@
       Create pull request
   %span.info
     Created
-    %abbr.timeago{:title => @build.created_at.to_json} recently
+    = timeago(@build.created_at)
   %span.info
     Updated
-    %abbr.timeago{:title => @build.updated_at.to_json} at some point
+    = timeago(@build.updated_at)
   - if @build.completed?
     %span.info
       = "Built in #{duration_strftime(@build.elapsed_time, "%Hh %Mm %Ss")}"
@@ -94,6 +94,9 @@
           - if part.unsuccessful?
             = link_to("Rebuild", rebuild_repository_build_part_path(@build.repository, @build, part), :method => :post)
 
+- if @build.on_success_script_log_file.url
+  = link_to(File.basename(@build.on_success_script_log_file.path), @build.on_success_script_log_file.url)
+
 = content_for :javascript do
   :javascript
     if ($('#build-summary tbody tr').length > 0) {
@@ -106,5 +109,9 @@
     }
     Kochiku.delayedRefresh({table: '.build-summary tbody', renderTime: Date.parse(#{@build.updated_at.to_json})});
 
-- if @build.on_success_script_log_file.url
-  = link_to(File.basename(@build.on_success_script_log_file.path), @build.on_success_script_log_file.url)
+    $('abbr.timeago').click(function() {
+      // swap the relative time with the absolute time
+      var originalText = $(this).text();
+      $(this).text($(this).attr('title'));
+      $(this).attr('title', originalText);
+    });
