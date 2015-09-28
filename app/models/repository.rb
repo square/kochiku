@@ -5,6 +5,7 @@ require 'remote_server'
 # through the RemoteServer classes.
 class Repository < ActiveRecord::Base
   has_many :branches, :dependent => :destroy
+  has_many :convergence_branches, -> { where(convergence: true) }, class_name: "Branch"
   validates_presence_of :host, :name, :url
   validates_uniqueness_of :name
   validates_numericality_of :timeout, :only_integer => true

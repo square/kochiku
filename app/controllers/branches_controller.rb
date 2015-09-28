@@ -1,6 +1,7 @@
 class BranchesController < ApplicationController
   caches_action :show, :cache_path => proc { |c|
-    updated_at = Branch.where(:name => params[:id]).select(:updated_at).first!.updated_at
+    load_repository_and_branch
+    updated_at = @branch.updated_at
     { :modified => updated_at.to_i }
   }
 
@@ -22,11 +23,6 @@ class BranchesController < ApplicationController
         key = [build_part.paths.first, build_part.kind, build_part.options['ruby']]
         (@build_parts[key] ||= Hash.new)[build] = build_part
       end
-    end
-
-    if params[:format] == 'rss'
-      # remove recent builds that are pending or in progress (cimonitor expects this)
-      @builds = @builds.drop_while {|build| [:partitioning, :runnable, :running].include?(build.state) }
     end
 
     @branch = @branch.decorate
@@ -111,7 +107,7 @@ class BranchesController < ApplicationController
 
   # GET /XmlStatusReport.aspx
   #
-  # This action returns the current build status for all of the master branches
+  # This action returns the current build status for all of the convergence branches
   # in the system
   def status_report
     @branches = Branch.includes(:repository).where(convergence: true).decorate
@@ -126,6 +122,6 @@ class BranchesController < ApplicationController
 
   def load_repository_and_branch
     @repository || load_repository
-    @branch = @repository.branches.where(name: params[:id]).first!
+    @branch ||= @repository.branches.where(name: params[:id]).first!
   end
 end
