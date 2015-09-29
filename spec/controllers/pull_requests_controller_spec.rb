@@ -26,6 +26,7 @@ describe PullRequestsController do
         context "for push events" do
           let(:repository_fields) { { run_ci: true } }
           let!(:master_branch) { FactoryGirl.create(:master_branch, repository: repository) }
+          let!(:convergence_branch) { FactoryGirl.create(:branch, repository: repository, convergence: true, name: "convergence_branch") }
 
           it "creates a build" do
             expect(Build.where(branch_id: master_branch.id, ref: to_40('2'))).to_not exist
@@ -36,7 +37,7 @@ describe PullRequestsController do
             expect(Build.where(branch_id: master_branch.id, ref: to_40('2'))).to exist
           end
 
-          it "does not create a build for pushes to branches other than master" do  # eventually this should be changed to non-convergence
+          it "does not create a build for pushes to non-convergence branches" do
             expect {
               post :build, 'payload' => push_payload("ref" => "refs/heads/some-branch")
               expect(response).to be_success
@@ -60,6 +61,13 @@ describe PullRequestsController do
               post :build, 'payload' => push_payload
               expect(response).to be_success
             }.to_not change(Build, :count)
+          end
+
+          it "builds for convergence branches" do
+            expect {
+              post :build, 'payload' => push_payload("ref" => "refs/heads/convergence_branch")
+              expect(response).to be_success
+            }.to change(Build, :count).by(1)
           end
 
           it "builds if there is completed ci build" do

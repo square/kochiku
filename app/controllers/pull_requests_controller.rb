@@ -27,13 +27,11 @@ class PullRequestsController < ApplicationController
   def handle_repo_push_request
     return unless @repository
 
-    if payload["ref"] == "refs/heads/master"
-      branch = @repository.branches.where(name: 'master').first
-
-      if branch.present? && @repository.run_ci?
-        sha = payload["after"]
-        branch.kickoff_new_build_unless_currently_busy(sha)
-      end
+    branch_name = payload["ref"].sub(%r{\Arefs/heads/}, '')
+    branch = @repository.branches.where(name: branch_name).first
+    if branch.present? && branch.convergence? && @repository.run_ci?
+      sha = payload["after"]
+      branch.kickoff_new_build_unless_currently_busy(sha)
     end
   end
 
@@ -42,7 +40,7 @@ class PullRequestsController < ApplicationController
 
     if active_pull_request? && @repository.build_pull_requests
       sha = payload["pull_request"]["head"]["sha"]
-      branch_name = payload["pull_request"]["head"]["ref"].gsub(%r{^refs/heads/}, '')
+      branch_name = payload["pull_request"]["head"]["ref"].sub(%r{\Arefs/heads/}, '')
       branch = @repository.branches.where(name: branch_name).first_or_create!
 
       build = @repository.ensure_build_exists(sha, branch)
