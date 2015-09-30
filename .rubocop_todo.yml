@@ -94,13 +94,6 @@ Style/HashSyntax:
   Enabled: false
 
 # Offense count: 2
-# Cop supports --auto-correct.
-Style/NegatedIf:
-  Exclude:
-    - 'app/controllers/repositories_controller.rb'
-    - 'app/models/build.rb'
-
-# Offense count: 2
 # Configuration parameters: EnforcedStyle, MinBodyLength, SupportedStyles.
 Style/Next:
   Exclude:

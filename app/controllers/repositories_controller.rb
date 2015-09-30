@@ -99,7 +99,7 @@ class RepositoriesController < ApplicationController
     branch = repository.branches.where(name: branch_name).first_or_create!
 
     build = repository.ensure_build_exists(sha, branch)
-    branch.abort_in_progress_builds_behind_build(build) if !branch.convergence?
+    branch.abort_in_progress_builds_behind_build(build) unless branch.convergence?
 
     build
   end

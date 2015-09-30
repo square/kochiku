@@ -215,7 +215,7 @@ class Build < ActiveRecord::Base
   end
 
   def promote!
-    if !promoted?
+    unless promoted?
       BuildStrategy.promote_build(self)
       update!(promoted: true)
     end
