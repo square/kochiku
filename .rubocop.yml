@@ -37,3 +37,7 @@ Style/GuardClause:
 
 Style/MultilineBlockChain:
   Enabled: false
+
+Style/MultilineBlockLayout:
+  Exclude:
+    - 'spec/lib/partitioner/maven_spec.rb'

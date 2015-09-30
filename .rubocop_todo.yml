@@ -93,22 +93,6 @@ Style/Documentation:
 Style/HashSyntax:
   Enabled: false
 
-# Offense count: 34
-# Cop supports --auto-correct.
-# Configuration parameters: EnforcedStyle, SupportedStyles.
-Style/IndentHash:
-  Enabled: false
-
-# Offense count: 12
-# Cop supports --auto-correct.
-Style/MultilineBlockLayout:
-  Exclude:
-    - 'app/controllers/build_attempts_controller.rb'
-    - 'spec/helpers/application_helper_spec.rb'
-    - 'spec/helpers/build_helper_spec.rb'
-    - 'spec/lib/partitioner/maven_spec.rb'
-    - 'spec/lib/remote_server/stash_spec.rb'
-
 # Offense count: 2
 # Cop supports --auto-correct.
 Style/NegatedIf:

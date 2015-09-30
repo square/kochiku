@@ -67,8 +67,9 @@ describe RemoteServer::Stash do
 
     it 'does not support HTTP auth credentials in URL' do
       # Use a netrc file instead.
-      expect { make_server \
-        "https://don@stash.example.com/scm/myproject/myrepo.git"
+      expect {
+        make_server \
+          "https://don@stash.example.com/scm/myproject/myrepo.git"
       }.to raise_error(RemoteServer::UnknownUrlFormat)
     end
 

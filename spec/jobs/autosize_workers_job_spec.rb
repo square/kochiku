@@ -16,26 +16,26 @@ describe AutosizeWorkersJob do
 
   let(:idle_response) {
     {
-        :workers=>maximum_workers - 30,
-        :working=>maximum_workers - 100,
+      :workers=>maximum_workers - 30,
+      :working=>maximum_workers - 100,
     }
   }
   let(:busy_response) {
     {
-        :workers=>maximum_workers - 30,
-        :working=>maximum_workers - 35,
+      :workers=>maximum_workers - 30,
+      :working=>maximum_workers - 35,
     }
   }
   let(:small_pool) {
     {
-        :workers=>minimum_workers + 5,
-        :working=>0,
+      :workers=>minimum_workers + 5,
+      :working=>0,
     }
   }
   let(:full_pool) {
     {
-        :workers=>maximum_workers,
-        :working=>maximum_workers - 5,
+      :workers=>maximum_workers,
+      :working=>maximum_workers - 5,
     }
   }
 

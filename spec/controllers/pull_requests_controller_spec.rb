@@ -111,10 +111,11 @@ describe PullRequestsController do
 
           context "when the pull request sha has already been built" do
             before do
-              @github_payload = pull_request_payload("pull_request" => {
-                "head" => {"sha" => "de8251ff97ee194a289832576287d6f8ad74e3d0", "ref" => "branch-name"},
-                "body" => "best pull request ever",
-              })
+              @github_payload = pull_request_payload(
+                "pull_request" => {
+                  "head" => {"sha" => "de8251ff97ee194a289832576287d6f8ad74e3d0", "ref" => "branch-name"},
+                  "body" => "best pull request ever",
+                })
             end
             let!(:branch) { FactoryGirl.create(:branch, repository: repository, name: "branch-name") }
 
@@ -175,10 +176,11 @@ describe PullRequestsController do
               let!(:build_two) { FactoryGirl.create(:build, :branch_record => branch, :ref => to_40('y')) }
 
               it "aborts previous builds of the same branch" do
-                github_payload = pull_request_payload("pull_request" => {
+                github_payload = pull_request_payload(
+                  "pull_request" => {
                     "head" => {"sha" => to_40('z'), "ref" => branch.name},
                     "body" => "best pull request ever",
-                })
+                  })
 
                 expect {
                   post :build, 'payload' => github_payload

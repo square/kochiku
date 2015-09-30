@@ -66,13 +66,15 @@ describe ApplicationHelper do
   describe "#show_link_to_compare" do
     let(:branch_stash) { FactoryGirl.create(:branch, repository: repository_stash, name: "okay") }
     let(:branch_stash_no_greenupdate) { FactoryGirl.create(:branch, repository: repository_stash_no_greenupdate, name: "okay") }
-    let(:repository_stash) { FactoryGirl.create(:stash_repository, url: "https://stash.example.com/scm/square/web2.git",
-                                                                   host: "stash.example.com", namespace: "square",
-                                                                   on_green_update: "green,red")
+    let(:repository_stash) {
+      FactoryGirl.create(:stash_repository, url: "https://stash.example.com/scm/square/web2.git",
+                                            host: "stash.example.com", namespace: "square",
+                                            on_green_update: "green,red")
     }
-    let(:repository_stash_no_greenupdate) { FactoryGirl.create(:stash_repository, url: "https://stash.example.com/scm/square/web3.git",
-                                                                                  host: "stash.example.com",
-                                                                                  namespace: "square", on_green_update: "")
+    let(:repository_stash_no_greenupdate) {
+      FactoryGirl.create(:stash_repository, url: "https://stash.example.com/scm/square/web3.git",
+                                            host: "stash.example.com",
+                                            namespace: "square", on_green_update: "")
     }
 
     it "creates a url to github showing the diff between 2 SHAs" do

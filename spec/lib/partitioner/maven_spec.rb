@@ -60,10 +60,12 @@ describe Partitioner::Maven do
           allow(File).to receive(:exist?).with("module-two/pom.xml").and_return(true)
 
           allow(subject).to receive(:maven_modules).and_return(["module-one", "module-two", "module-two/integration", "module-three", "module-four"])
-          allow(subject).to receive(:depends_on_map).and_return({
-            "module-one" => ["module-one", "module-three", "module-four"].to_set,
-            "module-two" => ["module-two", "module-two/integration", "module-three"].to_set,
-          })
+          allow(subject).to receive(:depends_on_map).and_return(
+            {
+              "module-one" => ["module-one", "module-three", "module-four"].to_set,
+              "module-two" => ["module-two", "module-two/integration", "module-three"].to_set,
+            }
+          )
           expect(subject).to_not receive(:all_partitions)
         end
 
@@ -185,9 +187,9 @@ describe Partitioner::Maven do
       context "with build_everything set" do
         let(:kochiku_yml) {
           {
-              'maven_settings' => {
-                  'build_everything' => ['build-all'],
-              }
+            'maven_settings' => {
+              'build_everything' => ['build-all'],
+            }
           }
         }
 
@@ -198,10 +200,12 @@ describe Partitioner::Maven do
           allow(subject).to receive(:pom_for).and_return ""
 
           allow(subject).to receive(:maven_modules).and_return(["module-one", "build-all"])
-          allow(subject).to receive(:depends_on_map).and_return({
-            "module-one" => ["module-one", "build-all"].to_set,
-            "build-all" => ["build-all"].to_set,
-          })
+          allow(subject).to receive(:depends_on_map).and_return(
+            {
+              "module-one" => ["module-one", "build-all"].to_set,
+              "build-all" => ["build-all"].to_set,
+            }
+          )
 
           expect(subject).to receive(:all_partitions).and_return([{"type" => "maven", "files" => "ALL"}])
 
@@ -215,10 +219,12 @@ describe Partitioner::Maven do
         allow(GitBlame).to receive(:files_changed_since_last_build).with(build, sync: anything)
           .and_return([{:file => "toplevel/foo.xml", :emails => []}])
 
-        allow(subject).to receive(:depends_on_map).and_return({
-          "module-one" => ["module-one", "module-three", "module-four"].to_set,
-          "module-two" => ["module-two", "module-three"].to_set
-        })
+        allow(subject).to receive(:depends_on_map).and_return(
+          {
+            "module-one" => ["module-one", "module-three", "module-four"].to_set,
+            "module-two" => ["module-two", "module-three"].to_set
+          }
+        )
 
         expect(subject).to receive(:all_partitions).and_return([{"type" => "maven", "files" => "ALL"}])
 
@@ -235,10 +241,12 @@ describe Partitioner::Maven do
         allow(File).to receive(:exist?).with("new-module/pom.xml").and_return(true)
 
         allow(subject).to receive(:maven_modules).and_return(["module-one", "module-two"])
-        allow(subject).to receive(:depends_on_map).and_return({
-          "module-one" => ["module-one", "module-three", "module-four"].to_set,
-          "module-two" => ["module-two", "module-three"].to_set
-        })
+        allow(subject).to receive(:depends_on_map).and_return(
+          {
+            "module-one" => ["module-one", "module-three", "module-four"].to_set,
+            "module-two" => ["module-two", "module-three"].to_set
+          }
+        )
         expect(subject).to_not receive(:all_partitions)
 
         partitions = subject.partitions
@@ -315,11 +323,13 @@ describe Partitioner::Maven do
         allow(File).to receive(:exist?).with("module-two/pom.xml").and_return(true)
         allow(File).to receive(:exist?).with("failed-module/pom.xml").and_return(true)
 
-        allow(subject).to receive(:depends_on_map).and_return({
-                                                                  "module-one" => ["module-one", "module-three", "failed-module"].to_set,
-                                                                  "module-two" => ["module-two", "module-three"].to_set,
-                                                                  "failed-module" => ["failed-module"].to_set
-                                                              })
+        allow(subject).to receive(:depends_on_map).and_return(
+          {
+            "module-one" => ["module-one", "module-three", "failed-module"].to_set,
+            "module-two" => ["module-two", "module-three"].to_set,
+            "failed-module" => ["failed-module"].to_set
+          }
+        )
 
         email_and_files = subject.emails_for_commits_causing_failures
         expect(email_and_files.size).to eq(2)
@@ -332,9 +342,9 @@ describe Partitioner::Maven do
       context "with ignore_paths set" do
         let(:kochiku_yml) {
           {
-              'maven_settings' => {
-                  'ignore_paths' => ['ignored-module'],
-              }
+            'maven_settings' => {
+              'ignore_paths' => ['ignored-module'],
+            }
           }
         }
 
@@ -347,8 +357,8 @@ describe Partitioner::Maven do
           allow(File).to receive(:exist?).with("failed-module/pom.xml").and_return(true)
 
           allow(subject).to receive(:depends_on_map).and_return({
-                                                                    "ignored-module" => ["ignored-module"].to_set,
-                                                                    "failed-module" => ["failed-module"].to_set
+                                                                  "ignored-module" => ["ignored-module"].to_set,
+                                                                  "failed-module" => ["failed-module"].to_set
                                                                 })
 
           email_and_files = subject.emails_for_commits_causing_failures
@@ -365,8 +375,8 @@ describe Partitioner::Maven do
           allow(File).to receive(:exist?).with("failed-module/pom.xml").and_return(true)
 
           allow(subject).to receive(:depends_on_map).and_return({
-                                                                    "ignored-module" => ["ignored-module", "failed-module"].to_set,
-                                                                    "failed-module" => ["failed-module"].to_set
+                                                                  "ignored-module" => ["ignored-module", "failed-module"].to_set,
+                                                                  "failed-module" => ["failed-module"].to_set
                                                                 })
 
           email_and_files = subject.emails_for_commits_causing_failures
@@ -379,9 +389,9 @@ describe Partitioner::Maven do
       context "with build_everything set" do
         let(:kochiku_yml) {
           {
-              'maven_settings' => {
-                  'build_everything' => ['build-all'],
-              }
+            'maven_settings' => {
+              'build_everything' => ['build-all'],
+            }
           }
         }
 
@@ -394,8 +404,8 @@ describe Partitioner::Maven do
           allow(File).to receive(:exist?).with("failed-module/pom.xml").and_return(true)
 
           allow(subject).to receive(:depends_on_map).and_return({
-                                                                    "build-all" => ["build-all"].to_set,
-                                                                    "module-four" => ["module-four"].to_set
+                                                                  "build-all" => ["build-all"].to_set,
+                                                                  "module-four" => ["module-four"].to_set
                                                                 })
 
           email_and_files = subject.emails_for_commits_causing_failures
@@ -410,12 +420,12 @@ describe Partitioner::Maven do
   describe "#sort_modules" do
     before do
       allow(subject).to receive(:module_dependency_map).and_return({
-                        "module-one" => ["module-two"].to_set,
-                        "module-two" => ["module-three"].to_set,
-                        "module-three" => ["module-four"].to_set,
-                        "module-four" => Set.new,
-                        "module-five" => Set.new,
-                      })
+                                                                     "module-one" => ["module-two"].to_set,
+                                                                     "module-two" => ["module-three"].to_set,
+                                                                     "module-three" => ["module-four"].to_set,
+                                                                     "module-four" => Set.new,
+                                                                     "module-five" => Set.new,
+                                                                   })
     end
 
     it "should sort the modules based on a topological sort of the dependency map" do
@@ -440,10 +450,10 @@ describe Partitioner::Maven do
   describe "#depends_on_map" do
     it "should convert a dependency map to a depends on map" do
       allow(subject).to receive(:transitive_dependency_map).and_return({
-                                                           "module-one" => ["a", "b"].to_set,
-                                                           "module-two" => ["b", "c", "module-one"].to_set,
-                                                           "module-three" => Set.new
-                                                         })
+                                                                         "module-one" => ["a", "b"].to_set,
+                                                                         "module-two" => ["b", "c", "module-one"].to_set,
+                                                                         "module-three" => Set.new
+                                                                       })
 
       depends_on_map = subject.depends_on_map
 

@@ -34,18 +34,18 @@ class BuildPart < ActiveRecord::Base
   def job_args(build_attempt)
     repository = build_instance.repository
     {
-        "build_attempt_id" => build_attempt.id,
-        "build_kind" => kind,
-        "build_ref" => build_instance.ref,
-        "branch" => build_instance.branch_record.name,
-        "test_files" => paths,
-        "repo_name" => repository.repo_cache_name,
-        "test_command" => build_instance.test_command,
-        "repo_url" => repository.url_for_fetching,
-        "remote_name" => "origin",
-        "timeout" => repository.timeout.minutes,
-        "options" => options,
-        "kochiku_env" => Rails.env,
+      "build_attempt_id" => build_attempt.id,
+      "build_kind" => kind,
+      "build_ref" => build_instance.ref,
+      "branch" => build_instance.branch_record.name,
+      "test_files" => paths,
+      "repo_name" => repository.repo_cache_name,
+      "test_command" => build_instance.test_command,
+      "repo_url" => repository.url_for_fetching,
+      "remote_name" => "origin",
+      "timeout" => repository.timeout.minutes,
+      "options" => options,
+      "kochiku_env" => Rails.env,
     }
   end
 
