@@ -306,10 +306,10 @@ describe Partitioner::Maven do
 
       it "should return the emails for the modules that are failing" do
         allow(GitBlame).to receive(:files_changed_since_last_green).with(build, fetch_emails: true)
-                           .and_return([{:file => "module-one/src/main/java/com/lobsters/Foo.java", :emails => ["userone@example.com"]},
-                                        {:file => "module-two/src/main/java/com/lobsters/Bar.java", :emails => ["usertwo@example.com"]},
-                                        {:file => "failed-module/src/main/java/com/lobsters/Baz.java", :emails => ["userfour@example.com"]},
-                                        {:file => "failed-module/src/main/java/com/lobsters/Bing.java", :emails => ["userfour@example.com"]}])
+          .and_return([{:file => "module-one/src/main/java/com/lobsters/Foo.java", :emails => ["userone@example.com"]},
+                       {:file => "module-two/src/main/java/com/lobsters/Bar.java", :emails => ["usertwo@example.com"]},
+                       {:file => "failed-module/src/main/java/com/lobsters/Baz.java", :emails => ["userfour@example.com"]},
+                       {:file => "failed-module/src/main/java/com/lobsters/Bing.java", :emails => ["userfour@example.com"]}])
         allow(File).to receive(:exist?).and_return(false)
         allow(File).to receive(:exist?).with("module-one/pom.xml").and_return(true)
         allow(File).to receive(:exist?).with("module-two/pom.xml").and_return(true)
@@ -340,8 +340,8 @@ describe Partitioner::Maven do
 
         it "should not return emails if changes are on an ignored path and not in the dependency map" do
           allow(GitBlame).to receive(:files_changed_since_last_green).with(build, fetch_emails: true)
-                             .and_return([{:file => "ignored-module/src/main/java/com/lobsters/Foo.java", :emails => ["userone@example.com"]},
-                                          {:file => "failed-module/src/main/java/com/lobsters/Bing.java", :emails => ["userfour@example.com"]}])
+            .and_return([{:file => "ignored-module/src/main/java/com/lobsters/Foo.java", :emails => ["userone@example.com"]},
+                         {:file => "failed-module/src/main/java/com/lobsters/Bing.java", :emails => ["userfour@example.com"]}])
           allow(File).to receive(:exist?).and_return(false)
           allow(File).to receive(:exist?).with("ignored-module/pom.xml").and_return(true)
           allow(File).to receive(:exist?).with("failed-module/pom.xml").and_return(true)
@@ -358,8 +358,8 @@ describe Partitioner::Maven do
 
         it "should return emails if changes are on an ignored path but are in the dependency map" do
           allow(GitBlame).to receive(:files_changed_since_last_green).with(build, fetch_emails: true)
-                             .and_return([{:file => "ignored-module/src/main/java/com/lobsters/Foo.java", :emails => ["userone@example.com"]},
-                                          {:file => "failed-module/src/main/java/com/lobsters/Bing.java", :emails => ["userfour@example.com"]}])
+            .and_return([{:file => "ignored-module/src/main/java/com/lobsters/Foo.java", :emails => ["userone@example.com"]},
+                         {:file => "failed-module/src/main/java/com/lobsters/Bing.java", :emails => ["userfour@example.com"]}])
           allow(File).to receive(:exist?).and_return(false)
           allow(File).to receive(:exist?).with("ignored-module/pom.xml").and_return(true)
           allow(File).to receive(:exist?).with("failed-module/pom.xml").and_return(true)
@@ -387,8 +387,8 @@ describe Partitioner::Maven do
 
         it "should return email for change to build_everything even if build_everything module does not depend on changed file" do
           allow(GitBlame).to receive(:files_changed_since_last_green).with(build, fetch_emails: true)
-                             .and_return([{:file => "build-all/src/main/java/com/lobsters/Foo.java", :emails => ["userone@example.com"]},
-                                          {:file => "module-four/src/main/java/com/lobsters/Bar.java", :emails => ["userfour@example.com"]}])
+            .and_return([{:file => "build-all/src/main/java/com/lobsters/Foo.java", :emails => ["userone@example.com"]},
+                         {:file => "module-four/src/main/java/com/lobsters/Bar.java", :emails => ["userfour@example.com"]}])
           allow(File).to receive(:exist?).and_return(false)
           allow(File).to receive(:exist?).with("build-all/pom.xml").and_return(true)
           allow(File).to receive(:exist?).with("failed-module/pom.xml").and_return(true)

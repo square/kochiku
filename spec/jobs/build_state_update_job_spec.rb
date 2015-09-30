@@ -33,11 +33,11 @@ describe BuildStateUpdateJob do
 
   describe "#perform" do
     it "updates github when a build passes" do
-      expect(GithubRequest).to receive(:post).
-        with(%r|/statuses/#{build.ref}|,
-             hash_including(:state => 'pending'),
-             anything
-            )
+      expect(GithubRequest).to receive(:post)
+        .with(%r|/statuses/#{build.ref}|,
+              hash_including(:state => 'pending'),
+              anything
+             )
 
       BuildStateUpdateJob.perform(build.id)
 
@@ -46,11 +46,11 @@ describe BuildStateUpdateJob do
         build_attempt.finish!(:passed)
       end
 
-      expect(GithubRequest).to receive(:post).
-        with(%r|/statuses/#{build.ref}|,
-             hash_including(:state => 'success'),
-             anything
-            )
+      expect(GithubRequest).to receive(:post)
+        .with(%r|/statuses/#{build.ref}|,
+              hash_including(:state => 'success'),
+              anything
+             )
 
       BuildStateUpdateJob.perform(build.id)
     end

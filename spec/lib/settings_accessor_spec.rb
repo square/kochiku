@@ -30,8 +30,8 @@ describe SettingsAccessor do
         type: github
         mirror: 'git://git-mirror.example.com/'
     YAML
-    expect(settings.git_servers.keys).
-      to match_array(%w{stash.example.com github.com github-enterprise.example.com})
+    expect(settings.git_servers.keys)
+      .to match_array(%w{stash.example.com github.com github-enterprise.example.com})
     expect(settings.git_servers['stash.example.com'].type). to eq('stash')
     expect(settings.git_servers['github-enterprise.example.com'].type).to eq('github')
   end

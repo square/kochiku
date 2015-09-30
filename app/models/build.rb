@@ -232,9 +232,9 @@ class Build < ActiveRecord::Base
     update!(state: :aborted, merge_on_success: false)
 
     all_build_part_ids = build_parts.select([:id, :build_id]).collect(&:id)
-    BuildAttempt.
-        where(state: :runnable, build_part_id: all_build_part_ids).
-        update_all(state: :aborted, updated_at: Time.now)
+    BuildAttempt
+      .where(state: :runnable, build_part_id: all_build_part_ids)
+      .update_all(state: :aborted, updated_at: Time.now)
   end
 
   def to_color
@@ -299,7 +299,7 @@ class Build < ActiveRecord::Base
   private
 
   def status_png(r, g, b)
-    ChunkyPNG::Canvas.new(13, 13, ChunkyPNG::Color::TRANSPARENT).
-      circle(6, 6, 5, ChunkyPNG::Color::BLACK, ChunkyPNG::Color.rgb(r, g, b))
+    ChunkyPNG::Canvas.new(13, 13, ChunkyPNG::Color::TRANSPARENT)
+      .circle(6, 6, 5, ChunkyPNG::Color::BLACK, ChunkyPNG::Color.rgb(r, g, b))
   end
 end

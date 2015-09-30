@@ -87,12 +87,6 @@ Style/BracesAroundHashParameters:
 Style/Documentation:
   Enabled: false
 
-# Offense count: 34
-# Cop supports --auto-correct.
-# Configuration parameters: EnforcedStyle, SupportedStyles.
-Style/DotPosition:
-  Enabled: false
-
 # Offense count: 760
 # Cop supports --auto-correct.
 # Configuration parameters: EnforcedStyle, SupportedStyles, UseHashRocketsWithSymbolValues.
@@ -114,12 +108,6 @@ Style/MultilineBlockLayout:
     - 'spec/helpers/build_helper_spec.rb'
     - 'spec/lib/partitioner/maven_spec.rb'
     - 'spec/lib/remote_server/stash_spec.rb'
-
-# Offense count: 24
-# Cop supports --auto-correct.
-# Configuration parameters: EnforcedStyle, SupportedStyles.
-Style/MultilineOperationIndentation:
-  Enabled: false
 
 # Offense count: 2
 # Cop supports --auto-correct.

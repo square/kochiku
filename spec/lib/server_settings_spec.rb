@@ -23,8 +23,8 @@ RSpec.describe ServerSettings do
 
         settings = ServerSettings.new({ oauth_token_file: '/secrets/github_oauth_token' }, 'git.example.com')
 
-        expect(settings.oauth_token).
-          to eq('oauth_token_for_test')
+        expect(settings.oauth_token)
+          .to eq('oauth_token_for_test')
       end
     end
   end

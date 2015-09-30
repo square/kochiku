@@ -56,11 +56,11 @@ class RepositoriesController < ApplicationController
 
   def dashboard
     @branches =
-      Branch.joins(:repository).
-        includes(:repository).
-        where(name: 'master').
-        order('repositories.name').
-        decorate
+      Branch.joins(:repository)
+      .includes(:repository)
+      .where(name: 'master')
+      .order('repositories.name')
+      .decorate
   end
 
   def build_ref
@@ -107,11 +107,11 @@ class RepositoriesController < ApplicationController
   private
 
   def repository_params
-    params.require(:repository).
-      permit(:url, :timeout, :build_pull_requests,
-             :run_ci, :on_green_update, :send_build_success_email,
-             :send_build_failure_email, :allows_kochiku_merges,
-             :email_on_first_failure, :send_merge_successful_email)
+    params.require(:repository)
+      .permit(:url, :timeout, :build_pull_requests,
+              :run_ci, :on_green_update, :send_build_success_email,
+              :send_build_failure_email, :allows_kochiku_merges,
+              :email_on_first_failure, :send_merge_successful_email)
   end
 
   # update_convergence_branches is called by both create and update. This
