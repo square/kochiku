@@ -32,9 +32,7 @@ module BuildHelper
   end
 
   def multiple_ruby_versions?(build)
-    build.build_parts.map { |bp|
-      bp.options['ruby']
-    }.compact.uniq.size > 1
+    build.build_parts.map { |bp| bp.options['ruby'] }.compact.uniq.size > 1
   end
 
   def is_a_build_with_one_part?(build)

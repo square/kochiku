@@ -73,7 +73,7 @@ describe Repository do
       context "is set" do
         it "leaves it as is" do
           repo = Repository.new(url: "git://git.example.com/square/kochiku-name.git",
-              name: "another_repo")
+                                name: "another_repo")
           repo.valid?
           expect(repo.name).to eq("another_repo")
         end
@@ -98,7 +98,6 @@ describe Repository do
     end
 
   end
-
 
   context "#interested_github_events" do
     it 'includes push if run_ci is enabled' do

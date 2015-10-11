@@ -15,14 +15,14 @@ describe GithubPostReceiveHook do
   end
 
   it "does not recreate the hook if it already exists" do
-    stub_request(:get, "https://git.example.com/api/v3/repos/square/web/hooks").
-        to_return(:body => github_hooks)
+    stub_request(:get, "https://git.example.com/api/v3/repos/square/web/hooks")
+      .to_return(:body => github_hooks)
     subject.subscribe!
   end
 
   it "creates the hook" do
-    stub_request(:get, "https://git.example.com/api/v3/repos/square/web/hooks").
-        to_return(:body => '[]')
+    stub_request(:get, "https://git.example.com/api/v3/repos/square/web/hooks")
+      .to_return(:body => '[]')
     stub_request(:post, "https://git.example.com/api/v3/repos/square/web/hooks").with do |request|
       body = JSON.parse(request.body)
       expect(body["name"]).to eq("web")
@@ -36,8 +36,8 @@ describe GithubPostReceiveHook do
 
   it "updates a repositories github_post_receive_hook_id" do
     expect(repository.github_post_receive_hook_id).to eq(nil)
-    stub_request(:get, "https://git.example.com/api/v3/repos/square/web/hooks").
-        to_return(:body => github_hooks)
+    stub_request(:get, "https://git.example.com/api/v3/repos/square/web/hooks")
+      .to_return(:body => github_hooks)
     subject.subscribe!
     expect(repository.github_post_receive_hook_id).to eq(78)
   end
@@ -59,6 +59,6 @@ describe GithubPostReceiveHook do
   end
 
   def github_hooks
-"[{\"active\":true,\"updated_at\":\"2012-10-09T19:02:47Z\",\"last_response\":{\"status\":\"unused\",\"message\":null,\"code\":null},\"events\":[\"pull_request\"],\"created_at\":\"2012-10-09T19:02:47Z\",\"url\":\"https://git.example.com/api/v3/repos/square/kochiku/hooks/78\",\"name\":\"web\",\"config\":{\"url\":\"http://localhost:3001/pull-request-builder\"},\"id\":78}]"
+    "[{\"active\":true,\"updated_at\":\"2012-10-09T19:02:47Z\",\"last_response\":{\"status\":\"unused\",\"message\":null,\"code\":null},\"events\":[\"pull_request\"],\"created_at\":\"2012-10-09T19:02:47Z\",\"url\":\"https://git.example.com/api/v3/repos/square/kochiku/hooks/78\",\"name\":\"web\",\"config\":{\"url\":\"http://localhost:3001/pull-request-builder\"},\"id\":78}]"
   end
 end

@@ -55,15 +55,17 @@ describe Partitioner::Maven do
           allow(GitBlame).to receive(:files_changed_since_last_build).with(build, sync: anything)
             .and_return([{:file => "module-one/src/main/java/com/lobsters/foo.java", :emails => []},
                          {:file => "module-two/src/main/java/com/lobsters/bar.java", :emails => []}])
-          allow(File).to receive(:exists?).and_return(false)
-          allow(File).to receive(:exists?).with("module-one/pom.xml").and_return(true)
-          allow(File).to receive(:exists?).with("module-two/pom.xml").and_return(true)
+          allow(File).to receive(:exist?).and_return(false)
+          allow(File).to receive(:exist?).with("module-one/pom.xml").and_return(true)
+          allow(File).to receive(:exist?).with("module-two/pom.xml").and_return(true)
 
           allow(subject).to receive(:maven_modules).and_return(["module-one", "module-two", "module-two/integration", "module-three", "module-four"])
-          allow(subject).to receive(:depends_on_map).and_return({
-            "module-one" => ["module-one", "module-three", "module-four"].to_set,
-            "module-two" => ["module-two", "module-two/integration", "module-three"].to_set,
-          })
+          allow(subject).to receive(:depends_on_map).and_return(
+            {
+              "module-one" => ["module-one", "module-three", "module-four"].to_set,
+              "module-two" => ["module-two", "module-two/integration", "module-three"].to_set,
+            }
+          )
           expect(subject).to_not receive(:all_partitions)
         end
 
@@ -167,8 +169,9 @@ describe Partitioner::Maven do
 
           partitions = subject.partitions
           expect(partitions.size).to eq(1)
-          expect(partitions).to include(a_hash_including(
-            { "files" => build_part.paths, "queue" => build_part.queue.to_s }))
+          expect(partitions).to include(
+            a_hash_including("files" => build_part.paths, "queue" => build_part.queue.to_s)
+          )
         end
 
         it "should not add all successful parts from the previous build" do
@@ -184,23 +187,25 @@ describe Partitioner::Maven do
       context "with build_everything set" do
         let(:kochiku_yml) {
           {
-              'maven_settings' => {
-                  'build_everything' => ['build-all'],
-              }
+            'maven_settings' => {
+              'build_everything' => ['build-all'],
+            }
           }
         }
 
         it "should build everything if one of the changed file starts with a path in build_everything" do
           allow(GitBlame).to receive(:files_changed_since_last_build).with(build, sync: anything)
             .and_return([{:file => "build-all/src/main/java/com/lobsters/foo.java", :emails => []}])
-          allow(File).to receive(:exists?).and_return(false)
+          allow(File).to receive(:exist?).and_return(false)
           allow(subject).to receive(:pom_for).and_return ""
 
           allow(subject).to receive(:maven_modules).and_return(["module-one", "build-all"])
-          allow(subject).to receive(:depends_on_map).and_return({
-            "module-one" => ["module-one", "build-all"].to_set,
-            "build-all" => ["build-all"].to_set,
-          })
+          allow(subject).to receive(:depends_on_map).and_return(
+            {
+              "module-one" => ["module-one", "build-all"].to_set,
+              "build-all" => ["build-all"].to_set,
+            }
+          )
 
           expect(subject).to receive(:all_partitions).and_return([{"type" => "maven", "files" => "ALL"}])
 
@@ -214,10 +219,12 @@ describe Partitioner::Maven do
         allow(GitBlame).to receive(:files_changed_since_last_build).with(build, sync: anything)
           .and_return([{:file => "toplevel/foo.xml", :emails => []}])
 
-        allow(subject).to receive(:depends_on_map).and_return({
-          "module-one" => ["module-one", "module-three", "module-four"].to_set,
-          "module-two" => ["module-two", "module-three"].to_set
-        })
+        allow(subject).to receive(:depends_on_map).and_return(
+          {
+            "module-one" => ["module-one", "module-three", "module-four"].to_set,
+            "module-two" => ["module-two", "module-three"].to_set
+          }
+        )
 
         expect(subject).to receive(:all_partitions).and_return([{"type" => "maven", "files" => "ALL"}])
 
@@ -230,14 +237,16 @@ describe Partitioner::Maven do
         allow(GitBlame).to receive(:files_changed_since_last_build).with(build, sync: anything)
           .and_return([{:file => "new-module/src/main/java/com/lobsters/foo.java", :emails => []}])
 
-        allow(File).to receive(:exists?).and_return(false)
-        allow(File).to receive(:exists?).with("new-module/pom.xml").and_return(true)
+        allow(File).to receive(:exist?).and_return(false)
+        allow(File).to receive(:exist?).with("new-module/pom.xml").and_return(true)
 
         allow(subject).to receive(:maven_modules).and_return(["module-one", "module-two"])
-        allow(subject).to receive(:depends_on_map).and_return({
-          "module-one" => ["module-one", "module-three", "module-four"].to_set,
-          "module-two" => ["module-two", "module-three"].to_set
-        })
+        allow(subject).to receive(:depends_on_map).and_return(
+          {
+            "module-one" => ["module-one", "module-three", "module-four"].to_set,
+            "module-two" => ["module-two", "module-three"].to_set
+          }
+        )
         expect(subject).to_not receive(:all_partitions)
 
         partitions = subject.partitions
@@ -274,7 +283,8 @@ describe Partitioner::Maven do
         subject { Partitioner::Maven.new(build2, kochiku_yml) }
 
         it "should NOT add all the non-successful parts from the previous build" do
-          build_part = FactoryGirl.create(:build_part, :build_instance => build, :paths => ["module-one"])
+          FactoryGirl.create(:build_part, :build_instance => build, :paths => ["module-one"])
+
           expect(build.build_parts.first).to be_unsuccessful
           allow(subject).to receive(:sort_modules) { |mvn_modules| mvn_modules }
 
@@ -304,20 +314,22 @@ describe Partitioner::Maven do
 
       it "should return the emails for the modules that are failing" do
         allow(GitBlame).to receive(:files_changed_since_last_green).with(build, fetch_emails: true)
-                           .and_return([{:file => "module-one/src/main/java/com/lobsters/Foo.java", :emails => ["userone@example.com"]},
-                                        {:file => "module-two/src/main/java/com/lobsters/Bar.java", :emails => ["usertwo@example.com"]},
-                                        {:file => "failed-module/src/main/java/com/lobsters/Baz.java", :emails => ["userfour@example.com"]},
-                                        {:file => "failed-module/src/main/java/com/lobsters/Bing.java", :emails => ["userfour@example.com"]}])
-        allow(File).to receive(:exists?).and_return(false)
-        allow(File).to receive(:exists?).with("module-one/pom.xml").and_return(true)
-        allow(File).to receive(:exists?).with("module-two/pom.xml").and_return(true)
-        allow(File).to receive(:exists?).with("failed-module/pom.xml").and_return(true)
+          .and_return([{:file => "module-one/src/main/java/com/lobsters/Foo.java", :emails => ["userone@example.com"]},
+                       {:file => "module-two/src/main/java/com/lobsters/Bar.java", :emails => ["usertwo@example.com"]},
+                       {:file => "failed-module/src/main/java/com/lobsters/Baz.java", :emails => ["userfour@example.com"]},
+                       {:file => "failed-module/src/main/java/com/lobsters/Bing.java", :emails => ["userfour@example.com"]}])
+        allow(File).to receive(:exist?).and_return(false)
+        allow(File).to receive(:exist?).with("module-one/pom.xml").and_return(true)
+        allow(File).to receive(:exist?).with("module-two/pom.xml").and_return(true)
+        allow(File).to receive(:exist?).with("failed-module/pom.xml").and_return(true)
 
-        allow(subject).to receive(:depends_on_map).and_return({
-                                                                  "module-one" => ["module-one", "module-three", "failed-module"].to_set,
-                                                                  "module-two" => ["module-two", "module-three"].to_set,
-                                                                  "failed-module" => ["failed-module"].to_set
-                                                              })
+        allow(subject).to receive(:depends_on_map).and_return(
+          {
+            "module-one" => ["module-one", "module-three", "failed-module"].to_set,
+            "module-two" => ["module-two", "module-three"].to_set,
+            "failed-module" => ["failed-module"].to_set
+          }
+        )
 
         email_and_files = subject.emails_for_commits_causing_failures
         expect(email_and_files.size).to eq(2)
@@ -330,23 +342,23 @@ describe Partitioner::Maven do
       context "with ignore_paths set" do
         let(:kochiku_yml) {
           {
-              'maven_settings' => {
-                  'ignore_paths' => ['ignored-module'],
-              }
+            'maven_settings' => {
+              'ignore_paths' => ['ignored-module'],
+            }
           }
         }
 
         it "should not return emails if changes are on an ignored path and not in the dependency map" do
           allow(GitBlame).to receive(:files_changed_since_last_green).with(build, fetch_emails: true)
-                             .and_return([{:file => "ignored-module/src/main/java/com/lobsters/Foo.java", :emails => ["userone@example.com"]},
-                                          {:file => "failed-module/src/main/java/com/lobsters/Bing.java", :emails => ["userfour@example.com"]}])
-          allow(File).to receive(:exists?).and_return(false)
-          allow(File).to receive(:exists?).with("ignored-module/pom.xml").and_return(true)
-          allow(File).to receive(:exists?).with("failed-module/pom.xml").and_return(true)
+            .and_return([{:file => "ignored-module/src/main/java/com/lobsters/Foo.java", :emails => ["userone@example.com"]},
+                         {:file => "failed-module/src/main/java/com/lobsters/Bing.java", :emails => ["userfour@example.com"]}])
+          allow(File).to receive(:exist?).and_return(false)
+          allow(File).to receive(:exist?).with("ignored-module/pom.xml").and_return(true)
+          allow(File).to receive(:exist?).with("failed-module/pom.xml").and_return(true)
 
           allow(subject).to receive(:depends_on_map).and_return({
-                                                                    "ignored-module" => ["ignored-module"].to_set,
-                                                                    "failed-module" => ["failed-module"].to_set
+                                                                  "ignored-module" => ["ignored-module"].to_set,
+                                                                  "failed-module" => ["failed-module"].to_set
                                                                 })
 
           email_and_files = subject.emails_for_commits_causing_failures
@@ -356,15 +368,15 @@ describe Partitioner::Maven do
 
         it "should return emails if changes are on an ignored path but are in the dependency map" do
           allow(GitBlame).to receive(:files_changed_since_last_green).with(build, fetch_emails: true)
-                             .and_return([{:file => "ignored-module/src/main/java/com/lobsters/Foo.java", :emails => ["userone@example.com"]},
-                                          {:file => "failed-module/src/main/java/com/lobsters/Bing.java", :emails => ["userfour@example.com"]}])
-          allow(File).to receive(:exists?).and_return(false)
-          allow(File).to receive(:exists?).with("ignored-module/pom.xml").and_return(true)
-          allow(File).to receive(:exists?).with("failed-module/pom.xml").and_return(true)
+            .and_return([{:file => "ignored-module/src/main/java/com/lobsters/Foo.java", :emails => ["userone@example.com"]},
+                         {:file => "failed-module/src/main/java/com/lobsters/Bing.java", :emails => ["userfour@example.com"]}])
+          allow(File).to receive(:exist?).and_return(false)
+          allow(File).to receive(:exist?).with("ignored-module/pom.xml").and_return(true)
+          allow(File).to receive(:exist?).with("failed-module/pom.xml").and_return(true)
 
           allow(subject).to receive(:depends_on_map).and_return({
-                                                                    "ignored-module" => ["ignored-module", "failed-module"].to_set,
-                                                                    "failed-module" => ["failed-module"].to_set
+                                                                  "ignored-module" => ["ignored-module", "failed-module"].to_set,
+                                                                  "failed-module" => ["failed-module"].to_set
                                                                 })
 
           email_and_files = subject.emails_for_commits_causing_failures
@@ -377,23 +389,23 @@ describe Partitioner::Maven do
       context "with build_everything set" do
         let(:kochiku_yml) {
           {
-              'maven_settings' => {
-                  'build_everything' => ['build-all'],
-              }
+            'maven_settings' => {
+              'build_everything' => ['build-all'],
+            }
           }
         }
 
         it "should return email for change to build_everything even if build_everything module does not depend on changed file" do
           allow(GitBlame).to receive(:files_changed_since_last_green).with(build, fetch_emails: true)
-                             .and_return([{:file => "build-all/src/main/java/com/lobsters/Foo.java", :emails => ["userone@example.com"]},
-                                          {:file => "module-four/src/main/java/com/lobsters/Bar.java", :emails => ["userfour@example.com"]}])
-          allow(File).to receive(:exists?).and_return(false)
-          allow(File).to receive(:exists?).with("build-all/pom.xml").and_return(true)
-          allow(File).to receive(:exists?).with("failed-module/pom.xml").and_return(true)
+            .and_return([{:file => "build-all/src/main/java/com/lobsters/Foo.java", :emails => ["userone@example.com"]},
+                         {:file => "module-four/src/main/java/com/lobsters/Bar.java", :emails => ["userfour@example.com"]}])
+          allow(File).to receive(:exist?).and_return(false)
+          allow(File).to receive(:exist?).with("build-all/pom.xml").and_return(true)
+          allow(File).to receive(:exist?).with("failed-module/pom.xml").and_return(true)
 
           allow(subject).to receive(:depends_on_map).and_return({
-                                                                    "build-all" => ["build-all"].to_set,
-                                                                    "module-four" => ["module-four"].to_set
+                                                                  "build-all" => ["build-all"].to_set,
+                                                                  "module-four" => ["module-four"].to_set
                                                                 })
 
           email_and_files = subject.emails_for_commits_causing_failures
@@ -408,12 +420,12 @@ describe Partitioner::Maven do
   describe "#sort_modules" do
     before do
       allow(subject).to receive(:module_dependency_map).and_return({
-                        "module-one" => ["module-two"].to_set,
-                        "module-two" => ["module-three"].to_set,
-                        "module-three" => ["module-four"].to_set,
-                        "module-four" => Set.new,
-                        "module-five" => Set.new,
-                      })
+                                                                     "module-one" => ["module-two"].to_set,
+                                                                     "module-two" => ["module-three"].to_set,
+                                                                     "module-three" => ["module-four"].to_set,
+                                                                     "module-four" => Set.new,
+                                                                     "module-five" => Set.new,
+                                                                   })
     end
 
     it "should sort the modules based on a topological sort of the dependency map" do
@@ -438,10 +450,10 @@ describe Partitioner::Maven do
   describe "#depends_on_map" do
     it "should convert a dependency map to a depends on map" do
       allow(subject).to receive(:transitive_dependency_map).and_return({
-                                                           "module-one" => ["a", "b"].to_set,
-                                                           "module-two" => ["b", "c", "module-one"].to_set,
-                                                           "module-three" => Set.new
-                                                         })
+                                                                         "module-one" => ["a", "b"].to_set,
+                                                                         "module-two" => ["b", "c", "module-one"].to_set,
+                                                                         "module-three" => Set.new
+                                                                       })
 
       depends_on_map = subject.depends_on_map
 
@@ -613,29 +625,29 @@ describe Partitioner::Maven do
 
   describe "#file_to_module" do
     before do
-      allow(File).to receive(:exists?).and_return(false)
+      allow(File).to receive(:exist?).and_return(false)
     end
 
     it "should return the module for a src main path" do
-      allow(File).to receive(:exists?).with("oyster/pom.xml").and_return(true)
+      allow(File).to receive(:exist?).with("oyster/pom.xml").and_return(true)
       expect(subject.file_to_module("oyster/src/main/java/com/lobsters/oyster/OysterApp.java")).to eq("oyster")
     end
 
     it "should return the module in a subdirectory" do
-      allow(File).to receive(:exists?).with("gateways/cafis/pom.xml").and_return(true)
+      allow(File).to receive(:exist?).with("gateways/cafis/pom.xml").and_return(true)
       expect(subject.file_to_module("gateways/cafis/src/main/java/com/lobsters/gateways/cafis/data/DataField_9_6_1.java"))
         .to eq("gateways/cafis")
     end
 
     it "should return the module for a src test path even if there is pom in the parent directory" do
-      allow(File).to receive(:exists?).with("integration/hibernate/pom.xml").and_return(true)
-      allow(File).to receive(:exists?).with("integration/hibernate/tests/pom.xml").and_return(true)
+      allow(File).to receive(:exist?).with("integration/hibernate/pom.xml").and_return(true)
+      allow(File).to receive(:exist?).with("integration/hibernate/tests/pom.xml").and_return(true)
       expect(subject.file_to_module("integration/hibernate/tests/src/test/java/com/lobsters/integration/hibernate/ConfigurationExtTest.java"))
         .to eq("integration/hibernate/tests")
     end
 
     it "should return a module for a pom change" do
-      allow(File).to receive(:exists?).with("common/pom.xml").and_return(true)
+      allow(File).to receive(:exist?).with("common/pom.xml").and_return(true)
       expect(subject.file_to_module("common/pom.xml")).to eq("common")
     end
 

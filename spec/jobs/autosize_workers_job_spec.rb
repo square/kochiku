@@ -16,26 +16,26 @@ describe AutosizeWorkersJob do
 
   let(:idle_response) {
     {
-        :workers=>maximum_workers - 30,
-        :working=>maximum_workers - 100,
+      :workers=>maximum_workers - 30,
+      :working=>maximum_workers - 100,
     }
   }
   let(:busy_response) {
     {
-        :workers=>maximum_workers - 30,
-        :working=>maximum_workers - 35,
+      :workers=>maximum_workers - 30,
+      :working=>maximum_workers - 35,
     }
   }
   let(:small_pool) {
     {
-        :workers=>minimum_workers + 5,
-        :working=>0,
+      :workers=>minimum_workers + 5,
+      :working=>0,
     }
   }
   let(:full_pool) {
     {
-        :workers=>maximum_workers,
-        :working=>maximum_workers - 5,
+      :workers=>maximum_workers,
+      :working=>maximum_workers - 5,
     }
   }
 
@@ -44,9 +44,9 @@ describe AutosizeWorkersJob do
   subject { AutosizeWorkersJob.perform }
 
   def push(count, response)
-    redis_connection.del(MonitorWorkersJob.REDIS_STATS_KEY)
+    redis_connection.del(MonitorWorkersJob::REDIS_STATS_KEY)
     1.upto(count) do
-      redis_connection.rpush(MonitorWorkersJob.REDIS_STATS_KEY, response.to_json)
+      redis_connection.rpush(MonitorWorkersJob::REDIS_STATS_KEY, response.to_json)
     end
   end
 
@@ -76,7 +76,7 @@ describe AutosizeWorkersJob do
       it "Does not adjust size if even one sample shows busy" do
         push(sample_count - 1, small_pool)
         small_pool[:working] = small_pool[:workers]
-        redis_connection.rpush(MonitorWorkersJob.REDIS_STATS_KEY, small_pool.to_json)
+        redis_connection.rpush(MonitorWorkersJob::REDIS_STATS_KEY, small_pool.to_json)
         allow(Resque).to receive(:info).and_return(small_pool)
         expect(AutosizeWorkersJob).to_not receive(:adjust_worker_count)
         subject

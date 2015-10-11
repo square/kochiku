@@ -4,10 +4,10 @@ class AddRepositoryNameAsColumn < ActiveRecord::Migration
   Rails.logger = Logger.new(STDOUT)
 
   URL_PARSERS = {
-      "git@" => /@(.*):(.*)\/(.*)\.git/,
-      "git:" => /:\/\/(.*)\/(.*)\/(.*)\.git/,
-      "http" => /https?:\/\/(.*)\/(.*)\/([^.]*)\.?/,
-      'ssh:' => %r{ssh://git@(.*):(\d+)/(.*)/([^.]+)\.git}
+    "git@" => /@(.*):(.*)\/(.*)\.git/,
+    "git:" => /:\/\/(.*)\/(.*)\/(.*)\.git/,
+    "http" => /https?:\/\/(.*)\/(.*)\/([^.]*)\.?/,
+    'ssh:' => %r{ssh://git@(.*):(\d+)/(.*)/([^.]+)\.git}
   }
 
   class Repository < ActiveRecord::Base
@@ -20,16 +20,16 @@ class AddRepositoryNameAsColumn < ActiveRecord::Migration
 
     if match.length > 4
       {
-          host:       match[1],
-          port:       match[2].to_i,
-          username:   match[3],
-          repository: match[4]
+        host:       match[1],
+        port:       match[2].to_i,
+        username:   match[3],
+        repository: match[4]
       }
     else
       {
-          host:       match[1],
-          username:   match[2],
-          repository: match[3]
+        host:       match[1],
+        username:   match[2],
+        repository: match[3]
       }
     end
   end

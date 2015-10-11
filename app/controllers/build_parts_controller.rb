@@ -1,6 +1,7 @@
 class BuildPartsController < ApplicationController
   before_filter :load_repository_build_and_part, :only => [:rebuild, :show, :modified_time]
-  caches_action :show, :cache_path => proc { |c|
+
+  caches_action :show, cache_path: proc {
     { :modified => @build_part.updated_at.to_i }
   }
 
@@ -25,7 +26,7 @@ class BuildPartsController < ApplicationController
     end
   end
 
-private
+  private
 
   def load_repository_build_and_part
     r_namespace, r_name = params[:repository_path].split('/')

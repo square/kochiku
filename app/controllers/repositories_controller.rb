@@ -56,11 +56,11 @@ class RepositoriesController < ApplicationController
 
   def dashboard
     @branches =
-      Branch.joins(:repository).
-        includes(:repository).
-        where(name: 'master').
-        order('repositories.name').
-        decorate
+      Branch.joins(:repository)
+      .includes(:repository)
+      .where(name: 'master')
+      .order('repositories.name')
+      .decorate
   end
 
   def build_ref
@@ -71,15 +71,15 @@ class RepositoriesController < ApplicationController
     # Query string parameters are provided for easy integrations, since it the
     # simplest to implement.
     changes = if params[:refChanges]
-      params[:refChanges].map do |change|
-        [
-          change[:refId].gsub(/^refs\/heads\//,''),
-          change[:toHash]
-        ]
-      end
-    else
-      [params.values_at(:ref, :sha)]
-    end
+                params[:refChanges].map do |change|
+                  [
+                    change[:refId].gsub(/^refs\/heads\//,''),
+                    change[:toHash]
+                  ]
+                end
+              else
+                [params.values_at(:ref, :sha)]
+              end
 
     result = changes.map do |ref, sha|
       ensure_build(repository, ref, sha)
@@ -99,7 +99,7 @@ class RepositoriesController < ApplicationController
     branch = repository.branches.where(name: branch_name).first_or_create!
 
     build = repository.ensure_build_exists(sha, branch)
-    branch.abort_in_progress_builds_behind_build(build) if !branch.convergence?
+    branch.abort_in_progress_builds_behind_build(build) unless branch.convergence?
 
     build
   end
@@ -107,11 +107,11 @@ class RepositoriesController < ApplicationController
   private
 
   def repository_params
-    params.require(:repository).
-      permit(:url, :timeout, :build_pull_requests,
-             :run_ci, :on_green_update, :send_build_success_email,
-             :send_build_failure_email, :allows_kochiku_merges,
-             :email_on_first_failure, :send_merge_successful_email)
+    params.require(:repository)
+      .permit(:url, :timeout, :build_pull_requests,
+              :run_ci, :on_green_update, :send_build_success_email,
+              :send_build_failure_email, :allows_kochiku_merges,
+              :email_on_first_failure, :send_merge_successful_email)
   end
 
   # update_convergence_branches is called by both create and update. This
@@ -125,8 +125,9 @@ class RepositoriesController < ApplicationController
     add_convergence_to = new_branch_names - current_branch_names
 
     remove_convergence_from.each do |name|
-      branch = current_convergence_branches.detect { |branch| branch.name == name }
-      branch.update!(convergence: false)
+      current_convergence_branches.detect { |branch|
+        branch.name == name
+      }.update!(convergence: false)
     end
 
     add_convergence_to.each do |name|

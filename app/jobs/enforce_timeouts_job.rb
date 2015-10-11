@@ -5,7 +5,7 @@ class EnforceTimeoutsJob
       if attempt.elapsed_time > lenient_timeout.minutes
         # Error artifact creation taken from kochiku-worker
         message = StringIO.new
-        message.puts("This BuildAttempt has not been updated by its worker,\n" +
+        message.puts("This BuildAttempt has not been updated by its worker,\n" \
                      "but the build taken longer than the project's timeout.")
         message.rewind
         def message.path

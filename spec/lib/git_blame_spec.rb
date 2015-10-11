@@ -74,7 +74,7 @@ describe GitBlame do
     end
 
     it "returns a single email" do
-        expect(subject).to eq(["userone@example.com"])
+      expect(subject).to eq(["userone@example.com"])
     end
   end
 

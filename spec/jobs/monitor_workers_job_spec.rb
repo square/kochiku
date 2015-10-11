@@ -6,7 +6,7 @@ describe 'When collecting stats' do
     1.upto(1000) do
       MonitorWorkersJob.perform
     end
-    stats_length = REDIS.llen(MonitorWorkersJob.REDIS_STATS_KEY)
+    stats_length = REDIS.llen(MonitorWorkersJob::REDIS_STATS_KEY)
     expect(stats_length).to eq(Settings.worker_thresholds[:number_of_samples])
   end
 end

@@ -8,7 +8,7 @@ class BuildPartitioningJob < JobBase
 
   @retry_limit = 5
   @retry_exceptions = {GitRepo::RefNotFoundError => [60, 60, 60, 180, 360],
-      Cocaine::ExitStatusError => [30, 60, 60, 60, 60] }
+                       Cocaine::ExitStatusError => [30, 60, 60, 60, 60] }
 
   def initialize(build_id)
     @build = Build.find(build_id)
@@ -30,8 +30,8 @@ class BuildPartitioningJob < JobBase
       @build.update_attributes!(:state => :waiting_for_sync)
     else
       @build.update_attributes!(
-          :state => :errored,
-          :error_details => { :message => e.to_s, :backtrace => e.backtrace.join("\n") }
+        :state => :errored,
+        :error_details => { :message => e.to_s, :backtrace => e.backtrace.join("\n") }
       )
       @build.update_commit_status!
     end

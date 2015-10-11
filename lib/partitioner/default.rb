@@ -1,7 +1,6 @@
 require 'partitioner/base'
 
 module Partitioner
-
   # This is the origional partitioner behavior, which is somewhat ruby targeted
   class Default < Base
     def partitions
@@ -24,9 +23,7 @@ module Partitioner
         @kochiku_yml.fetch('targets')
       end.map do |subset|
         file_to_times_hash = load_manifest(subset['time_manifest'])
-        if file_to_times_hash.is_a?(Hash)
-          file_to_times_hash.values
-        end
+        file_to_times_hash.values if file_to_times_hash.is_a?(Hash)
       end.flatten.compact.max
     end
 
@@ -109,7 +106,7 @@ module Partitioner
           files_by_worker << [file]
           runtimes_by_worker << file_runtime
         else
-          fastest_worker_time, fastest_worker_index = runtimes_by_worker.each_with_index.min
+          _fastest_worker_time, fastest_worker_index = runtimes_by_worker.each_with_index.min
           files_by_worker[fastest_worker_index] << file
           runtimes_by_worker[fastest_worker_index] += file_runtime - setup_time
         end

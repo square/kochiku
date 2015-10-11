@@ -1,5 +1,4 @@
 module ProjectStatsHelper
-
   def pass_rate_css_class(rate)
     case rate.to_i
     when 0..39 then 'bad'
@@ -18,7 +17,7 @@ module ProjectStatsHelper
 
   # A string representing the percentage of builds that eventually passed
   def eventual_pass_rate(builds)
-    pass_rate_text(builds.select(&:succeeded?).size / builds.size.to_f)
+    pass_rate_text(builds.select(&:succeeded?).size / builds.size.to_f) # rubocop:disable Performance/Count
   end
 
   # A string representing the percentage of the builds that had
@@ -31,7 +30,7 @@ module ProjectStatsHelper
   end
 
   def pass_rate_text(number)
-    "%1.0f%" % (100 * number)
+    format("%1.0f%", 100 * number)
   end
 
   # Calculates the average number of rebuilds required before builds succeed.

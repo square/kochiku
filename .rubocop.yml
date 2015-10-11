@@ -1,0 +1,44 @@
+inherit_from: .rubocop_todo.yml
+AllCops:
+  Include:
+    - 'Rakefile'
+    - 'config.ru'
+  Exclude:
+    - 'vendor/**/*'
+    - 'db/schema.rb'
+
+Lint/HandleExceptions:
+  Exclude:
+    - 'lib/git_repo.rb'
+
+Lint/NonLocalExitFromIterator:
+  Exclude:
+    - 'app/jobs/autosize_workers_job.rb'
+
+Lint/UselessAssignment:
+  Exclude:
+    - 'config/compass.rb'
+    - 'spec/models/build_spec.rb'
+
+Style/BlockDelimiters:
+  Enabled: false
+
+Style/EmptyLinesAroundBlockBody:
+  Enabled: false
+
+Style/EmptyLinesAroundClassBody:
+  Enabled: false
+
+Style/ExtraSpacing:
+  Enabled: false
+
+Style/GuardClause:
+  # Permit this for reasonably sized methods
+  MinBodyLength: 7
+
+Style/MultilineBlockChain:
+  Enabled: false
+
+Style/MultilineBlockLayout:
+  Exclude:
+    - 'spec/lib/partitioner/maven_spec.rb'

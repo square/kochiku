@@ -4,7 +4,6 @@ require 'github_request'
 require 'git_merge_executor'
 
 module RemoteServer
-
   # All integration with Github must go via this class.
   class Github
     URL_PARSERS = [
@@ -37,7 +36,7 @@ module RemoteServer
 
     # Class to use for merge methods
     def merge_executor
-        GitMergeExecutor
+      GitMergeExecutor
     end
 
     # Public: Returns a url for the remote repo in the format Kochiku prefers
@@ -96,5 +95,4 @@ module RemoteServer
       "https://#{attributes[:host]}/#{attributes[:repository_namespace]}/#{attributes[:repository_name]}"
     end
   end
-
 end

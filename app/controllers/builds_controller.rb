@@ -3,15 +3,15 @@ require 'git_repo'
 class BuildsController < ApplicationController
   before_filter :load_repository, :only => [:show, :retry_partitioning, :rebuild_failed_parts, :request_build, :abort, :toggle_merge_on_success, :build_status, :modified_time]
 
-  caches_action :show, :cache_path => proc { |c|
+  caches_action :show, cache_path: proc {
     updated_at = Build.select(:updated_at).find(params[:id]).updated_at
     { :modified => updated_at.to_i }
   }
 
   def show
-    @build = Build.includes(build_parts: :build_attempts).
-                   joins(:branch_record).where('branches.repository_id' => @repository.id).
-                   find(params[:id])
+    @build = Build.includes(build_parts: :build_attempts)
+             .joins(:branch_record).where('branches.repository_id' => @repository.id)
+             .find(params[:id])
 
     respond_to do |format|
       format.html
@@ -77,9 +77,9 @@ class BuildsController < ApplicationController
   end
 
   def rebuild_failed_parts
-    @build = Build.includes(build_parts: :build_attempts).
-                   joins(:branch_record).where('branches.repository_id' => @repository.id).
-                   find(params[:id])
+    @build = Build.includes(build_parts: :build_attempts)
+             .joins(:branch_record).where('branches.repository_id' => @repository.id)
+             .find(params[:id])
     @build.build_parts.failed_errored_or_aborted.each do |part|
       # There is an exceptional case in Kochiku where a build part's prior attempt may have
       # passed but the latest attempt failed. We do not want to rebuild those parts.
@@ -112,8 +112,8 @@ class BuildsController < ApplicationController
   end
 
   def modified_time
-    updated_at = Build.joins(:branch_record).where('branches.repository_id' => @repository.id).
-                       find(params[:id]).updated_at
+    updated_at = Build.joins(:branch_record).where('branches.repository_id' => @repository.id)
+                 .find(params[:id]).updated_at
     respond_to do |format|
       format.json do
         render :json => updated_at

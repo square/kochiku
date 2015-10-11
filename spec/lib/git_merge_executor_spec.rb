@@ -51,9 +51,9 @@ describe GitMergeExecutor do
 
       it "should raise an exception" do
         status_failure = double('Process::Status', :success? => false)
-        expect(Open3).to receive(:capture2e).with(/git push/).
-          and_return(["", status_failure]).
-          exactly(3).times
+        expect(Open3).to receive(:capture2e).with(/git push/)
+          .and_return(["", status_failure])
+          .exactly(3).times
         expect { subject }.to raise_error(described_class::GitPushFailedError)
       end
     end

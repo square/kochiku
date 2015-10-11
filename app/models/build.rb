@@ -19,21 +19,27 @@ class Build < ActiveRecord::Base
             AND newer_attempt.id > build_attempts.id
       EOSQL
     end
+
     def passed
       joins(:build_attempts).where("build_attempts.state" => :passed).group("build_parts.id")
     end
+
     def failed
       not_passed_and_last_attempt_in_state(:failed)
     end
+
     def failed_or_errored
       not_passed_and_last_attempt_in_state(:failed, :errored)
     end
+
     def failed_errored_or_aborted
       not_passed_and_last_attempt_in_state(:failed, :errored, :aborted)
     end
+
     def errored
       not_passed_and_last_attempt_in_state(:errored)
     end
+
     def all_passed_on_first_try?
       successful_build_attempts = joins(:build_attempts).where("build_attempts.state" => :passed).count
       unsuccessful_build_attempts = joins(:build_attempts).where("build_attempts.state != ?", :passed).count
@@ -60,11 +66,11 @@ class Build < ActiveRecord::Base
   scope :completed, -> { where(state: TERMINAL_STATES) }
 
   def test_command
-    (kochiku_yml && kochiku_yml.has_key?('test_command')) ? kochiku_yml['test_command'] : repository.test_command
+    (kochiku_yml && kochiku_yml.key?('test_command')) ? kochiku_yml['test_command'] : repository.test_command
   end
 
   def on_success_script
-    (kochiku_yml && kochiku_yml.has_key?('on_success_script')) ? kochiku_yml['on_success_script'] : nil
+    (kochiku_yml && kochiku_yml.key?('on_success_script')) ? kochiku_yml['on_success_script'] : nil
   end
 
   def previous_build
@@ -110,17 +116,17 @@ class Build < ActiveRecord::Base
     failed = build_parts.failed
 
     next_state = case
-      when (build_parts - passed).empty?
-        :succeeded
-      when self.state == :aborted
-        :aborted
-      when errored.any?
-        :errored
-      when (passed | failed).count == build_parts.count
-        :failed
-      else
-        failed.empty? ? :running : :doomed
-      end
+                 when (build_parts - passed).empty?
+                   :succeeded
+                 when self.state == :aborted
+                   :aborted
+                 when errored.any?
+                   :errored
+                 when (passed | failed).count == build_parts.count
+                   :failed
+                 else
+                   failed.empty? ? :running : :doomed
+                 end
 
     previous_state = self.state
     update_attributes!(:state => next_state) unless previous_state == next_state
@@ -196,7 +202,7 @@ class Build < ActiveRecord::Base
   end
 
   def merge_on_success_enabled?
-    !branch_record.convergence? && !!self.merge_on_success
+    !branch_record.convergence? && self.merge_on_success
   end
 
   def newer_branch_build_exists?
@@ -209,7 +215,7 @@ class Build < ActiveRecord::Base
   end
 
   def promote!
-    if !promoted?
+    unless promoted?
       BuildStrategy.promote_build(self)
       update!(promoted: true)
     end
@@ -226,9 +232,9 @@ class Build < ActiveRecord::Base
     update!(state: :aborted, merge_on_success: false)
 
     all_build_part_ids = build_parts.select([:id, :build_id]).collect(&:id)
-    BuildAttempt.
-        where(state: :runnable, build_part_id: all_build_part_ids).
-        update_all(state: :aborted, updated_at: Time.now)
+    BuildAttempt
+      .where(state: :runnable, build_part_id: all_build_part_ids)
+      .update_all(state: :aborted, updated_at: Time.now)
   end
 
   def to_color
@@ -286,14 +292,14 @@ class Build < ActiveRecord::Base
   end
 
   def junit_failures
-    # TODO fix n+1
+    # TODO: fix n+1
     build_parts.map(&:last_junit_failures).flatten
   end
 
   private
 
   def status_png(r, g, b)
-    ChunkyPNG::Canvas.new(13, 13, ChunkyPNG::Color::TRANSPARENT).
-      circle(6, 6, 5, ChunkyPNG::Color::BLACK, ChunkyPNG::Color.rgb(r, g, b))
+    ChunkyPNG::Canvas.new(13, 13, ChunkyPNG::Color::TRANSPARENT)
+      .circle(6, 6, 5, ChunkyPNG::Color::BLACK, ChunkyPNG::Color.rgb(r, g, b))
   end
 end

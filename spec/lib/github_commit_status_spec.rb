@@ -18,40 +18,40 @@ describe GithubCommitStatus do
 
   it "marks a build as pending" do
     build.update_attributes!(:state => :running)
-    expect(GithubRequest).to receive(:post).
-      with(%r|/statuses/#{build.ref}|,
-           hash_including(:state => 'pending'),
-           oauth_token
-          ).and_return(commit_status_response)
+    expect(GithubRequest).to receive(:post)
+      .with(%r|/statuses/#{build.ref}|,
+            hash_including(:state => 'pending'),
+            oauth_token
+           ).and_return(commit_status_response)
     subject.update_commit_status!
   end
 
   it "marks a build as success" do
     build.update_attributes!(:state => :succeeded)
-    expect(GithubRequest).to receive(:post).
-      with(%r|/statuses/#{build.ref}|,
-           hash_including(:state => 'success'),
-           oauth_token
-          ).and_return(commit_status_response)
+    expect(GithubRequest).to receive(:post)
+      .with(%r|/statuses/#{build.ref}|,
+            hash_including(:state => 'success'),
+            oauth_token
+           ).and_return(commit_status_response)
     subject.update_commit_status!
   end
 
   it "marks a build as failure" do
     build.update_attributes!(:state => :failed)
-    expect(GithubRequest).to receive(:post).
-      with(%r|/statuses/#{build.ref}|,
-           hash_including(:state => 'failure'),
-           oauth_token
-          ).and_return(commit_status_response)
+    expect(GithubRequest).to receive(:post)
+      .with(%r|/statuses/#{build.ref}|,
+            hash_including(:state => 'failure'),
+            oauth_token
+           ).and_return(commit_status_response)
     subject.update_commit_status!
   end
 
   it "uses a repos github url" do
     build.branch_record.update_attributes!(:repository => FactoryGirl.create(:repository, :url => "git@github.com:square/kochiku-worker.git"))
     build.update_attributes!(:state => :failed)
-    expect(GithubRequest).to receive(:post).
-      with("https://api.github.com/repos/square/kochiku-worker/statuses/#{build.ref}",
-           anything, anything).and_return(commit_status_response)
+    expect(GithubRequest).to receive(:post)
+      .with("https://api.github.com/repos/square/kochiku-worker/statuses/#{build.ref}",
+            anything, anything).and_return(commit_status_response)
     subject.update_commit_status!
   end
 

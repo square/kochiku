@@ -22,19 +22,20 @@ describe 'stash integration test' do
 
   describe ".setup_auth!" do
     it "should send username and password on" do
-      request = double()
+      request = double
       expect(request).to receive(:basic_auth).with("stashuser", "stashpassword")
       stash_request.setup_auth!(request)
     end
   end
 
   describe "#update_commit_status!" do
-    let(:build) { double('build',
-      ref:        'abc123',
-      repository: double('repository', to_param: 'my_namespace/my_repo_name'),
-      succeeded?: true,
-      id:         123
-    ) }
+    let(:build) {
+      double('build',
+             ref:        'abc123',
+             repository: double('repository', to_param: 'my_namespace/my_repo_name'),
+             succeeded?: true,
+             id:         123)
+    }
 
     it "should post to stash" do
       stub_request(:post, "https://stashuser:stashpassword@stash.example.com/rest/build-status/1.0/commits/#{build.ref}")
@@ -66,8 +67,9 @@ describe RemoteServer::Stash do
 
     it 'does not support HTTP auth credentials in URL' do
       # Use a netrc file instead.
-      expect { make_server \
-        "https://don@stash.example.com/scm/myproject/myrepo.git"
+      expect {
+        make_server \
+          "https://don@stash.example.com/scm/myproject/myrepo.git"
       }.to raise_error(RemoteServer::UnknownUrlFormat)
     end
 
