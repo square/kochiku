@@ -254,8 +254,12 @@ module RemoteServer
           body = response.body
           Rails.logger.info("Stash response: #{response.inspect}")
           Rails.logger.info("Stash response body: #{body.inspect}")
-          unless response.is_a? Net::HTTPSuccess
-            raise "#{response.class} body: #{body}"
+          unless response.is_a?(Net::HTTPSuccess)
+            if response.is_a?(Net::HTTPUnauthorized)
+              raise RemoteServer::AccessDenied.new(url, method, body)
+            else
+              raise "#{response.class} body: #{body}"
+            end
           end
         end
         body

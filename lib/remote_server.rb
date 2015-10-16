@@ -5,6 +5,17 @@ module RemoteServer
   UnknownGitServer = Class.new(RuntimeError)
   UnknownUrlFormat = Class.new(RuntimeError)
   RefDoesNotExist = Class.new(RuntimeError)
+  class AccessDenied < StandardError
+    def initialize(url, action, original_message = nil)
+      @url = url
+      @action = action
+      @original_message = original_message
+    end
+
+    def to_s
+      "Authorization failure when attempting to call #{@url} via #{@action}"
+    end
+  end
 
   def self.for_url(url)
     server = Settings.git_server(url)
