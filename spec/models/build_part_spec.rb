@@ -159,21 +159,6 @@ describe BuildPart do
     end
   end
 
-  describe "#last_junit_artifact" do
-    let(:artifact) { FactoryGirl.create(:build_artifact, :log_file => File.open(FIXTURE_PATH + "rspec.xml.log.gz")) }
-    let(:part) { artifact.build_attempt.build_part }
-
-    subject { part.last_junit_artifact }
-
-    it { should == artifact }
-
-    describe "#last_junit_failures" do
-      subject { part.last_junit_failures }
-
-      it { should have(1).testcase }
-    end
-  end
-
   describe "#should_reattempt?" do
     let(:build_part) { FactoryGirl.create(:build_part, retry_count: 1, build_instance: build) }
 

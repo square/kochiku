@@ -107,19 +107,4 @@ class BuildPart < ActiveRecord::Base
       false
     end
   end
-
-  def last_junit_artifact
-    artifacts = last_completed_attempt.try(:build_artifacts)
-    artifacts ? artifacts.junit_log.first : nil
-  end
-
-  def last_junit_failures
-    junit_artifact = last_junit_artifact
-    if junit_artifact
-      Zlib::GzipReader.open(junit_artifact.log_file.path) do |gz|
-        xml = Nokogiri::XML.parse(gz)
-        xml.xpath('//testcase[failure]')
-      end
-    end
-  end
 end

@@ -7,6 +7,5 @@ class BuildArtifact < ActiveRecord::Base
   validates_presence_of :log_file
 
   scope :stdout_log, -> { where(:log_file => ['stdout.log.gz', 'stdout.log']) }
-  scope :junit_log, -> { where(:log_file => 'rspec.xml.log.gz') }
   scope :error_txt, -> { where(:log_file => 'error.txt') }
 end

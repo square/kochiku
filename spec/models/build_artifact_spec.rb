@@ -9,15 +9,15 @@ describe BuildArtifact do
     expect(ba).to be_valid
   end
 
-  describe "junit_log scope" do
-    let!(:artifact)       { FactoryGirl.create :build_artifact }
-    let!(:junit_artifact) { FactoryGirl.create :build_artifact, :log_file => File.open(FIXTURE_PATH + 'rspec.xml.log.gz') }
+  describe "stdout_log scope" do
+    let!(:artifact) { FactoryGirl.create :build_artifact }
+    let!(:stdout_artifact) { FactoryGirl.create :build_artifact, :log_file => File.open(FIXTURE_PATH + 'stdout.log.gz') }
 
-    subject { BuildArtifact.junit_log }
+    subject { BuildArtifact.stdout_log }
 
-    it "should return artifacts that match rspec.xml.log" do
+    it "should return artifacts that match stdout.log" do
       should_not include(artifact)
-      should include(junit_artifact)
+      should include(stdout_artifact)
     end
   end
 end
