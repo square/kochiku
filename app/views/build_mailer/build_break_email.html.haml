@@ -20,9 +20,11 @@
     %ul
       - @failed_build_parts.each do |failed_build_part|
         %li
-          =link_to("Part number #{ failed_build_part.id }", repository_build_part_url(@build.repository, @build, failed_build_part))
-          failed after #{ failed_build_part.elapsed_time.to_i/60 } minutes,
-          for details you can go directly to the #{ link_to('stdout', failed_build_stdout(failed_build_part)) }
+          = link_to("Part number #{ failed_build_part.id }", repository_build_part_url(@build.repository, @build, failed_build_part))
+          failed after #{ failed_build_part.elapsed_time.to_i/60 } minutes
+          - stdout_log = failed_build_part.most_recent_stdout_artifact
+          - if stdout_log
+            , for details you can go directly to the #{link_to('stdout', build_artifact_url(stdout_log))}
     %br
     - @responsible_email_and_files.each do |email, files|
       #{ email } was emailed because of changes to:

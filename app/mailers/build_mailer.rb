@@ -53,7 +53,7 @@ class BuildMailer < ActionMailer::Base
       @git_changes = GitBlame.changes_in_branch(@build)
     end
 
-    @failed_build_parts = @build.build_parts.failed_or_errored
+    @failed_build_parts = @build.build_parts.failed_or_errored.decorate
     @pr_link = pull_request_link(build)
 
     mail :to => @emails,

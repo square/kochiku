@@ -12,8 +12,10 @@
 Failed build parts:
 <% @failed_build_parts.each do |failed_build_part| %>
   Go to <%= repository_build_part_url(@build.repository, @build, failed_build_part) %> for details
-  Or go directly to <%= failed_build_stdout(failed_build_part) %>
-
+  <% stdout_log = failed_build_part.most_recent_stdout_artifact %>
+  <% if stdout_log %>
+    Or go directly to <%= build_artifact_url(stdout_log) %>
+  <% end %>
 <% end %>
 
 <% @responsible_email_and_files.each do |email, files| %>

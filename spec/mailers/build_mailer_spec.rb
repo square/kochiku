@@ -38,8 +38,8 @@ describe BuildMailer do
       allow(Partitioner).to receive(:for_build).and_return(partitioner)
 
       build_part = build.build_parts.create!(:paths => ["a", "b"], :kind => "cucumber", :queue => :ci)
-      build_attempt = build_part.build_attempts.create!(:state => :failed, :builder => "test-builder")
-      FactoryGirl.create(:stdout_build_artifact, build_attempt: build_attempt)
+      @build_attempt = build_part.build_attempts.create!(:state => :failed, :builder => "test-builder")
+      FactoryGirl.create(:stdout_build_artifact, build_attempt: @build_attempt)
     end
 
     context "on a convergence branch" do
@@ -113,6 +113,29 @@ describe BuildMailer do
 
           email = BuildMailer.build_break_email(build)
           expect(email.html_part.body).to include("pull-requests/3/overview")
+        end
+      end
+    end
+
+    describe 'failed build part information' do
+      context 'stdout log file has been uploaded' do
+        it 'should link to the log file' do
+          stdout_artifact = @build_attempt.build_artifacts.stdout_log.first
+          email = BuildMailer.build_break_email(build)
+          expect(email.text_part.body).to include(build_artifact_url(stdout_artifact))
+          expect(email.html_part.body).to include(build_artifact_url(stdout_artifact))
+        end
+      end
+
+      context 'stdout log file has not been uploaded yet' do
+        before do
+          @build_attempt.build_artifacts.delete_all
+        end
+
+        it 'should not link to the log file' do
+          email = BuildMailer.build_break_email(build)
+          expect(email.text_part.body).to_not include("/build_artifacts/")
+          expect(email.html_part.body).to_not include("/build_artifacts/")
         end
       end
     end

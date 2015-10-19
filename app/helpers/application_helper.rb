@@ -66,12 +66,6 @@ module ApplicationHelper
     "#{build.repository.base_html_url}/pull/new/master...#{build.ref}"
   end
 
-  def failed_build_stdout(failed_build_part)
-    failed_build_attempt = failed_build_part.build_attempts.unsuccessful.last
-    stdout_build_artifact_id = failed_build_attempt.build_artifacts.stdout_log.first.id
-    "#{Settings.kochiku_host_with_protocol}/build_artifacts/#{stdout_build_artifact_id}"
-  end
-
   def timeago(time, options = {})
     options[:class] ||= "timeago"
     content_tag(:abbr, time.to_s, options.merge(:title => time.getutc.iso8601)) if time

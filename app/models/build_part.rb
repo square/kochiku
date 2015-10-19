@@ -12,10 +12,6 @@ class BuildPart < ActiveRecord::Base
     build_attempts.last
   end
 
-  def last_completed_attempt
-    build_attempts.reverse.find { |bp| BuildAttempt::COMPLETED_BUILD_STATES.include?(bp.state) }
-  end
-
   def create_and_enqueue_new_build_attempt!
     begin
       build_attempt = build_attempts.create!(:state => :runnable)
@@ -110,11 +106,6 @@ class BuildPart < ActiveRecord::Base
     else
       false
     end
-  end
-
-  def last_stdout_artifact
-    artifacts = last_completed_attempt.try(:build_artifacts)
-    artifacts ? artifacts.stdout_log.first : nil
   end
 
   def last_junit_artifact
