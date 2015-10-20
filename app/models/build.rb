@@ -291,11 +291,6 @@ class Build < ActiveRecord::Base
     IN_PROGRESS_STATES.include?(self.state)
   end
 
-  def junit_failures
-    # TODO: fix n+1
-    build_parts.map(&:last_junit_failures).flatten
-  end
-
   private
 
   def status_png(r, g, b)

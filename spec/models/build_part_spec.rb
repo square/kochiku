@@ -159,52 +159,6 @@ describe BuildPart do
     end
   end
 
-  context "#last_completed_attempt" do
-    it "does not find if not in a completed state" do
-      (BuildAttempt::STATES - BuildAttempt::COMPLETED_BUILD_STATES).each do |state|
-        FactoryGirl.create(:build_attempt, :state => state)
-      end
-      expect(BuildPart.last.last_completed_attempt).to be_nil
-    end
-    it "does find a completed" do
-      attempt = FactoryGirl.create(:build_attempt, :state => :passed)
-      expect(BuildPart.last.last_completed_attempt).to eq(attempt)
-    end
-  end
-
-  describe "#last_stdout_artifact" do
-    let(:artifact) { FactoryGirl.create(:build_artifact, :log_file => File.open(FIXTURE_PATH + file)) }
-    let(:attempt) { artifact.build_attempt }
-    let(:part) { attempt.build_part }
-
-    subject { part.last_stdout_artifact }
-
-    context "stdout.log" do
-      let(:file) { "stdout.log" }
-      it { should == artifact }
-    end
-
-    context "stdout.log.gz" do
-      let(:file) { "stdout.log.gz" }
-      it { should == artifact }
-    end
-  end
-
-  describe "#last_junit_artifact" do
-    let(:artifact) { FactoryGirl.create(:build_artifact, :log_file => File.open(FIXTURE_PATH + "rspec.xml.log.gz")) }
-    let(:part) { artifact.build_attempt.build_part }
-
-    subject { part.last_junit_artifact }
-
-    it { should == artifact }
-
-    describe "#last_junit_failures" do
-      subject { part.last_junit_failures }
-
-      it { should have(1).testcase }
-    end
-  end
-
   describe "#should_reattempt?" do
     let(:build_part) { FactoryGirl.create(:build_part, retry_count: 1, build_instance: build) }
 
