@@ -1,5 +1,5 @@
 class BuildMailer < ActionMailer::Base
-  helper :application
+  helper :application, :mail
 
   default :from => Proc.new { Settings.sender_email_address }
 
