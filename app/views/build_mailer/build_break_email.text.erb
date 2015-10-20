@@ -1,25 +1,15 @@
 <%= @build.branch_record.name %> build failed for <%= @build.repository.name %>
 <%= repository_build_url(@build.repository, @build) %>
-<% if @build.build_parts.count > 1 %>
-  The build was sharded into <%= @build.build_parts.count %> parts and took <%= @build.elapsed_time.to_i/60 %> minutes.
-  (<%= @build.idle_time.to_i/60 %>m idle, <%= @build.longest_build_part.to_i/60 %>m running.)
-  Without sharding the build would have taken <%= @build.linear_time.to_i/60 %> minutes to run.
-<% else %>
-  The build took <%= @build.elapsed_time.to_i/60 %> minutes.
-  (<%= @build.idle_time.to_i/60 %>m idle, <%= @build.longest_build_part.to_i/60 %>m running.)
-<% end %>
 
-Failed build parts:
-<% @failed_build_parts.each do |failed_build_part| %>
-  Go to <%= repository_build_part_url(@build.repository, @build, failed_build_part) %> for details
-  <% stdout_log = failed_build_part.most_recent_stdout_artifact %>
-  <% if stdout_log %>
-    Or go directly to <%= build_artifact_url(stdout_log) %>
-  <% end %>
+<% if @build.build_parts.count > 1 %>
+The build was sharded into <%= @build.build_parts.count %> parts and took <%= @build.elapsed_time.to_i/60 %> minutes. (<%= @build.idle_time.to_i/60 %>m idle, <%= @build.longest_build_part.to_i/60 %>m running.)
+Without sharding the build would have taken <%= @build.linear_time.to_i/60 %> minutes to run.
+<% else %>
+The build took <%= @build.elapsed_time.to_i/60 %> minutes. (<%= @build.idle_time.to_i/60 %>m idle, <%= @build.longest_build_part.to_i/60 %>m running.)
 <% end %>
 
 <% @responsible_email_and_files.each do |email, files| %>
-  <%= email %> was emailed because of changes to <%= files.join(", ") %>
+<%= email %> was emailed because of changes to <%= files.join(", ") %>
 <% end %>
 
 --------------------------------------------------------------------------------
