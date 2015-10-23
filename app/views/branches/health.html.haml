@@ -26,6 +26,32 @@
       %span.number= rate
       %span.label pass rate on first try
 
+  .stats
+    %h2.subheader Build statistics
+    %p= "Build created on #{@first_built_date.strftime("%Y-%m-%d")}"
+    %table.build-stats
+      %thead
+        %tr
+          %th
+          %th Total
+          %th Failures
+          %th Pass Rate
+        %tr
+          %td= "All Time (#{@days_since_first_build} days)"
+          %td= @total_build_count
+          %td= @total_failure_count
+          %td= "#{@total_pass_rate}%"
+        %tr
+          %td Past 30 days
+          %td= @last30_build_count
+          %td= @last30_failure_count
+          %td= "#{@last30_pass_rate}%"
+        %tr
+          %td Past 7 days
+          %td= @last7_build_count
+          %td= @last7_failure_count
+          %td= "#{@last7_pass_rate}%"
+
 - if @part_climate.count > 0
   %h2.subheader= "#{@repository.name}/#{@branch.name} part failure stats over #{@builds.count} builds"
   %table.project-part-info
