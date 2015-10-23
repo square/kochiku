@@ -61,6 +61,7 @@ class BranchesController < ApplicationController
 
   def health
     load_repository_and_branch
+    load_build_stats
 
     @builds = @branch.builds.includes(:build_parts => :build_attempts).last(params[:count] || 12)
 
@@ -123,5 +124,22 @@ class BranchesController < ApplicationController
   def load_repository_and_branch
     @repository || load_repository
     @branch ||= @repository.branches.where(name: params[:id]).first!
+  end
+
+  def load_build_stats
+    @first_built_date = @branch.builds.first.created_at
+    @days_since_first_build = (Date.today - @first_built_date.to_date).to_i
+
+    @total_build_count = @branch.builds.count
+    @total_failure_count = @branch.builds.where.not(state: 'succeeded').count
+    @total_pass_rate = (@total_build_count - @total_failure_count) * 100 / @total_build_count
+
+    @last30_build_count = @branch.builds.where('created_at >= ?', Date.today - 30.days).count
+    @last30_failure_count = @last30_build_count - @branch.builds.where('state = "succeeded" AND created_at >= ?', Date.today - 30.days).count
+    @last30_pass_rate = (@last30_build_count - @last30_failure_count) * 100 / @last30_build_count
+
+    @last7_build_count = @branch.builds.where('created_at >= ?', Date.today - 7.days).count
+    @last7_failure_count = @last7_build_count - @branch.builds.where('state = "succeeded" AND created_at >= ?', Date.today - 7.days).count
+    @last7_pass_rate = (@last7_build_count - @last7_failure_count) * 100 / @last7_build_count
   end
 end
