@@ -2,6 +2,14 @@ require 'spec_helper'
 
 RSpec.describe Branch, type: :model do
 
+  it 'should fail on nil name' do
+    expect(FactoryGirl.build(:branch, name: nil).valid?).to be false
+  end
+
+  it 'should fail on empty name' do
+    expect(FactoryGirl.build(:branch, name: "").valid?).to be false
+  end
+
   describe '#abort_in_progress_builds_behind_build' do
     let(:branch) { FactoryGirl.create(:branch) }
 

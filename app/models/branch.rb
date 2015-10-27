@@ -2,6 +2,8 @@ class Branch < ActiveRecord::Base
   belongs_to :repository
   has_many :builds, :dependent => :destroy, :inverse_of => :branch_record
 
+  validates :name, :presence => true
+
   def to_param
     self.name
   end
