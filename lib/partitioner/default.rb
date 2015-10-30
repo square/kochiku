@@ -50,7 +50,7 @@ module Partitioner
     end
 
     def partitions_for(subset)
-      glob = subset.fetch('glob', '') # Dir[''] == []
+      glob = subset.fetch('glob', '/dev/null')
       type = subset.fetch('type', 'test')
       workers = subset.fetch('workers', 1)
       manifest = subset['manifest']
