@@ -36,6 +36,9 @@ Style/GuardClause:
   # Permit this for reasonably sized methods
   MinBodyLength: 7
 
+Style/IfUnlessModifier:
+  Enabled: false
+
 Style/MultilineBlockChain:
   Enabled: false
 
