@@ -5,8 +5,8 @@ class PollRepositoriesJob
 
       begin
         head = repo.sha_for_branch(branch.name)
-      rescue RemoteServer::RefDoesNotExist, Zlib::BufError => e
-        Rails.logger.info("[PollRepositoriesJob] Exception #{e} occurred for repo #{repo.id}:#{repo.name}")
+      rescue RemoteServer::AccessDenied, RemoteServer::RefDoesNotExist, Zlib::BufError => e
+        Rails.logger.error("[PollRepositoriesJob] Exception #{e} occurred for repo #{repo.id}:#{repo.name}")
         next
       end
 
