@@ -4,7 +4,7 @@
 #                                                                       #
 #########################################################################
 
-# The descriptions for these settings are in config/application.yml.
+# The descriptions for these settings are in config/application.dev.yml
 
 sender_email_address: 'kochiku@example.com'
 kochiku_notifications_email_address: 'kochiku-notifications@example.com'

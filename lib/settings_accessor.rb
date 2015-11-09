@@ -59,6 +59,10 @@ class SettingsAccessor
     @hash[:redis_host]
   end
 
+  def redis_port
+    @hash.fetch(:redis_port, 6379)
+  end
+
   def git_pair_email_prefix
     @hash[:git_pair_email_prefix]
   end
