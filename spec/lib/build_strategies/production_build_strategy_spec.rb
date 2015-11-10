@@ -115,7 +115,6 @@ describe BuildStrategy do
     }
 
     before do
-      allow(GitRepo).to receive(:inside_copy).and_yield
       expect(build).to receive(:on_success_script).and_return("./this_is_a_triumph")
     end
 

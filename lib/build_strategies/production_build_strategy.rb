@@ -24,7 +24,7 @@ class BuildStrategy
     end
 
     def run_success_script(build)
-      GitRepo.inside_copy(build.repository, build.ref) do
+      GitRepo.inside_repo(build.repository) do
         command = Cocaine::CommandLine.new(on_success_command(build), "", :expected_outcodes => 0..255)
         output = command.run
         output += "\nExited with status: #{command.exit_status}"
