@@ -25,7 +25,8 @@ class BuildStrategy
 
     def run_success_script(build)
       GitRepo.inside_repo(build.repository) do
-        command = Cocaine::CommandLine.new(on_success_command(build), "", :expected_outcodes => 0..255)
+        # stderr is redirected to stdout so that all output is captured in the log
+        command = Cocaine::CommandLine.new(on_success_command(build), "2>&1", expected_outcodes: 0..255)
         output = command.run
         output += "\nExited with status: #{command.exit_status}"
         script_log = FilelessIO.new(output)
