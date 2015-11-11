@@ -13,8 +13,7 @@ class GitRepo
       synchronize_cache_repo(cached_repo_path)
 
       Dir.mktmpdir(nil, WORKING_DIR) do |dir|
-        # clone local repo (fast!)
-        Cocaine::CommandLine.new("git clone", "#{cached_repo_path} #{dir}").run
+        Cocaine::CommandLine.new("git clone", "--config remote.origin.pushurl=#{repo.url} #{cached_repo_path} #{dir}").run
 
         Dir.chdir(dir) do
           raise RefNotFoundError, "repo:#{repository.url}, sha:#{sha}" unless system("git rev-list --quiet -n1 #{sha}")
@@ -75,7 +74,7 @@ class GitRepo
       cached_repo_path = WORKING_DIR.join(repository.repo_cache_name)
 
       if !cached_repo_path.directory?
-        clone_repo(repository, cached_repo_path)
+        clone_bare_repo(repository, cached_repo_path)
       else
         harmonize_remote_url(cached_repo_path, repository.url_for_fetching)
       end
@@ -102,11 +101,11 @@ class GitRepo
       end
     end
 
-    def clone_repo(repo, cached_repo_path)
+    def clone_bare_repo(repo, cached_repo_path)
       # Note: the --config option was added in git 1.7.7
       Cocaine::CommandLine.new(
         "git clone",
-        "--recursive --config remote.origin.pushurl=#{repo.url} #{repo.url_for_fetching} #{cached_repo_path}"
+        "--bare --quiet --config remote.origin.pushurl=#{repo.url} #{repo.url_for_fetching} #{cached_repo_path}"
       ).run
     end
 
