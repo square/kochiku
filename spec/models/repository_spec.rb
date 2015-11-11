@@ -154,11 +154,6 @@ describe Repository do
 
   context "#repo_cache_name" do
     it "returns the cache from the settings or the default from the repo name" do
-      repository = Repository.new(:repo_cache_dir => "foobar")
-      expect(repository.repo_cache_name).to eq("foobar")
-    end
-
-    it "returns the cache from the settings or the default from the repo name" do
       repository = Repository.new(url: "https://git.example.com/square/kochiku")
       repository.valid?
       expect(repository.repo_cache_name).to eq("kochiku-cache")

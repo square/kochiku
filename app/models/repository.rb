@@ -55,7 +55,7 @@ class Repository < ActiveRecord::Base
   delegate :base_html_url, :base_api_url, :sha_for_branch, :url_for_fetching, to: :remote_server
 
   def repo_cache_name
-    repo_cache_dir || "#{name}-cache"
+    "#{name}-cache"
   end
 
   def promotion_refs
