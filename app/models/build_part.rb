@@ -35,7 +35,7 @@ class BuildPart < ActiveRecord::Base
       "build_ref" => build_instance.ref,
       "branch" => build_instance.branch_record.name,
       "test_files" => paths,
-      "repo_name" => repository.repo_cache_name,
+      "repo_name" => "#{repository.name}-cache",  # need to pass -cache for now for compatibility with current kochiku-worker
       "test_command" => build_instance.test_command,
       "repo_url" => repository.url_for_fetching,
       "remote_name" => "origin",

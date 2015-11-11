@@ -152,14 +152,6 @@ describe Repository do
     end
   end
 
-  context "#repo_cache_name" do
-    it "returns the cache from the settings or the default from the repo name" do
-      repository = Repository.new(url: "https://git.example.com/square/kochiku")
-      repository.valid?
-      expect(repository.repo_cache_name).to eq("kochiku-cache")
-    end
-  end
-
   context "#run_ci=" do
     it "converts the checkbox to bool" do
       repository = FactoryGirl.create(:repository)

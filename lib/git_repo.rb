@@ -71,9 +71,10 @@ class GitRepo
     end
 
     def cached_repo_for(repository)
-      cached_repo_path = WORKING_DIR.join(repository.repo_cache_name)
+      cached_repo_path = WORKING_DIR.join(repository.namespace, "#{repository.name}.git")
 
       if !cached_repo_path.directory?
+        FileUtils.mkdir_p(WORKING_DIR.join(repository.namespace))
         clone_bare_repo(repository, cached_repo_path)
       else
         harmonize_remote_url(cached_repo_path, repository.url_for_fetching)

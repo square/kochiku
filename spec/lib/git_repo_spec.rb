@@ -26,7 +26,11 @@ describe GitRepo do
       FileUtils.mkdir GitRepo::WORKING_DIR
     end
 
-    it 'does not use a cached copy if remote URL has changed' do
+    it 'updates the remote URL of the cached copy if the remote URL has changed' do
+      # Stipulates that the namespace and the name of the repo are still the
+      # same. This is for situations where something else about the url
+      # changed, e.g. switched to a git mirror
+
       Dir.mktmpdir do |old_remote|
         Dir.mktmpdir do |new_remote|
 
@@ -38,27 +42,25 @@ describe GitRepo do
           end
 
           repository = double('Repository',
-                              repo_cache_name:  'test-repo',
+                              namespace:        'sq',
+                              name:             'fun-with-flags',
                               url:              'push-url',
                               url_for_fetching: old_remote)
           # Clone the repo first time, prime the cache.
-          GitRepo.inside_repo(repository) {}
+          GitRepo.inside_repo(repository, sync: false) {}
 
-          `git clone -q #{old_remote} #{new_remote}`
+          # make a copy of the faux remote
+          FileUtils.cp_r("#{old_remote}/.", new_remote, verbose: false)
 
-          repository = double('Repository',
-                              repo_cache_name:  'test-repo',
-                              url:              'push-url',
-                              url_for_fetching: new_remote)
+          allow(repository).to receive(:url_for_fetching).and_return(new_remote)
 
-          actual_remote = nil
-
-          # Same repository, different URL.
-          GitRepo.inside_repo(repository) do
-            actual_remote = `git config --get remote.origin.url`.chomp
+          # retrieve the updated url of the repository
+          updated_remote = nil
+          GitRepo.inside_repo(repository, sync: false) do
+            updated_remote = `git config --get remote.origin.url`.chomp
           end
 
-          expect(actual_remote).to eq(new_remote)
+          expect(updated_remote).to eq(new_remote)
         end
       end
     end
