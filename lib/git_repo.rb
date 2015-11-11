@@ -21,8 +21,6 @@ class GitRepo
 
           Cocaine::CommandLine.new("git checkout", "--quiet :commit").run(commit: sha)
 
-          synchronize_submodules_from_cached_repo(repository, cached_repo_path)
-
           yield dir
         end
       end
@@ -101,7 +99,6 @@ class GitRepo
       Dir.chdir(cached_repo_path) do
         # update the cached repo
         synchronize_with_remote('origin')
-        synchronize_submodules
       end
     end
 
@@ -124,72 +121,6 @@ class GitRepo
         retry
       else
         raise e
-      end
-    end
-
-    def with_submodules
-      return unless File.exist?('.gitmodules')
-
-      Cocaine::CommandLine.new("git submodule", "--quiet init").run
-      submodules = Cocaine::CommandLine.new('git config', '--get-regexp "^submodule\\..*\\.url$"').run
-
-      yield submodules unless submodules.empty?
-    end
-
-    def synchronize_submodules
-      with_submodules do |submodules|
-        submodules.each_line do |config_line|
-          submodule_path = config_line.match(/submodule\.(.*?)\.url/)[1]
-          existing_url = config_line.split(" ")[1]
-          begin
-            submodule_url = RemoteServer.for_url(existing_url).url_for_fetching
-            if existing_url != submodule_url
-              Cocaine::CommandLine.new("git config",
-                                       "--replace-all submodule.#{submodule_path}.url '#{submodule_url}'").run
-            end
-          rescue RemoteServer::UnknownGitServer
-            # If the settings don't contain information about the server, don't rewrite it
-          end
-        end
-
-        Cocaine::CommandLine.new('git submodule', '--quiet update').run
-      end
-    end
-
-    def synchronize_submodules_from_cached_repo(repo, cached_repo_path)
-      with_submodules do |submodules|
-        cached_submodules = ""
-        inside_repo(repo, sync: false) do
-          begin
-            cached_submodules = Cocaine::CommandLine.new('git config', '--get-regexp "^submodule\\..*\\.url$"').run
-          rescue Cocaine::ExitStatusError
-            Rails.logger.info "Failed to find any initialized submodules in the cache repo."
-          end
-        end
-
-        # Redirect the submodules to the cached_repo
-        # If the submodule was added since the last time the cache was synchronized with the remote
-        # then it will not be present in the cached_repo and we will use a remote url to clone
-        submodules.each_line do |config_line|
-          submodule_path = config_line.match(/submodule\.(.*?)\.url/)[1]
-          if cached_submodules.include?(config_line)
-            Cocaine::CommandLine.new("git config",
-                                     "--replace-all submodule.#{submodule_path}.url '#{cached_repo_path}/#{submodule_path}'").run
-          else
-            existing_url = config_line.split(" ")[1]
-            begin
-              submodule_url = RemoteServer.for_url(existing_url).url_for_fetching
-              if existing_url != submodule_url
-                Cocaine::CommandLine.new("git config",
-                                         "--replace-all submodule.#{submodule_path}.url '#{submodule_url}'").run
-              end
-            rescue RemoteServer::UnknownGitServer
-              # If the settings don't contain information about the server, don't rewrite it
-            end
-          end
-        end
-
-        Cocaine::CommandLine.new('git submodule', '--quiet update').run
       end
     end
   end
