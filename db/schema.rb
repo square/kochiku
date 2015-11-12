@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150719130110) do
+ActiveRecord::Schema.define(version: 20151111080255) do
 
   create_table "branches", force: :cascade do |t|
     t.integer  "repository_id", limit: 4,                   null: false
@@ -100,7 +100,6 @@ ActiveRecord::Schema.define(version: 20150719130110) do
     t.boolean  "run_ci"
     t.boolean  "build_pull_requests"
     t.string   "on_green_update",             limit: 255
-    t.string   "repo_cache_dir",              limit: 255
     t.boolean  "send_build_failure_email",                default: true,  null: false
     t.integer  "timeout",                     limit: 4,   default: 40
     t.string   "name",                        limit: 255,                 null: false

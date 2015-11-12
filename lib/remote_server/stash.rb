@@ -131,7 +131,7 @@ module RemoteServer
       if success
         Rails.logger.info("Request to stash to merge PR #{pr_id} for branch #{branch} succeeded.")
       else
-        Rails.logger.info("Request to stash to merge PR #{pr_id} for branch #{branch} failed.")
+        Rails.logger.warn("Request to stash to merge PR #{pr_id} for branch #{branch} failed.")
       end
 
       success

@@ -5,9 +5,6 @@ class StashMergeExecutor < GitMergeExecutor
 
   # Merges the branch associated with a build using the Stash REST api.
   def merge_and_push
-    # builds on convergence branches are ineligible for merge
-    return if @build.branch_record.convergence?
-
     remote_server = @build.repository.remote_server
     Rails.logger.info("Trying to merge branch #{@build.branch_record.name} after build id #{@build.id} using Stash REST api")
     merge_success = remote_server.merge(@build.branch_record.name)

@@ -6,8 +6,8 @@ class GitMergeExecutor
   class GitPushFailedError < StandardError; end
 
   def initialize(build)
-    if build.branch_record.blank?
-      raise "GitMergeExecutor requires a Build associated with a git branch"
+    if build.branch_record.convergence?
+      raise "attempted to merge #{build.branch_record.name} which is a convergence branch and is ineligible for merge by Kochiku"
     end
     @build = build
   end

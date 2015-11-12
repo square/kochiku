@@ -8,12 +8,15 @@ describe BuildStrategy do
 
   before(:each) do
     CommandStubber.new # ensure Open3 is stubbed
-    allow(GitRepo).to receive(:inside_repo).and_yield
 
     expect(Rails.application.config.action_mailer.delivery_method).to eq(:test)
   end
 
   describe "#merge_ref" do
+    before do
+      allow(GitRepo).to receive(:inside_copy).and_yield
+    end
+
     context "when auto_merge is enabled" do
       before do
         expect(GitBlame).to receive(:emails_in_branch).with(an_instance_of(Build)).and_return("the-committers@example.com")
@@ -73,6 +76,10 @@ describe BuildStrategy do
   describe "#promote_build" do
     subject { described_class.promote_build(build) }
 
+    before do
+      allow(GitRepo).to receive(:inside_repo).and_yield
+    end
+
     context "when the ref is an ancestor" do
       before(:each) {
         expect(GitRepo).to receive(:included_in_promotion_ref?).and_return(true)
@@ -115,6 +122,7 @@ describe BuildStrategy do
     }
 
     before do
+      allow(GitRepo).to receive(:inside_copy).and_yield
       expect(build).to receive(:on_success_script).and_return("./this_is_a_triumph")
     end
 

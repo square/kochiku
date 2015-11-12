@@ -24,7 +24,7 @@ class BuildStrategy
     end
 
     def run_success_script(build)
-      GitRepo.inside_repo(build.repository) do
+      GitRepo.inside_copy(build.repository, build.ref) do
         # stderr is redirected to stdout so that all output is captured in the log
         command = Cocaine::CommandLine.new(on_success_command(build), "2>&1", expected_outcodes: 0..255)
         output = command.run
@@ -37,7 +37,8 @@ class BuildStrategy
     end
 
     def merge_ref(build)
-      GitRepo.inside_repo(build.repository) do
+      # If only Stash is used this could be just inside_repo
+      GitRepo.inside_copy(build.repository, "master") do
         begin
           emails = GitBlame.emails_in_branch(build)
           merger = build.repository.remote_server.merge_executor.new(build)

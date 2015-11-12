@@ -38,9 +38,8 @@ describe StashMergeExecutor do
     context "for a build on a convergence branch" do
       let(:branch) { FactoryGirl.create(:convergence_branch, repository: repository) }
 
-      it "should do nothing" do
-        expect(stash_build.repository.remote_server).to_not receive(:merge)
-        subject
+      it "should raise an exception" do
+        expect { subject }.to raise_error(/ineligible for merge/)
       end
     end
   end
