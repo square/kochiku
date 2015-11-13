@@ -69,14 +69,4 @@ RSpec.configure do |config|
 
     ActionMailer::Base.deliveries.clear
   end
-
-  config.before(:suite) do
-    test_repo = Rails.root.join('tmp', 'build-partition', 'test-repo-cache')
-    unless File.exist?(test_repo)
-      FileUtils.mkdir_p test_repo
-      Dir.chdir(test_repo) do
-        Cocaine::CommandLine.new("git init").run
-      end
-    end
-  end
 end
