@@ -106,12 +106,12 @@ class GitRepo
       # Note: the --config option was added in git 1.7.7
       Cocaine::CommandLine.new(
         "git clone",
-        "--bare --quiet --config remote.origin.pushurl=#{repo.url} #{repo.url_for_fetching} #{cached_repo_path}"
+        "--bare --quiet --config remote.origin.pushurl=#{repo.url} --config remote.origin.fetch='+refs/heads/*:refs/heads/*' --config remote.origin.tagopt='--no-tags' #{repo.url_for_fetching} #{cached_repo_path}"
       ).run
     end
 
     def synchronize_with_remote(name)
-      Cocaine::CommandLine.new("git fetch", "--quiet --prune --no-tags #{name}").run
+      Cocaine::CommandLine.new("git fetch", "--quiet --prune #{name}").run
     rescue Cocaine::ExitStatusError => e
       # likely caused by another 'git fetch' that is currently in progress. Wait a few seconds and try again
       tries = (tries || 0) + 1
