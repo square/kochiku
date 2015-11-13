@@ -13,7 +13,7 @@ class GitRepo
       synchronize_cache_repo(cached_repo_path)
 
       Dir.mktmpdir(nil, WORKING_DIR) do |dir|
-        Cocaine::CommandLine.new("git clone", "--config remote.origin.pushurl=#{repo.url} #{cached_repo_path} #{dir}").run
+        Cocaine::CommandLine.new("git clone", "--config remote.origin.pushurl=#{repository.url} #{cached_repo_path} #{dir}").run
 
         Dir.chdir(dir) do
           raise RefNotFoundError, "repo:#{repository.url}, sha:#{sha}" unless system("git rev-list --quiet -n1 #{sha}")
