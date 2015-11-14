@@ -68,13 +68,13 @@ class GitBlame
 
     def git_names_and_emails_since_last_green(build)
       GitRepo.inside_repo(build.repository) do
-        Cocaine::CommandLine.new("git log --format='%cn:%ce' --cc '#{build.previous_successful_build.try(:ref)}...#{build.ref}'").run.split("\n")
+        Cocaine::CommandLine.new("git log --format='%cn:%ce' '#{build.previous_successful_build.try(:ref)}...#{build.ref}'").run.split("\n")
       end
     end
 
     def git_names_and_emails_in_branch(build)
       GitRepo.inside_repo(build.repository) do
-        Cocaine::CommandLine.new("git log --format='%cn:%ce' --cc 'master..#{build.branch_record.name}'").run.split("\n")
+        Cocaine::CommandLine.new("git log --format='%cn:%ce' 'master..#{build.branch_record.name}'").run.split("\n")
       end
     end
 
