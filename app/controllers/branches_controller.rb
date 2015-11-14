@@ -5,10 +5,12 @@ class BranchesController < ApplicationController
     { :modified => updated_at.to_i }
   }
 
-  # lists all of the branches for a repository
+  # lists all convergence branches as well the 100 most recently active
+  # branches
   def index
     load_repository
-    @branches = @repository.branches
+    @convergence_branches = @repository.branches.where(convergence: true)
+    @recently_active_branches = @repository.branches.where(convergence: false).order('updated_at DESC').limit(100)
   end
 
   def show
