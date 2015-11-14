@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20151111080255) do
+ActiveRecord::Schema.define(version: 20151114185514) do
 
   create_table "branches", force: :cascade do |t|
     t.integer  "repository_id", limit: 4,                   null: false
@@ -21,7 +21,7 @@ ActiveRecord::Schema.define(version: 20151111080255) do
     t.datetime "updated_at",                                null: false
   end
 
-  add_index "branches", ["convergence"], name: "index_branches_on_convergence", using: :btree
+  add_index "branches", ["repository_id", "convergence"], name: "index_branches_on_repository_id_and_convergence", using: :btree
   add_index "branches", ["repository_id", "name"], name: "index_branches_on_repository_id_and_name", unique: true, using: :btree
 
   create_table "build_artifacts", force: :cascade do |t|
