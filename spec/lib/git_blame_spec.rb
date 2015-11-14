@@ -147,14 +147,14 @@ describe GitBlame do
               `git config user.email "test@example.com" && git config user.name "test"`
               FileUtils.touch("TESTFILE")
               `git add -A && git commit -m "commit 1" && git tag a`
-              `git checkout -b branch`
+              `git checkout -q -b branch`
               FileUtils.touch("TESTFILE2")
               `git add -A && git commit -m "commit 2" && git tag b`
-              `git checkout -`
+              `git checkout -q -`
               FileUtils.touch("TESTFILE3")
               `git add -A && git commit -m "commit 3" && git tag c`
               # --no-commit allows us to change arbitrary files, like in merge conflict resolution
-              `git merge branch --no-ff --no-commit`
+              `git merge branch --no-ff --no-commit 2> /dev/null`
               # modify a new file during the merge not modified by parents
               FileUtils.touch("NEWFILE")
               `git add -A && git commit -m "merge commit" && git tag d`

@@ -47,7 +47,7 @@ class GitRepo
       # --is-ancestor was added in git 1.8.0
       # exit ->   1: not an ancestor
       # exit -> 128: the commit does not exist
-      ancestor_cmd = Cocaine::CommandLine.new("git merge-base", "--is-ancestor #{build_ref} origin/#{promotion_ref}", :expected_outcodes => [0, 1, 128])
+      ancestor_cmd = Cocaine::CommandLine.new("git merge-base", "--is-ancestor #{build_ref} #{promotion_ref}", :expected_outcodes => [0, 1, 128])
       ancestor_cmd.run
       ancestor_cmd.exit_status == 0
     end
@@ -106,12 +106,12 @@ class GitRepo
       # Note: the --config option was added in git 1.7.7
       Cocaine::CommandLine.new(
         "git clone",
-        "--bare --quiet --config remote.origin.pushurl=#{repo.url} #{repo.url_for_fetching} #{cached_repo_path}"
+        "--bare --quiet --config remote.origin.pushurl=#{repo.url} --config remote.origin.fetch='+refs/heads/*:refs/heads/*' --config remote.origin.tagopt='--no-tags' #{repo.url_for_fetching} #{cached_repo_path}"
       ).run
     end
 
     def synchronize_with_remote(name)
-      Cocaine::CommandLine.new("git fetch", "--quiet --prune --no-tags #{name}").run
+      Cocaine::CommandLine.new("git fetch", "--quiet --prune #{name}").run
     rescue Cocaine::ExitStatusError => e
       # likely caused by another 'git fetch' that is currently in progress. Wait a few seconds and try again
       tries = (tries || 0) + 1
