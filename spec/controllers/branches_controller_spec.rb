@@ -6,13 +6,14 @@ describe BranchesController do
 
   describe "#index" do
     let(:repo) { FactoryGirl.create(:repository) }
-    let!(:a) { FactoryGirl.create(:branch, name: 'aster', repository: repo) }
+    let!(:a) { FactoryGirl.create(:branch, name: 'aster', repository: repo, convergence: true) }
     let!(:b) { FactoryGirl.create(:branch, name: 'buckeye', repository: repo) }
     let!(:c) { FactoryGirl.create(:branch, name: 'creosote', repository: repo) }
 
     it "shows branches in order" do
       get :index, repository_path: repo
-      expect(assigns(:branches).map(&:name)).to eq(%w{aster buckeye creosote})
+      expect(assigns(:convergence_branches).map(&:name)).to eq(%w{aster})
+      expect(assigns(:recently_active_branches).map(&:name)).to eq(%w{buckeye creosote})
     end
   end
 
@@ -158,7 +159,7 @@ describe BranchesController do
     end
 
     context "with extra convergence branch and one non-convergence" do
-      before do 
+      before do
         FactoryGirl.create(:branch, :name => 'feature-branch', convergence: false, repository: repository)
         FactoryGirl.create(:branch, :name => 'convergence', convergence: true, repository: repository)
       end

@@ -4,6 +4,9 @@
 
 .projects
   %ul
-    - @branches.each do |branch|
-      %li.build-info{:class => ("bold" if branch.convergence?)}
+    - @convergence_branches.each do |branch|
+      %li.build-info{class: 'bold'}
+        = link_to(branch.name, repository_branch_path(branch.repository, branch))
+    - @recently_active_branches.each do |branch|
+      %li.build-info
         = link_to(branch.name, repository_branch_path(branch.repository, branch))
