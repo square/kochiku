@@ -123,6 +123,18 @@ describe BuildsController do
     end
   end
 
+  describe "#show" do
+    it "should return a valid JSON" do
+      branch = FactoryGirl.create(:branch, name: 'gummy-bears')
+      build = FactoryGirl.create(:build, branch_record: branch)
+      FactoryGirl.create(:build_part, build_instance: build)
+      get :show, repository_path: branch.repository, id: build.id, format: :json
+      ret = JSON.parse(response.body)
+      expect(ret['build']['build_parts'].length).to eq(1)
+      expect(ret['build']['build_parts'][0]['build_id']).to eq(build.id)
+    end
+  end
+
   describe "#abort" do
     before do
       @build = FactoryGirl.create(:build)

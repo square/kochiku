@@ -35,6 +35,7 @@ class BranchesController < ApplicationController
       # due to the very permissive branch id constraint. Instead users will
       # have to specify a query param of format=rss to receive the RSS feed.
       format.rss { @builds = @builds.reverse } # most recent first
+      format.json
     end
   end
 

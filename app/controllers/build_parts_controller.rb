@@ -6,6 +6,12 @@ class BuildPartsController < ApplicationController
   }
 
   def show
+    respond_to do |format|
+      format.html
+      format.json do
+        render :json => @build_part, include: { build_attempts: { include: :build_artifacts } }
+      end
+    end
   end
 
   def rebuild

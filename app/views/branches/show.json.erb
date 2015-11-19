@@ -1,0 +1,5 @@
+<%
+  json_data = @branch.attributes
+  json_data['recent_builds'] = @builds
+%>
+<%= json_data.to_json.html_safe %>

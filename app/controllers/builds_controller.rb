@@ -15,6 +15,7 @@ class BuildsController < ApplicationController
 
     respond_to do |format|
       format.html
+      format.json { render :json => @build, include: :build_parts }
       format.png do
         # See http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.21
         headers['Expires'] = CGI.rfc1123_date(Time.now.utc)
