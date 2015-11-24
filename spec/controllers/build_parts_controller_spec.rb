@@ -14,6 +14,16 @@ describe BuildPartsController do
       expect(response).to be_success
       expect(response).to render_template("build_parts/show")
     end
+
+    it "renders JSON if requested" do
+      build_attempt = FactoryGirl.create(:build_attempt, build_part: build_part)
+      FactoryGirl.create(:build_artifact, build_attempt: build_attempt)
+      get :show, repository_path: repository, build_id: build, id: build_part, format: :json
+      ret = JSON.parse(response.body)
+      expect(ret['build_part']['build_attempts'].length).to eq(1)
+      expect(ret['build_part']['build_attempts'][0]['build_artifacts'].length).to eq(1)
+      expect(ret['build_part']['build_attempts'][0]['build_artifacts'][0]['build_attempt_id']).to eq(build_attempt.id)
+    end
   end
 
   describe "#rebuild" do

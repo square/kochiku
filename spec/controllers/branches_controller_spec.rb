@@ -30,6 +30,15 @@ describe BranchesController do
       expect(items.first.elements.to_a("title").first.text).to eq("Build Number #{build2.id} failed")
       expect(items.last.elements.to_a("title").first.text).to eq("Build Number #{build1.id} success")
     end
+
+    it "should return a JSON if requested" do
+      get :show, repository_path: branch.repository, id: branch, format: :json
+      results = JSON.parse(response.body)
+      expect(results['id']).to eq(branch.id)
+      expect(results['recent_builds'].length).to eq(Build.count)
+      expect(results['recent_builds'][0]['build']['id']).to eq(build1.id)
+      expect(results['recent_builds'][1]['build']['id']).to eq(build2.id)
+    end
   end
 
   describe "#request_new_build" do
