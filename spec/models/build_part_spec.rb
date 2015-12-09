@@ -233,7 +233,7 @@ describe BuildPart do
         FactoryGirl.create(:build_attempt, :build_part => build_part, :state => :passed)
       end
 
-      it "should be included in as_json" do
+      it "includes synthetic attributes like status" do
         expect(json[:status]).to eq(:passed)
       end
     end

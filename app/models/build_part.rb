@@ -97,7 +97,7 @@ class BuildPart < ActiveRecord::Base
   end
 
   def as_json(options={})
-    super(options.merge(methods: :status))
+    super(options.reverse_merge(methods: :status))
   end
 
   def should_reattempt?
