@@ -96,6 +96,10 @@ class BuildPart < ActiveRecord::Base
     end
   end
 
+  def as_json(options={})
+    super(options.reverse_merge(methods: :status))
+  end
+
   def should_reattempt?
     if (build_attempts.unsuccessful.count - 1) < retry_count
       true

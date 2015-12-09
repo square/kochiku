@@ -225,4 +225,17 @@ describe BuildPart do
       end
     end
   end
+
+  describe "#as_json" do
+    subject(:json) { build_part.as_json['build_part'].with_indifferent_access }
+    context "with a build attempt" do
+      before do
+        FactoryGirl.create(:build_attempt, :build_part => build_part, :state => :passed)
+      end
+
+      it "includes synthetic attributes like status" do
+        expect(json[:status]).to eq(:passed)
+      end
+    end
+  end
 end
