@@ -560,4 +560,31 @@ describe Build do
       end
     end
   end
+
+  describe '#as_json' do
+    it 'returns a hash with elapsed_time' do
+      build.partition(parts)
+      hash = build.as_json
+      expect(hash['build'].key?('elapsed_time')).to eq(true)
+      expect(hash['build']['elapsed_time']).to eq(build.elapsed_time)
+      last_attempt = BuildAttempt.find(build.build_attempts.last.id)
+      last_attempt.update_attributes(:finished_at => build.created_at + 10.minutes)
+      hash = build.as_json
+      expect(hash['build'].key?('elapsed_time')).to eq(true)
+      expect(hash['build']['elapsed_time']).to eq(build.elapsed_time)
+    end
+
+    it 'returns elapsed_time even when other options are used' do
+      build.partition(parts)
+      hash = build.as_json(include: :build_parts)
+      expect(hash['build'].key?('elapsed_time')).to eq(true)
+    end
+
+    it 'allows overriding :methods option' do
+      build.partition(parts)
+      hash = build.as_json(methods: :idle_time)
+      expect(hash['build'].key?('elapsed_time')).to eq(false)
+      expect(hash['build'].key?('idle_time')).to eq(true)
+    end
+  end
 end
