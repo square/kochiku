@@ -291,6 +291,10 @@ class Build < ActiveRecord::Base
     IN_PROGRESS_STATES.include?(self.state)
   end
 
+  def as_json(options = {})
+    super(options.reverse_merge(methods: :elapsed_time))
+  end
+
   private
 
   def status_png(r, g, b)
