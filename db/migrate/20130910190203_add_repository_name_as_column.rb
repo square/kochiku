@@ -8,7 +8,7 @@ class AddRepositoryNameAsColumn < ActiveRecord::Migration
     "git:" => /:\/\/(.*)\/(.*)\/(.*)\.git/,
     "http" => /https?:\/\/(.*)\/(.*)\/([^.]*)\.?/,
     'ssh:' => %r{ssh://git@(.*):(\d+)/(.*)/([^.]+)\.git}
-  }
+  }.freeze
 
   class Repository < ActiveRecord::Base
   end

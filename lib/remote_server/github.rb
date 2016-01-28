@@ -10,7 +10,7 @@ module RemoteServer
       %r{\Agit@(?<host>[^:]*):(?<username>[^\/]*)/(?<name>[-.\w]+?)(\.git)?\z},        # git@
       %r{\Agit://(?<host>[^\/]*)/(?<username>[^\/]*)/(?<name>[-.\w]+)\.git\z},         # git://  (GHE only)
       %r{\Ahttps?://(?<host>[^\/]*)/(?<username>[^\/]*)/(?<name>[-.\w]+?)(\.git)?\z},  # https://
-    ]
+    ].freeze
 
     def initialize(url, server)
       @url = url

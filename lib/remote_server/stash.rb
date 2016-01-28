@@ -12,7 +12,7 @@ module RemoteServer
       %r{\Agit@(?<host>[^:]*):(?<username>[^\/]*)/(?<name>[-.\w]+)\.git\z},
       %r{\Assh://git@(?<host>[^\/]*?)(?<port>:\d+)?/(?<username>[^\/]*)/(?<name>[-.\w]+)\.git\z},
       %r{\Ahttps://(?<host>[^@\/]+)/scm/(?<username>[^\/]*)/(?<name>[-.\w]+)\.git\z},
-    ]
+    ].freeze
 
     def initialize(url, server)
       @url = url

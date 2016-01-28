@@ -91,7 +91,7 @@ class Repository < ActiveRecord::Base
   def name_with_namespace
     "#{namespace}/#{name}"
   end
-  alias_method :to_param, :name_with_namespace
+  alias to_param name_with_namespace
 
   private
 

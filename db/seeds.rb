@@ -39,11 +39,11 @@ def create_build_part(build, kind, paths, build_attempt_state)
                          :paths => paths,
                          :queue => 'ci')
   build_attempt_state ||= (BuildAttempt::STATES + [:passed] * 5).sample
-  if BuildAttempt::IN_PROGRESS_BUILD_STATES.include?(build_attempt_state)
-    finished = nil
-  else
-    finished = rand(500).seconds.from_now
-  end
+  finished = if BuildAttempt::IN_PROGRESS_BUILD_STATES.include?(build_attempt_state)
+               nil
+             else
+               rand(500).seconds.from_now
+             end
   attempt = BuildAttempt.create!(
     :build_part => bp,
     :builder => @builders.sample,

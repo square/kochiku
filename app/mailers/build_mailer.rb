@@ -40,18 +40,18 @@ class BuildMailer < ActionMailer::Base
     @responsible_email_and_files = partitioner.emails_for_commits_causing_failures
     @emails = @responsible_email_and_files.keys
     if @emails.empty?
-      if @build.branch_record.convergence?
-        @emails = GitBlame.emails_since_last_green(@build)
-      else
-        @emails = GitBlame.emails_in_branch(@build)
-      end
+      @emails = if @build.branch_record.convergence?
+                  GitBlame.emails_since_last_green(@build)
+                else
+                  GitBlame.emails_in_branch(@build)
+                end
     end
 
-    if @build.branch_record.convergence?
-      @git_changes = GitBlame.changes_since_last_green(@build)
-    else
-      @git_changes = GitBlame.changes_in_branch(@build)
-    end
+    @git_changes = if @build.branch_record.convergence?
+                     GitBlame.changes_since_last_green(@build)
+                   else
+                     GitBlame.changes_in_branch(@build)
+                   end
 
     @failed_build_parts = @build.build_parts.failed_or_errored.decorate
     @pr_link = pull_request_link(build)

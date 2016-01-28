@@ -40,7 +40,7 @@ module ApplicationHelper
   end
 
   def show_link_to_commit(build)
-    "#{build.repository.remote_server.href_for_commit(build.ref)}"
+    build.repository.remote_server.href_for_commit(build.ref).to_s
   end
 
   # TODO: Extract these links into RemoteServer
@@ -53,11 +53,7 @@ module ApplicationHelper
     attrs_from_remote_server = RemoteServer.for_url(repo.url)
 
     if attrs_from_remote_server.class == RemoteServer::Stash
-      if repo.on_green_update.blank?
-        second_commit_hash = ""
-      else
-        second_commit_hash = repo.on_green_update.split(',').first
-      end
+      second_commit_hash = repo.on_green_update.blank? ? "" : repo.on_green_update.split(',').first
     end
     attrs_from_remote_server.url_for_compare(first_commit_hash, second_commit_hash)
   end

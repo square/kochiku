@@ -187,7 +187,7 @@ describe BranchesController do
 
         names = elements.map{ |e| e.attribute("name").to_s }
 
-        expect(names).to match_array(["#{repository.to_param}", "#{repository.to_param}/convergence"])
+        expect(names).to match_array([repository.to_param, "#{repository.to_param}/convergence"])
       end
     end
   end

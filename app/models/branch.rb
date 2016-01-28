@@ -19,8 +19,8 @@ class Branch < ActiveRecord::Base
 
   def abort_in_progress_builds_behind_build(current_build)
     builds.where(state: Build::IN_PROGRESS_STATES).readonly(false)
-      .reject { |build| build.id >= current_build.id }
-      .each { |build| build.abort! }
+          .reject { |build| build.id >= current_build.id }
+          .each { |build| build.abort! }
   end
 
   def most_recent_build

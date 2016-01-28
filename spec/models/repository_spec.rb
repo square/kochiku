@@ -122,7 +122,7 @@ describe Repository do
     end
 
     it "splits on comma's" do
-      expect(Repository.new(:on_green_update => "a,b,c").promotion_refs).to eq(["a", "b", "c"])
+      expect(Repository.new(:on_green_update => "a,b,c").promotion_refs).to eq(%w( a b c ))
     end
   end
 

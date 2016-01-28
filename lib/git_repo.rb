@@ -58,7 +58,7 @@ class GitRepo
       'kochiku.yml',
       'config/kochiku.yml',
       'config/ci/kochiku.yml',
-    ]
+    ].freeze
 
     def read_repo_config(ref)
       command = Cocaine::CommandLine.new("git show", ":ref::file",
