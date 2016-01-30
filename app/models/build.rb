@@ -47,9 +47,9 @@ class Build < ActiveRecord::Base
     end
   end
   has_many :build_attempts, :through => :build_parts
-  TERMINAL_STATES = [:failed, :succeeded, :errored, :aborted]
-  FAILED_STATES = [:failed, :errored, :doomed]
-  IN_PROGRESS_STATES = [:waiting_for_sync, :partitioning, :runnable, :running, :doomed]
+  TERMINAL_STATES = [:failed, :succeeded, :errored, :aborted].freeze
+  FAILED_STATES = [:failed, :errored, :doomed].freeze
+  IN_PROGRESS_STATES = [:waiting_for_sync, :partitioning, :runnable, :running, :doomed].freeze
   STATES = IN_PROGRESS_STATES + TERMINAL_STATES
   symbolize :state, :in => STATES
   serialize :error_details, Hash
@@ -299,6 +299,6 @@ class Build < ActiveRecord::Base
 
   def status_png(r, g, b)
     ChunkyPNG::Canvas.new(13, 13, ChunkyPNG::Color::TRANSPARENT)
-      .circle(6, 6, 5, ChunkyPNG::Color::BLACK, ChunkyPNG::Color.rgb(r, g, b))
+                     .circle(6, 6, 5, ChunkyPNG::Color::BLACK, ChunkyPNG::Color.rgb(r, g, b))
   end
 end

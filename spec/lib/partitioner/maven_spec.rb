@@ -609,7 +609,7 @@ describe Partitioner::Maven do
 
     it "should work for the recursive case" do
       dependency_map = {
-        "module-one" => ["a", "b", "c"].to_set,
+        "module-one" => %w(a b c).to_set,
         "a" => ["d"].to_set,
         "b" => ["d", "e"].to_set,
         "c" => Set.new,

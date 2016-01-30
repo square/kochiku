@@ -5,7 +5,6 @@ class AssignBuildsToBranches < ActiveRecord::Migration
     # Be mindful of build.branch versus build#branch_id
     # `build.branch` is a reference to the name of the branch as a string
     Build.where(branch_id: nil).find_each do |build|
-      branch_record = nil
       repository_id = connection.select_value("SELECT repository_id FROM projects WHERE id = #{build.project_id}")
 
       if repository_id.nil?
@@ -13,11 +12,11 @@ class AssignBuildsToBranches < ActiveRecord::Migration
         next
       end
 
-      if build.branch.present?
-        branch_record = Branch.find_or_create_by(repository_id: repository_id, name: build.branch)
-      else
-        branch_record = Branch.find_or_create_by(repository_id: repository_id, name: "unknown")
-      end
+      branch_record = if build.branch.present?
+                        Branch.find_or_create_by(repository_id: repository_id, name: build.branch)
+                      else
+                        Branch.find_or_create_by(repository_id: repository_id, name: "unknown")
+                      end
 
       build.update_column(:branch_id, branch_record.id)
     end

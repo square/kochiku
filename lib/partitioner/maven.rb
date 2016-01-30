@@ -6,7 +6,7 @@ require 'partitioner/topological_sorter'
 module Partitioner
   # This partitioner uses knowledge of Maven to shard large java repos
   class Maven < Base
-    POM_XML = 'pom.xml'
+    POM_XML = 'pom.xml'.freeze
 
     def initialize(build, kochiku_yml)
       @build = build
@@ -33,7 +33,9 @@ module Partitioner
 
           module_affected_by_file = file_to_module(file_and_emails[:file])
 
-          if module_affected_by_file.nil? || @settings.fetch('build_everything', []).detect { |dir| file_and_emails[:file].start_with?(dir) }
+          if module_affected_by_file.nil? ||
+             @settings.fetch('build_everything', []).detect { |dir| file_and_emails[:file].start_with?(dir) }
+
             return add_options(all_partitions)
           else
             modules_to_build.merge(depends_on_map[module_affected_by_file] || Set.new)
@@ -185,7 +187,7 @@ module Partitioner
         group_id = group_id.text
         artifact_id = artifact_id.text
 
-        group_artifact_map["#{group_id}:#{artifact_id}"] = "#{mvn_module}"
+        group_artifact_map["#{group_id}:#{artifact_id}"] = mvn_module.to_s
       end
 
       @module_dependency_map = {}

@@ -82,6 +82,10 @@ Style/BracesAroundHashParameters:
     - 'spec/models/build_part_spec.rb'
     - 'spec/models/build_spec.rb'
 
+Style/ConditionalAssignment:
+  Exclude:
+    - 'app/helpers/build_helper.rb'  # this one looks like a rubocop bug
+
 # Offense count: 100
 # Configuration parameters: Exclude.
 Style/Documentation:
@@ -216,15 +220,6 @@ Style/SignalException:
     - 'lib/stash_merge_executor.rb'
     - 'spec/support/command_stubber.rb'
 
-# Offense count: 48
-# Cop supports --auto-correct.
-Style/SingleSpaceBeforeFirstArg:
-  Exclude:
-    - 'config/deploy.rb'
-    - 'db/migrate/20110708203120_change_build_artifacts_for_carrier_wave.rb'
-    - 'db/migrate/20110719205413_add_project_id_to_builds.rb'
-    - 'db/schema.rb'
-
 # Offense count: 3
 # Cop supports --auto-correct.
 Style/SpaceAfterColon:
@@ -330,26 +325,6 @@ Style/TrailingBlankLines:
   Exclude:
     - 'config/initializers/cocaine.rb'
     - 'db/migrate/20120817225343_add_branch_to_build.rb'
-
-# Offense count: 44
-# Cop supports --auto-correct.
-# Configuration parameters: EnforcedStyleForMultiline, SupportedStyles.
-Style/TrailingComma:
-  Exclude:
-    - 'app/models/build_part.rb'
-    - 'config/initializers/redis.rb'
-    - 'lib/git_repo.rb'
-    - 'lib/remote_server/github.rb'
-    - 'lib/remote_server/stash.rb'
-    - 'spec/controllers/builds_controller_spec.rb'
-    - 'spec/controllers/pull_requests_controller_spec.rb'
-    - 'spec/controllers/repositories_controller_spec.rb'
-    - 'spec/decorators/branch_decorator_spec.rb'
-    - 'spec/jobs/autosize_workers_job_spec.rb'
-    - 'spec/lib/partitioner/default_spec.rb'
-    - 'spec/lib/partitioner/maven_spec.rb'
-    - 'spec/lib/partitioner_spec.rb'
-    - 'spec/lib/server_settings_spec.rb'
 
 # Offense count: 1
 # Cop supports --auto-correct.

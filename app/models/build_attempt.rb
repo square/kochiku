@@ -3,9 +3,9 @@ class BuildAttempt < ActiveRecord::Base
   belongs_to :build_part, :inverse_of => :build_attempts, :touch => true
   has_one :build_instance, through: :build_part
 
-  FAILED_BUILD_STATES = [:failed, :errored]
+  FAILED_BUILD_STATES = [:failed, :errored].freeze
   COMPLETED_BUILD_STATES = [:passed, :aborted] + FAILED_BUILD_STATES
-  IN_PROGRESS_BUILD_STATES = [:runnable, :running]
+  IN_PROGRESS_BUILD_STATES = [:runnable, :running].freeze
   STATES = IN_PROGRESS_BUILD_STATES + COMPLETED_BUILD_STATES
 
   symbolize :state, :in => STATES, :scopes => true

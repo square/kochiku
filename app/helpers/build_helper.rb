@@ -1,21 +1,21 @@
 module BuildHelper
   def build_metadata_headers(build, display_ruby_version)
-    [].tap do |headers|
-      headers << "Ruby Version" if display_ruby_version
+    headers = []
+    headers << "Ruby Version" if display_ruby_version
 
-      if is_a_build_with_one_part?(build)
-        headers << "Target"
-      else
-        headers << "Paths"
-      end
+    if is_a_build_with_one_part?(build)
+      headers << "Target"
+    else
+      headers << "Paths"
     end
+    headers
   end
 
   def build_metadata_values(build, build_part, display_ruby_version)
-    [].tap do |values|
-      values << build_part.options["ruby"] if display_ruby_version
-      values << format_paths(build_part)
-    end
+    values = []
+    values << build_part.options["ruby"] if display_ruby_version
+    values << format_paths(build_part)
+    values
   end
 
   def format_paths(build_part)

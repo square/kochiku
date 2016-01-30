@@ -25,7 +25,7 @@ class BuildPart < ActiveRecord::Base
       raise
     end
   end
-  alias_method :rebuild!, :create_and_enqueue_new_build_attempt!
+  alias rebuild! create_and_enqueue_new_build_attempt!
 
   def job_args(build_attempt)
     repository = build_instance.repository

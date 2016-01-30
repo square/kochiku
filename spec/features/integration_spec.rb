@@ -24,7 +24,7 @@ feature "viewing an in process build" do
       expect(find("td:nth-child(1)")).to have_content(build_part.id)
       expect(find("td:nth-child(2)")).to have_content("Runnable")
       expect(find("td:nth-child(4)")).to have_content("test")
-      click_link("#{build_part.id}")
+      click_link(build_part.id.to_s)
     end
 
     expect(find(".subheader")).to have_content("#{build.ref[0, 7]} – #{build_part.kind} (part #{build_part.id})")
