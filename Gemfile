@@ -1,6 +1,6 @@
 source 'https://rubygems.org'
 
-gem 'rails', '~> 4.2.3'
+gem 'rails', '~> 4.2.5'
 gem 'passenger', '~> 4.0.41', group: :production
 gem 'dynamic_form'
 gem 'rails-observers'
@@ -25,8 +25,6 @@ gem 'libv8', '3.16.14.7', require: false  # 3.16.14.11 has a compilation error o
 gem 'resque', '~> 1.25'
 gem 'resque-scheduler', require: false
 gem 'resque-retry'
-gem 'resque-web', '~> 0.0.6', require: 'resque_web'
-gem 'twitter-bootstrap-rails', '2.2.8' # not a direct dependency. resque-web 0.0.6 does not work with 3.X versions of this gem.
 
 gem 'json' # used by resque
 

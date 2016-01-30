@@ -1,7 +1,7 @@
+require 'resque/server'
+
 Kochiku::Application.routes.draw do
-  require "resque_web"
-  ResqueWeb::Engine.eager_load!  # workaround for https://github.com/resque/resque-web/issues/29
-  mount ResqueWeb::Engine => "/resque"
+  mount Resque::Server.new, :at => '/resque'
 
   if Rails.env.development?
     # https://github.com/rails/rails/pull/17896
