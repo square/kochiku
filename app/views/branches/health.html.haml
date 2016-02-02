@@ -28,7 +28,8 @@
 
   .stats
     %h2.subheader Build statistics
-    %p= "Build created on #{@first_built_date.strftime("%Y-%m-%d")}"
+    - if @first_built_date
+      %p= "First build created on #{@first_built_date.strftime("%Y-%m-%d")}"
     %table.build-stats
       %thead
         %tr

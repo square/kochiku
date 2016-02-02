@@ -7,13 +7,13 @@ describe BranchesController do
   describe "#index" do
     let(:repo) { FactoryGirl.create(:repository) }
     let!(:a) { FactoryGirl.create(:branch, name: 'aster', repository: repo, convergence: true) }
-    let!(:b) { FactoryGirl.create(:branch, name: 'buckeye', repository: repo) }
-    let!(:c) { FactoryGirl.create(:branch, name: 'creosote', repository: repo) }
+    let!(:b) { FactoryGirl.create(:branch, name: 'buckeye', repository: repo, updated_at: 30.minutes.ago) }
+    let!(:c) { FactoryGirl.create(:branch, name: 'creosote', repository: repo, updated_at: 15.minutes.ago) }
 
     it "shows branches in order" do
       get :index, repository_path: repo
       expect(assigns(:convergence_branches).map(&:name)).to eq(%w{aster})
-      expect(assigns(:recently_active_branches).map(&:name)).to eq(%w{buckeye creosote})
+      expect(assigns(:recently_active_branches).map(&:name)).to eq(%w{creosote buckeye})
     end
   end
 
@@ -92,16 +92,56 @@ describe BranchesController do
   describe "#health" do
     let(:branch) { FactoryGirl.create(:branch) }
 
-    before do
-      build = FactoryGirl.create(:build, branch_record: branch, state: :succeeded)
-      build_part = FactoryGirl.create(:build_part, build_instance: build)
-      FactoryGirl.create(:completed_build_attempt, build_part: build_part, state: :failed)
-      FactoryGirl.create(:completed_build_attempt, build_part: build_part, state: :passed)
+    context "normal circumstances" do
+      before do
+        build = FactoryGirl.create(:build, branch_record: branch, state: :succeeded)
+        build_part = FactoryGirl.create(:build_part, build_instance: build)
+        FactoryGirl.create(:completed_build_attempt, build_part: build_part, state: :failed)
+        FactoryGirl.create(:completed_build_attempt, build_part: build_part, state: :passed)
+      end
+
+      it "should render" do
+        get :health, repository_path: branch.repository, id: branch
+        expect(response).to be_success
+      end
     end
 
-    it "should render" do
-      get :health, repository_path: branch.repository, id: branch
-      expect(response).to be_success
+    context "no builds are present" do
+      it "should not error" do
+        get :health, repository_path: branch.repository, id: branch
+        expect(response).to be_success
+      end
+    end
+
+    context "only older builds are present" do
+      before do
+        # a build from 1 year ago
+        build = FactoryGirl.create(:build, branch_record: branch, state: :failed, created_at: 1.year.ago)
+        build_part = FactoryGirl.create(:build_part, build_instance: build, created_at: 1.year.ago)
+        FactoryGirl.create(:completed_build_attempt, build_part: build_part, state: :failed, created_at: 1.year.ago)
+      end
+
+      context "no builds from the last 30 days" do
+        it "should not error" do
+          get :health, repository_path: branch.repository, id: branch
+          expect(response).to be_success
+        end
+      end
+
+      context "no builds from the last 7 days" do
+        before do
+          # a build from 10 days ago
+          build = FactoryGirl.create(:build, branch_record: branch, state: :failed, created_at: 10.days.ago)
+          build_part = FactoryGirl.create(:build_part, build_instance: build, created_at: 10.days.ago)
+          FactoryGirl.create(:completed_build_attempt, build_part: build_part, state: :failed, created_at: 10.days.ago)
+        end
+
+        it "should not error" do
+          get :health, repository_path: branch.repository, id: branch
+          expect(response).to be_success
+        end
+      end
+
     end
   end
 

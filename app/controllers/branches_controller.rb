@@ -64,6 +64,7 @@ class BranchesController < ApplicationController
 
   def health
     load_repository_and_branch
+    initialize_stats_variables
     load_build_stats
 
     @builds = @branch.builds.includes(:build_parts => :build_attempts).last(params[:count] || 12)
@@ -129,8 +130,25 @@ class BranchesController < ApplicationController
     @branch ||= @repository.branches.where(name: params[:id]).first!
   end
 
+  # set the various stats variables to reasonable null values in case
+  # the load_build_stats method short-circuits
+  def initialize_stats_variables
+    @days_since_first_build = 0
+    @total_build_count = 0
+    @total_failure_count = 0
+    @total_pass_rate = '—'
+    @last30_build_count = 0
+    @last30_failure_count = 0
+    @last30_pass_rate = '—'
+    @last7_build_count = 0
+    @last7_failure_count = 0
+    @last7_pass_rate = '—'
+  end
+
   def load_build_stats
-    @first_built_date = @branch.builds.first.created_at
+    @first_built_date = @branch.builds.first.try(:created_at)
+    return if @first_built_date.nil?
+
     @days_since_first_build = (Date.today - @first_built_date.to_date).to_i
 
     @total_build_count = @branch.builds.count
@@ -138,10 +156,12 @@ class BranchesController < ApplicationController
     @total_pass_rate = (@total_build_count - @total_failure_count) * 100 / @total_build_count
 
     @last30_build_count = @branch.builds.where('created_at >= ?', Date.today - 30.days).count
+    return if @last30_build_count.zero?
     @last30_failure_count = @last30_build_count - @branch.builds.where('state = "succeeded" AND created_at >= ?', Date.today - 30.days).count
     @last30_pass_rate = (@last30_build_count - @last30_failure_count) * 100 / @last30_build_count
 
     @last7_build_count = @branch.builds.where('created_at >= ?', Date.today - 7.days).count
+    return if @last7_build_count.zero?
     @last7_failure_count = @last7_build_count - @branch.builds.where('state = "succeeded" AND created_at >= ?', Date.today - 7.days).count
     @last7_pass_rate = (@last7_build_count - @last7_failure_count) * 100 / @last7_build_count
   end
