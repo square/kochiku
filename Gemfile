@@ -20,7 +20,6 @@ gem 'uglifier'
 # therubyracer is a JS runtime required by execjs, which is in turn required
 # by uglifier. therubyracer is not the fastest option but it is the most portable.
 gem 'therubyracer'
-gem 'libv8', '3.16.14.7', require: false  # 3.16.14.11 has a compilation error on OSX 10.10.4
 
 gem 'resque', '~> 1.25'
 gem 'resque-scheduler', require: false
