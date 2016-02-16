@@ -5,7 +5,7 @@ class AddProjectIdToBuilds < ActiveRecord::Migration
   end
 
   def self.down
-    remove_index  :builds, :project_id
+    remove_index  :builds, column: :project_id
     remove_column :builds, :project_id
   end
 end

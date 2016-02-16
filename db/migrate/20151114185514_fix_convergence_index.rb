@@ -4,6 +4,6 @@ class FixConvergenceIndex < ActiveRecord::Migration
   def change
     # Add the new index first to avoid killing performance
     add_index :branches, [:repository_id, :convergence]
-    remove_index :branches, :convergence
+    remove_index :branches, column: :convergence
   end
 end
