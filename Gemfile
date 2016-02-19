@@ -21,6 +21,10 @@ gem 'uglifier'
 # by uglifier. therubyracer is not the fastest option but it is the most portable.
 gem 'therubyracer'
 
+gem 'redis', require: ["redis", "redis/connection/hiredis"]
+gem 'hiredis' # better Redis performance for usage as cache
+gem 'readthis'
+
 gem 'resque', '~> 1.25'
 gem 'resque-scheduler', require: false
 gem 'resque-retry'

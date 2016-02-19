@@ -7,7 +7,17 @@ Kochiku::Application.configure do
   config.consider_all_requests_local = true   # internal service; safe to show errors
   config.action_controller.perform_caching = true
 
-  config.cache_store = :file_store, "tmp/cache"
+  config.cache_store = :readthis_store, {
+    expires_in: 2.days.to_i,
+    namespace: 'cache',
+    marshal: Readthis::Passthrough,
+    redis: {
+      host: Settings.redis_host,
+      port: Settings.redis_port,
+      db: 1, # use different db than Resque
+      driver: :hiredis
+    }
+  }
 
   # Disable Rails's static asset server (Apache or nginx will already do this)
   config.serve_static_files = false
