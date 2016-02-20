@@ -18,18 +18,19 @@ Kochiku::Application.configure do
   config.action_controller.perform_caching = true
   config.cache_store = :memory_store, { size: 67108864 } # 64.megabytes
 
-  # Uncomment to develop with Redis caching
-  #config.cache_store = :readthis_store, {
-  #  expires_in: 2.days.to_i,
-  #  namespace: 'cache',
-  #  marshal: Readthis::Passthrough,
-  #  redis: {
-  #    host: Settings.redis_host,
-  #    port: Settings.redis_port,
-  #    db: 1, # use different db than Resque
-  #    driver: :hiredis
-  #  }
-  #}
+  # Uncomment to use Redis caching in development
+  #
+  # config.cache_store = :readthis_store, {
+  #   expires_in: 2.days.to_i,
+  #   namespace: 'cache',
+  #   marshal: Readthis::Passthrough,
+  #   redis: {
+  #     host: Settings.redis_host,
+  #     port: Settings.redis_port,
+  #     db: 1, # use different db than Resque
+  #     driver: :hiredis
+  #   }
+  # }
 
   # Don't care if the mailer can't send
   config.action_mailer.raise_delivery_errors = false
