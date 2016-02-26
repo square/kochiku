@@ -154,7 +154,7 @@ module Partitioner
         'type' => 'maven',
         'files' => mvn_modules.sort!,
         'queue' => queue,
-        'retry_count' => @options.fetch('retry_count', 2)
+        'retry_count' => @options.fetch('retry_count', 0)
       }
     end
 
