@@ -11,6 +11,8 @@ Kochiku::Application.routes.draw do
 
   root :to => "repositories#dashboard"
 
+  get '/_status' => "status#available"
+
   # /repositories/1/build-ref?ref=master&sha=abc123
   resources :repositories, only: [:index, :create, :new, :update, :destroy] do
     member do
