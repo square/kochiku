@@ -5,6 +5,8 @@ class BranchesController < ApplicationController
     { :modified => updated_at.to_i }
   }
 
+  caches_action :status_report, expires_in: 15.seconds
+
   # lists all convergence branches as well the 100 most recently active
   # branches
   def index
