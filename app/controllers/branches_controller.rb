@@ -1,8 +1,7 @@
 class BranchesController < ApplicationController
-  caches_action :show, cache_path: proc {
+  caches_action :show, :build_time_history, cache_path: proc {
     load_repository_and_branch
-    updated_at = @branch.updated_at
-    { :modified => updated_at.to_i }
+    { :modified => @branch.updated_at.to_i }
   }
 
   caches_action :status_report, expires_in: 15.seconds
@@ -101,13 +100,9 @@ class BranchesController < ApplicationController
   def build_time_history
     load_repository_and_branch
 
-    history_json = Rails.cache.fetch("build-time-history-#{@branch.id}-#{@branch.updated_at}") do
-      @branch.decorate.build_time_history.to_json
-    end
-
     respond_to do |format|
       format.json do
-        render :json => history_json
+        render json: @branch.decorate.build_time_history.to_json
       end
     end
   end
