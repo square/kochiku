@@ -37,19 +37,19 @@ gem 'cocaine'
 gem 'awesome_print', require: false
 gem 'nokogiri'
 
-gem 'bullet'
 gem 'pry-rails'
 gem 'pry-byebug'
 
-gem 'colorize', require: false
-
 group :test, :development do
+  gem 'haml_lint', require: false
+  gem 'rubocop', require: false
   gem 'rspec-rails', '~> 3.0'
   gem 'rspec-collection_matchers'
   gem 'factory_girl_rails'
 end
 
 group :development do
+  gem 'bullet'
   gem 'capistrano', '~> 3.0', require: false
   gem 'capistrano-rails', '~> 1.1', require: false
   gem 'capistrano-bundler', '~> 1.1', require: false
@@ -57,8 +57,6 @@ group :development do
   gem 'capistrano-rvm', '~> 0.1', require: false
   gem 'thin'
   gem 'rails-erd'
-  gem 'rubocop', require: false
-  gem 'haml_lint', require: false
 end
 
 group :test do

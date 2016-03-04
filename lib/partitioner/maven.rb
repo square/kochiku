@@ -7,7 +7,7 @@ require 'partitioner/topological_sorter'
 module Partitioner
   # This partitioner uses knowledge of Maven to shard large java repos
   class Maven < Base
-    POM_XML = 'pom.xml'.freeze
+    POM_XML = 'pom.xml'
 
     def initialize(build, kochiku_yml)
       @build = build
