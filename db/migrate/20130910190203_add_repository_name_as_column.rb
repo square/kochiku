@@ -1,5 +1,3 @@
-require 'colorize'
-
 class AddRepositoryNameAsColumn < ActiveRecord::Migration
   Rails.logger = Logger.new(STDOUT)
 
@@ -55,11 +53,11 @@ class AddRepositoryNameAsColumn < ActiveRecord::Migration
     if duplicates.any?
       Rails.logger.warn("")
       Rails.logger.warn("")
-      Rails.logger.warn(("*" * 80).yellow)
-      Rails.logger.warn("Duplicate repositories detected.".yellow)
+      Rails.logger.warn(("*" * 80))
+      Rails.logger.warn("Duplicate repositories detected.")
     end
     duplicates.each do |name, count|
-      Rails.logger.warn("Found #{count} repositories named #{name}. Please rename them.".yellow)
+      Rails.logger.warn("Found #{count} repositories named #{name}. Please rename them.")
     end
   end
 

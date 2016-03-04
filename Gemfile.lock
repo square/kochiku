@@ -348,7 +348,6 @@ DEPENDENCIES
   carrierwave
   chunky_png
   cocaine
-  colorize
   compass-rails
   draper (~> 2.1)
   dynamic_form

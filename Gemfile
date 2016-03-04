@@ -41,8 +41,6 @@ gem 'bullet'
 gem 'pry-rails'
 gem 'pry-byebug'
 
-gem 'colorize', require: false
-
 group :test, :development do
   gem 'rspec-rails', '~> 3.0'
   gem 'rspec-collection_matchers'
