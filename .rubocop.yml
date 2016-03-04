@@ -37,6 +37,10 @@ Style/EmptyLinesAroundClassBody:
 Style/ExtraSpacing:
   Enabled: false
 
+Style/FrozenStringLiteralComment:
+  # will enable this after Ruby 3.0 is released
+  Enabled: false
+
 Style/GuardClause:
   # Personally disagree with this one. In certain situations not using a
   # GuardClause makes it more readable.

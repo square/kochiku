@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 # This job is run every 10 seconds on master.  Record the current Resque statistics
 class MonitorWorkersJob < JobBase
-  REDIS_STATS_KEY = "WORKER_STAT_LIST".freeze
+  REDIS_STATS_KEY = "WORKER_STAT_LIST"
   @queue = :high
 
   def self.perform

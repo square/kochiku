@@ -2,7 +2,7 @@
 require 'github_request'
 
 class GithubPostReceiveHook
-  SUBSCRIBE_NAME = "web".freeze
+  SUBSCRIBE_NAME = "web"
 
   def initialize(repository, oauth_token)
     @repository = repository
