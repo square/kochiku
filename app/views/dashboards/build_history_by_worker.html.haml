@@ -9,7 +9,7 @@
         %td
           - @partition_jobs.each do |partition_job|
             = link_to build_redirect_path(partition_job) do
-              - if partition_job.build_parts.size > 0
+              - if !partition_job.build_parts.empty?
                 %span.attempt-status{:class => :passed}
                 // ugly hack because in this table, partitioning means "in progress", whereas in
                 // the following build attempts table, it means not started yet

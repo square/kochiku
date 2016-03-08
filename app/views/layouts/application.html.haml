@@ -1,8 +1,8 @@
 !!!
-%html{ :lang => 'en' }
+%html{:lang => 'en'}
   %head
-    %meta{ :charset => 'utf-8' }
-    %meta{ :name => 'google', :value => 'notranslate' }
+    %meta{:charset => 'utf-8'}
+    %meta{:name => 'google', :value => 'notranslate'}
     %title
       - if (title = yield(:title)).present?
         #{title} &ndash;
@@ -17,17 +17,17 @@
       = favicon_link_tag '/favicon.ico'
   %body
     #page
-      #header.section-wrapper
+      .section-wrapper#header
         .section
-          %a{:href => root_path, :class => "logo", :title => "Home"}
+          %a.logo{:href => root_path, :title => "Home"}
             %h1
               %b Kochiku
               %ruby.translation
                 構 <rt>こう</rt>
                 築 <rt>ちく</rt>
-          %div.header-right
+          .header-right
             = yield :header
-      #content.section-wrapper
+      .section-wrapper#content
         .section
           - if flash[:error].present?
             .flash.error
