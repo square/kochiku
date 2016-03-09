@@ -25,8 +25,16 @@ class BuildAttempt < ActiveRecord::Base
 
     build = build_part.build_instance
     previous_state, new_state = build.update_state_from_parts!
-    Rails.logger.info("Build #{build.id} state is now #{build.state}")
-    BuildStateUpdateJob.enqueue(build.id) if previous_state != new_state
+
+    if previous_state == new_state
+      # bump build's update_at because update_state_from_parts did not alter the build record
+      build.touch
+    end
+
+    if previous_state != new_state
+      Rails.logger.info("Build #{build.id} state is now #{build.state}")
+      BuildStateUpdateJob.enqueue(build.id)
+    end
 
     true
   end
@@ -45,8 +53,16 @@ class BuildAttempt < ActiveRecord::Base
     build = build_part.build_instance
 
     previous_state, new_state = build.update_state_from_parts!
-    Rails.logger.info("Build #{build.id} state is now #{build.state}")
-    BuildStateUpdateJob.enqueue(build.id) if previous_state != new_state
+
+    if previous_state == new_state
+      # bump build's update_at because update_state_from_parts did not alter the build record
+      build.touch
+    end
+
+    if previous_state != new_state
+      Rails.logger.info("Build #{build.id} state is now #{build.state}")
+      BuildStateUpdateJob.enqueue(build.id)
+    end
 
     true
   end
