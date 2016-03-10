@@ -12,6 +12,8 @@ class BuildStateUpdateJob < JobBase
 
   def perform
     build = Build.find(@build_id)
+
+    # notify github/stash that the build status has changed
     build.update_commit_status!
 
     # trigger another build for this branch if there is unbuilt commits
