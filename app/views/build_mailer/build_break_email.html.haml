@@ -1,38 +1,38 @@
-%html(xmlns="http://www.w3.org/1999/html")
+%html{xmlns: "http://www.w3.org/1999/html"}
   %head
-    %meta(content='text/html; charset=UTF-8' http-equiv='Content-Type')
+    %meta{'content' => 'text/html; charset=UTF-8', 'http-equiv' => 'Content-Type'}
   %body
-    %h1 #{ @build.branch_record.name } build failed for #{ @build.repository.name }
+    %h1 #{@build.branch_record.name} build failed for #{@build.repository.name}
     = link_to('Link to build.', repository_build_url(@build.repository, @build))
     - if @pr_link
       = link_to('Link to PR.', @pr_link)
     - if @build.build_parts.count > 1
-      The build was sharded into #{ @build.build_parts.count } parts and took #{ @build.elapsed_time.to_i/60 } minutes.
-      (#{ @build.idle_time.to_i/60 }m idle, #{ @build.longest_build_part.to_i/60 }m running.)
+      The build was sharded into #{@build.build_parts.count} parts and took #{@build.elapsed_time.to_i / 60} minutes.
+      (#{@build.idle_time.to_i / 60}m idle, #{@build.longest_build_part.to_i / 60}m running.)
       %br
-      Without sharding the build would have taken #{ @build.linear_time.to_i/60 } minutes to run.
+      Without sharding the build would have taken #{@build.linear_time.to_i / 60} minutes to run.
       %br
     - else
-      The build took #{ @build.elapsed_time.to_i/60 } minutes.
-      (#{ @build.idle_time.to_i/60 }m idle, #{ @build.longest_build_part.to_i/60 }m running.)
+      The build took #{@build.elapsed_time.to_i / 60} minutes.
+      (#{@build.idle_time.to_i / 60}m idle, #{@build.longest_build_part.to_i / 60}m running.)
       %br
     %h2 Failed build parts:
     %ul
       - @failed_build_parts.each do |failed_build_part|
         %li
-          = link_to("Part number #{ failed_build_part.id }", repository_build_part_url(@build.repository, @build, failed_build_part))
+          = link_to("Part number #{failed_build_part.id}", repository_build_part_url(@build.repository, @build, failed_build_part))
           = failed_build_part_sentence(failed_build_part)
     %br
     - @responsible_email_and_files.each do |email, files|
-      #{ email } was emailed because of changes to:
+      #{email} was emailed because of changes to:
       %ul
         - files.each do |file|
           %li= file
       %br
 
-    %h2= "Changes #{@build.branch_record.convergence? ? 'since last success' : 'included in build'}"
+    %h2 Changes #{@build.branch_record.convergence? ? 'since last success' : 'included in build'}
     - @git_changes.each do |git_change|
-      %b SHA: #{ link_to(git_change[:hash], "#{@build.repository.remote_server.href_for_commit(git_change[:hash])}") }
+      %b SHA: #{link_to(git_change[:hash], @build.repository.remote_server.href_for_commit(git_change[:hash]))}
       %br
       %b Committer:
       = git_change[:author]

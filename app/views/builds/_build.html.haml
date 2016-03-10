@@ -1,17 +1,17 @@
 .build
-  %a{:href => repository_build_path(build.repository, build), :class => "build-wrapper"}
+  %a.build-wrapper{:href => repository_build_path(build.repository, build)}
     .build-info
       .ref= build.ref
     %h3.build-id{:class => build.state}= build.id
     .times
       .time-started
         Started at
-        =time_for(build.created_at, "%m/%d %I:%M%P")
+        = time_for(build.created_at, "%m/%d %I:%M%P")
       .time-elapsed
         - if build.completed?
           Built in
           %strong
-            =duration_strftime(build.elapsed_time, "%Hh %Mm %Ss")
+            = duration_strftime(build.elapsed_time, "%Hh %Mm %Ss")
 
   .build-state
     %span.info

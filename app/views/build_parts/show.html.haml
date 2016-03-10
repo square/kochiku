@@ -11,7 +11,7 @@
   = link_to(@build.branch_record.name, repository_branch_path(@build.repository, @build.branch_record))
   &ndash;
   = link_to repository_build_path(@repository, @build) do
-    %code.build-status{ class: @build.state, title: @build.ref }
+    %code.build-status{class: @build.state, title: @build.ref}
       = @build.ref[0, 7]
   &ndash; #{@build_part.kind} (part #{@build_part.id})
 
@@ -46,7 +46,7 @@
         %td.right.elapsed= duration_strftime(attempt.elapsed_time)
         %td.right= attempt.builder ? attempt.builder.sub(".#{Settings.domain_name}", '') : "pending"
         %td
-          - if (attempt.running? && attempt.log_streamer_port.present?)
+          - if attempt.running? && attempt.log_streamer_port.present?
             = link_to("stdout.log (in progress)", stream_logs_path(attempt.id))
           - else
             - attempt.build_artifacts.each do |artifact|
@@ -55,20 +55,21 @@
         %td
           - if (attempt.unsuccessful? || attempt.aborted?) && @build_part.unsuccessful?
             = link_to("Rebuild", rebuild_repository_build_part_path(@repository, @build, @build_part), :method => :post)
-          - if not attempt.stopped?
+          - unless attempt.stopped?
             = link_to("Abandon", finish_build_attempt_path(attempt, :state => :aborted), :method => :post)
 
 %ol#build-paths
-  - if (@build_part.options['total_workers'] && @build_part.options['worker_chunk'])
-    %li="Chunk #{@build_part.options['worker_chunk']} of #{@build_part.options['total_workers']}"
+  - if @build_part.options['total_workers'] && @build_part.options['worker_chunk']
+    %li Chunk #{@build_part.options['worker_chunk']} of #{@build_part.options['total_workers']}
   - @build_part.paths.each do |path|
-    %li=path
+    %li= path
 
 = content_for :javascript do
   :javascript
     if ($('.build-part-info tbody tr').length > 0) {
       $('.build-part-info').tablesorter({ sortList: [ [0, 0] ] });
       StartTimes = #{
+        # rubocop:disable Style/IndentationConsistency
         start_times = {}
         @build_part.build_attempts.each_with_index { |attempt, index| start_times[index + 1] = attempt.started_at }
         start_times.to_json

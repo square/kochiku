@@ -4,10 +4,10 @@
   = link_to @build.branch_record.name, repository_branch_path(@repository, @build.branch_record)
   &ndash;
   = link_to repository_build_path(@repository, @build) do
-    %code.build-status{ class: @build.state, title: @build.ref }
+    %code.build-status{class: @build.state, title: @build.ref}
       = @build.ref[0, 7]
   &ndash; Part #{@build_part.id}
-.flash.error{'id' => 'errorMessage', 'style' => "display: none;" }
+.flash.error{'id' => 'errorMessage', 'style' => "display: none;"}
   Error streaming logs
 %label
   = check_box_tag :refresh, true, true
@@ -17,8 +17,8 @@
 
 %br
 
-.log_contents{ 'id' => 'log_content_display' }
-%img(src="#{image_url('loader.gif')}"){'id' => "loading_img"}
+.log_contents{'id' => 'log_content_display'}
+%img{:src => image_url('loader.gif'), 'id' => "loading_img"}
 
 = content_for :javascript do
   :javascript

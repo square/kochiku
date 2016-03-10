@@ -1,8 +1,8 @@
-%html(xmlns="http://www.w3.org/1999/html")
+%html{xmlns: "http://www.w3.org/1999/html"}
   %head
-    %meta(content='text/html; charset=UTF-8' http-equiv='Content-Type')
+    %meta{'content' => 'text/html; charset=UTF-8', 'http-equiv' => 'Content-Type'}
   %body
-    %h2 Kochiku error on #{ @builder }
+    %h2 Kochiku error on #{@builder}
     = repository_build_part_url(@build_part.build_instance.repository, @build_part.build_instance, @build_part)
 
     %h2 Error text

@@ -8,40 +8,40 @@
     %li= link_to("Settings", repository_edit_path(@repository), class: "info")
     %li= link_to("Branches", repository_branches_path(@repository))
   = form_for @build, url: request_new_build_repository_branch_path(@repository, @branch) do |f|
-    = f.submit "Build", {class: 'build-button'}
+    = f.submit "Build", class: 'build-button'
 
 - cache(@branch) do
-  %div{class: 'health button'}= link_to('Health', health_repository_branch_path(@repository, @branch, 'count' => 12), {:style => 'color: white'})
+  %div.health.button= link_to('Health', health_repository_branch_path(@repository, @branch, 'count' => 12))
   - rate = error_free_pass_rate(@builds)
   - avg_rebuilds = average_number_of_rebuilds(@builds)
   - median_seconds_to_success = median_elapsed_time(@builds)
   .performance
     - if median_seconds_to_success
-      %div{ title: "Median elapsed time for successful builds on #{@branch.name}" }
+      %div{title: "Median elapsed time for successful builds on #{@branch.name}"}
         %span.label Median time:
-        %span.number= "#{seconds_to_minutes(median_seconds_to_success)} minutes"
+        %span.number #{seconds_to_minutes(median_seconds_to_success)} minutes
     - else
-      %div{ title: "Median elapsed time for successful builds on #{@branch.name}" }
+      %div{title: "Median elapsed time for successful builds on #{@branch.name}"}
         %span.label Never built
 
-    %div{ title: "Average number of build parts reattempted to get to a successful build", class: rebuild_count_css_class(avg_rebuilds) }
-      %span.number= "%0.1f" % avg_rebuilds
+    %div{title: "Average number of build parts reattempted to get to a successful build", class: rebuild_count_css_class(avg_rebuilds)}
+      %span.number= format('%0.1f', avg_rebuilds)
       %span.label rebuilds required on average
 
-    %div{ title: "Percentage of builds with all parts succeeding on the first try", class: pass_rate_css_class(rate) }
+    %div{title: "Percentage of builds with all parts succeeding on the first try", class: pass_rate_css_class(rate)}
       %span.number= rate
       %span.label completion rate on first try
 
 %h2.subheader
-  = "#{@repository.namespace}/#{@repository.name}"
+  = @repository.namespace + '/' + @repository.name
   &ndash;
   = @branch.name
 
 #plot
 
 .select_commit
-  %input{:type=>"text", :id=>"build_ref_input", :placeholder=>"Commit Revision" }
-  %button{:onClick=>"goto_ref();"}Lookup Commit
+  %input{type: "text", id: "build_ref_input", placeholder: "Commit Revision"}
+  %button{onClick: "goto_ref();"} Lookup Commit
 
 = content_for :javascript do
   :javascript
@@ -67,24 +67,25 @@
       %tr
         %th.right.whisker Previous
         %th.status
-          %code.build-status{ class: @current_build.state }
+          %code.build-status{class: @current_build.state}
             = link_to @current_build.ref[0, 5], repository_build_path(@repository, @current_build)
         - display_ruby_version = multiple_ruby_versions?(@current_build)
         - build_metadata_headers(@current_build, display_ruby_version).each do |header|
-          %th{ class: header.downcase.gsub(/\W+/, '-') }= header
+          %th{class: header.downcase.gsub(/\W+/, '-')}= header
         %th.type Type
         %th.right.time Elapsed
         %th.right.count Attempt
         %th.right.actions Actions
-    - @build_parts.each do |key, build_parts_by_build|
+    - @build_parts.each do |_key, build_parts_by_build|
       - part = build_parts_by_build.values.first
       - build_part = build_parts_by_build[@current_build]
       - cache(part) do
-        %tr{ :id => dom_id(part) }
+        %tr{:id => dom_id(part)}
           %td.right.whisker
             - total_attempts = 0
             - @builds[0..-2].each do |previous_build|
-              - if previous_part = build_parts_by_build[previous_build]
+              - previous_part = build_parts_by_build[previous_build]
+              - if previous_part.present?
                 - attempts = previous_part.build_attempts.size
                 - total_attempts += attempts
                 = link_to "/#{@repository.to_param}/builds/#{previous_build.to_param}/parts/#{previous_part.to_param}" do
@@ -101,9 +102,9 @@
           %td.right.elapsed= build_part.elapsed_time ? duration_strftime(build_part.elapsed_time) : '' if build_part
           %td.right
             = build_part.build_attempts.size if build_part
-            - average = (total_attempts.to_f / (@builds.length-1)).round 0 if @builds.length > 1
+            - average = (total_attempts.to_f / (@builds.length - 1)).round 0 if @builds.length > 1
             - if average && average > 1
-              %span{ title: 'Average' } / #{average}
+              %span{title: 'Average'} / #{average}
           %td.right
             - if build_part && build_part.unsuccessful?
               = link_to "Rebuild", "/#{@repository.to_param}/builds/#{@current_build.to_param}/parts/#{build_part.to_param}/rebuild", method: :post

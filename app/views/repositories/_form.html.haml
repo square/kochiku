@@ -2,55 +2,55 @@
   = f.error_messages
   %div
     %label{:for => "url"} Repository URL:
-    = f.text_field :url, {:placeholder => '', :autocapitalize => 'off', :autocorrect => 'off', :spellcheck => 'false'}
+    = f.text_field :url, :placeholder => '', :autocapitalize => 'off', :autocorrect => 'off', :spellcheck => 'false'
   %div
     %label{:for => "convergence_branches"} Convergence Branches:
-    = text_field_tag :convergence_branches, @current_convergence_branches.join(', '), {placeholder: "master", autocapitalize: 'off', autocorrect: 'off', spellcheck: 'false'}
+    = text_field_tag :convergence_branches, @current_convergence_branches.join(', '), placeholder: "master", autocapitalize: 'off', autocorrect: 'off', spellcheck: 'false'
   - if @repository.test_command.present?
-    %div{ title: 'Test command should now be specified in the kochiku.yml' }
+    %div{title: 'Test command should now be specified in the kochiku.yml'}
       %label{:for => "test_command"} Test Command: (Deprecated)
-      = f.text_field :test_command, {:id => 'test_command', :disabled => true}
+      = f.text_field :test_command, :id => 'test_command', :disabled => true
   %div
     %label{:for => "timeout"} Timeout a build part after:
-    = f.text_field :timeout, {:id => "timeout"}
+    = f.text_field :timeout, :id => "timeout"
     minutes
   %div
     %label{:for => "run_ci"} Trigger build on push to master:
-    = f.check_box :run_ci, {:id => "run_ci"}
+    = f.check_box :run_ci, :id => "run_ci"
 
 
   %fieldset
     %legend Pull Requests
     %div
       %label{:for => "build_pull_requests"} Build pull requests:
-      = f.check_box :build_pull_requests, {:id => "build_pull_requests"}
+      = f.check_box :build_pull_requests, :id => "build_pull_requests"
     %div
       %label{:for => "allows_kochiku_merges"} Allow developers to request branches be merged into master on success:
-      = f.check_box :allows_kochiku_merges, {:id => "allows_kochiku_merges"}
+      = f.check_box :allows_kochiku_merges, :id => "allows_kochiku_merges"
 
       - display_css = @repository.allows_kochiku_merges ? '' : 'display: none'
       %span{:id => 'branch-delete-warning', :style => display_css} Warning: Kochiku will delete the branch from Git after merging.
     %div
       %label{:for => "send_merge_successful_email"} Send email on automatic merge success:
-      = f.check_box :send_merge_successful_email, {:id => "send_merge_successful_email", :disabled => @repository.allows_kochiku_merges ? nil : true}
+      = f.check_box :send_merge_successful_email, :id => "send_merge_successful_email", :disabled => @repository.allows_kochiku_merges ? nil : true
 
   %fieldset
     %legend On a green build
     %div
       %label{:for => "on_green_update"} Update branches to last green commit:
-      = f.text_field :on_green_update, {:id => "on_green_update", :placeholder => "Comma separated list of branch names"}
+      = f.text_field :on_green_update, :id => "on_green_update", :placeholder => "Comma separated list of branch names"
     %div
       %label{:for => "send_build_success_email"} Send email to contributers:
-      = f.check_box :send_build_success_email, {:id => "send_build_success_email"}
+      = f.check_box :send_build_success_email, :id => "send_build_success_email"
 
   %fieldset
     %legend On a red build
     %div
       %label{:for => "send_build_failure_email"} Send email to build breakers:
-      = f.check_box :send_build_failure_email, {:id => "send_build_failure_email"}
+      = f.check_box :send_build_failure_email, :id => "send_build_failure_email"
     %div
       %label{:for => "email_on_first_failure"} Email on first build part failure for branch builds:
-      = f.check_box :email_on_first_failure, {:id => "email_on_first_failure"}
+      = f.check_box :email_on_first_failure, :id => "email_on_first_failure"
 
   = f.submit @repository.new_record? ? "Create" : "Update"
 

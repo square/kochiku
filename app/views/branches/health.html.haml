@@ -14,22 +14,22 @@
   - median_seconds_to_success = median_elapsed_time(@builds)
   .performance
     - if median_seconds_to_success
-      %div{ title: "Median elapsed time for successful builds on #{@branch.name}" }
+      %div{title: "Median elapsed time for successful builds on #{@branch.name}"}
         %span.label Median time:
-        %span.number= "#{seconds_to_minutes(median_seconds_to_success)} minutes"
+        %span.number #{seconds_to_minutes(median_seconds_to_success)} minutes
 
-    %div{ title: "Average number of build parts reattempted to get to a successful build", class: rebuild_count_css_class(avg_rebuilds) }
-      %span.number= "%0.1f" % avg_rebuilds
+    %div{title: "Average number of build parts reattempted to get to a successful build", class: rebuild_count_css_class(avg_rebuilds)}
+      %span.number= format("%0.1f", avg_rebuilds)
       %span.label rebuilds required on average
 
-    %div{ title: "Percentage of builds with all parts succeeding on the first try", class: pass_rate_css_class(rate) }
+    %div{title: "Percentage of builds with all parts succeeding on the first try", class: pass_rate_css_class(rate)}
       %span.number= rate
       %span.label pass rate on first try
 
   .stats
     %h2.subheader Build statistics
     - if @first_built_date
-      %p= "First build created on #{@first_built_date.strftime("%Y-%m-%d")}"
+      %p First build created on #{@first_built_date.strftime("%Y-%m-%d")}
     %table.build-stats
       %thead
         %tr
@@ -39,31 +39,31 @@
           %th Pass Rate
       %tbody
         %tr
-          %td= "All Time (#{@days_since_first_build} days)"
+          %td All Time (#{@days_since_first_build} days)
           %td= @total_build_count
           %td= @total_failure_count
-          %td= "#{@total_pass_rate}%"
+          %td #{@total_pass_rate}%
         %tr
           %td Past 30 days
           %td= @last30_build_count
           %td= @last30_failure_count
-          %td= "#{@last30_pass_rate}%"
+          %td #{@last30_pass_rate}%
         %tr
           %td Past 7 days
           %td= @last7_build_count
           %td= @last7_failure_count
-          %td= "#{@last7_pass_rate}%"
+          %td #{@last7_pass_rate}%
 
 - if @part_climate.count > 0
-  %h2.subheader= "#{@repository.name}/#{@branch.name} part failure stats over #{@builds.count} builds"
+  %h2.subheader #{@repository.name}/#{@branch.name} part failure stats over #{@builds.count} builds
   %table.project-part-info
     %thead
       %tr
         %th.right.whisker Rate
         %th Part Info
-    - @part_climate.sort.reverse.each do |key, parts_with_failures|
+    - @part_climate.sort.reverse_each do |key, parts_with_failures|
       %tr
-        %td.right= "#{key[0]}%"
+        %td.right #{key[0]}%
         %td= format_paths(parts_with_failures.first)
       %tr
         %td
@@ -72,4 +72,4 @@
             = link_to repository_build_part_path(@repository, part.build_instance, part) do
               %span.part-status{class: [part.status, "attempt-#{part.build_attempts.size}"]}
 - else
-  %h2.subheader= "#{@repository.name}/#{@branch.name} hasn't failed in #{@builds.count} builds"
+  %h2.subheader #{@repository.name}/#{@branch.name} hasn't failed in #{@builds.count} builds

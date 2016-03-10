@@ -10,7 +10,7 @@
   &ndash;
   = link_to(@build.branch_record.name, repository_branch_path(@build.repository, @build.branch_record))
   &ndash;
-  %code.build-status{ class: @build.state, title: @build.ref }
+  %code.build-status{class: @build.state, title: @build.ref}
     = @build.ref[0, 7]
   %a.info{:href => show_link_to_commit(@build)}
     Show
@@ -41,7 +41,7 @@
     = timeago(@build.updated_at)
   - if @build.completed?
     %span.info
-      = "Built in #{duration_strftime(@build.elapsed_time, "%Hh %Mm %Ss")}"
+      Built in #{duration_strftime(@build.elapsed_time, "%Hh %Mm %Ss")}
   - if @build.is_running?
     %span.info
       = button_to "Abort Build", abort_repository_build_path(@build.repository, @build), method: :patch, class: "abort-build"
@@ -63,7 +63,7 @@
       %th.status Status
       - display_ruby_version = multiple_ruby_versions?(@build)
       - build_metadata_headers(@build, display_ruby_version).each do |header|
-        %th{ class: header.downcase.gsub(/\W+/, '-') }= header
+        %th{class: header.downcase.gsub(/\W+/, '-')}= header
       %th.type Type
       %th.right.worker Worker
       %th.right.time Elapsed Time
@@ -76,12 +76,12 @@
         %td
           %span.part-status{:class => part.status}
             - text = part.status.to_s.capitalize
-            - if (part.status == :running && part.last_attempt.log_streamer_port.present?)
+            - if part.status == :running && part.last_attempt.log_streamer_port.present?
               = link_to(text, stream_logs_path(part.last_attempt.id))
-            - elsif(artifact = part.most_recent_stdout_artifact)
-              =link_to(text, artifact, :title => 'Last completed stdout.log')
+            - elsif (artifact = part.most_recent_stdout_artifact)
+              = link_to(text, artifact, :title => 'Last completed stdout.log')
             - else
-              =text
+              = text
         - build_metadata_values(@build, part, display_ruby_version).each do |value|
           %td= value
         %td= part.kind.to_s
@@ -102,6 +102,7 @@
     if ($('#build-summary tbody tr').length > 0) {
       $('#build-summary').tablesorter({ sortList: [ [1, 0] ] });
       StartTimes = #{
+        # rubocop:disable Style/IndentationConsistency
         start_times = {}
         @build.build_parts.each { |part| start_times[part.id] = part.started_at }
         start_times.to_json

@@ -1,0 +1,9 @@
+linters:
+  ImplicitDiv:
+    enabled: false
+
+  LineLength:
+    enabled: false
+
+  SpaceInsideHashAttributes:
+    style: no_space

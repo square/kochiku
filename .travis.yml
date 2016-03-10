@@ -9,3 +9,4 @@ script:
   - RAILS_ENV=test bundle exec rake --trace db:create db:migrate
   - bundle exec rspec
   - bundle exec rubocop
+  - bundle exec haml-lint app/views/

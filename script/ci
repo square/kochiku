@@ -9,7 +9,9 @@ echo
 # set -ex: make script verbose and exit on first failed command
 set -ex
 
-gem install bundler -v '~> 1.5.2' --conservative
+gem install bundler -v '>= 1.5.2' --conservative
 bundle check || bundle
 bundle exec rake db:create db:schema:load RAILS_ENV=test
 bundle exec rspec
+bundle exec rubocop
+bundle exec haml-lint app/views/
