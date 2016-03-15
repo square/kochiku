@@ -3,7 +3,7 @@ require 'spec_helper'
 describe BuildPart do
   let(:repository) { FactoryGirl.create(:repository) }
   let(:branch) { FactoryGirl.create(:branch, :repository => repository) }
-  let(:build) { FactoryGirl.create(:build, :branch_record => branch) }
+  let(:build) { FactoryGirl.create(:build, :branch_record => branch, :state => :runnable) }
   let(:build_part) { FactoryGirl.create(:build_part, :paths => ["a", "b"], :kind => "spec", :build_instance => build, :queue => 'ci') }
 
   before do
@@ -15,12 +15,6 @@ describe BuildPart do
       expect {
         build_part.create_and_enqueue_new_build_attempt!
       }.to change(build_part.build_attempts, :count).by(1)
-    end
-
-    it "updates the build state to running" do
-      expect(build.state).not_to eq(:running)
-      build_part.create_and_enqueue_new_build_attempt!
-      expect(build.state).to eq(:running)
     end
 
     it "enqueues onto the queue specified in the build part" do
