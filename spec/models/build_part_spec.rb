@@ -3,7 +3,7 @@ require 'spec_helper'
 describe BuildPart do
   let(:repository) { FactoryGirl.create(:repository) }
   let(:branch) { FactoryGirl.create(:branch, :repository => repository) }
-  let(:build) { FactoryGirl.create(:build, :branch_record => branch, :state => :runnable) }
+  let(:build) { FactoryGirl.create(:build, branch_record: branch, state: :runnable, created_at: 5.minutes.ago, updated_at: 5.minutes.ago) }
   let(:build_part) { FactoryGirl.create(:build_part, :paths => ["a", "b"], :kind => "spec", :build_instance => build, :queue => 'ci') }
 
   before do
@@ -23,6 +23,13 @@ describe BuildPart do
         expect(queue).to eq("queueX")
       end
       build_part.create_and_enqueue_new_build_attempt!
+    end
+
+    it "bumps updated_at value on the build record" do
+      # if build.updated_at is not changed then the view caches will be stale
+      original_updated_at = build.updated_at.to_i
+      build_part.create_and_enqueue_new_build_attempt!
+      expect(build.reload.updated_at.to_i).to_not eq(original_updated_at)
     end
 
     it "should enqueue the build attempt for building" do
