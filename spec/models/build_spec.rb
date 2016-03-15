@@ -46,9 +46,10 @@ describe Build do
       expect(build.build_parts.find_by_kind('cucumber').paths).to match_array(['a', 'b'])
     end
 
-    it "should change state to running" do
-      build.partition(parts)
-      expect(build.state).to eq(:running)
+    it "should change state to runnable" do
+      expect {
+        build.partition(parts)
+      }.to change(build, :state).from(:partitioning).to(:runnable)
     end
 
     it "creates parts with options" do

@@ -15,8 +15,8 @@ class BuildPart < ActiveRecord::Base
   def create_and_enqueue_new_build_attempt!
     begin
       build_attempt = build_attempts.create!(:state => :runnable)
-      build_instance.running!
       BuildAttemptJob.enqueue_on(queue.to_s, job_args(build_attempt))
+      build_instance.touch # invalidate the cache of builds#show
       build_attempt
     rescue GitRepo::RefNotFoundError
       # delete the dud build_attempt and re-raise
