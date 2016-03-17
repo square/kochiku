@@ -52,6 +52,12 @@ class GitRepo
       ancestor_cmd.exit_status == 0
     end
 
+    def branch_exist?(branch)
+      exist_cmd = Cocaine::CommandLine.new("git rev-parse", "--verify --quiet #{branch}", expected_outcodes: [0, 1])
+      exist_cmd.run
+      exist_cmd.exit_status == 0
+    end
+
     private
 
     KOCHIKU_YML_LOCS = [

@@ -64,6 +64,18 @@ describe GitBlame do
         expect(subject).to eq(["userone@example.com", "usertwo@example.com"])
       end
     end
+
+    context "with deleted branch" do
+      before do
+        allow(GitBlame).to receive(:git_names_and_emails_in_branch).and_call_original
+        allow(GitRepo).to receive(:inside_repo).and_yield
+        allow(GitRepo).to receive(:branch_exist?).and_return(false)
+      end
+
+      it "should should return []" do
+        expect(subject).to eq([])
+      end
+    end
   end
 
   describe "#last_email_in_branch" do

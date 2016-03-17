@@ -65,4 +65,32 @@ describe GitRepo do
       end
     end
   end
+
+  describe "#branch_exist?" do
+    before do
+      allow(GitRepo).to receive(:inside_repo) do |_build, _sync_repo, &block|
+        Dir.mktmpdir do |directory|
+          Dir.chdir(directory) do
+            `git init`
+            `git config user.email "test@example.com" && git config user.name "test"`
+            FileUtils.touch("TESTFILE")
+            `git add -A && git commit -m "commit 1" && git tag a`
+            block.call
+          end
+        end
+      end
+    end
+
+    it "should return false for nonexisting branch" do
+      GitRepo.inside_repo('repo') do
+        expect(GitRepo.branch_exist?('fake_branch')).to be false
+      end
+    end
+
+    it "should return true for existing branch" do
+      GitRepo.inside_repo('repo') do
+        expect(GitRepo.branch_exist?('master')).to be true
+      end
+    end
+  end
 end
