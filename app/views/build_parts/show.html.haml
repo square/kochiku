@@ -52,8 +52,8 @@
             - attempt.build_artifacts.each do |artifact|
               = link_to File.basename(artifact.log_file.path), artifact
               %br
-        %td
-          - if (attempt.unsuccessful? || attempt.aborted?) && @build_part.unsuccessful?
+        %td.wrap
+          - if (attempt.unsuccessful? || attempt.aborted? || attempt.running?) && @build_part.unsuccessful?
             = link_to("Rebuild", rebuild_repository_build_part_path(@repository, @build, @build_part), :method => :post)
           - unless attempt.stopped?
             = link_to("Abandon", finish_build_attempt_path(attempt, :state => :aborted), :method => :post)
