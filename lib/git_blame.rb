@@ -74,7 +74,11 @@ class GitBlame
 
     def git_names_and_emails_in_branch(build)
       GitRepo.inside_repo(build.repository) do
-        Cocaine::CommandLine.new("git log --format='%cn:%ce' 'master..#{build.branch_record.name}'").run.split("\n")
+        if GitRepo.branch_exist?(build.branch_record.name)
+          Cocaine::CommandLine.new("git log --format='%cn:%ce' 'master..#{build.branch_record.name}'").run.split("\n")
+        else
+          []
+        end
       end
     end
 
