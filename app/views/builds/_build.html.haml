@@ -26,7 +26,7 @@
         Create pull request
     - if build.on_success_script_log_file.present?
       = link_to File.basename(build.on_success_script_log_file.to_s), build.on_success_script_log_file.url, :class => :info
-    %a.info.last{:href => show_link_to_commit(build)}
+    %a.info.last{:href => show_link_to_commit(build.repository, build.ref)}
       Show HEAD commit
 
   .parts= render build.build_parts

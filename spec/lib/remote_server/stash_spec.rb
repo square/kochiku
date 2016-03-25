@@ -168,4 +168,18 @@ describe RemoteServer::Stash do
       expect { server.merge("abranch") }.to_not raise_error
     end
   end
+
+  describe "#head_commit" do
+    let(:https_url) { "https://stash.example.com/scm/foo/bar.git" }
+    let(:server) { make_server(https_url) }
+    let(:stash_request) { server.stash_request }
+
+    it "should not raise errors" do
+      allow(server).to receive(:get_pr_id_and_version).and_return([1, 5])
+      allow(stash_request).to receive(:get).and_return({"values" => [{"id" => "3" * 40}]}.to_json)
+
+      expect(server).to receive(:get_pr_id_and_version).once
+      expect { server.head_commit("a/branch") }.to_not raise_error
+    end
+  end
 end
