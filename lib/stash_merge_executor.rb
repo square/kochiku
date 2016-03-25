@@ -7,12 +7,14 @@ class StashMergeExecutor < GitMergeExecutor
   def merge_and_push
     remote_server = @build.repository.remote_server
     Rails.logger.info("Trying to merge branch #{@build.branch_record.name} after build id #{@build.id} using Stash REST api")
-    merge_success = remote_server.merge(@build.branch_record.name)
+    branch_name = @build.branch_record.name
+    head_commit = remote_server.head_commit(branch_name)
+    merge_success = remote_server.merge(branch_name)
     unless merge_success
       Rails.logger.info("Merge of #{@build.branch_record.name} failed.")
       raise GitMergeFailedError
     end
-    return "Successfully merged #{@build.branch_record.name}"
+    { ref: head_commit, log_output: "Successfully merged #{@build.branch_record.name}" }
   end
 
   # Delete branch associated with a build using Stash REST api.

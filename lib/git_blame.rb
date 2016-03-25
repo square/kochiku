@@ -98,7 +98,7 @@ class GitBlame
     def parse_git_changes(output)
       output.split("::!::").each_with_object([]) do |line, git_changes|
         commit_hash, author, commit_date, commit_message = line.chomp.split("|")
-        next if commit_hash.nil?
+        next if commit_hash.nil? || commit_message.nil?
         git_changes << {:hash => commit_hash, :author => author, :date => commit_date, :message => commit_message.tr("\n", " ")}
       end
     end

@@ -21,11 +21,15 @@ describe StashMergeExecutor do
   context "Using stash repository" do
     subject { stash_merger.merge_and_push }
 
+    before do
+      allow_any_instance_of(RemoteServer::Stash).to receive(:head_commit).and_return([1, 5])
+    end
+
     it "should use stash REST api" do
       expect(stash_build.repository.remote_server).to receive(:merge).once
       allow(stash_build.repository.remote_server).to receive(:merge).and_return(true)
 
-      expect(subject).to eq("Successfully merged funyuns")
+      expect(subject).to eq(ref: [1, 5], log_output: "Successfully merged funyuns")
     end
 
     it "should use throw exception if stash api refuses merge" do
