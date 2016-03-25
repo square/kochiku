@@ -31,16 +31,16 @@ module ApplicationHelper
     end
   end
 
-  def link_to_commit(build)
-    link_to build.ref[0,7], show_link_to_commit(build)
+  def link_to_commit(repo, ref)
+    link_to ref[0, 7], show_link_to_commit(repo, ref)
   end
 
   def link_to_branch(build)
     link_to build.branch_record.name, show_link_to_branch(build.branch_record)
   end
 
-  def show_link_to_commit(build)
-    build.repository.remote_server.href_for_commit(build.ref).to_s
+  def show_link_to_commit(repo, ref)
+    repo.remote_server.href_for_commit(ref).to_s
   end
 
   # TODO: Extract these links into RemoteServer

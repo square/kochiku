@@ -26,7 +26,7 @@ describe BuildStrategy do
         it "should merge to master" do
           merger = object_double(GitMergeExecutor.new(build))
           expect(GitMergeExecutor).to receive(:new).and_return(merger)
-          expect(merger).to receive(:merge_and_push)
+          expect(merger).to receive(:merge_and_push).and_return(ref: to_40('a'), log_output: "This is not a drill")
           expect(merger).to receive(:delete_branch)
           expect { BuildStrategy.merge_ref(build) }.not_to raise_error
           $stderr.puts build.repository.remote_server.canonical_repository_url
@@ -64,7 +64,7 @@ describe BuildStrategy do
       it "should merge to master using stash REST api" do
         merger = object_double(GitMergeExecutor.new(stash_build))
         expect(GitMergeExecutor).to receive(:new).and_return(merger)
-        expect(merger).to receive(:merge_and_push)
+        expect(merger).to receive(:merge_and_push).and_return(ref: to_40('a'), log_output: "This is not a drill")
         expect(merger).to receive(:delete_branch)
 
         expect { BuildStrategy.merge_ref(build) }.not_to raise_error

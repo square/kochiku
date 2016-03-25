@@ -47,13 +47,13 @@ describe ApplicationHelper do
 
   describe "#link_to_commit" do
     it "should create a link to the github url" do
-      expect(link_to_commit(@build)).to eq(%{<a href="#{show_link_to_commit(@build)}">SHA1FOR</a>})
+      expect(link_to_commit(@build.repository, @build.ref)).to eq(%{<a href="#{show_link_to_commit(@build.repository, @build.ref)}">SHA1FOR</a>})
     end
   end
 
   describe "#show_link_to_commit" do
     it "should create a url to github based on config" do
-      expect(show_link_to_commit(@build)).to eq('https://git.example.com/square/web/commit/SHA1FORCOMMIT')
+      expect(show_link_to_commit(@build.repository, @build.ref)).to eq('https://git.example.com/square/web/commit/SHA1FORCOMMIT')
     end
   end
 

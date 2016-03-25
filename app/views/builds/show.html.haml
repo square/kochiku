@@ -12,7 +12,7 @@
   &ndash;
   %code.build-status{class: @build.state, title: @build.ref}
     = @build.ref[0, 7]
-  %a.info{:href => show_link_to_commit(@build)}
+  %a.info{:href => show_link_to_commit(@build.repository, @build.ref)}
     Show
   - if @build.branch_record.convergence?
     %a.info{:href => show_link_to_compare(@build, @build.previous_successful_build.try(:ref), @build.ref), :title => 'show changes since last green build'}

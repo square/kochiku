@@ -24,7 +24,7 @@ class GitMergeExecutor
     begin
       git_fetch_and_reset
 
-      merge_log = merge_to_master
+      ref, merge_log = merge_to_master
 
       push_log = push_to_remote
     rescue GitFetchFailedError, GitPushFailedError
@@ -37,7 +37,7 @@ class GitMergeExecutor
       end
     end
 
-    [merge_log, push_log].join("\n")
+    { ref: ref, log_output: [merge_log, push_log].join("\n") }
   end
 
   def delete_branch
@@ -72,7 +72,8 @@ class GitMergeExecutor
       raise_and_log(GitMergeFailedError, "Was unable to merge your branch:", merge_log)
     end
 
-    merge_log
+    newest_ref, _status = Open3.capture2e("git rev-parse master")
+    [newest_ref.chomp, merge_log]
   end
 
   def push_to_remote

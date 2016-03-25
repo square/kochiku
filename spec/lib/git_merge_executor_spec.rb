@@ -26,7 +26,7 @@ describe GitMergeExecutor do
 
       it "should not raise exceptions" do
         combined_log = subject
-        expect(combined_log).to include(@stubber.fake_command_output)
+        expect(combined_log[:log_output]).to include(@stubber.fake_command_output)
         @stubber.check_cmd_executed("git merge")
       end
     end
