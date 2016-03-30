@@ -37,6 +37,17 @@ describe ProjectStatsHelper do
       end
       it { should == '50%' }
     end
+
+    context "when the latest build part is running" do
+      before do
+        create_some_builds_with_build_attempts(3)
+        @builds.last.update_attribute(:state, :running)
+      end
+
+      it "should not count running build" do
+        expect(subject).to eq('100%')
+      end
+    end
   end
 
   describe 'eventual_pass_rate' do
