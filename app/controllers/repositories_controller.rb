@@ -63,11 +63,11 @@ class RepositoriesController < ApplicationController
             .decorate
   end
 
+  # build_ref is intended to be used by the Stash webhooks plugin
+  # https://marketplace.atlassian.com/plugins/com.atlassian.stash.plugin.stash-web-post-receive-hooks-plugin
   def build_ref
     repository = Repository.find(params[:id])
 
-    # refChanges is provided by the standard Stash webhooks plugin
-    # https://marketplace.atlassian.com/plugins/com.atlassian.stash.plugin.stash-web-post-receive-hooks-plugin
     # Query string parameters are provided for easy integrations, since it the
     # simplest to implement.
     changes = if params[:refChanges]

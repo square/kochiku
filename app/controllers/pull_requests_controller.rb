@@ -1,14 +1,12 @@
 require 'remote_server'
 
-# This controller receives webhooks from Github only. Stash webhooks are
-# received by RepositoriesController#build_ref. At some point we should
-# consolidate the two actions into a single controller.
 class PullRequestsController < ApplicationController
 
+  # Receives a webhook from both Github and Stash requesting a new build
   # TODO(rob): pretty good chance Github's request format has changed and this action won't work anymore. Verify.
   def build
     if payload['host']
-      @repository = Repository.lookup(host: payload["host"], namespace: payload["repository"]["key"], name:payload["repository"]["slug"])
+      @repository = Repository.lookup(host: payload["host"], namespace: payload["repository"]["key"], name: payload["repository"]["slug"])
     else
       url = payload['repository']['url'] || payload['repository']['ssh_url']
       ssh_url = RemoteServer.for_url(url).canonical_repository_url
