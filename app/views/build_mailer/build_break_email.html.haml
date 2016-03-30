@@ -22,6 +22,7 @@
         %li
           = link_to("Part number #{failed_build_part.id}", repository_build_part_url(@build.repository, @build, failed_build_part))
           = failed_build_part_sentence(failed_build_part)
+        %span.broken-path{style: "font-size: smaller; color: gray;"} - #{failed_build_paths(failed_build_part)}
     %br
     - @responsible_email_and_files.each do |email, files|
       #{email} was emailed because of changes to:
