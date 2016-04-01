@@ -42,12 +42,12 @@ class BuildStrategy
         begin
           emails = GitBlame.emails_in_branch(build)
           merger = build.repository.remote_server.merge_executor.new(build)
-          merge_res = merger.merge_and_push
-          ref = merge_res[:ref]
-          merge_output = merge_res[:log_output]
+          merge_info = merger.merge_and_push
+
           if build.repository.send_merge_successful_email?
-            MergeMailer.merge_successful(build, ref, emails, merge_output).deliver_now
+            MergeMailer.merge_successful(build, merge_info[:merge_commit], emails, merge_info[:log_output]).deliver_now
           end
+
           merger.delete_branch
         rescue GitMergeExecutor::GitMergeFailedError => ex
           MergeMailer.merge_failed(build, emails, ex.message).deliver_now

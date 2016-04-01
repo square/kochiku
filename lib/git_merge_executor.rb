@@ -15,16 +15,13 @@ class GitMergeExecutor
   # Public: Merges the branch associated with a build into the master branch
   # and pushes the result to remote git repo. If the merge is unsuccessful for
   # any reason the merge is aborted and an exception is raised.
-  #
-  # build - ActiveRecord object for a build
-  #
   def merge_and_push
     Rails.logger.info("Trying to merge branch: #{@build.branch_record.name} to master after build id: #{@build.id}")
 
     begin
       git_fetch_and_reset
 
-      ref, merge_log = merge_to_master
+      merge_commit_sha, merge_log = merge_to_master
 
       push_log = push_to_remote
     rescue GitFetchFailedError, GitPushFailedError
@@ -37,7 +34,7 @@ class GitMergeExecutor
       end
     end
 
-    { ref: ref, log_output: [merge_log, push_log].join("\n") }
+    { merge_commit: merge_commit_sha, log_output: [merge_log, push_log].join("\n") }
   end
 
   def delete_branch
@@ -72,8 +69,8 @@ class GitMergeExecutor
       raise_and_log(GitMergeFailedError, "Was unable to merge your branch:", merge_log)
     end
 
-    newest_ref, _status = Open3.capture2e("git rev-parse master")
-    [newest_ref.chomp, merge_log]
+    newest_sha, _status = Open3.capture2e("git rev-parse master")
+    [newest_sha.chomp, merge_log]
   end
 
   def push_to_remote
