@@ -26,7 +26,8 @@ module ProjectStatsHelper
     error_free_count = builds.to_a.count do |build|
       build.succeeded? && build.build_parts.all_passed_on_first_try?
     end
-    pass_rate_text(error_free_count / builds.size.to_f)
+    total_count = builds.to_a.count(&:completed?)
+    pass_rate_text(error_free_count / total_count.to_f)
   end
 
   def pass_rate_text(number)
