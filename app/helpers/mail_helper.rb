@@ -7,4 +7,16 @@ module MailHelper
     end
     str.html_safe
   end
+
+  def failed_build_paths(build_part)
+    paths = build_part.paths
+
+    str = if build_part.kind.include?('spec')
+            paths.map { |path| path.split('/').last }
+          else
+            paths
+          end
+
+    str.join(', ').truncate(200)
+  end
 end
