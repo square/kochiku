@@ -12,7 +12,7 @@ describe PullRequestsController do
       end
 
       let!(:repository) do
-        FactoryGirl.create(:repository, { url: "git@git.#{git_server_type}.com:square/web.git" }.merge(repository_fields))
+        FactoryGirl.create(:repository, { url: "git@#{git_server_type}.com:square/web.git" }.merge(repository_fields))
       end
       let(:repository_fields) { Hash.new }  # expected to be overwritten by a sub-context
 
@@ -219,7 +219,7 @@ describe PullRequestsController do
       before do
         settings = SettingsAccessor.new(<<-YAML)
         git_servers:
-          git.github.com:
+          github.com:
             type: github
         YAML
         stub_const "Settings", settings
@@ -232,7 +232,7 @@ describe PullRequestsController do
       before do
         settings = SettingsAccessor.new(<<-YAML)
         git_servers:
-          git.stash.com:
+          stash.com:
             type: stash
         YAML
         stub_const "Settings", settings
@@ -248,7 +248,7 @@ describe PullRequestsController do
       "repository" => {
         "name" => "web",
         "full_name" => "square/web",
-        "ssh_url" => "git@git.github.com:square/web.git",
+        "ssh_url" => "git@github.com:square/web.git",
       },
       "head_commit" => {
         "id" => to_40('2')
@@ -272,7 +272,7 @@ describe PullRequestsController do
         "owner" => {
           "login" => "square"
         },
-        "ssh_url" => "git@git.github.com:square/web.git"
+        "ssh_url" => "git@github.com:square/web.git"
       }
     }.deep_merge(options)
   end
@@ -283,12 +283,12 @@ describe PullRequestsController do
         "after" => to_40('2'),
         "repository" => {
           "id" => "252",
-          "url" => "https://git.stash.com/projects/SQUARE/repos/web/browse",
-          "key" => "SQUARE",
+          "url" => "https://stash.com/scm/square/web.git",
+          "key" => "square",
           "slug" => "web",
           "name" => "web",
         },
-        "host" => "git.stash.com",
+        "host" => "stash.com",
         "ref" => "refs/heads/master",
       }.deep_merge(options).to_json
     }
@@ -308,12 +308,12 @@ describe PullRequestsController do
         },
         "repository" => {
           "id" => "252",
-          "url" => "https://git.stash.com/projects/SQUARE/repos/web/browse",
-          "key" => "SQUARE",
+          "url" => "https://stash.com/scm/square/web.git",
+          "key" => "square",
           "slug" => "web",
           "name" => "web",
         },
-        "host" => "git.stash.com",
+        "host" => "stash.com",
         "action" => "synchronize",
         "type" => "pr"
       }.deep_merge(options).to_json

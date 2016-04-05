@@ -13,13 +13,7 @@ class PullRequestsController < ApplicationController
   end
 
   def handle_stash_request(payload)
-    repo_info = {
-      host: payload['host'],
-      namespace: payload['repository']['key'],
-      name: payload['repository']['slug'],
-      url: payload['repository']['url'] || payload['repository']['ssh_url']
-    }
-    @repo = get_repo(repo_info)
+    @repo = get_repo(payload['repository']['url'])
 
     if payload['pull_request'] && active_pull_request?(payload['action'])
       branch_name = get_branch_name(payload['pull_request']['head']['ref'])
@@ -33,17 +27,9 @@ class PullRequestsController < ApplicationController
   end
 
   def handle_github_request(payload)
-    repository = payload['repository']
-    pull_request = payload['pull_request']
-    namespace = repository['full_name'].split("/").first if repository['full_name'].present?
-    repo_info = {
-      host: RemoteServer.for_url(repository['ssh_url']).attributes[:host],
-      namespace: namespace,
-      name: repository['name'],
-      url: repository['ssh_url']
-    }
-    @repo = get_repo(repo_info)
+    @repo = get_repo(payload['repository']['ssh_url'])
 
+    pull_request = payload['pull_request']
     if payload['pull_request'] && active_pull_request?(pull_request['state'])
       branch_name = get_branch_name(pull_request['head']['ref'])
       sha = pull_request['head']['sha']
@@ -57,13 +43,8 @@ class PullRequestsController < ApplicationController
 
   private
 
-  def get_repo(data)
-    repo = Repository.lookup(host: data[:host], namespace: data[:namespace], name: data[:name]) if data[:host]
-    unless repo
-      ssh_url = RemoteServer.for_url(data[:url]).canonical_repository_url
-      Repository.lookup_by_url(ssh_url)
-    end
-    repo
+  def get_repo(url)
+    Repository.lookup_by_url(url)
   end
 
   def handle_repo_push_request(branch_name, sha)
