@@ -126,7 +126,8 @@ module RemoteServer
     # TODO pass in expected SHA for head to branch to prevent merging a branch
     # that is in an unexpected state
     def merge(branch)
-      pr_id, pr_version = get_pr_id_and_version(branch)
+      @pr_ids ||= get_pr_id_and_version(branch)
+      pr_id, pr_version = @pr_ids
       success = can_merge?(pr_id) && perform_merge(pr_id, pr_version)
 
       if success
@@ -136,6 +137,16 @@ module RemoteServer
       end
 
       success
+    end
+
+    def head_commit(branch)
+      @pr_ids ||= get_pr_id_and_version(branch)
+      pr_id, _pr_version = @pr_ids
+      response = @stash_request.get("#{base_api_url}/pull-requests/#{pr_id}/commits")
+      pr_commits = JSON.parse(response)
+      raise StashAPIError, pr_commits["errors"] if pr_commits["errors"].present?
+
+      pr_commits["values"].first["id"]
     end
 
     # uses the stash REST api to delete a branch
