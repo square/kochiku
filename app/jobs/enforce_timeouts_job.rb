@@ -1,12 +1,14 @@
 class EnforceTimeoutsJob
   def self.perform
-    BuildAttempt.where(:state => 'running').each do |attempt|
-      lenient_timeout = attempt.build_instance.repository.timeout + 15
+    # The EnforceTimeoutsJob runs frequently so we do not check BuildAttempts greater than 1 day old
+    BuildAttempt.where("created_at > ? AND state = 'running' AND started_at IS NOT NULL", 1.day.ago).each do |attempt|
+      lenient_timeout = attempt.build_instance.repository.timeout + 5
       if attempt.elapsed_time > lenient_timeout.minutes
         # Error artifact creation taken from kochiku-worker
         message = StringIO.new
         message.puts("This BuildAttempt has not been updated by its worker,\n" \
-                     "but the build taken longer than the project's timeout.")
+                     "and has been running longer then the timeout so it has\n" \
+                     "been considered lost by Kochiku.")
         message.rewind
         def message.path
           'error.txt'
