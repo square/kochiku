@@ -225,6 +225,17 @@ describe BuildPart do
         expect(build_part.should_reattempt?).to be false
       end
     end
+
+    context "when there has already been a successful attempt" do
+      before do
+        FactoryGirl.create(:build_attempt, build_part: build_part, state: :passed)
+        FactoryGirl.create(:build_attempt, build_part: build_part, state: :failed)
+      end
+
+      it "will not reattempt" do
+        expect(build_part.should_reattempt?).to be false
+      end
+    end
   end
 
   describe "#as_json" do
