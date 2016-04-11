@@ -40,6 +40,10 @@ class Build < ActiveRecord::Base
       not_passed_and_last_attempt_in_state(:errored)
     end
 
+    def allowed_failure
+      not_passed_and_last_attempt_in_state(:allowed_failure)
+    end
+
     def all_passed_on_first_try?
       successful_build_attempts = joins(:build_attempts).where("build_attempts.state" => :passed).count
       unsuccessful_build_attempts = joins(:build_attempts).where("build_attempts.state != ?", :passed).count
@@ -47,7 +51,7 @@ class Build < ActiveRecord::Base
     end
   end
   has_many :build_attempts, :through => :build_parts
-  TERMINAL_STATES = [:failed, :succeeded, :errored, :aborted].freeze
+  TERMINAL_STATES = [:failed, :succeeded, :errored, :aborted, :allowed_failure].freeze
   FAILED_STATES = [:failed, :errored, :doomed].freeze
   IN_PROGRESS_STATES = [:waiting_for_sync, :partitioning, :runnable, :running, :doomed].freeze
   STATES = IN_PROGRESS_STATES + TERMINAL_STATES
@@ -114,9 +118,10 @@ class Build < ActiveRecord::Base
     errored = build_parts.errored
     passed = build_parts.passed
     failed = build_parts.failed
+    allowed_failure = build_parts.allowed_failure
 
     next_state = case
-                 when (build_parts - passed).empty?
+                 when (build_parts - passed - allowed_failure).empty?
                    :succeeded
                  when self.state == :aborted
                    :aborted

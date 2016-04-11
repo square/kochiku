@@ -4,7 +4,7 @@ class BuildAttempt < ActiveRecord::Base
   has_one :build_instance, through: :build_part
 
   FAILED_BUILD_STATES = [:failed, :errored].freeze
-  COMPLETED_BUILD_STATES = [:passed, :aborted] + FAILED_BUILD_STATES
+  COMPLETED_BUILD_STATES = [:passed, :aborted, :allowed_failure] + FAILED_BUILD_STATES
   IN_PROGRESS_BUILD_STATES = [:runnable, :running].freeze
   STATES = IN_PROGRESS_BUILD_STATES + COMPLETED_BUILD_STATES
 
