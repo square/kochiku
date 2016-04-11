@@ -193,6 +193,14 @@ describe Build do
       expect(build.state).to eq(:succeeded)
     end
 
+    it "should consider an otherwise passing build with allowed failures as passing" do
+      ba1 = FactoryGirl.create(:build_attempt, build_part: build_part_1, state: :passed)
+      ba2 = FactoryGirl.create(:build_attempt, build_part: build_part_2, state: :allowed_failure)
+      build.update_state_from_parts!
+
+      expect(build.state).to eq(:succeeded)
+    end
+
     context "when the build is aborted" do
       let(:build) { FactoryGirl.create(:build, branch_record: branch, state: :aborted) }
 
