@@ -227,13 +227,13 @@ class Build < ActiveRecord::Base
 
   # Changes the build state to 'aborted'. Sets merge_on_success to false to
   # protect against accidental merges. Updates the state of all of the build's
-  # build_parts to be 'aborted'.
+  # 'runnable' build_parts to be 'aborted'.
   def abort!
     update!(state: :aborted, merge_on_success: false)
 
-    all_build_part_ids = build_parts.select([:id, :build_id]).collect(&:id)
     BuildAttempt
-      .where(state: :runnable, build_part_id: all_build_part_ids)
+      .joins(:build_part)
+      .where(:state => :runnable, 'build_parts.build_id' => self.id)
       .update_all(state: :aborted, updated_at: Time.now)
   end
 
