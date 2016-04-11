@@ -83,6 +83,10 @@ class BuildAttempt < ActiveRecord::Base
     state == :running
   end
 
+  def allowed_failure?
+    state == :allowed_failure
+  end
+
   def stopped?
     COMPLETED_BUILD_STATES.include?(state)
   end
