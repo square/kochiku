@@ -101,7 +101,9 @@ class BuildPart < ActiveRecord::Base
   end
 
   def should_reattempt?
-    if (build_attempts.unsuccessful.count - 1) < retry_count
+    if successful?
+      false
+    elsif (build_attempts.unsuccessful.count - 1) < retry_count
       true
     # automatically retry build parts that errored in less than 60 seconds
     elsif elapsed_time && elapsed_time < 60 && last_attempt.errored? &&

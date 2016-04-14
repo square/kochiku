@@ -9,8 +9,8 @@ poll_repositories_for_changes:
 
 enforce_timeouts_on_attempts:
   every:
-    - "10m"
-    - :first_in: "30m"
+    - "5m"
+    - :first_in: "5m"
   class: "EnforceTimeoutsJob"
   queue: low
   args:

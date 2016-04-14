@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20151114185514) do
+ActiveRecord::Schema.define(version: 20160408214135) do
 
   create_table "branches", force: :cascade do |t|
     t.integer  "repository_id", limit: 4,                   null: false
@@ -45,6 +45,7 @@ ActiveRecord::Schema.define(version: 20151114185514) do
   end
 
   add_index "build_attempts", ["build_part_id"], name: "index_build_attempts_on_build_part_id", using: :btree
+  add_index "build_attempts", ["created_at"], name: "index_build_attempts_on_created_at", using: :btree
 
   create_table "build_parts", force: :cascade do |t|
     t.integer  "build_id",    limit: 4
