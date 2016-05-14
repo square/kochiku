@@ -115,6 +115,19 @@ class BranchesController < ApplicationController
     @branches = Branch.includes(:repository).where(convergence: true).decorate
   end
 
+  def badge
+    @repository || load_repository
+    @branch ||= @repository.branches.where(name: params[:branch]).first!
+    build = @branch.most_recent_build
+    if build.succeeded?
+      send_file('public/images/passing.svg', type: 'image/svg+xml', disposition: 'inline')
+    elsif build.failed?
+      send_file('public/images/failing.svg', type: 'image/svg+xml', disposition: 'inline')
+    else # in progress
+      send_file('public/images/pending.svg', type: 'image/svg+xml', disposition: 'inline')
+    end
+  end
+
   private
 
   def load_repository

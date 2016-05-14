@@ -56,6 +56,8 @@ Kochiku::Application.routes.draw do
       end
     end
 
+    get 'badge', to: 'branches#badge'
+
     # override branch id to allow branch name to contain both slashes and dots
     resources :branches, path: "", only: [:index, :show], constraints: { id: /.+/ } do
       member do
