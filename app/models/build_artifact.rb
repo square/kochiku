@@ -8,4 +8,12 @@ class BuildArtifact < ActiveRecord::Base
 
   scope :stdout_log, -> { where(:log_file => ['stdout.log.gz', 'stdout.log']) }
   scope :error_txt, -> { where(:log_file => 'error.txt') }
+
+  def log_contents
+    if log_file.path.include? '.gz'
+      Zlib::GzipReader.new(open(log_file.path)).read
+    else
+      log_file.read
+    end
+  end
 end
