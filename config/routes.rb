@@ -32,6 +32,7 @@ Kochiku::Application.routes.draw do
   match '/build_attempts/:id/stream_logs' => "build_attempts#stream_logs", :via => :get, :as => :stream_logs
   match '/build_attempts/:id/stream_logs_chunk' => "build_attempts#stream_logs_chunk", :via => :get, :as => :stream_logs_chunk
   match '/pull-request-builder' => "pull_requests#build", :via => :post, :as => :pull_request_build
+  get 'badge/*repository_path', to: 'branches#badge'
 
   # Redirects for legacy urls
   get '/projects/:project_id/builds/:build_id', to: redirect('/builds/%{build_id}')
@@ -55,8 +56,6 @@ Kochiku::Application.routes.draw do
         get 'modified_time', action: "modified_time", on: :member, defaults: { format: 'json' }
       end
     end
-
-    get 'badge', to: 'branches#badge'
 
     # override branch id to allow branch name to contain both slashes and dots
     resources :branches, path: "", only: [:index, :show], constraints: { id: /.+/ } do

@@ -2,6 +2,17 @@ require 'spec_helper'
 
 RSpec.describe "routes", :type => :routing do
 
+  describe '/badge/org_name/repo_name' do
+    specify {
+      expect(get: '/badge/org_name/repo_name?branch=moonwalker').to route_to(
+        controller: "branches",
+        action: "badge",
+        repository_path: "org_name/repo_name",
+        branch: "moonwalker"
+      )
+    }
+  end
+
   context "branches at" do
     describe '/:repository_path/:id' do
       it 'to branch show page' do
