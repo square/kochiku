@@ -16,10 +16,6 @@ Lint/NestedMethodDefinition:
   Exclude:
     - 'app/jobs/enforce_timeouts_job.rb'
 
-Lint/NonLocalExitFromIterator:
-  Exclude:
-    - 'app/jobs/autosize_workers_job.rb'
-
 Lint/UselessAssignment:
   Exclude:
     - 'config/compass.rb'

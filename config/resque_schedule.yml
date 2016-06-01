@@ -15,19 +15,3 @@ enforce_timeouts_on_attempts:
   queue: low
   args:
   description: "Errors any attempts where the workers should have timed out"
-
-# These autoscale jobs are turned off by default. Uncomment and configure
-# worker_thresholds in application.yml if you would like to use them.
-#
-# resize_worker_pool:
-#   every:
-#     - "1m"
-#   class: "AutosizeWorkersJob"
-#   args:
-#   description: "Determines the correct worker size pool"
-# monitor_worker_pool:
-#   every:
-#     - "10s"
-#   class: "MonitorWorkersJob"
-#   args:
-#   description: "Records the current number of workers and tasks"
