@@ -12,7 +12,7 @@ class Repository < ActiveRecord::Base
   validates_inclusion_of :timeout, :in => 0..1440, :message => 'The maximum timeout allowed is 1440 minutes'
 
   validates_uniqueness_of :url, :allow_blank => true
-  validate :url_against_remote_servers
+  validate :validate_url_against_remote_servers
 
   def self.lookup_by_url(url)
     remote_server = RemoteServer.for_url(url)
@@ -41,6 +41,7 @@ class Repository < ActiveRecord::Base
     write_attribute(:url, value)
 
     return unless RemoteServer.parseable_url?(value)
+    return unless RemoteServer.valid_git_host?(value)
 
     attrs_from_remote_server = RemoteServer.for_url(value).attributes
     self.host = attrs_from_remote_server[:host] unless host_changed?
@@ -95,10 +96,14 @@ class Repository < ActiveRecord::Base
 
   private
 
-  def url_against_remote_servers
+  def validate_url_against_remote_servers
     return unless url.present?
 
-    unless RemoteServer.parseable_url?(url)
+    if RemoteServer.parseable_url?(url)
+      unless RemoteServer.valid_git_host?(url)
+        errors.add(:url, "host is not in Kochiku's list of git servers")
+      end
+    else
       errors.add(:url, 'is not in a format supported by Kochiku')
     end
   end

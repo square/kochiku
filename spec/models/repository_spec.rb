@@ -67,6 +67,11 @@ describe Repository do
         expect(repo.errors_on(:url)).to include("is not in a format supported by Kochiku")
       end
 
+      it "should add an error on url on unknown git server" do
+        repo = Repository.new(url: "git@example.com:who/what.git")
+        expect(repo).to have(1).error_on(:url)
+        expect(repo.errors_on(:url)).to include("host is not in Kochiku's list of git servers")
+      end
     end
 
     context "when name" do
