@@ -24,14 +24,3 @@ git_servers:
     type: github
   stash.example.com:
     type: stash
-
-worker_thresholds:
-  minimum_total_workers: 50
-  maximum_total_workers: 500
-  instance_chunk_size: 10
-  number_of_samples: 30
-  idle_excess_count: 50
-  idle_insufficient_count: 30
-  worker_fluctuation_tolerance: 5
-  spin_up_script: /path/to/new-instance.rb
-  autosize_queue: developer
