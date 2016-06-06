@@ -24,6 +24,9 @@ Lint/UselessAssignment:
 Style/BlockDelimiters:
   Enabled: false
 
+Style/DoubleNegation:
+  Enabled: false
+
 Style/EmptyLinesAroundBlockBody:
   Enabled: false
 
