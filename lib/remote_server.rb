@@ -37,4 +37,8 @@ module RemoteServer
       url =~ format
     end
   end
+
+  def self.valid_git_host?(url)
+    !!Settings.git_server(url)
+  end
 end

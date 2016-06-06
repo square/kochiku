@@ -118,3 +118,24 @@ describe 'RemoteServer::Stash' do
     let(:remote_server) { RemoteServer::Stash.new(url, Settings.git_server(url)) }
   end
 end
+
+describe 'valid_git_host?' do
+  before do
+    settings = SettingsAccessor.new(<<-YAML)
+    git_servers:
+      git.example.com:
+        type: github
+    YAML
+    stub_const "Settings", settings
+  end
+
+  it 'returns true for known git hosts' do
+    known_git_host = 'git.example.com'
+    expect(RemoteServer.valid_git_host?(known_git_host)).to be_truthy
+  end
+
+  it 'returns false for unknown git hosts' do
+    unknown_git_host = 'example.com'
+    expect(RemoteServer.valid_git_host?(unknown_git_host)).to be_falsey
+  end
+end
