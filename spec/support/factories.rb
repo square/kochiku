@@ -56,7 +56,7 @@ FactoryGirl.define do
 
     factory :completed_build_attempt do
       state { build_part.build_instance.state == :succeeded ? :passed : :failed }
-      finished_at { Time.now }
+      finished_at { Time.current }
     end
   end
 

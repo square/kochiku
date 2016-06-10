@@ -6,7 +6,7 @@ module Partitioner
   def self.for_build(build)
     kochiku_yml = build.kochiku_yml
     if kochiku_yml
-      start = Time.now
+      start = Time.current
       res = case kochiku_yml['partitioner']
             when 'maven'
               Partitioner::Maven.new(build, kochiku_yml)
@@ -14,7 +14,7 @@ module Partitioner
               # Default behavior
               Partitioner::Default.new(build, kochiku_yml)
             end
-      finish = Time.now
+      finish = Time.current
       diff = finish - start
       Rails.logger.info("Partition finished: [#{kochiku_yml['partitioner'] || 'DEFAULT'}] #{diff} #{build.ref}")
       res

@@ -21,6 +21,8 @@ module Partitioner
     end
 
     def partitions
+      Rails.logger.info("Partition started: [maven] #{@build.ref}")
+      start = Time.current
       modules_to_build = Set.new
 
       GitRepo.inside_copy(@build.repository, @build.ref) do
@@ -49,6 +51,9 @@ module Partitioner
 
         add_options(group_modules(sort_modules(modules_to_build)))
       end
+    ensure
+      # TODO: log this information to event stream
+      Rails.logger.info("Partition finished: [maven] #{Time.current - start} #{@build.ref}")
     end
 
     def emails_for_commits_causing_failures

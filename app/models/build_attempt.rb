@@ -16,12 +16,12 @@ class BuildAttempt < ActiveRecord::Base
     if finished_at && started_at
       finished_at - started_at
     elsif started_at
-      Time.now - started_at
+      Time.current - started_at
     end
   end
 
   def start!(builder)
-    return false unless update_attributes(:state => :running, :started_at => Time.now, :builder => builder)
+    return false unless update_attributes(:state => :running, :started_at => Time.current, :builder => builder)
 
     build = build_part.build_instance
     previous_state, new_state = build.update_state_from_parts!
@@ -40,7 +40,7 @@ class BuildAttempt < ActiveRecord::Base
   end
 
   def finish!(state)
-    return false unless update_attributes(:state => state, :finished_at => Time.now)
+    return false unless update_attributes(:state => state, :finished_at => Time.current)
 
     if should_reattempt?
       # Will only send email if email_on_first_failure is enabled.

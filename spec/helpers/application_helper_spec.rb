@@ -100,7 +100,7 @@ describe ApplicationHelper do
 
   describe "timeago" do
     it "should generate the correct abbr tag" do
-      timestamp = Time.at(0)
+      timestamp = Time.at(0).utc
       expect(timeago(timestamp)).to eq(
         %{<abbr class="timeago" title="1970-01-01T00:00:00Z">#{timestamp}</abbr>}
       )

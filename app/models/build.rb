@@ -114,7 +114,6 @@ class Build < ActiveRecord::Base
     errored = build_parts.errored
     passed = build_parts.passed
     failed = build_parts.failed
-
     next_state = case
                  when (build_parts - passed).empty?
                    :succeeded
@@ -234,7 +233,7 @@ class Build < ActiveRecord::Base
     BuildAttempt
       .joins(:build_part)
       .where(:state => :runnable, 'build_parts.build_id' => self.id)
-      .update_all(state: :aborted, updated_at: Time.now)
+      .update_all(state: :aborted, updated_at: Time.current)
   end
 
   def to_color

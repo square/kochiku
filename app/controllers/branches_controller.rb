@@ -159,20 +159,20 @@ class BranchesController < ApplicationController
     @first_built_date = @branch.builds.first.try(:created_at)
     return if @first_built_date.nil?
 
-    @days_since_first_build = (Date.today - @first_built_date.to_date).to_i
+    @days_since_first_build = (Time.zone.today - @first_built_date.to_date).to_i
 
     @total_build_count = @branch.builds.count
     @total_failure_count = @branch.builds.where.not(state: 'succeeded').count
     @total_pass_rate = (@total_build_count - @total_failure_count) * 100 / @total_build_count
 
-    @last30_build_count = @branch.builds.where('created_at >= ?', Date.today - 30.days).count
+    @last30_build_count = @branch.builds.where('created_at >= ?', Time.zone.today - 30.days).count
     return if @last30_build_count.zero?
-    @last30_failure_count = @last30_build_count - @branch.builds.where('state = "succeeded" AND created_at >= ?', Date.today - 30.days).count
+    @last30_failure_count = @last30_build_count - @branch.builds.where('state = "succeeded" AND created_at >= ?', Time.zone.today - 30.days).count
     @last30_pass_rate = (@last30_build_count - @last30_failure_count) * 100 / @last30_build_count
 
-    @last7_build_count = @branch.builds.where('created_at >= ?', Date.today - 7.days).count
+    @last7_build_count = @branch.builds.where('created_at >= ?', Time.zone.today - 7.days).count
     return if @last7_build_count.zero?
-    @last7_failure_count = @last7_build_count - @branch.builds.where('state = "succeeded" AND created_at >= ?', Date.today - 7.days).count
+    @last7_failure_count = @last7_build_count - @branch.builds.where('state = "succeeded" AND created_at >= ?', Time.zone.today - 7.days).count
     @last7_pass_rate = (@last7_build_count - @last7_failure_count) * 100 / @last7_build_count
   end
 end
