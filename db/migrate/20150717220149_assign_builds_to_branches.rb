@@ -8,7 +8,7 @@ class AssignBuildsToBranches < ActiveRecord::Migration
       repository_id = connection.select_value("SELECT repository_id FROM projects WHERE id = #{build.project_id}")
 
       if repository_id.nil?
-        puts "skipping Build #{build.id} because its project or repository not longer exists"
+        Rails.logger.error "skipping Build #{build.id} because its project or repository not longer exists"
         next
       end
 

@@ -8,6 +8,9 @@ AllCops:
     - 'vendor/**/*'
     - 'db/schema.rb'
 
+Rails:
+  Enabled: true
+
 Lint/HandleExceptions:
   Exclude:
     - 'lib/git_repo.rb'

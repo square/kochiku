@@ -40,7 +40,7 @@ describe Partitioner do
         end
 
         it "parses options from kochiku yml" do
-          allow(Time).to receive(:now).and_return(Time.new(1977, 3, 10, 5, 30, 0))
+          allow(Time).to receive(:now).and_return(Time.new(1977, 3, 10, 5, 30, 0).utc)
           expect(Rails.logger).to receive(:info).with("Partition finished: [DEFAULT] 0.0 1111111111111111111111111111111111111111")
           partitions = subject.partitions
           expect(partitions.first["options"]["ruby"]).to eq("ree-1.8.7-2011.12")
@@ -55,7 +55,7 @@ describe Partitioner do
         let(:kochiku_yml) { {'partitioner' => 'maven'} }
 
         it "should call the maven partitioner" do
-          allow(Time).to receive(:now).and_return(Time.new(1977, 3, 10, 5, 30, 0))
+          allow(Time).to receive(:now).and_return(Time.new(1977, 3, 10, 5, 30, 0).utc)
           expect(Rails.logger).to receive(:info).with("Partition finished: [maven] 0.0 1111111111111111111111111111111111111111")
           expect(subject).to be_a(Partitioner::Maven)
         end

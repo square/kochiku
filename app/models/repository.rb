@@ -6,12 +6,11 @@ require 'remote_server'
 class Repository < ActiveRecord::Base
   has_many :branches, :dependent => :destroy
   has_many :convergence_branches, -> { where(convergence: true) }, class_name: "Branch"
-  validates_presence_of :host, :name, :url
-  validates_uniqueness_of :name
-  validates_numericality_of :timeout, :only_integer => true
-  validates_inclusion_of :timeout, :in => 0..1440, :message => 'The maximum timeout allowed is 1440 minutes'
-
-  validates_uniqueness_of :url, :allow_blank => true
+  validates :host, :name, :url, presence: true
+  validates :name, uniqueness: true
+  validates :timeout, numericality: { :only_integer => true }
+  validates :timeout, inclusion: { in: 0..1440, message: 'The maximum timeout allowed is 1440 minutes' }
+  validates :url, uniqueness: true, allow_blank: true
   validate :validate_url_against_remote_servers
 
   def self.lookup_by_url(url)
@@ -20,17 +19,17 @@ class Repository < ActiveRecord::Base
     repository_name = remote_server.attributes.fetch(:repository_name)
     repository_host_and_aliases = remote_server.attributes.fetch(:possible_hosts)
 
-    Repository.where(host: repository_host_and_aliases,
-                     namespace: repository_namespace,
-                     name: repository_name).first
+    Repository.find_by(host: repository_host_and_aliases,
+                       namespace: repository_namespace,
+                       name: repository_name)
   end
 
   def self.lookup(host:, namespace:, name:)
     git_server_settings = Settings.git_server(host)
 
-    Repository.where(host: [git_server_settings.host, *git_server_settings.aliases].compact,
-                     namespace: namespace,
-                     name: name).first
+    Repository.find_by(host: [git_server_settings.host, *git_server_settings.aliases].compact,
+                       namespace: namespace,
+                       name: name)
   end
 
   # Setting a URL will extract values for host, namespace, and name. This
@@ -38,7 +37,7 @@ class Repository < ActiveRecord::Base
   # session.
   def url=(value)
     # this column is deprecated; eventually url will just be a virtual attribute
-    write_attribute(:url, value)
+    self[:url] = value
 
     return unless RemoteServer.parseable_url?(value)
     return unless RemoteServer.valid_git_host?(value)
@@ -71,7 +70,7 @@ class Repository < ActiveRecord::Base
   #
   # Returns: Build AR object or nil
   def build_for_commit(sha)
-    Build.joins(:branch_record).where(:ref => sha, 'branches.repository_id' => self.id).first
+    Build.joins(:branch_record).find_by(:ref => sha, 'branches.repository_id' => self.id)
   end
 
   # Public: looks across all of a repository's builds for one with the given

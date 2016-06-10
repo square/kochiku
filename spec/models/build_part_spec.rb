@@ -155,7 +155,7 @@ describe BuildPart do
       it { should be true }
     end
     context "when finished" do
-      before { FactoryGirl.create(:build_attempt, :build_part => build_part, :state => :passed, :finished_at => Time.now) }
+      before { FactoryGirl.create(:build_attempt, :build_part => build_part, :state => :passed, :finished_at => Time.current) }
       it { should be false }
     end
   end
@@ -192,7 +192,7 @@ describe BuildPart do
       let(:build_part) { FactoryGirl.create(:build_part, retry_count: 0, build_instance: build) }
 
       before do
-        FactoryGirl.create(:build_attempt, build_part: build_part, state: :errored, started_at: 10.seconds.ago, finished_at: Time.now)
+        FactoryGirl.create(:build_attempt, build_part: build_part, state: :errored, started_at: 10.seconds.ago, finished_at: Time.current)
       end
 
       it "will reattempt" do
@@ -205,7 +205,7 @@ describe BuildPart do
 
       before do
         5.times do
-          FactoryGirl.create(:build_attempt, build_part: build_part, state: :errored, started_at: 10.seconds.ago, finished_at: Time.now)
+          FactoryGirl.create(:build_attempt, build_part: build_part, state: :errored, started_at: 10.seconds.ago, finished_at: Time.current)
         end
       end
 
@@ -218,7 +218,7 @@ describe BuildPart do
       let(:build_part) { FactoryGirl.create(:build_part, retry_count: 0, build_instance: build) }
 
       before do
-        FactoryGirl.create(:build_attempt, build_part: build_part, state: :errored, started_at: 70.seconds.ago, finished_at: Time.now)
+        FactoryGirl.create(:build_attempt, build_part: build_part, state: :errored, started_at: 70.seconds.ago, finished_at: Time.current)
       end
 
       it "shouldn't reattempt" do

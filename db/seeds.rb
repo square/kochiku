@@ -48,7 +48,7 @@ def create_build_part(build, kind, paths, build_attempt_state)
     :build_part => bp,
     :builder => @builders.sample,
     :state => build_attempt_state,
-    :started_at => Time.now,
+    :started_at => Time.current,
     :finished_at => finished
   )
   create_build_artifact(attempt)

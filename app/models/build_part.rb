@@ -3,7 +3,7 @@ class BuildPart < ActiveRecord::Base
   belongs_to :build_instance, :class_name => "Build", :foreign_key => "build_id", :inverse_of => :build_parts
   has_many :build_attempts, :dependent => :destroy, :inverse_of => :build_part
   symbolize :queue
-  validates_presence_of :kind, :paths, :queue
+  validates :kind, :paths, :queue, presence: true
 
   serialize :paths, Array
   serialize :options, Hash
@@ -92,7 +92,7 @@ class BuildPart < ActiveRecord::Base
     if finished_at && started_at
       finished_at - started_at
     elsif started_at
-      Time.now - started_at
+      Time.current - started_at
     end
   end
 
