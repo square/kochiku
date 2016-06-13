@@ -18,6 +18,10 @@ class BuildArtifactsController < ApplicationController
   def show
     build_artifact = BuildArtifact.find(params[:id])
 
-    redirect_to build_artifact.log_file.url
+    if params[:format] == 'text'
+      render text: build_artifact.log_contents
+    else
+      redirect_to build_artifact.log_file.url
+    end
   end
 end

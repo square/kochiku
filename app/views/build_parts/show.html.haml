@@ -52,7 +52,10 @@
             = link_to("stdout.log (in progress)", stream_logs_path(attempt.id))
           - else
             - attempt.build_artifacts.each do |artifact|
-              = link_to File.basename(artifact.log_file.path), artifact
+              = link_to basename_without_extension(artifact.log_file.path), build_artifact_path(artifact, format: :text)
+              (
+              = link_to 'gzipped', build_artifact_path(artifact)
+              )
               %br
         %td.wrap
           - unless attempt.stopped?
