@@ -51,7 +51,7 @@
           - if attempt.running? && attempt.log_streamer_port.present?
             = link_to("stdout.log (in progress)", stream_logs_path(attempt.id))
           - else
-            - attempt.build_artifacts.each do |artifact|
+            - attempt.build_artifacts.sort_by { |artifact| artifact.log_file.path }.each do |artifact|
               = link_to File.basename(artifact.log_file.path), artifact
               %br
         %td.wrap
