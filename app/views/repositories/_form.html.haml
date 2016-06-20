@@ -12,7 +12,7 @@
       = f.text_field :test_command, :id => 'test_command', :disabled => true
   %div
     %label{:for => "timeout"} Timeout a build part after:
-    = f.text_field :timeout, :id => "timeout"
+    = f.text_field :timeout, :id => "timeout", :class => "short"
     minutes
   %div
     %label{:for => "run_ci"} Trigger build on push to master:
