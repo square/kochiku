@@ -11,8 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160408214135) do
-
+ActiveRecord::Schema.define(version: 20160913224622) do
   create_table "branches", force: :cascade do |t|
     t.integer  "repository_id", limit: 4,                   null: false
     t.string   "name",          limit: 255,                 null: false
@@ -80,6 +79,58 @@ ActiveRecord::Schema.define(version: 20160408214135) do
   add_index "builds", ["project_id"], name: "index_builds_on_project_id", using: :btree
   add_index "builds", ["ref", "branch_id"], name: "index_builds_on_ref_and_branch_id", unique: true, using: :btree
   add_index "builds", ["ref", "project_id"], name: "index_builds_on_ref_and_project_id", unique: true, using: :btree
+
+  create_table "kochiku_quantity_reports", force: :cascade do |t|
+    t.integer  "job_number",   limit: 4
+    t.integer  "build_number", limit: 4
+    t.datetime "target_ts",                null: false
+    t.string   "frequency",    limit: 255, null: false
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  add_index "kochiku_quantity_reports", ["target_ts"], name: "index_kochiku_quantity_reports_on_target_ts", unique: true, using: :btree
+
+  create_table "kochiku_time_reports", force: :cascade do |t|
+    t.integer  "ninety_five_pctl_job_wait_time", limit: 4
+    t.integer  "ninety_pctl_job_wait_time",      limit: 4
+    t.integer  "seventy_pctl_job_wait_time",     limit: 4
+    t.integer  "fifty_pctl_job_wait_time",       limit: 4
+    t.datetime "target_ts",                                  null: false
+    t.string   "frequency",                      limit: 255, null: false
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  create_table "project_quantity_reports", force: :cascade do |t|
+    t.integer  "repo_id",      limit: 4
+    t.string   "repo_name",    limit: 255
+    t.string   "project_name", limit: 255
+    t.integer  "job_number",   limit: 4
+    t.integer  "build_number", limit: 4
+    t.datetime "target_ts",                null: false
+    t.string   "frequency",    limit: 255, null: false
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  create_table "project_time_reports", force: :cascade do |t|
+    t.integer  "repo_id",                          limit: 4
+    t.string   "project_name",                     limit: 255
+    t.string   "repo_name",                        limit: 255
+    t.integer  "ninety_five_pctl_build_wait_time", limit: 4
+    t.integer  "ninety_pctl_build_wait_time",      limit: 4
+    t.integer  "seventy_pctl_build_wait_time",     limit: 4
+    t.integer  "fifty_pctl_build_wait_time",       limit: 4
+    t.integer  "ninety_five_pctl_build_run_time",  limit: 4
+    t.integer  "ninety_pctl_build_run_time",       limit: 4
+    t.integer  "seventy_pctl_pctl_build_run_time", limit: 4
+    t.integer  "fifty_pctl_build_run_time",        limit: 4
+    t.datetime "target_ts",                                    null: false
+    t.string   "frequency",                        limit: 255, null: false
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
 
   create_table "projects", force: :cascade do |t|
     t.string   "name",          limit: 255

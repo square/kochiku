@@ -15,3 +15,27 @@ enforce_timeouts_on_attempts:
   queue: low
   args:
   description: "Errors any attempts where the workers should have timed out"
+
+kochiku_daily_build_quantity:
+  cron: "0 1 * * * America/Los_Angeles"
+  class: "KochikuDailyBuildQuantityJob"
+  args:
+  description: "Count builds number of all kochiku projects"
+
+kochiku_weekly_build_time:
+  cron: "30 0 * * 1 America/Los_Angeles"
+  class: "KochikuWeeklyBuildTimeJob"
+  args:
+  description: "collect numbers of builds of all kochiku projects"
+
+kochiku_project_daily_build_quantity:
+  cron: "0 2 * * * America/Los_Angeles"
+  class: "ProjectDailyBuildQuantityJob"
+  args:
+  description: "Count builds number per project"
+
+kochiku_project_daily_build_time:
+  cron: "0 3 * * * America/Los_Angeles"
+  class: "ProjectDailyBuildTimeJob"
+  args:
+  description: "build and wait time stats per project"
