@@ -8,7 +8,7 @@ gem 'actionpack-action_caching'
 
 gem 'carrierwave'
 gem 'draper', '~> 2.1'
-gem 'mysql2'
+gem 'mysql2','>= 0.4.4'
 gem 'symbolize'
 
 gem 'haml-rails'
