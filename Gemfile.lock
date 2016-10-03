@@ -161,7 +161,7 @@ GEM
     minitest (5.9.0)
     mono_logger (1.1.0)
     multi_json (1.12.1)
-    mysql2 (0.4.3)
+    mysql2 (0.4.4)
     net-scp (1.2.1)
       net-ssh (>= 2.6.5)
     net-ssh (2.9.2)
@@ -364,7 +364,7 @@ DEPENDENCIES
   hiredis
   jquery-rails
   json
-  mysql2
+  mysql2 (>= 0.4.4)
   nokogiri
   passenger (~> 4.0.41)
   posix-spawn
