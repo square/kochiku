@@ -49,19 +49,10 @@ module Partitioner
       end
     end
 
-    def partitions_for(subset)
+    def get_file_parts_for(subset)
       glob = subset.fetch('glob', '/dev/null')
-      type = subset.fetch('type', 'test')
-      workers = subset.fetch('workers', 1)
       manifest = subset['manifest']
-      retry_count = subset['retry_count'] || 0
-      if subset['log_file_globs']
-        subset['options']['log_file_globs'] = Array(subset['log_file_globs'])
-      end
-
-      queue = @build.branch_record.convergence? ? "ci" : "developer"
-      queue_override = subset.fetch('queue_override', nil)
-      queue = "#{queue}-#{queue_override}" if queue_override.present?
+      workers = subset.fetch('workers', 1)
 
       strategy = subset.fetch('balance', 'round_robin')
       strategy = 'round_robin' unless Strategies.respond_to?(strategy) # override if specified strategy is invalid
@@ -79,7 +70,21 @@ module Partitioner
 
       files -= balanced_partitions.flatten
 
-      (Strategies.send(strategy, files, workers) + balanced_partitions).map do |part_files|
+      Strategies.send(strategy, files, workers) + balanced_partitions
+    end
+
+    def partitions_for(subset)
+      type = subset.fetch('type', 'test')
+      retry_count = subset['retry_count'] || 0
+      if subset['log_file_globs']
+        subset['options']['log_file_globs'] = Array(subset['log_file_globs'])
+      end
+
+      queue = @build.branch_record.convergence? ? "ci" : "developer"
+      queue_override = subset.fetch('queue_override', nil)
+      queue = "#{queue}-#{queue_override}" if queue_override.present?
+
+      get_file_parts_for(subset).map do |part_files|
         {'type' => type, 'files' => part_files.compact, 'queue' => queue,
          'retry_count' => retry_count, 'options' => subset['options']}
       end.select { |p| p['files'].present? }

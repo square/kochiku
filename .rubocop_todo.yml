@@ -76,6 +76,7 @@ Style/BracesAroundHashParameters:
     - 'lib/remote_server/stash.rb'
     - 'spec/controllers/pull_requests_controller_spec.rb'
     - 'spec/lib/git_blame_spec.rb'
+    - 'spec/lib/partitioner/shared_default_behavior.rb'
     - 'spec/lib/partitioner/default_spec.rb'
     - 'spec/lib/partitioner/maven_spec.rb'
     - 'spec/mailers/build_mailer_spec.rb'
