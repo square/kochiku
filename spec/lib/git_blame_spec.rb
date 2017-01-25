@@ -240,7 +240,7 @@ describe GitBlame do
 
   describe "#net_files_changed_in_branch" do
     let(:options) { {} }
-    let(:git_diff_command) { "git diff --name-only --find-renames --find-copies 'master..#{build.branch_record.name}' " }
+    let(:git_diff_command) { "git diff --name-only --find-renames --find-copies 'master..#{build.branch_record.name}'" }
     let(:git_diff_output) { "path/one/file.java\npath/two/file.java" }
 
     subject { GitBlame.net_files_changed_in_branch(build, options) }
@@ -260,21 +260,6 @@ describe GitBlame do
       expect(git_file_changes.size).to eq(2)
       expect(git_file_changes).to include({:file => "path/one/file.java", :emails => []})
       expect(git_file_changes).to include({:file => "path/two/file.java", :emails => []})
-    end
-
-    context "with glob option defined" do
-      let(:options) { { glob: 'path/one/**' } }
-      let(:git_diff_command) { "git diff --name-only --find-renames --find-copies 'master..#{build.branch_record.name}' path/one/**" }
-      let(:git_diff_output) { "path/one/file.java" }
-
-      it "should only return file paths that match the glob" do
-        # should format the git log command correctly
-        expect(Cocaine::CommandLine).to receive(:new).with(git_diff_command)
-
-        git_file_changes = subject
-        expect(git_file_changes.size).to eq(1)
-        expect(git_file_changes).to include({:file => "path/one/file.java", :emails => []})
-      end
     end
   end
 end

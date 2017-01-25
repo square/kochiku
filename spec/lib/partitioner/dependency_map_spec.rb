@@ -14,28 +14,23 @@ describe Partitioner::DependencyMap do
       allow(Dir).to receive(:[]) do |*globs|
         matched_files = []
 
-        matched_files << 'source_for_glob_1' if globs.include?('source_glob/1/**')
-        matched_files << 'test_for_glob_1' if globs.include?('test_glob/1/**')
+        matched_files << 'source_glob/1/foo.rb' if globs.include?('source_glob/1/**')
+        matched_files << 'test_glob/1/bar_spec.rb' if globs.include?('test_glob/1/**')
 
-        matched_files << 'source_for_glob_2_part_1' if globs.include?('source_glob/2_part_1/**')
-        matched_files << 'source_for_glob_2_part_2' if globs.include?('source_glob/2_part_2/**')
-        matched_files << 'test_for_glob_2_part_1' if globs.include?('test_glob/2_part_1/**')
-        matched_files << 'test_for_glob_2_part_2' if globs.include?('test_glob/2_part_2/**')
+        matched_files << 'source_glob/2_part_1/foo.rb' if globs.include?('source_glob/2_part_1/**')
+        matched_files << 'source_glob/2_part_2/foo.rb' if globs.include?('source_glob/2_part_2/**')
+        matched_files << 'test_glob/2_part_1/bar_spec.rb' if globs.include?('test_glob/2_part_1/**')
+        matched_files << 'test_glob/2_part_2/bar_spec.rb' if globs.include?('test_glob/2_part_2/**')
 
-        matched_files << 'test_for_default_glob' if globs.include?('test_glob/default/**')
+        matched_files << 'test_glob/default/foo/bar/baz_spec.rb' if globs.include?('test_glob/default/**')
 
-        matched_files << 'generic_glob_match' if globs.include?('glob/**')
+        matched_files << 'glob/foo/bar.rb' if globs.include?('glob/**')
 
         matched_files
       end
 
-      allow(GitBlame).to receive(:net_files_changed_in_branch) do |_build, options|
-        if options && options[:glob]
-          (Dir[*options[:glob]] & changed_files)
-            .map { |file| {:file => file, :emails => []} }
-        else
-          changed_files.map { |file| {:file => file, :emails => []} }
-        end
+      allow(GitBlame).to receive(:net_files_changed_in_branch) do
+        changed_files.map { |file| {:file => file, :emails => []} }
       end
     end
 
@@ -86,11 +81,11 @@ describe Partitioner::DependencyMap do
         let(:build) { FactoryGirl.create(:build, :branch_record => FactoryGirl.create(:master_branch)) }
 
         context 'when one of the source_globs matches changed files' do
-          let(:changed_files) { %w(source_for_glob_1) }
+          let(:changed_files) { %w(source_glob/1/foo.rb) }
 
           it 'should add all test globs to partition' do
             expect(partitions.first['files']).to(
-              eq(%w(test_for_glob_1 test_for_glob_2_part_1 test_for_glob_2_part_2 test_for_default_glob))
+              eq(%w(test_glob/1/bar_spec.rb test_glob/2_part_1/bar_spec.rb test_glob/2_part_2/bar_spec.rb test_glob/default/foo/bar/baz_spec.rb))
             )
           end
         end
@@ -100,7 +95,7 @@ describe Partitioner::DependencyMap do
 
           it 'should add all test globs to partition' do
             expect(partitions.first['files']).to(
-              eq(%w(test_for_glob_1 test_for_glob_2_part_1 test_for_glob_2_part_2 test_for_default_glob))
+              eq(%w(test_glob/1/bar_spec.rb test_glob/2_part_1/bar_spec.rb test_glob/2_part_2/bar_spec.rb test_glob/default/foo/bar/baz_spec.rb))
             )
           end
         end
@@ -113,25 +108,25 @@ describe Partitioner::DependencyMap do
 
           it 'should add all test globs to partition' do
             expect(partitions.first['files']).to(
-              eq(%w(test_for_glob_1 test_for_glob_2_part_1 test_for_glob_2_part_2 test_for_default_glob))
+              eq(%w(test_glob/1/bar_spec.rb test_glob/2_part_1/bar_spec.rb test_glob/2_part_2/bar_spec.rb test_glob/default/foo/bar/baz_spec.rb))
             )
           end
         end
 
         context 'when one of the source_globs matches changed files' do
-          let(:changed_files) { %w(source_for_glob_1) }
+          let(:changed_files) { %w(source_glob/1/foo.rb) }
 
           it 'adds only the tests for that glob to the partition' do
-            expect(partitions.first['files']).to eq(%w(test_for_glob_1))
+            expect(partitions.first['files']).to eq(%w(test_glob/1/bar_spec.rb))
           end
         end
 
         context 'when multiple source_globs match changed files' do
-          let(:changed_files) { %w(source_for_glob_1 source_for_glob_2_part_1) }
+          let(:changed_files) { %w(source_glob/1/foo.rb source_glob/2_part_1/foo.rb) }
 
           it 'adds the tests for both globs to the partition' do
             expect(partitions.first['files']).to(
-              eq(%w(test_for_glob_1 test_for_glob_2_part_1 test_for_glob_2_part_2))
+              eq(%w(test_glob/1/bar_spec.rb test_glob/2_part_1/bar_spec.rb test_glob/2_part_2/bar_spec.rb))
             )
           end
         end
@@ -141,7 +136,7 @@ describe Partitioner::DependencyMap do
 
           context 'when default_test_glob is defined' do
             it 'adds only default_test_glob tests to the partition' do
-              expect(partitions.first['files']).to eq(%w(test_for_default_glob))
+              expect(partitions.first['files']).to eq(%w(test_glob/default/foo/bar/baz_spec.rb))
             end
           end
 
@@ -172,7 +167,7 @@ describe Partitioner::DependencyMap do
           end
 
           it 'adds tests from glob to partition' do
-            expect(partitions.first['files']).to eq(%w(generic_glob_match))
+            expect(partitions.first['files']).to eq(%w(glob/foo/bar.rb))
           end
         end
 
@@ -186,7 +181,7 @@ describe Partitioner::DependencyMap do
           end
 
           it 'adds tests from default_test_glob to partition' do
-            expect(partitions.first['files']).to eq(%w(test_for_default_glob))
+            expect(partitions.first['files']).to eq(%w(test_glob/default/foo/bar/baz_spec.rb))
           end
         end
       end
@@ -213,7 +208,7 @@ describe Partitioner::DependencyMap do
           end
 
           it 'adds tests from default_test_glob to partition' do
-            expect(partitions.first['files']).to eq(%w(test_for_default_glob))
+            expect(partitions.first['files']).to eq(%w(test_glob/default/foo/bar/baz_spec.rb))
           end
         end
       end

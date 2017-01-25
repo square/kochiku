@@ -87,12 +87,15 @@ module Partitioner
         else
           test_globs_to_add = []
 
+          changed_files = GitBlame.net_files_changed_in_branch(@build).map { |file_object| file_object[:file] }
+
           # If a source_glob matches the changed files on this branch, add its test_glob to the partition
           dependency_map.each do |dependency|
-            source_glob = dependency.fetch('source_glob', '')
-            changed_files_that_match_glob = GitBlame.net_files_changed_in_branch(@build, glob: source_glob)
+            source_globs = [*dependency.fetch('source_glob', '')]
 
-            test_globs_to_add << dependency.fetch('test_glob', '') unless changed_files_that_match_glob.empty?
+            matched_files = changed_files.select { |path| source_globs.any? { |pattern| File.fnmatch(pattern, path) } }
+
+            test_globs_to_add << dependency.fetch('test_glob', '') unless matched_files.empty?
           end
 
           # If no source_globs matched the changed files on this branch, add the default_test_glob to the partition

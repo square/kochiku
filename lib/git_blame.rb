@@ -56,11 +56,9 @@ class GitBlame
 
     # net_files_changed_in_branch counts only files which have a net diff in the branch. If a branch includes a commit
     # to modify a file, and then a revert commit, that file will not be included in this list.
-    def net_files_changed_in_branch(build, sync: true, glob: '')
+    def net_files_changed_in_branch(build, sync: true)
       output = GitRepo.inside_repo(build.repository, sync: sync) do
-        # TODO: Push this down into GitRepo and integration test it.
-        filter = [*glob].join(' ')
-        Cocaine::CommandLine.new("git diff --name-only --find-renames --find-copies 'master..#{build.branch_record.name}' #{filter}").run
+        Cocaine::CommandLine.new("git diff --name-only --find-renames --find-copies 'master..#{build.branch_record.name}'").run
       end
       parse_git_files_changes(output, fetch_emails: false)
     end
