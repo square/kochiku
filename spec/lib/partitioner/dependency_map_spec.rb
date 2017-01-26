@@ -153,6 +153,67 @@ describe Partitioner::DependencyMap do
             end
           end
         end
+
+        context 'when workers are defined for the maps' do
+          let(:target) do
+            {
+              'type' => 'karma_chrome',
+              'workers' => 5,
+              'dependency_map' => dependency_map
+            }
+          end
+
+          let(:dependency_map) do
+            [
+              {
+                'source_glob' => 'source_glob/1/**',
+                'test_glob' => 'test_glob/1/**',
+                'workers' => 1
+              },
+              {
+                'source_glob' => %w(
+                  source_glob/2_part_1/**
+                  source_glob/2_part_2/**
+                ),
+                'test_glob' => %w(
+                  test_glob/2_part_1/**
+                  test_glob/2_part_2/**
+                ),
+                'workers' => 1
+              }
+            ]
+          end
+
+          context 'when one of the source_globs matches changed files' do
+            let(:changed_files) { %w(source_glob/1/foo.rb) }
+
+            it 'creates partitions for the number of workers specified by that mapping' do
+              expect(partitions.size).to eq(1)
+            end
+          end
+
+          context 'when multiple source_globs match changed files' do
+            let(:changed_files) { %w(source_glob/1/foo.rb source_glob/2_part_1/foo.rb) }
+
+            it 'creates partitions for the sum of the workers specified by those mappings' do
+              expect(partitions.size).to eq(2)
+            end
+
+            context 'and the max workers for the target is less than the sum of those workers' do
+              let(:target) do
+                {
+                  'type' => 'karma_chrome',
+                  'workers' => 1,
+                  'dependency_map' => dependency_map
+                }
+              end
+
+              it 'creates partitions for the max workers specified by the target' do
+                expect(partitions.size).to eq(1)
+              end
+            end
+          end
+        end
       end
     end
 

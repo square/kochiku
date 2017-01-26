@@ -24,6 +24,7 @@ module Partitioner
   #       # add files that match its test_glob to the files that should be used in the partitions
   #       - source_glob: foo/**
   #         test_glob: foo/**/*spec.rb
+  #         workers: 1  # Add this many workers if this source_glob matches files changed on this branch
   #
   #       - source_glob:
   #           - bar/**
@@ -31,6 +32,7 @@ module Partitioner
   #         test_glob:
   #           - bar/**/*spec.rb
   #           - spec/bar/**/*spec.rb
+  #         workers: 5
   #
   #       - source_glob: *
   #         test_glob: baz/*spec.rb
@@ -41,6 +43,9 @@ module Partitioner
   #       - {foo,bar}/**/*spec.rb
   #       - spec/bar/**/*spec.rb
   #       - baz/*spec.rb
+  #
+  #     # Maximum number of workers for this partition
+  #     workers: 30
   # ```
   class DependencyMap < Default
     private
@@ -86,6 +91,7 @@ module Partitioner
           test_globs_to_add = dependency_map.map { |dependency| dependency.fetch('test_glob', '') } << default_test_glob
         else
           test_globs_to_add = []
+          workers_for_dependency_map = 0
 
           changed_files = GitBlame.net_files_changed_in_branch(@build).map { |file_object| file_object[:file] }
 
@@ -95,12 +101,21 @@ module Partitioner
 
             matched_files = changed_files.select { |path| source_globs.any? { |pattern| File.fnmatch(pattern, path) } }
 
-            test_globs_to_add << dependency.fetch('test_glob', '') unless matched_files.empty?
+            unless matched_files.empty?
+              test_globs_to_add << dependency.fetch('test_glob', '')
+              workers_for_dependency_map += dependency.fetch('workers', 0)
+            end
           end
 
           # If no source_globs matched the changed files on this branch, add the default_test_glob to the partition
           if test_globs_to_add.empty?
             test_globs_to_add << default_test_glob
+          end
+
+          # If workers were added for the source_globs that matched, and the total is less than the maximum number
+          # of workers allotted for this target, use that amount of workers to build the partitions
+          if workers_for_dependency_map > 0
+            workers = [workers, workers_for_dependency_map].min
           end
         end
 
