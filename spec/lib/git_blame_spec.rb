@@ -240,7 +240,11 @@ describe GitBlame do
 
   describe "#net_files_changed_in_branch" do
     let(:options) { {} }
-    let(:git_diff_command) { "git diff --name-only --find-renames --find-copies 'master..#{build.branch_record.name}'" }
+
+    let(:git_merge_base_command) { "git merge-base master #{build.branch_record.name}" }
+    let(:git_merge_base_output) { '12345' }
+
+    let(:git_diff_command) { "git diff --name-only --find-renames --find-copies '12345..#{build.branch_record.name}'" }
     let(:git_diff_output) { "path/one/file.java\npath/two/file.java" }
 
     subject { GitBlame.net_files_changed_in_branch(build, options) }
@@ -253,6 +257,10 @@ describe GitBlame do
       diff_double = double('git diff')
       allow(diff_double).to receive(:run).and_return(git_diff_output)
       allow(Cocaine::CommandLine).to receive(:new).with(git_diff_command) { diff_double }
+
+      merge_base_double = double('git merge-base')
+      allow(merge_base_double).to receive(:run).and_return(git_merge_base_output)
+      allow(Cocaine::CommandLine).to receive(:new).with(git_merge_base_command) { merge_base_double }
     end
 
     it "should parse the git diff and return change file paths" do

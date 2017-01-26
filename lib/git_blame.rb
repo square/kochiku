@@ -57,8 +57,13 @@ class GitBlame
     # net_files_changed_in_branch counts only files which have a net diff in the branch. If a branch includes a commit
     # to modify a file, and then a revert commit, that file will not be included in this list.
     def net_files_changed_in_branch(build, sync: true)
+      # get revision of shared ancestor of master and build branch, i.e. the commit at which point this branch was created
+      common_ancestor = GitRepo.inside_repo(build.repository, sync: sync) do
+        Cocaine::CommandLine.new("git merge-base master #{build.branch_record.name}").run
+      end
+
       output = GitRepo.inside_repo(build.repository, sync: sync) do
-        Cocaine::CommandLine.new("git diff --name-only --find-renames --find-copies 'master..#{build.branch_record.name}'").run
+        Cocaine::CommandLine.new("git diff --name-only --find-renames --find-copies '#{common_ancestor.strip}..#{build.branch_record.name}'").run
       end
       parse_git_files_changes(output, fetch_emails: false)
     end
