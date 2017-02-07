@@ -119,6 +119,21 @@ describe Partitioner::DependencyMap do
           it 'adds only the tests for that glob to the partition' do
             expect(partitions.first['files']).to eq(%w(test_glob/1/bar_spec.rb))
           end
+
+          context 'but no test_glob is provided' do
+            let(:dependency_map) do
+              [
+                {
+                  'source_glob' => 'source_glob/1/**'
+                }
+              ]
+            end
+
+            it 'does not add any partitions' do
+              expect(partitions).to eq([])
+            end
+          end
+
         end
 
         context 'when multiple source_globs match changed files' do

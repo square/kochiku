@@ -127,6 +127,8 @@ module Partitioner
         files = Array(load_manifest(manifest)) | Dir[*glob]
       end
 
+      return [] if files.empty?
+
       file_to_times_hash = load_manifest(subset['time_manifest'])
 
       balanced_partitions = if file_to_times_hash.is_a?(Hash)
