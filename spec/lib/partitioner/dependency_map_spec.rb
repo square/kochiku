@@ -102,17 +102,6 @@ describe Partitioner::DependencyMap do
       end
 
       context 'on a branch where tests should be isolated' do
-        # TODO(WFE-1190): Re-enable logic to run all tests if kochiku.yml has changed
-        context.skip 'when kochiku.yml was changed' do
-          let(:changed_files) { %w(config/ci/kochiku.yml) }
-
-          it 'should add all test globs to partition' do
-            expect(partitions.first['files']).to(
-              eq(%w(test_glob/1/bar_spec.rb test_glob/2_part_1/bar_spec.rb test_glob/2_part_2/bar_spec.rb test_glob/default/foo/bar/baz_spec.rb))
-            )
-          end
-        end
-
         context 'when one of the source_globs matches changed files' do
           let(:changed_files) { %w(source_glob/1/foo.rb) }
 

@@ -56,11 +56,6 @@ module Partitioner
     # that have changed in this branch
     def should_run_all_tests
       @should_run_all_tests ||= (
-        # TODO(WFE-1190): Re-enable logic to run all tests if kochiku.yml has changed
-        # Run all tests if kochiku.yml file was changed in this branch
-        # changed_files = GitBlame.net_files_changed_in_branch(@build).map { |file_object| file_object[:file] }
-        # return true unless (changed_files & KOCHIKU_YML_LOCS).empty?
-
         # Run all tests if kochiku.yml is formatted the old way (as an array)
         return true if @kochiku_yml.is_a?(Array)
 
