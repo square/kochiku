@@ -244,8 +244,15 @@ describe GitBlame do
     let(:git_merge_base_command) { "git merge-base master #{build.branch_record.name}" }
     let(:git_merge_base_output) { '12345' }
 
-    let(:git_diff_command) { "git diff --name-only --find-renames --find-copies '12345..#{build.branch_record.name}'" }
-    let(:git_diff_output) { "path/one/file.java\npath/two/file.java" }
+    let(:git_diff_command) { "git diff --name-status --find-renames --find-copies '12345..#{build.branch_record.name}'" }
+    let(:git_diff_output) {
+      <<-GITDIFF
+D       path/to/deleted_file.java
+M       path/to/modified_file.java
+A       path/to/added_file.java
+R097    path/to/original_name.java path/to/new_name.java
+    GITDIFF
+    }
 
     subject { GitBlame.net_files_changed_in_branch(build, options) }
 
@@ -265,9 +272,12 @@ describe GitBlame do
 
     it "should parse the git diff and return change file paths" do
       git_file_changes = subject
-      expect(git_file_changes.size).to eq(2)
-      expect(git_file_changes).to include({:file => "path/one/file.java", :emails => []})
-      expect(git_file_changes).to include({:file => "path/two/file.java", :emails => []})
+      expect(git_file_changes.size).to eq(5)
+      expect(git_file_changes).to include({:file => "path/to/added_file.java", :emails => []})
+      expect(git_file_changes).to include({:file => "path/to/deleted_file.java", :emails => []})
+      expect(git_file_changes).to include({:file => "path/to/modified_file.java", :emails => []})
+      expect(git_file_changes).to include({:file => "path/to/original_name.java", :emails => []})
+      expect(git_file_changes).to include({:file => "path/to/new_name.java", :emails => []})
     end
   end
 end
