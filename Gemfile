@@ -35,7 +35,7 @@ gem 'chunky_png'
 gem 'posix-spawn'  # used by cocaine
 gem 'cocaine'
 gem 'awesome_print', require: false
-gem 'nokogiri'
+gem 'nokogiri', '~> 1.7'
 
 gem 'pry-rails'
 gem 'pry-byebug'
