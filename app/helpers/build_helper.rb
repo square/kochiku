@@ -22,7 +22,11 @@ module BuildHelper
     if (build_part.options['total_workers'] && build_part.options['worker_chunk'])
       build_part.paths.first + " - Chunk #{build_part.options['worker_chunk']} of #{build_part.options['total_workers']}"
     elsif build_part.paths.size == 1
-      build_part.paths.first
+      if build_part.paths.first == "/dev/null"
+        build_part.kind
+      else
+        build_part.paths.first
+      end
     else
       first, *rest = build_part.paths
       first = first.sub(/([^\/]+)/, '<b class="root">\1</b>')
