@@ -81,4 +81,12 @@ describe BuildHelper do
       expect(format_paths(build_part)).to eq("a - Chunk 3 of 5")
     end
   end
+
+  context "a build part with no paths (/dev/null)" do
+    let!(:build_part) { FactoryGirl.create(:build_part, build_instance: build, paths: ['/dev/null'], kind: 'lint-check') }
+
+    it "displays the BuildPart kind instead of /dev/null" do
+      expect(format_paths(build_part)).to eq("lint-check")
+    end
+  end
 end
