@@ -92,12 +92,6 @@ describe ApplicationHelper do
     end
   end
 
-  describe "#show_link_to_create_pull_request" do
-    it "creates a url to github for a pull request" do
-      expect(show_link_to_create_pull_request(@build)).to eq('https://git.example.com/square/web/pull/new/master...SHA1FORCOMMIT')
-    end
-  end
-
   describe "timeago" do
     it "should generate the correct abbr tag" do
       timestamp = Time.at(0).utc

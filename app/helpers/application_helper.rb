@@ -59,7 +59,7 @@ module ApplicationHelper
   end
 
   def show_link_to_create_pull_request(build)
-    "#{build.repository.base_html_url}/pull/new/master...#{build.ref}"
+    build.repository.open_pull_request_url(build.branch_record.name)
   end
 
   def timeago(time, options = {})

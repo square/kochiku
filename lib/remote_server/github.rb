@@ -94,5 +94,9 @@ module RemoteServer
     def base_html_url
       "https://#{attributes[:host]}/#{attributes[:repository_namespace]}/#{attributes[:repository_name]}"
     end
+
+    def open_pull_request_url(branch_name)
+      "#{base_html_url}/pull/new/master...#{branch_name}"
+    end
   end
 end
