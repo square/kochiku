@@ -112,11 +112,19 @@ module RemoteServer
     end
 
     def base_html_url
-      "https://#{attributes[:host]}/projects/#{attributes[:repository_namespace]}/repos/#{attributes[:repository_name]}"
+      "https://#{attributes[:host]}/projects/#{attributes[:repository_namespace].upcase}/repos/#{attributes[:repository_name]}"
     end
 
     def href_for_commit(sha)
       "#{base_html_url}/commits/#{sha}"
+    end
+
+    def get_branch_url(branch_name)
+      "#{base_html_url}?at=refs/heads/#{branch_name}"
+    end
+
+    def open_pull_request_url(branch_name)
+      "#{base_html_url}/compare/commits?sourceBranch=refs/heads/#{branch_name}"
     end
 
     # uses the stash REST api to merge a pull request

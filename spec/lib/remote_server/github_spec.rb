@@ -108,4 +108,20 @@ describe RemoteServer::Github do
       expect(result).to eq(ssh_url)
     end
   end
+
+  describe '#get_branch_url' do
+    it 'should return the expected url' do
+      https_url = "https://github.com/square/test-repo1.git"
+      result = make_server(https_url).get_branch_url('my-new-branch')
+      expect(result).to eq("https://github.com/square/test-repo1/tree/my-new-branch")
+    end
+  end
+
+  describe '#open_pull_request_url' do
+    it 'should return the expected url' do
+      https_url = "https://github.com/square/test-repo1.git"
+      result = make_server(https_url).open_pull_request_url('my-new-branch')
+      expect(result).to eq("https://github.com/square/test-repo1/pull/new/master...my-new-branch")
+    end
+  end
 end

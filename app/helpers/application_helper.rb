@@ -36,16 +36,13 @@ module ApplicationHelper
   end
 
   def link_to_branch(build)
-    link_to(build.branch_record.name, show_link_to_branch(build.branch_record))
+    branch_record = build.branch_record
+    branch_name = branch_record.name
+    link_to(branch_name, branch_record.repository.get_branch_url(branch_name))
   end
 
   def show_link_to_commit(repo, commit_sha)
     repo.remote_server.href_for_commit(commit_sha).to_s
-  end
-
-  # TODO: Extract these links into RemoteServer
-  def show_link_to_branch(branch_record)
-    "#{branch_record.repository.base_html_url}/tree/#{branch_record.name}"
   end
 
   def show_link_to_compare(build, first_commit_hash, second_commit_hash)
@@ -59,7 +56,7 @@ module ApplicationHelper
   end
 
   def show_link_to_create_pull_request(build)
-    "#{build.repository.base_html_url}/pull/new/master...#{build.ref}"
+    build.repository.open_pull_request_url(build.branch_record.name)
   end
 
   def timeago(time, options = {})
