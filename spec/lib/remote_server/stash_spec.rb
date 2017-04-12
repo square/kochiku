@@ -169,6 +169,14 @@ describe RemoteServer::Stash do
     end
   end
 
+  describe '#get_branch_url' do
+    it 'should return the expected url' do
+      https_url = "https://stash.example.com/scm/foo/bar.git"
+      result = make_server(https_url).get_branch_url('my-new-branch')
+      expect(result).to eq("https://stash.example.com/projects/FOO/repos/bar?at=refs/heads/my-new-branch")
+    end
+  end
+
   describe '#open_pull_request_url' do
     it 'should return the expected url' do
       https_url = "https://stash.example.com/scm/foo/bar.git"

@@ -52,7 +52,7 @@ class Repository < ActiveRecord::Base
     @remote_server ||= RemoteServer.for_url(url)
   end
 
-  delegate :base_html_url, :base_api_url, :sha_for_branch, :url_for_fetching, :open_pull_request_url, to: :remote_server
+  delegate :base_html_url, :base_api_url, :sha_for_branch, :url_for_fetching, :get_branch_url, :open_pull_request_url, to: :remote_server
 
   def promotion_refs
     on_green_update.split(",").map(&:strip).reject(&:blank?)

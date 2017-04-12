@@ -95,6 +95,10 @@ module RemoteServer
       "https://#{attributes[:host]}/#{attributes[:repository_namespace]}/#{attributes[:repository_name]}"
     end
 
+    def get_branch_url(branch_name)
+      "#{base_html_url}/tree/#{branch_name}"
+    end
+
     def open_pull_request_url(branch_name)
       "#{base_html_url}/pull/new/master...#{branch_name}"
     end
