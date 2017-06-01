@@ -70,6 +70,7 @@ module Partitioner
 
     # Overrides Partitioner::Default#get_file_parts_for. Decides which test files to include in the partitions
     # based on dependency_map option in each test target.
+    # rubocop:disable Metrics/MethodLength
     def get_file_parts_for(subset)
       glob = subset.fetch('glob', '/dev/null')
       manifest = subset['manifest']
@@ -138,4 +139,5 @@ module Partitioner
       Strategies.send(strategy, files, workers) + balanced_partitions
     end
   end
+  # rubocop:enable Metrics/MethodLength
 end
