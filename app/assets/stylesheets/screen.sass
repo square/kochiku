@@ -2,12 +2,12 @@
 @import compass/reset
 @import compass/css3/border-radius
 
-/* SQ Market font */
+/* SQ Market font
 @font-face
-  font-family: 'SQ Market'
-  src: url('/fonts/SQMarket-Regular.otf') format('opentype')
+  font-family: "SQ Market"
+  src: url("/fonts/SQMarket-Regular.otf") format("opentype")
 
-/* Variables */
+/* Variables
 $font-base: Helvetica Neue, Helvetica, Arial, sans-serif
 $font-code: Inconsolata, Menlo, Monaco, monospace
 $color-base: #52585D
@@ -21,18 +21,20 @@ $color-failed: hsl(0, 90%, 70%)
 $color-errored: hsl(48, 90%, 70%)
 $color-aborted: hsl(0, 0%, 70%)
 
-/* Mixins */
+/* Mixins
 =has-layout
   display: block
   zoom: 1
 
 =envelope
   +has-layout
+
   position: relative
   overflow: hidden
 
 =safe-envelope
   +has-layout
+
   &:after
     content: " "
     display: block
@@ -54,7 +56,7 @@ $color-aborted: hsl(0, 0%, 70%)
   -moz-border-radius: $radius
   border-radius: $radius
 
-/* Styles */
+/* Styles
 html, body
   height: 100%
 
@@ -91,19 +93,23 @@ input[type=password]
   border: solid 1px rgba(black, 0.3)
   padding: 4px
   color: #202122
+
   &:focus
     border-color: hsla(207, 63%, 47%, 0.6)
 
 input[type=submit], button, .button
   +border-radius(3px)
+
   box-shadow: 0 1px 0 rgba(white, 0.1) inset, 0 0 3px rgba(black, 0.2)
   border: solid 1px rgba(black, 0.2)
   background: $color-link linear-gradient(to bottom, transparent, rgba(black, 0.2))
   color: white
   text-shadow: 0 -1px 0 rgba(black, 0.2)
   padding: 4px 8px
+
   a
     color: white
+
   &:active
     box-shadow: 0 1px 3px rgba(black, 0.2) inset
     color: rgba(white, 0.95)
@@ -112,12 +118,14 @@ input[type=submit], button, .button
 #tiptip_content
   font-size: 14px
 
-/* Index */
+/* Index
 .section-wrapper
   overflow: hidden
   border-bottom: solid 1px #e2e2e2
+
 .section
   +envelope
+
   margin: 1em
 
 .flash
@@ -127,30 +135,39 @@ input[type=submit], button, .button
   border-radius: 12px
   margin-bottom: 10px
   font-weight: bold
+
   &.message
     background-color: #91f991
+
   &.error
     background-color: #ff9999
+
   &.warn
     background-color: #edfa3f
 
 #header
   a.logo
     float: left
+
     h1
       font-family: "SQ Market", $font-base
       font-size: 28px
       height: 37px
       color: $color-title + #666
+
       b
         color: $color-title
+
       .translation
         font-size: 14px
+
   ul.links
     display: inline-block
+
     li
       display: inline-block
       margin-right: 1em
+
   form
     display: inline-block
 
@@ -161,14 +178,18 @@ h2.subheader
   color: $color-title + #222
   font-size: 175%
   padding: 0 0 25px
+
   .info, .actions
     font-size: 12px
     font-weight: normal
+
   .actions
     float: right
     padding-top: 5px
+
   form
     display: inline
+
   label
     margin-left: 1em
     min-width: 0
@@ -182,6 +203,7 @@ h3
   margin-left: 8px
   padding-left: 8px
   border-left: solid 1px rgba(0, 0, 0, 0.3)
+
   form
     display: inline-block
 
@@ -195,12 +217,16 @@ h3
   float: right
   width: 300px
   text-align: right
+
   .great
     color: $color-passed
+
   .decent
     color: $color-errored
+
   .bad
     color: $color-failed
+
   .label
     cursor: help
 
@@ -212,17 +238,23 @@ h3
   margin-bottom: 2em
   min-width: 1000px
   height: 180px
+
   .legend table
     width: auto
+
     td
       padding: 2px
+
   .xAxis
     text-align: center
     font-size: 12px
+
     a
       font-family: $font-code
+
     .build-status
       position: relative
+
     .build-status:before
       position: absolute
       left: 50%
@@ -233,18 +265,23 @@ h3
       margin: 0
       margin-left: -5px
       border-radius: 2px
+
     time
       display: block
       font-size: 10px
       margin-top: 2px
+
   .axis-label
     position: absolute
     color: #666
+
     &.y
       -webkit-transform: rotate(-90deg)
       left: -45px
       top: 45%
-  .flot-overlay, .flot-y-axis  // make the x-axis clickable
+
+  .flot-overlay, .flot-y-axis
+    // make the x-axis clickable
     z-index: -1
 
 #tooltip
@@ -254,11 +291,12 @@ h3
   padding: 2px
   background-color: #B8BEC3
   font-size: 130%
-  opacity: 0.80
+  opacity: 0.8
 
 .build-state
   .state
     font-weight: bold
+
   .queue
     font-weight: bold
 
@@ -268,16 +306,19 @@ h3
 
   .build-wrapper
     +envelope
+
     color: #666
     display: block
 
     .build-info
       float: left
+
       .ref
         font-size: 175%
         font-family: $font-code
         line-height: 40px
         letter-spacing: 1px
+
         &:hover
           color: $color-link
 
@@ -289,6 +330,7 @@ h3
 
     .build-id
       +text-shadow
+
       font-family: $font-base
       float: right
       font-size: 400%
@@ -299,7 +341,9 @@ $part-margin: 2px
 
 .parts
   +envelope
+
   margin: 10px (-$part-margin)
+
   .part
     overflow: hidden
     float: left
@@ -307,28 +351,37 @@ $part-margin: 2px
     border-radius: 3px
     margin: $part-margin
     box-shadow: 0 1px 1px rgba(0, 0, 0, 0.3)
+
   .part.runnable
     background-color: $color-runnable
+
   .part.running
     background-color: $color-running
+
   .part.passed
     background-color: $color-passed
+
   .part.failed
     background-color: $color-failed
+
   .part.errored
     background-color: $color-errored
+
   .part.aborted
     background-color: $color-aborted
 
   .part-wrapper
     +envelope
+
     display: block
     margin: 5px
     width: 115px
     height: 25px
     color: #333
+
     .kind, .attempts
       display: inline-block
+
     .kind
       font-size: 175%
       font-weight: bold
@@ -345,12 +398,13 @@ $part-margin: 2px
   font-size: 120%
   font-family: $font-code
   max-width: 500px !important
+
   li
     margin: 5px 0
 
 .build-status, .part-status, .attempt-status
   &:before
-    content: "\00A0"
+    content: " "
     border: 1px solid rgba(black, 0.4)
     border-radius: 3px
     display: inline-block
@@ -363,42 +417,52 @@ $part-margin: 2px
     font-family: verdana, sans-serif
     font-weight: bold
     color: rgba(black, 0.4)
+
   &.runnable:before, &.partitioning:before
     background-color: $color-runnable
+
   &.running:before
     background-color: $color-running
+
   &.failed:before, &.errored:before, &.aborted:before, &.doomed:before
     content: "!"
+
   &.failed:before, &.doomed:before
     background-color: $color-failed
+
   &.errored:before
     background-color: $color-errored
+
   &.aborted:before
     background-color: $color-aborted
+
   &.passed:before, &.succeeded:before
     background-color: $color-passed
 
 h2 .build-status:before
   vertical-align: middle
 
-/* New build in header */
+/* New build in header
 .header-right
   float: right
   line-height: 32px
   margin-top: 5px
+
   input.ref
     margin: 0
     width: 200px
     font-size: 100%
 
-/* New build page */
+/* New build page
 input.ref
   width: 500px
   font-family: $font-code
   font-size: 150%
+
 input.build-button
   font-size: 120%
-/* health pretends to be a button */
+
+/* health pretends to be a button
 .health
   float: right
   margin: 8px 5px
@@ -406,96 +470,128 @@ input.build-button
 table
   table-layout: fixed
   width: 100%
+
   tr:nth-child(even)
     background-color: rgba(0, 0, 0, 0.05)
+
   tbody tr:hover
     background-color: #e4edfa !important
+
   th
     font-weight: bold
     border-bottom: 1px solid rgba(0, 0, 0, 0.1)
     padding: 0 5px 5px
     cursor: pointer
     white-space: nowrap
+
     &.headerSortDown:after
       content: " ▲"
       font-size: 8px
+
     &.headerSortUp:after
       content: " ▼"
       font-size: 8px
+
     code
       font-size: 15px
+
     &.id
       width: 50px
+
     &.whisker
       width: 45px
+
     &.status
       width: 70px
+
     &.ruby-version
       width: 100px
+
     &.type
       width: 156px
+
     &.worker
       width: 156px
+
     &.time
       width: 80px
+
     &.count
       width: 50px
+
     &.actions
       width: 70px
+
     &.first-path
       width: 100px
+
     &.date
       width: 180px
+
   td
     padding: 5px
     overflow: hidden
     text-overflow: ellipsis
     white-space: nowrap
+
     &.whisker
       padding-right: 2px
+
       .part-status:before
         content: ""
         width: 1px
         height: 10px
         margin-right: -1px
         border-color: rgba(black, 0.2)
+
       .part-status.attempt-0:before
         height: 1px
         border-color: transparent
         -webkit-box-shadow: none
+
       .part-status.attempt-1:before
         height: 1px
+
       .part-status.attempt-2:before
         height: 3px
+
       .part-status.attempt-3:before
         height: 5px
+
       .part-status.attempt-4:before
         height: 7px
+
       .part-status.attempt-5:before
         height: 9px
+
   th.right, td.right
     text-align: right
+
   td .paths
     color: #999
+
     .root
       color: black
+
   td.wrap
     white-space: normal
     line-height: 1.6
 
-/* Search by build revision */
+/* Search by build revision
 .select_commit
   margin-bottom: 20px
+
 #build_ref_input
   width: 100px
 
-/* Build show */
+/* Build show
 .build-info-subheader
-  margin: -15px 0 25px
+  margin: (-15px) 0 25px
+
 .build-summary
   margin-bottom: 10px
 
-/* Build parts show*/
+/* Build parts show
 table.build-part-info
   margin-bottom: 20px
 
@@ -512,11 +608,13 @@ ol#build-paths
 
 .projects
   +pie-clearfix
-  margin-right: .75em
-  margin-left: .75em
+
+  margin-right: 0.75em
+  margin-left: 0.75em
 
   li.build-info
-    margin: .3em 0
+    margin: 0.3em 0
+
     &.bold
       font-weight: bold
 
@@ -528,27 +626,34 @@ ol#build-paths
     border-radius: 10px
     text-align: center
     vertical-align: top
-    margin: .5em
+    margin: 0.5em
     color: rgba(black, 0.8)
-    text-shadow: rgba(white, .1) 0 1px 0
-    +box-shadow(0 1px 2px rgba(black, .5), inset 0 0 3px rgba(black, .3))
+    text-shadow: rgba(white, 0.1) 0 1px 0
+
+    +box-shadow(0 1px 2px rgba(black, 0.5), inset 0 0 3px rgba(black, 0.3))
+
     a
       color: rgba(white, 0.95)
-      text-shadow: rgba(black, .2) 0 -1px 0
+      text-shadow: rgba(black, 0.2) 0 -1px 0
+
     .project-name
       font-size: 26px
       font-weight: 300
+
       a
         display: block
         padding: 55px 0 10px
-        letter-spacing: .05em
+        letter-spacing: 0.05em
+
     .state
       padding-top: 6px
+
     .project-link
       display: none
       position: absolute
       bottom: 10px
       width: 100%
+
     &:hover
       .project-link
         display: block
@@ -567,11 +672,12 @@ ol#build-paths
   background-color: desaturate(darken($color-aborted, 10%), 20%)
   font-weight: bold
 
-/* Repository form styles */
+/* Repository form styles
 
 fieldset
   legend
     font-weight: bold
+
   padding: 0.5em 0
   margin: 1em 0
 
@@ -582,6 +688,7 @@ fieldset
 // Give more spacing to the checkboxes
 #repository-form > div, #repository-form fieldset > div
   min-height: 28px
+
 #repository-form input[type='checkbox']
   margin-top: 8px
 
@@ -598,7 +705,7 @@ fieldset
 #branch-delete-warning
   color: #B8BEC3
 
-/* END Repository form styles */
+/* END Repository form styles
 
 .build-error
   pre
@@ -606,6 +713,7 @@ fieldset
     background-color: rgba(0, 0, 0, 0.05)
     padding: 1em
     margin-bottom: 2em
+
   h2
     padding: 0.5em
     font-size: 1.5em
