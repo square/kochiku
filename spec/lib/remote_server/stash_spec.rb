@@ -38,11 +38,12 @@ describe 'stash integration test' do
     }
 
     it "should post to stash" do
-      stub_request(:post, "https://stashuser:stashpassword@stash.example.com/rest/build-status/1.0/commits/#{build.ref}")
+      stub_request(:post, "https://@stash.example.com/rest/build-status/1.0/commits/#{build.ref}")
+        .with(basic_auth: ['stashuser', 'stashpassword'])
 
       stash.update_commit_status!(build)
 
-      expect(WebMock).to have_requested(:post, "https://stashuser:stashpassword@stash.example.com/rest/build-status/1.0/commits/#{build.ref}")
+      expect(WebMock).to have_requested(:post, "https://stash.example.com/rest/build-status/1.0/commits/#{build.ref}")
     end
   end
 end

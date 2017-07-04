@@ -21,7 +21,8 @@ shared_examples_for 'a remote server' do
 
       before do
         stub_request(:get, "#{repo_uri}/git/refs/heads/#{branch}").to_return(:status => 404, :body => '{ "message": "Not Found" }')
-        stub_request(:get, "https://stashuser:stashpassword@stash.example.com/rest/api/1.0/projects/sq/repos/non-existent-repo/commits?limit=1&until=#{branch}")
+        stub_request(:get, "https://stash.example.com/rest/api/1.0/projects/sq/repos/non-existent-repo/commits?limit=1&until=#{branch}")
+          .with(basic_auth: ['stashuser', 'stashpassword'])
           .to_return(:status => 404, :body => '{ "errors": [ { "context": null, "message": "A detailed error message.", "exceptionName": null } ] }')
       end
 
@@ -35,7 +36,8 @@ shared_examples_for 'a remote server' do
 
       before do
         stub_request(:get, "#{repo_uri}/git/refs/heads/#{branch}").to_return(:status => 404, :body => '{ "message": "Not Found" }')
-        stub_request(:get, "https://stashuser:stashpassword@stash.example.com/rest/api/1.0/projects/sq/repos/kochiku/commits?limit=1&until=#{branch}")
+        stub_request(:get, "https://@stash.example.com/rest/api/1.0/projects/sq/repos/kochiku/commits?limit=1&until=#{branch}")
+          .with(basic_auth: ['stashuser', 'stashpassword'])
           .to_return(:status => 400, :body => '{ "errors": [ { "context": null, "message": "A detailed error message.", "exceptionName": null } ] }')
       end
 
@@ -110,7 +112,8 @@ describe 'RemoteServer::Stash' do
 
     allow(File).to receive(:read).with("/password").and_return("stashpassword")
 
-    stub_request(:get, "https://stashuser:stashpassword@stash.example.com/rest/api/1.0/projects/sq/repos/kochiku/commits?limit=1&until=#{branch}")
+    stub_request(:get, "https://stash.example.com/rest/api/1.0/projects/sq/repos/kochiku/commits?limit=1&until=#{branch}")
+      .with(basic_auth: ['stashuser', 'stashpassword'])
       .to_return(:status => 200, :body => build_ref_info)
   end
 
