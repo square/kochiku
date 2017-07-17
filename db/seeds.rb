@@ -1,7 +1,7 @@
 # Eagerly load all of the models to avoid errors related to multiple threads
 Dir[Rails.root.join("app/models/*.rb")].each {|f| require f}
 
-repo_infos = [{:name => 'kandan', :location => "git@github.com:kandanapp/kandan.git", :build_attempt_state => :passed, :types => [:spec, :cucumber]},
+repo_infos = [{:name => 'kandan', :location => "git@github.com:kandanapp/kandan.git", :build_attempt_state => :passed, :types => [:spec, :cucumber, :rubocop, :lint, :unit]},
               {:name => 'copycopter-server', :build_attempt_state => :passed, :location => "git@github.com:copycopter/copycopter-server.git", :types => [:spec]},
               {:name => 'lobsters', :build_attempt_state => :errored, :location => "git@github.com:jcs/lobsters.git", :types => [:junit]}]
 
@@ -42,7 +42,7 @@ def create_build_part(build, kind, paths, build_attempt_state)
   finished = if BuildAttempt::IN_PROGRESS_BUILD_STATES.include?(build_attempt_state)
                nil
              else
-               rand(500).seconds.from_now
+               rand(7200).seconds.from_now
              end
   attempt = BuildAttempt.create!(
     :build_part => bp,
@@ -68,7 +68,7 @@ def create_build(branch, test_types, build_attempt_state: :passed)
       spec/views/mailers/application_mailer/interval_sales_report.text.plain.erb_spec.rb
     )
 
-    5.times do
+    10.times do
       create_build_part(build, kind, paths, build_attempt_state)
     end
   end
@@ -98,8 +98,10 @@ repo_infos.each do |repo_info|
   repos[repo_info[:name]] = repository
   master_branch = Branch.create!(:name => 'master', :convergence => true, :repository => repository)
   populate_builds_for(master_branch, repo_info)
-  developer_branch = Branch.create!(:name => 'feature-branch', :convergence => false, :repository => repository)
-  populate_builds_for(developer_branch, repo_info)
+  %w(feature-branch feature-branch2 feature-branch3).each do |b|
+    developer_branch = Branch.create!(:name => b, :convergence => false, :repository => repository)
+    populate_builds_for(developer_branch, repo_info)
+  end
 end
 
 # create an extra running build for copycopter-server to show something that is in progress
