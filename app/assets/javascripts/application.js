@@ -138,3 +138,21 @@ Kochiku.graphBuildTimes = function(repositoryPath, branchName) {
     format: function(s) { return statuses.indexOf(s.replace(/^\s+|\s+$/g, '')); }
   });
 })();
+
+function timeToSeconds(time) {
+  var timeArr = time.split(':')
+  if (timeArr.length === 2) {
+    return Number(timeArr[0])*60 + Number(timeArr[1])
+  } else {
+    return Number(timeArr[0])*3600 + Number(timeArr[1])*60 + Number(timeArr[2])
+  }
+}
+
+(function() {
+  $.tablesorter.addParser({
+    id:     'elapsedTime',
+    type:   'numeric',
+    is:     function(s) { return /^([0-9]*:(?=[0-9]{2}:))?([0-5]?[0-9])(:[0-5][0-9])$/.test(s); },
+    format: function(s) { return timeToSeconds(s); }
+  });
+})();
