@@ -42,7 +42,7 @@ module RemoteServer
     # Public: Returns a url for the remote repo in the format Kochiku prefers
     # for Github, which is the SSH format.
     def canonical_repository_url
-      "git@#{@settings.host}:#{attributes[:repository_namespace]}/#{attributes[:repository_name]}.git"
+      "https://#{@settings.host}/#{attributes[:repository_namespace]}/#{attributes[:repository_name]}.git"
     end
 
     def url_for_compare(first_commit_hash, second_commit_hash)
