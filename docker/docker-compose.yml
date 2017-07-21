@@ -1,0 +1,8 @@
+redis:
+  image: redis:latest
+
+worker1:
+  build: kochiku-worker
+  links:
+    - redis:redis
+  hostname: worker1
