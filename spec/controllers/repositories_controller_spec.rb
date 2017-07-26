@@ -73,6 +73,7 @@ describe RepositoriesController do
 
     # boolean attributes
     [
+      :enabled,
       :run_ci,
       :build_pull_requests,
       :send_build_failure_email,

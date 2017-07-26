@@ -8,7 +8,10 @@
     %li= link_to("Settings", repository_edit_path(@repository), class: "info")
     %li= link_to("Branches", repository_branches_path(@repository))
   = form_for @build, url: request_new_build_repository_branch_path(@repository, @branch) do |f|
-    = f.submit "Build", class: 'build-button'
+    - if @repository.enabled?
+      = f.submit "Build", class: 'build-button'
+    - else
+      = f.submit "Build", class: 'build-button', disabled: 'true'
 
 - cache(@branch) do
   %div.health.button= link_to('Health', health_repository_branch_path(@repository, @branch, 'count' => 12))

@@ -45,7 +45,7 @@
   - if @build.is_running?
     %span.info
       = button_to "Abort Build", abort_repository_build_path(@build.repository, @build), method: :patch, class: "abort-build"
-  - if @build.failed? || @build.aborted?
+  - if @repository.enabled? && (@build.failed? || @build.aborted?)
     %span.info
       - if @build.build_parts.empty? || !@build.error_details.empty?
         = button_to "Retry Partitioning", retry_partitioning_repository_build_path(@build.repository, @build), :method => :post, :form_class => "retry-partitioning"
@@ -91,7 +91,7 @@
         %td.right.elapsed= part.elapsed_time ? duration_strftime(part.elapsed_time) : "pending"
         %td.right= part.build_attempts.size
         %td.right
-          - if part.unsuccessful?
+          - if part.unsuccessful? && @repository.enabled?
             = link_to("Rebuild", rebuild_repository_build_part_path(@build.repository, @build, part), :method => :post)
 
 - if @build.on_success_script_log_file.url

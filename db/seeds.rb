@@ -1,9 +1,29 @@
 # Eagerly load all of the models to avoid errors related to multiple threads
 Dir[Rails.root.join("app/models/*.rb")].each {|f| require f}
 
-repo_infos = [{:name => 'kandan', :location => "git@github.com:kandanapp/kandan.git", :build_attempt_state => :passed, :types => [:spec, :cucumber, :rubocop, :lint, :unit]},
-              {:name => 'copycopter-server', :build_attempt_state => :passed, :location => "git@github.com:copycopter/copycopter-server.git", :types => [:spec]},
-              {:name => 'lobsters', :build_attempt_state => :errored, :location => "git@github.com:jcs/lobsters.git", :types => [:junit]}]
+repo_infos = [
+  {
+    :name => 'kandan',
+    :enabled => true,
+    :location => "git@github.com:kandanapp/kandan.git",
+    :build_attempt_state => :passed,
+    :types => [:spec, :cucumber, :rubocop, :lint, :unit]
+  },
+  {
+    :name => 'copycopter-server',
+    :enabled => true,
+    :build_attempt_state => :passed,
+    :location => "git@github.com:copycopter/copycopter-server.git",
+    :types => [:spec]
+  },
+  {
+    :name => 'lobsters',
+    :enabled => false,
+    :build_attempt_state => :errored,
+    :location => "git@github.com:jcs/lobsters.git",
+    :types => [:junit]
+  }
+]
 
 @builders = %w/
   builder01.local builder02.local
@@ -94,7 +114,7 @@ write_the_sample_stdout_log_file
 
 repos = {}
 repo_infos.each do |repo_info|
-  repository = Repository.create!({:url => repo_info[:location], :test_command => "script/ci", :run_ci => true})
+  repository = Repository.create!({:url => repo_info[:location], :test_command => "script/ci", :run_ci => true, :enabled => repo_info[:enabled]})
   repos[repo_info[:name]] = repository
   master_branch = Branch.create!(:name => 'master', :convergence => true, :repository => repository)
   populate_builds_for(master_branch, repo_info)

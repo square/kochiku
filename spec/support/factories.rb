@@ -12,6 +12,10 @@ FactoryGirl.define do
       name "master"
       convergence true
     end
+
+    factory :branch_on_disabled_repo do
+      association :repository, factory: :disabled_repository
+    end
   end
 
   factory :build do
@@ -34,6 +38,10 @@ FactoryGirl.define do
       after(:create) do |build_instance, evaluator|
         create_list(:build_part_with_build_attempt, evaluator.num_build_parts, build_instance: build_instance)
       end
+    end
+
+    factory :build_on_disabled_repo do
+      association :branch_record, factory: :branch_on_disabled_repo
     end
   end
 
@@ -74,9 +82,14 @@ FactoryGirl.define do
     test_command "script/ci worker"
     on_green_update 'last-green-build'
     allows_kochiku_merges true
+    enabled true
 
     factory :stash_repository do
       sequence(:url) { |n| "git@stash.example.com:bucket_name/test-repo#{n}.git" }
+    end
+
+    factory :disabled_repository do
+      enabled false
     end
   end
 end

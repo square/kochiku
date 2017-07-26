@@ -17,6 +17,9 @@
   %div
     %label{:for => "run_ci"} Trigger build on push to master:
     = f.check_box :run_ci, :id => "run_ci"
+  %div
+    %label{:for => "enabled"} Enable repository:
+    = f.check_box :enabled, :id => "enabled"
 
 
   %fieldset
