@@ -101,9 +101,6 @@
           %td.right.elapsed= build_part.elapsed_time ? duration_strftime(build_part.elapsed_time) : '' if build_part
           %td.right
             = build_part.build_attempts.size if build_part
-            - average = (total_attempts.to_f / (@builds.length - 1)).round 0 if @builds.length > 1
-            - if average && average > 1
-              %span{title: 'Average'} / #{average}
 
 - if @current_build
   = content_for :javascript do
