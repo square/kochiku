@@ -75,7 +75,6 @@
         %th.type Type
         %th.right.time Elapsed
         %th.right.count Attempt
-        %th.right.actions Actions
     - @build_parts.each do |_key, build_parts_by_build|
       - part = build_parts_by_build.values.first
       - build_part = build_parts_by_build[@current_build]
@@ -102,12 +101,6 @@
           %td.right.elapsed= build_part.elapsed_time ? duration_strftime(build_part.elapsed_time) : '' if build_part
           %td.right
             = build_part.build_attempts.size if build_part
-            - average = (total_attempts.to_f / (@builds.length - 1)).round 0 if @builds.length > 1
-            - if average && average > 1
-              %span{title: 'Average'} / #{average}
-          %td.right
-            - if build_part && build_part.unsuccessful?
-              = link_to "Rebuild", "/#{@repository.to_param}/builds/#{@current_build.to_param}/parts/#{build_part.to_param}/rebuild", method: :post
 
 - if @current_build
   = content_for :javascript do
