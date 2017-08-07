@@ -17,7 +17,8 @@
 
   .actions
     %label
-      = link_to("Rebuild", rebuild_repository_build_part_path(@repository, @build, @build_part), method: :post, class: "rebuild button")
+      - if @repository.enabled?
+        = link_to("Rebuild", rebuild_repository_build_part_path(@repository, @build, @build_part), method: :post, class: "rebuild button")
     %label
       = check_box_tag :refresh, true, @build_part.not_finished?
       Refresh

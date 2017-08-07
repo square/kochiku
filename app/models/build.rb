@@ -82,7 +82,7 @@ class Build < ActiveRecord::Base
   end
 
   def enqueue_partitioning_job
-    Resque.enqueue(BuildPartitioningJob, self.id)
+    Resque.enqueue(BuildPartitioningJob, self.id) if repository.enabled?
   end
 
   def kochiku_yml
@@ -94,6 +94,7 @@ class Build < ActiveRecord::Base
   end
 
   def partition(parts)
+    return unless repository.enabled?
     transaction do
       update_attributes!(:state => :runnable)
       parts.each do |part|

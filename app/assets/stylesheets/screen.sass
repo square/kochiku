@@ -145,6 +145,12 @@ input[type=submit], button, .button
   &.warn
     background-color: #edfa3f
 
+#disabled-repo-alert
+  color: #8a6d3b
+  background-color: #fcf8e3
+  border-color: #faebcc
+  font-size: 14px
+
 #header
   a.logo
     float: left
@@ -461,6 +467,13 @@ input.ref
 
 input.build-button
   font-size: 120%
+
+input[disabled]
+  background-color: #e8e8e8
+  background-image: linear-gradient(#fcfcfc,#e8e8e8)
+  border: 1px solid #e8e8e8
+  border-top-color: #e8e8e8
+  color: #999
 
 /* health pretends to be a button
 .health

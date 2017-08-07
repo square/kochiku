@@ -135,6 +135,48 @@ describe BuildsController do
       expect(ret['build']['build_parts'][0]['build_id']).to eq(build.id)
       expect(ret['build']['build_parts'][0]['status']).to eq('passed')
     end
+
+    context "when the repository is disabled" do
+      render_views
+      let(:build) {
+        FactoryGirl.create(:build_on_disabled_repo, state: :failed)
+      }
+
+      it "should not show 'Rebuild failed parts' button or rebuild action in #build-summary table" do
+        build_part = FactoryGirl.create(:build_part, build_instance: build)
+        FactoryGirl.create(:completed_build_attempt, build_part: build_part, state: :failed)
+        get :show, repository_path: build.repository, id: build.id
+        expect(response.body).to_not match(/<input.*value="Rebuild failed parts"/)
+        expect(response.body).to_not match(%r{<a.*>Rebuild<\/a>$})
+      end
+
+      it "should not show 'Retry Partitioning' button" do
+        build.build_parts.delete_all
+        get :show, repository_path: build.repository, id: build.id
+        expect(response.body).to_not match(/<input.*value="Retry Partitioning"/)
+      end
+    end
+
+    context "when the repository is enabled" do
+      render_views
+      let(:build) {
+        FactoryGirl.create(:build, state: :failed)
+      }
+
+      it "should show 'Rebuild failed parts' button or rebuild action in #build-summary table" do
+        build_part = FactoryGirl.create(:build_part, build_instance: build)
+        FactoryGirl.create(:completed_build_attempt, build_part: build_part, state: :failed)
+        get :show, repository_path: build.repository, id: build.id
+        expect(response.body).to match(/<input.*value="Rebuild failed parts"/)
+        expect(response.body).to match(%r{<a.*>Rebuild<\/a>$})
+      end
+
+      it "should show 'Retry Partitioning' button" do
+        build.build_parts.delete_all
+        get :show, repository_path: build.repository.to_param, id: build.id
+        expect(response.body).to match(/<input.*value="Retry Partitioning"/)
+      end
+    end
   end
 
   describe "#abort" do
@@ -317,6 +359,15 @@ describe BuildsController do
         FactoryGirl.create(:build_part, build_instance: build)
         post :retry_partitioning, repository_path: build.repository.to_param, id: build.id
         expect(response).to redirect_to(repository_build_path(build.repository, build))
+      end
+    end
+
+    context "when the build's repository is disabled" do
+      it "should not partition build" do
+        build2 = FactoryGirl.create(:build_on_disabled_repo)
+        expect(Resque).to_not receive(:enqueue)
+        post :retry_partitioning, repository_path: build2.repository.to_param, id: build2.id
+        expect(response).to redirect_to(repository_build_path(build2.repository, build2))
       end
     end
   end

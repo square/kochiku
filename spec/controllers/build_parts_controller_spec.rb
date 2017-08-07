@@ -24,6 +24,26 @@ describe BuildPartsController do
       expect(ret['build_part']['build_attempts'][0]['build_artifacts'].length).to eq(1)
       expect(ret['build_part']['build_attempts'][0]['build_artifacts'][0]['build_attempt_id']).to eq(build_attempt.id)
     end
+
+    context "when the repository is disabled" do
+      let(:build2) { FactoryGirl.create(:build_on_disabled_repo) }
+      let(:build_part2) { FactoryGirl.create(:build_part, build_instance: build2) }
+
+      it "should not show Rebuild button" do
+        get :show, repository_path: build2.repository, build_id: build2, id: build_part2
+        expect(response.body).to_not match(/class="rebuild button"/)
+      end
+    end
+
+    context "when the repository is enabled" do
+      let(:build2) { FactoryGirl.create(:build) }
+      let(:build_part2) { FactoryGirl.create(:build_part, build_instance: build2) }
+
+      it "should show Rebuild button" do
+        get :show, repository_path: build2.repository, build_id: build2, id: build_part2
+        expect(response.body).to match(/class="rebuild button"/)
+      end
+    end
   end
 
   describe "#rebuild" do

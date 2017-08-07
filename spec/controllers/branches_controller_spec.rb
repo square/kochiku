@@ -39,6 +39,36 @@ describe BranchesController do
       expect(results['recent_builds'][0]['build']['id']).to eq(build1.id)
       expect(results['recent_builds'][1]['build']['id']).to eq(build2.id)
     end
+
+    context "when the repository is disabled" do
+      let(:branch2) { FactoryGirl.create(:branch_on_disabled_repo) }
+
+      before do
+        build3 = FactoryGirl.create(:build, branch_record: branch2, state: :failed)
+        build_part = FactoryGirl.create(:build_part, build_instance: build3)
+        FactoryGirl.create(:completed_build_attempt, build_part: build_part, state: :failed)
+      end
+
+      it "should disable build button" do
+        get :show, repository_path: branch2.repository, id: branch2
+        expect(response.body).to match(/disabled="disabled"/)
+      end
+    end
+
+    context "when the repository is enabled" do
+      let(:branch2) { FactoryGirl.create(:branch) }
+
+      before do
+        build3 = FactoryGirl.create(:build, branch_record: branch2, state: :failed)
+        build_part = FactoryGirl.create(:build_part, build_instance: build3)
+        FactoryGirl.create(:completed_build_attempt, build_part: build_part, state: :failed)
+      end
+
+      it "shouldn't disable build button" do
+        get :show, repository_path: branch2.repository, id: branch2
+        expect(response.body).to_not match(/disabled="disabled"/)
+      end
+    end
   end
 
   describe "#request_new_build" do
