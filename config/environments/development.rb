@@ -23,7 +23,7 @@ Kochiku::Application.configure do
   # config.cache_store = :readthis_store, {
   #   expires_in: 2.days.to_i,
   #   namespace: 'cache',
-  #   marshal: JSON
+  #   marshal: JSON,
   #   redis: {
   #     host: Settings.redis_host,
   #     port: Settings.redis_port,
