@@ -5,7 +5,7 @@ class BuildsController < ApplicationController
 
   caches_action :show, cache_path: proc {
     updated_at = Build.select(:updated_at).find(params[:id]).updated_at
-    { :modified => updated_at.to_i }
+    { :modified => [updated_at.to_i, @repository.updated_at.to_i].max }
   }
 
   def show

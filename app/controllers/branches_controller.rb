@@ -1,7 +1,7 @@
 class BranchesController < ApplicationController
   caches_action :show, :build_time_history, cache_path: proc {
     load_repository_and_branch
-    { :modified => @branch.updated_at.to_i }
+    { :modified => [@branch.updated_at.to_i, @repository.updated_at.to_i].max }
   }
 
   caches_action :status_report, expires_in: 15.seconds
