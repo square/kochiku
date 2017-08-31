@@ -54,6 +54,20 @@ class GitBlame
       parse_git_files_changes(output, fetch_emails: fetch_emails)
     end
 
+    # net_files_changed_in_branch counts only files which have a net diff in the branch. If a branch includes a commit
+    # to modify a file, and then a revert commit, that file will not be included in this list.
+    def net_files_changed_in_branch(build, sync: true)
+      # get revision of shared ancestor of master and build branch, i.e. the commit at which point this branch was created
+      common_ancestor = GitRepo.inside_repo(build.repository, sync: sync) do
+        Cocaine::CommandLine.new("git merge-base master #{build.branch_record.name}").run
+      end
+
+      output = GitRepo.inside_repo(build.repository, sync: sync) do
+        Cocaine::CommandLine.new("git diff --name-status --find-renames --find-copies '#{common_ancestor.strip}..#{build.branch_record.name}'").run
+      end
+      parse_git_changes_by_name_status(output)
+    end
+
     private
 
     def email_from_git_email(email)
@@ -120,6 +134,20 @@ class GitBlame
         else
           file_changes << {:file => line, :emails => email_addresses}
         end
+      end
+    end
+
+    def parse_git_changes_by_name_status(output)
+      output.split("\n").each_with_object([]) do |line, file_changes|
+        next if line.empty?
+
+        # Format from --name-status prints a status code, then any file names after that.
+        # For example, a file rename that has 85% similarity would be output as:
+        #   R085   path/to/original_name.java   path/to/new_name.java
+        # We can safely reject the first element (status code) in the split array.
+        files_in_line = line.split[1..-1]
+
+        files_in_line.each { |file| file_changes << {file: file, emails: []} }
       end
     end
   end

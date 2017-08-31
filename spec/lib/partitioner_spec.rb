@@ -60,6 +60,16 @@ describe Partitioner do
           expect(subject).to be_a(Partitioner::Maven)
         end
       end
+
+      context "when using the dependency_map partitioner" do
+        let(:kochiku_yml) { {'partitioner' => 'dependency_map'} }
+
+        it "should call the dependency_map partitioner" do
+          allow(Time).to receive(:now).and_return(Time.new(1977, 3, 10, 5, 30, 0).utc)
+          expect(Rails.logger).to receive(:info).with("Partition finished: [dependency_map] 0.0 1111111111111111111111111111111111111111")
+          expect(subject).to be_a(Partitioner::DependencyMap)
+        end
+      end
     end
   end
 end
