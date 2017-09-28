@@ -2,17 +2,25 @@ require 'git_repo'
 
 class BuildsController < ApplicationController
   before_action :load_repository, :only => [:show, :retry_partitioning, :rebuild_failed_parts, :request_build, :abort, :toggle_merge_on_success, :build_status, :modified_time]
-
-  caches_action :show, cache_path: proc {
-    updated_at = Build.select(:updated_at).find(params[:id]).updated_at
-    { :modified => [updated_at.to_i, @repository.updated_at.to_i].max }
-  }
-
-  def show
+  before_action only: [:show] do
     @build = Build.includes(build_parts: :build_attempts)
                   .joins(:branch_record).where('branches.repository_id' => @repository.id)
                   .find(params[:id])
+    calculate_build_attempts_position(@build.build_attempts.where(state: :runnable))
+    format_build_parts_position
+  end
 
+  include BuildAttemptsQueuePosition
+
+  caches_action :show, cache_path: proc {
+    updated_at = Build.select(:updated_at).find(params[:id]).updated_at
+    {
+      build_modified: [updated_at.to_i, @repository.updated_at.to_i].max,
+      queue_position: Digest::SHA1.hexdigest(@build_attempts_rank.values.join(','))
+    }
+  }
+
+  def show
     respond_to do |format|
       format.html
       format.json { render :json => @build, include: { build_parts: { methods: [:status] } } }
@@ -138,5 +146,18 @@ class BuildsController < ApplicationController
   def load_repository
     r_namespace, r_name = params[:repository_path].split('/')
     @repository = Repository.where(namespace: r_namespace, name: r_name).first!
+  end
+
+  def format_build_parts_position
+    @build_parts_position = {}
+    @build_attempts_rank.each do |build_attempt_id, position|
+      next if position.nil?
+      build_part_id = BuildAttempt.find(build_attempt_id).build_part.id
+      if @build_parts_position[build_part_id].nil?
+        @build_parts_position[build_part_id] = position
+      elsif @build_parts_position[build_part_id] > position
+        @build_parts_position[build_part_id] = position
+      end
+    end
   end
 end

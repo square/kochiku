@@ -63,4 +63,8 @@ module ApplicationHelper
     options[:class] ||= "timeago"
     content_tag(:abbr, time.to_s, options.merge(:title => time.getutc.iso8601)) if time
   end
+
+  def show_na_for_nil(val)
+    val.nil? ? 'N/A' : val
+  end
 end
