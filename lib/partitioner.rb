@@ -1,4 +1,5 @@
 require 'partitioner/base'
+require 'partitioner/go'
 require 'partitioner/maven'
 require 'partitioner/default'
 require 'partitioner/dependency_map'
@@ -11,6 +12,8 @@ module Partitioner
       res = case kochiku_yml['partitioner']
             when 'maven'
               Partitioner::Maven.new(build, kochiku_yml)
+            when 'go'
+              Partitioner::Go.new(build, kochiku_yml)
             when 'dependency_map'
               Partitioner::DependencyMap.new(build, kochiku_yml)
             else
