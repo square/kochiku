@@ -353,5 +353,48 @@ RSpec.shared_examples "Partitioner::Default behavior" do |partitioner_class|
         end
       end
     end
+
+    context 'when target is specified' do
+      let(:kochiku_yml) do
+        {
+          'targets' => [
+            {
+              'type' => 'instrumentation',
+              'target' => 'util:libraryA'
+            },
+            {
+              'type' => 'instrumentation',
+              'target' => ['util:libraryB', 'util:libraryC']
+            }
+          ]
+        }
+      end
+
+      it 'accepts both strings and arrays' do
+        expect(subject.size).to eq(2)
+        expect(subject[0]['files']).to eq(['util:libraryA'])
+        expect(subject[1]['files']).to eq(['util:libraryB', 'util:libraryC'])
+      end
+
+      context "when workers and/or glob are also specified" do
+        let(:kochiku_yml) do
+          {
+            'targets' => [
+              {
+                'type' => 'instrumentation',
+                'target' => 'util:libraryA',
+                'workers' => 10,
+                'glob' => 'spec/**/*_spec.rb'
+              }
+            ]
+          }
+        end
+
+        it 'ignores them' do
+          expect(subject.size).to eq(1)
+          expect(subject[0]['files']).to eq(['util:libraryA'])
+        end
+      end
+    end
   end
 end

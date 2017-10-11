@@ -84,7 +84,9 @@ module Partitioner
       queue_override = subset.fetch('queue_override', nil)
       queue = "#{queue}-#{queue_override}" if queue_override.present?
 
-      get_file_parts_for(subset).map do |part_files|
+      subset_part_files = subset['target'] ? [Array(subset['target'])] : get_file_parts_for(subset)
+
+      subset_part_files.map do |part_files|
         {'type' => type, 'files' => part_files.compact, 'queue' => queue,
          'retry_count' => retry_count, 'options' => subset['options']}
       end.select { |p| p['files'].present? }
