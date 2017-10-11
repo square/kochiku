@@ -61,6 +61,7 @@
     %tr
       %th.right.id Part
       %th.status Status
+      %th.queue-position Position
       - display_ruby_version = multiple_ruby_versions?(@build)
       - build_metadata_headers(@build, display_ruby_version).each do |header|
         %th{class: header.downcase.gsub(/\W+/, '-')}= header
@@ -82,6 +83,7 @@
               = link_to(text, artifact, :title => 'Last completed stdout.log')
             - else
               = text
+        %td= show_na_for_nil(@build_parts_position[part.id])
         - build_metadata_values(@build, part, display_ruby_version).each do |value|
           %td= value
         %td= part.kind.to_s

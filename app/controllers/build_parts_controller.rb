@@ -1,8 +1,16 @@
 class BuildPartsController < ApplicationController
-  before_action :load_repository_build_and_part, :only => [:rebuild, :show, :modified_time]
+  before_action :load_repository_build_and_part, only: [:rebuild, :show, :modified_time]
+  before_action only: [:show] do
+    calculate_build_attempts_position(@build_part.build_attempts)
+  end
+
+  include BuildAttemptsQueuePosition
 
   caches_action :show, cache_path: proc {
-    { :modified => [@build_part.updated_at.to_i, @repository.updated_at.to_i].max }
+    {
+      modified: [@build_part.updated_at.to_i, @repository.updated_at.to_i].max,
+      queue_position: Digest::SHA1.hexdigest(@build_attempts_rank.values.join(','))
+    }
   }
 
   def show
