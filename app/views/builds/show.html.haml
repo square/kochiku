@@ -83,7 +83,7 @@
               = link_to(text, artifact, :title => 'Last completed stdout.log')
             - else
               = text
-        %td= show_na_for_nil(@build_parts_position[part.id])
+        %td= @build_parts_position[part.id]
         - build_metadata_values(@build, part, display_ruby_version).each do |value|
           %td= value
         %td= part.kind.to_s

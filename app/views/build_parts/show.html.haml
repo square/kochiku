@@ -34,7 +34,7 @@
     %tr
       %th.right.count Attempt
       %th.status Status
-      %th.queue-position Queue Position
+      %th.queue-position Position
       %th Started At
       %th.right.time Elapsed Time
       %th.right.worker Worker
@@ -46,7 +46,7 @@
         %td.right= index + 1
         %td
           %span.attempt-status{:class => attempt.state}= attempt.state.to_s.capitalize
-        %td.rank= show_na_for_nil(@build_attempts_rank[attempt.id.to_s])
+        %td.rank= @build_attempts_rank[attempt.id.to_s]
         %td= attempt.started_at
         %td.right.elapsed= duration_strftime(attempt.elapsed_time)
         %td.right= attempt.builder ? attempt.builder.sub(".#{Settings.domain_name}", '') : "pending"
