@@ -49,6 +49,17 @@ describe 'stash integration test' do
 end
 
 describe RemoteServer::Stash do
+  before do
+    settings = SettingsAccessor.new(<<-YAML)
+    git_servers:
+      stash.example.com:
+        type: stash
+        aliases:
+          - git-alias.example.com
+    YAML
+    stub_const "Settings", settings
+  end
+
   def make_server(url)
     described_class.new(url, Settings.git_server(url))
   end
@@ -58,11 +69,10 @@ describe RemoteServer::Stash do
       result = make_server \
         "https://stash.example.com/scm/myproject/myrepo.git"
 
-      expect(result.attributes).to eq(
+      expect(result.attributes).to include(
         host:                 'stash.example.com',
         repository_namespace: 'myproject',
-        repository_name:      'myrepo',
-        possible_hosts:       ['stash.example.com']
+        repository_name:      'myrepo'
       )
     end
 
@@ -78,11 +88,10 @@ describe RemoteServer::Stash do
       result = make_server \
         "git@stash.example.com:myproject/myrepo.git"
 
-      expect(result.attributes).to eq(
+      expect(result.attributes).to include(
         host:                 'stash.example.com',
         repository_namespace: 'myproject',
-        repository_name:      'myrepo',
-        possible_hosts:       ['stash.example.com']
+        repository_name:      'myrepo'
       )
     end
 
@@ -90,11 +99,10 @@ describe RemoteServer::Stash do
       result = make_server \
         "ssh://git@stash.example.com/myproject/myrepo.git"
 
-      expect(result.attributes).to eq(
+      expect(result.attributes).to include(
         host:                 'stash.example.com',
         repository_namespace: 'myproject',
-        repository_name:      'myrepo',
-        possible_hosts:       ['stash.example.com']
+        repository_name:      'myrepo'
       )
     end
 
@@ -102,12 +110,11 @@ describe RemoteServer::Stash do
       result = make_server \
         "ssh://git@stash.example.com:7999/myproject/myrepo.git"
 
-      expect(result.attributes).to eq(
+      expect(result.attributes).to include(
         host:                 'stash.example.com',
         repository_namespace: 'myproject',
         repository_name:      'myrepo',
-        port:                 '7999',
-        possible_hosts:       ['stash.example.com']
+        port:                 '7999'
       )
     end
 
@@ -150,6 +157,22 @@ describe RemoteServer::Stash do
       https_url = "https://stash.example.com/scm/foo/bar.git"
       result = make_server(https_url).canonical_repository_url
       expect(result).to eq(https_url)
+    end
+  end
+
+  describe "#base_api_url" do
+    it 'should use the primary host name' do
+      https_url = "https://git-alias.example.com/scm/foo/bar.git"
+      result = make_server(https_url).base_api_url
+      expect(result).to eq('https://stash.example.com/rest/api/1.0/projects/foo/repos/bar')
+    end
+  end
+
+  describe "#base_html_url" do
+    it 'should use the primary host name' do
+      https_url = "https://git-alias.example.com/scm/foo/bar.git"
+      result = make_server(https_url).base_html_url
+      expect(result).to eq('https://stash.example.com/projects/FOO/repos/bar')
     end
   end
 

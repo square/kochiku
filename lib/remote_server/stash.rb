@@ -108,11 +108,11 @@ module RemoteServer
     end
 
     def base_api_url
-      "https://#{attributes[:host]}/rest/api/1.0/projects/#{attributes[:repository_namespace]}/repos/#{attributes[:repository_name]}"
+      "https://#{@settings.host}/rest/api/1.0/projects/#{attributes[:repository_namespace]}/repos/#{attributes[:repository_name]}"
     end
 
     def base_html_url
-      "https://#{attributes[:host]}/projects/#{attributes[:repository_namespace].upcase}/repos/#{attributes[:repository_name]}"
+      "https://#{@settings.host}/projects/#{attributes[:repository_namespace].upcase}/repos/#{attributes[:repository_name]}"
     end
 
     def href_for_commit(sha)
