@@ -7,7 +7,8 @@ class Repository < ActiveRecord::Base
   has_many :branches, :dependent => :destroy
   has_many :convergence_branches, -> { where(convergence: true) }, class_name: "Branch"
   validates :host, :name, :url, presence: true
-  validates :name, uniqueness: true
+  validates :name, uniqueness: { scope: :namespace, message: "^Namespace + Name combination already exists",
+                                 case_sensitive: false }
   validates :timeout, numericality: { :only_integer => true }
   validates :timeout, inclusion: { in: 0..1440, message: 'The maximum timeout allowed is 1440 minutes' }
   validates :url, uniqueness: true, allow_blank: true
