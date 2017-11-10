@@ -155,7 +155,7 @@ describe GitBlame do
         allow(GitRepo).to receive(:inside_repo) do |build, sync_repo, &block|
           Dir.mktmpdir do |directory|
             Dir.chdir(directory) do
-              `git init`
+              suppressed_git_init
               `git config user.email "test@example.com" && git config user.name "test"`
               FileUtils.touch("TESTFILE")
               `git add -A && git commit -m "commit 1" && git tag a`
