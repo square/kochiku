@@ -90,15 +90,24 @@ describe Repository do
           repo.valid?
           expect(repo.name).to eq("kochiku-name")
         end
+      end
+    end
 
-        context "when that name already exists" do
-          let!(:existing_repo) { FactoryGirl.create(:repository, name: 'my-repo') }
+    context "name" do
+      before do
+        @repo1 = FactoryGirl.create(:repository, url: "git@git.example.com:kansas/kansas-city.git")
+      end
 
-          it "does not validate" do
-            repo = FactoryGirl.build(:repository, name: 'my-repo')
-            expect(repo).to_not be_valid
-          end
-        end
+      it "should allow two repositories with the same name from different namespaces" do
+        repo2 = Repository.new(url: "git://git.example.com/missouri/kansas-city.git")
+        expect(repo2).to be_valid
+      end
+
+      it "should not allow two repositories with the same name and namespaces" do
+        repo2 = Repository.new(url: "git://github.com/kansas/kansas-city.git")
+        repo2.valid?
+        expect(repo2).to have(1).error_on(:name)
+        expect(repo2.errors.full_messages).to include("Namespace + Name combination already exists")
       end
     end
 
