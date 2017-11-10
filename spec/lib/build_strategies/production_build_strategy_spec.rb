@@ -29,7 +29,6 @@ describe BuildStrategy do
           expect(merger).to receive(:merge_and_push).and_return(merge_commit: to_40('a'), log_output: "This is not a drill")
           expect(merger).to receive(:delete_branch)
           expect { BuildStrategy.merge_ref(build) }.not_to raise_error
-          $stderr.puts build.repository.remote_server.canonical_repository_url
         end
 
         it "should handle merge failure" do
