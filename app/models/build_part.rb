@@ -13,17 +13,15 @@ class BuildPart < ActiveRecord::Base
   end
 
   def create_and_enqueue_new_build_attempt!
-    begin
-      build_attempt = build_attempts.create!(:state => :runnable)
-      BuildAttemptJob.enqueue_on(queue.to_s, job_args(build_attempt))
-      build_instance.touch # invalidate the cache of builds#show
-      build_attempt
-    rescue GitRepo::RefNotFoundError
-      # delete the dud build_attempt and re-raise
-      build_attempt.destroy if build_attempt
+    build_attempt = build_attempts.create!(:state => :runnable)
+    BuildAttemptJob.enqueue_on(queue.to_s, job_args(build_attempt))
+    build_instance.touch # invalidate the cache of builds#show
+    build_attempt
+  rescue GitRepo::RefNotFoundError
+    # delete the dud build_attempt and re-raise
+    build_attempt.destroy if build_attempt
 
-      raise
-    end
+    raise
   end
   alias rebuild! create_and_enqueue_new_build_attempt!
 
@@ -96,7 +94,7 @@ class BuildPart < ActiveRecord::Base
     end
   end
 
-  def as_json(options={})
+  def as_json(options = {})
     super(options.reverse_merge(methods: :status))
   end
 

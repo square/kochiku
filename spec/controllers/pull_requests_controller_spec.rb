@@ -14,7 +14,7 @@ describe PullRequestsController do
       let!(:repository) do
         FactoryGirl.create(:repository, { url: "git@#{git_server_type}.com:square/web.git" }.merge(repository_fields))
       end
-      let(:repository_fields) { Hash.new }  # expected to be overwritten by a sub-context
+      let(:repository_fields) { {} }  # expected to be overwritten by a sub-context
 
       context "when push requests come" do
         let(:repository_fields) { { run_ci: true } }

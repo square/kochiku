@@ -7,7 +7,7 @@ class GithubPostReceiveHook
   def initialize(repository, oauth_token)
     @repository = repository
     @oauth_token = oauth_token
-    @root_url ="#{repository.base_api_url}/hooks"
+    @root_url = "#{repository.base_api_url}/hooks"
     @hook_url = "#{repository.base_api_url}/hooks/#{repository.github_post_receive_hook_id}"
     @receive_url = Rails.application.routes.url_helpers.pull_request_build_url
     @interested_events = @repository.interested_github_events

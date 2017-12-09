@@ -17,7 +17,7 @@ module ProjectStatsHelper
 
   # A string representing the percentage of builds that eventually passed
   def eventual_pass_rate(builds)
-    pass_rate_text(builds.select(&:succeeded?).size / builds.size.to_f) # rubocop:disable Performance/Count
+    pass_rate_text(builds.select(&:succeeded?).size / builds.size.to_f)
   end
 
   # A string representing the percentage of the builds that had

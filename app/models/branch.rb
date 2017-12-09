@@ -33,7 +33,7 @@ class Branch < ActiveRecord::Base
 
   # The fuzzy_limit is used to set a upper bound on the amount of time that the
   # sql query will take
-  def timing_data_for_recent_builds(fuzzy_limit=1000)
+  def timing_data_for_recent_builds(fuzzy_limit = 1000)
     id_cutoff = builds.maximum(:id).to_i - fuzzy_limit
 
     self.class.connection.execute(build_time_history_sql(id_cutoff))

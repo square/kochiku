@@ -5,8 +5,8 @@ feature "viewing an in process build" do
   let(:repository) { FactoryGirl.create(:repository) }
   let(:branch) { FactoryGirl.create(:master_branch, repository: repository) }
   let(:build) { FactoryGirl.create(:build, branch_record: branch) }
-  let(:build_part) { FactoryGirl.create(:build_part, :build_instance => build, :queue => 'ci')}
-  let!(:build_attempt) { FactoryGirl.create(:build_attempt, :build_part => build_part, :state => :runnable)}
+  let(:build_part) { FactoryGirl.create(:build_part, :build_instance => build, :queue => 'ci') }
+  let!(:build_attempt) { FactoryGirl.create(:build_attempt, :build_part => build_part, :state => :runnable) }
 
   it "view the current status of the build attempts" do
     build.update_attribute(:state, :runnable)

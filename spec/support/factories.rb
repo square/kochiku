@@ -1,6 +1,6 @@
 FactoryGirl.define do
   factory :branch do
-    sequence(:name) {|n| "branch_#{n}" }
+    sequence(:name) { |n| "branch_#{n}" }
     association :repository
 
     factory :convergence_branch do

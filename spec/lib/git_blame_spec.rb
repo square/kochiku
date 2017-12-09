@@ -8,7 +8,7 @@ describe GitBlame do
 
     context "with many build breakers, and no git prefix" do
       before do
-        allow(GitBlame).to receive(:git_names_and_emails_since_last_green).and_return(["User One:userone@example.com","User Two:usertwo@example.com"])
+        allow(GitBlame).to receive(:git_names_and_emails_since_last_green).and_return(["User One:userone@example.com", "User Two:usertwo@example.com"])
       end
 
       it "returns the emails of the users" do
@@ -16,7 +16,7 @@ describe GitBlame do
       end
 
       it "will not return the same user twice" do
-        allow(GitBlame).to receive(:git_names_and_emails_since_last_green).and_return(["User One:userone@example.com","User One:userone@example.com"])
+        allow(GitBlame).to receive(:git_names_and_emails_since_last_green).and_return(["User One:userone@example.com", "User One:userone@example.com"])
         expect(subject).to eq(["userone@example.com"])
       end
     end
@@ -37,7 +37,7 @@ describe GitBlame do
       end
 
       it "does not affect users with no plus sign" do
-        allow(GitBlame).to receive(:git_names_and_emails_since_last_green).and_return(["One:one@example.com","Two:two@foo.example.org"])
+        allow(GitBlame).to receive(:git_names_and_emails_since_last_green).and_return(["One:one@example.com", "Two:two@foo.example.org"])
         expect(subject).to eq(["one@example.com", "two@foo.example.org"])
       end
 
@@ -57,7 +57,7 @@ describe GitBlame do
 
     context "with many build breakers" do
       before do
-        allow(GitBlame).to receive(:git_names_and_emails_in_branch).and_return(["User One:userone@example.com","User Two:usertwo@example.com"])
+        allow(GitBlame).to receive(:git_names_and_emails_in_branch).and_return(["User One:userone@example.com", "User Two:usertwo@example.com"])
       end
 
       it "returns the emails of the users" do
@@ -178,10 +178,10 @@ describe GitBlame do
 
       it "should include all files modified in merge commit" do
         git_file_changes = subject
-        expect(git_file_changes).to_not include({:file=>"TESTFILE", :emails=>[]})
-        expect(git_file_changes).to include({:file=>"TESTFILE2", :emails=>[]})
-        expect(git_file_changes).to include({:file=>"TESTFILE3", :emails=>[]})
-        expect(git_file_changes).to include({:file=>"NEWFILE", :emails=>[]})
+        expect(git_file_changes).to_not include({:file => "TESTFILE", :emails => []})
+        expect(git_file_changes).to include({:file => "TESTFILE2", :emails => []})
+        expect(git_file_changes).to include({:file => "TESTFILE3", :emails => []})
+        expect(git_file_changes).to include({:file => "NEWFILE", :emails => []})
       end
     end
   end

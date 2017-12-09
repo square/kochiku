@@ -10,14 +10,14 @@ class BranchDecorator < Draper::Decorator
   end
 
   # Recent build timing information grouped by test types.
-  def build_time_history(fuzzy_limit=1000)
+  def build_time_history(fuzzy_limit = 1000)
     result = Hash.new { |hash, key| hash[key] = [] }
 
     object.timing_data_for_recent_builds.each do |value|
       if key = value.shift  # the type of test that was executed (e.g. cucumber)
         result[key] << value
       else # unfortunate, but flot dislikes missing data
-        result.keys.each do |k|
+        result.each_key do |k|
           result[k] << value
         end
       end

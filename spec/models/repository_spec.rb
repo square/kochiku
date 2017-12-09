@@ -169,11 +169,11 @@ describe Repository do
   context "#run_ci=" do
     it "converts the checkbox to bool" do
       repository = FactoryGirl.create(:repository)
-      repository.run_ci="1"
+      repository.run_ci = "1"
       repository.save
       repository.reload
       expect(repository.run_ci).to eq(true)
-      repository.run_ci="0"
+      repository.run_ci = "0"
       repository.save
       repository.reload
       expect(repository.run_ci).to eq(false)
@@ -183,11 +183,11 @@ describe Repository do
   context "#build_pull_requests=" do
     it "converts the checkbox to bool" do
       repository = FactoryGirl.create(:repository)
-      repository.build_pull_requests="1"
+      repository.build_pull_requests = "1"
       repository.save
       repository.reload
       expect(repository.build_pull_requests).to eq(true)
-      repository.build_pull_requests="0"
+      repository.build_pull_requests = "0"
       repository.save
       repository.reload
       expect(repository.build_pull_requests).to eq(false)
@@ -196,7 +196,7 @@ describe Repository do
 
   it "saves build tags" do
     repository = FactoryGirl.create(:repository)
-    repository.on_green_update="1,2,3"
+    repository.on_green_update = "1,2,3"
     repository.save
     repository.reload
     expect(repository.on_green_update).to eq("1,2,3")

@@ -9,6 +9,6 @@ ActiveSupport.on_load(:action_controller) do
 end
 
 ActiveSupport.on_load(:active_record) do
-  # The new default is false but Kochiku started when it was true 
+  # The new default is false but Kochiku started when it was true
   self.include_root_in_json = true
 end

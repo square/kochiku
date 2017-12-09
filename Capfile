@@ -14,6 +14,5 @@ require 'capistrano/rails'
 # For more information see:
 # http://capistranorb.com/documentation/frameworks/rbenv-rvm-chruby/
 
-
 # Loads custom tasks from `lib/capistrano/tasks' if you have any defined.
 Dir.glob('lib/capistrano/tasks/*.cap').sort.each { |r| import r }

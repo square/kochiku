@@ -74,7 +74,7 @@ class GitBlame
       if email =~ /^#{Settings.git_pair_email_prefix}\+/
         localpart, domain = email.split('@')
         usernames = localpart.strip.split('+')
-        usernames[1..-1].map { |username| "#{username}@#{domain}"}
+        usernames[1..-1].map { |username| "#{username}@#{domain}" }
       else
         email
       end

@@ -49,7 +49,7 @@ describe RepositoriesController do
   end
 
   describe "update" do
-    let!(:repository) { FactoryGirl.create(:repository, :url => "git@git.example.com:square/kochiku.git")}
+    let!(:repository) { FactoryGirl.create(:repository, :url => "git@git.example.com:square/kochiku.git") }
 
     it "updates existing repository" do
       expect{
@@ -122,7 +122,7 @@ describe RepositoriesController do
         branchC = FactoryGirl.create(:branch, repository: repository, name: 'branchC', convergence: false)
         # branchD does not yet exist
 
-        patch :update, id: repository.id, repository: {timeout:10}, convergence_branches: "branchA,branchB,branchD"
+        patch :update, id: repository.id, repository: {timeout: 10}, convergence_branches: "branchA,branchB,branchD"
         expect(branchA.reload).to be_convergence
         expect(branchB.reload).to be_convergence
         expect(branchC.reload).to_not be_convergence
@@ -138,7 +138,7 @@ describe RepositoriesController do
         # branchC does not have convergence
         branchC = FactoryGirl.create(:branch, repository: repository, name: 'branchC', convergence: false)
 
-        patch :update, id: repository.id, repository: {timeout:10}, convergence_branches: "branchA"
+        patch :update, id: repository.id, repository: {timeout: 10}, convergence_branches: "branchA"
         expect(branchA.reload).to be_convergence
         expect(branchB.reload).to_not be_convergence
         expect(branchC.reload).to_not be_convergence
@@ -147,7 +147,7 @@ describe RepositoriesController do
   end
 
   describe "delete /repositories/:id" do
-    let!(:repository) { FactoryGirl.create(:repository, :url => "git@git.example.com:square/kochiku.git", :test_command => "script/something")}
+    let!(:repository) { FactoryGirl.create(:repository, :url => "git@git.example.com:square/kochiku.git", :test_command => "script/something") }
     it "responds with success" do
       expect {
         get :destroy, :id => repository.id

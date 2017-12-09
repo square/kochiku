@@ -19,6 +19,6 @@ describe PollRepositoriesJob do
 
   it "won't build an old commit" do
     FactoryGirl.create(:build, :branch_record => branch, :ref => to_40("test_sha"))
-    expect { subject }.to_not change{branch.reload.builds.count}
+    expect { subject }.to_not change{ branch.reload.builds.count }
   end
 end

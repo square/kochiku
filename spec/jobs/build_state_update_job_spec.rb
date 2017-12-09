@@ -152,7 +152,7 @@ describe BuildStateUpdateJob do
 
       context "when the success script has been run" do
         before do
-          build.on_success_script_log_file = FilelessIO.new("test").tap {|fio| fio.original_filename = "bar.txt" }
+          build.on_success_script_log_file = FilelessIO.new("test").tap { |fio| fio.original_filename = "bar.txt" }
           build.save!
         end
 

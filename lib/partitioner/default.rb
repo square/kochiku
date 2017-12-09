@@ -37,7 +37,7 @@ module Partitioner
       end
     end
 
-    def build_targets(ruby_version=nil)
+    def build_targets(ruby_version = nil)
       options = {}
       options['ruby'] = ruby_version if ruby_version
       options['log_file_globs'] = Array(@kochiku_yml['log_file_globs']) if @kochiku_yml['log_file_globs']

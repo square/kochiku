@@ -73,7 +73,7 @@ class RepositoriesController < ApplicationController
     changes = if params[:refChanges]
                 params[:refChanges].map do |change|
                   [
-                    change[:refId].gsub(/^refs\/heads\//,''),
+                    change[:refId].gsub(/^refs\/heads\//, ''),
                     change[:toHash]
                   ]
                 end

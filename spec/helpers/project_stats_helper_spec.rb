@@ -140,9 +140,9 @@ describe ProjectStatsHelper do
 
     before do
       5.times do |i|
-        @builds << build = FactoryGirl.create(:build, :state => :succeeded, :created_at => (10 + 5*i).minutes.ago)
+        @builds << build = FactoryGirl.create(:build, :state => :succeeded, :created_at => (10 + 5 * i).minutes.ago)
         build_part = FactoryGirl.create(:build_part, :build_instance => build)
-        FactoryGirl.create(:build_attempt, :build_part => build_part, :finished_at => build.created_at + (3*i).minutes)
+        FactoryGirl.create(:build_attempt, :build_part => build_part, :finished_at => build.created_at + (3 * i).minutes)
       end
     end
 
