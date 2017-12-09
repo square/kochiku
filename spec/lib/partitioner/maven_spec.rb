@@ -95,10 +95,10 @@ describe Partitioner::Maven do
             partitions = subject.partitions
 
             expect(partitions.size).to eq(6)
-            expect(partitions).to include(a_hash_including({ 'files' => ['module-one'], 'options'=>{'total_workers' => 3, 'worker_chunk' => 1}}))
-            expect(partitions).to include(a_hash_including({ 'files' => ['module-one'], 'options'=>{'total_workers' => 3, 'worker_chunk' => 2}}))
-            expect(partitions).to include(a_hash_including({ 'files' => ['module-one'], 'options'=>{'total_workers' => 3, 'worker_chunk' => 3}}))
-            expect(partitions).to include(a_hash_including({ 'files' => ['module-three'], 'options'=>{}}))
+            expect(partitions).to include(a_hash_including({ 'files' => ['module-one'], 'options' => {'total_workers' => 3, 'worker_chunk' => 1}}))
+            expect(partitions).to include(a_hash_including({ 'files' => ['module-one'], 'options' => {'total_workers' => 3, 'worker_chunk' => 2}}))
+            expect(partitions).to include(a_hash_including({ 'files' => ['module-one'], 'options' => {'total_workers' => 3, 'worker_chunk' => 3}}))
+            expect(partitions).to include(a_hash_including({ 'files' => ['module-three'], 'options' => {}}))
           end
         end
 
@@ -119,7 +119,7 @@ describe Partitioner::Maven do
         end
 
         context 'with log_file_globs' do
-          let(:kochiku_yml) {{ 'log_file_globs' => log_files }}
+          let(:kochiku_yml) { { 'log_file_globs' => log_files } }
 
           context 'that uses a single string' do
             let(:log_files) { 'mylog.log' }
@@ -254,7 +254,7 @@ describe Partitioner::Maven do
       end
 
       context "with options" do
-        let(:kochiku_yml) {{ 'log_file_globs' => 'mylog.log', 'retry_count' => 5 }}
+        let(:kochiku_yml) { { 'log_file_globs' => 'mylog.log', 'retry_count' => 5 } }
 
         it "should include options in the event of a partial build" do
           allow(GitBlame).to receive(:files_changed_since_last_build).with(build, sync: anything)

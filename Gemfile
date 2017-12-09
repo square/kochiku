@@ -1,66 +1,66 @@
 source 'https://rubygems.org'
 
-gem 'rails', '~> 4.2.7'
-gem 'passenger', '~> 4.0.41', group: :production
-gem 'dynamic_form'
-gem 'rails-observers'
 gem 'actionpack-action_caching'
+gem 'dynamic_form'
+gem 'passenger', '~> 4.0.41', group: :production
+gem 'rails', '~> 4.2.7'
+gem 'rails-observers'
 
 gem 'carrierwave'
 gem 'draper', '~> 2.1'
-gem 'mysql2','>= 0.4.4'
+gem 'mysql2', '>= 0.4.4'
 gem 'symbolize'
 
-gem 'haml-rails'
-gem 'sass-rails'
 gem 'compass-rails'
+gem 'haml-rails'
 gem 'jquery-rails'
+gem 'sass-rails'
 gem 'uglifier'
 
 # therubyracer is a JS runtime required by execjs, which is in turn required
 # by uglifier. therubyracer is not the fastest option but it is the most portable.
 gem 'therubyracer'
 
-gem 'redis', require: ["redis", "redis/connection/hiredis"]
 gem 'hiredis' # better Redis performance for usage as cache
 gem 'readthis'
+gem 'redis', require: ["redis", "redis/connection/hiredis"]
 
 gem 'resque', '~> 1.25'
-gem 'resque-scheduler', require: false
 gem 'resque-retry'
+gem 'resque-scheduler', require: false
 
 gem 'json' # used by resque
 
-gem 'chunky_png'
-gem 'posix-spawn'  # used by cocaine
-gem 'cocaine'
 gem 'awesome_print', require: false
+gem 'chunky_png'
+gem 'cocaine'
 gem 'nokogiri', '~> 1.7'
+gem 'posix-spawn'  # used by cocaine
 
-gem 'pry-rails'
 gem 'pry-byebug'
+gem 'pry-rails'
 
 group :test, :development do
-  gem 'haml_lint', require: false
-  gem 'rubocop', require: false
-  gem 'rspec-rails', '~> 3.0'
-  gem 'rspec-collection_matchers'
   gem 'factory_girl_rails'
+  gem 'haml_lint', require: false
+  gem 'rspec-collection_matchers'
+  gem 'rspec-rails', '~> 3.0'
+  gem 'rubocop', require: false
 end
 
 group :development do
   gem 'bullet'
   gem 'capistrano', '~> 3.0', require: false
-  gem 'capistrano-rails', '~> 1.1', require: false
   gem 'capistrano-bundler', '~> 1.1', require: false
-  gem 'quiet_assets'
+  gem 'capistrano-rails', '~> 1.1', require: false
   gem 'capistrano-rvm', '~> 0.1', require: false
-  gem 'thin'
+  gem 'quiet_assets'
   gem 'rails-erd'
+  gem 'thin'
 end
 
 group :test do
-  gem 'webmock', require: false
   gem 'capybara', '~> 2.3'
   gem 'fakeredis', :require => "fakeredis/rspec"
+  gem 'webmock', require: false
 end

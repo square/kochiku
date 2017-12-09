@@ -11,7 +11,7 @@ class CommandStubber
     stub_capture2e
   end
 
-  def create_stubbed_process_status(exitstatus=0)
+  def create_stubbed_process_status(exitstatus = 0)
     double(
       exitstatus: exitstatus,
       success?: exitstatus == 0

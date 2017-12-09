@@ -15,7 +15,7 @@ FIXTURE_PATH = Rails.root.join('spec', 'fixtures')
 
 # Requires supporting ruby files with custom matchers and macros, etc,
 # in spec/support/ and its subdirectories.
-Dir[Rails.root.join("spec/support/**/*.rb")].each {|f| require f}
+Dir[Rails.root.join("spec/support/**/*.rb")].each { |f| require f }
 
 # Checks for pending migrations before tests are run.
 ActiveRecord::Migration.maintain_test_schema!

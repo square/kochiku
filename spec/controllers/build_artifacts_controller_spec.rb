@@ -13,7 +13,7 @@ describe BuildArtifactsController do
 
       expect {
         post :create, :build_attempt_id => build_attempt.to_param, :build_artifact => {:log_file => log_file}, :format => :xml
-      }.to change{build_attempt.build_artifacts.count}.by(1)
+      }.to change{ build_attempt.build_artifacts.count }.by(1)
 
       artifact = assigns(:build_artifact)
       expect(artifact.log_file.read).to eq(log_contents)

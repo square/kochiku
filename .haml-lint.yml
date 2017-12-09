@@ -1,9 +1,27 @@
 linters:
+  ConsecutiveSilentScripts:
+    enabled: false
+
+  IdNames:
+    enabled: false
+
+  InlineStyles:
+    enabled: false
+
+  InstanceVariables:
+    enabled: false
+
   ImplicitDiv:
     enabled: false
 
   LineLength:
     enabled: false
 
+  RuboCop:
+    enabled: false
+
   SpaceInsideHashAttributes:
     style: no_space
+
+  ViewLength:
+    enabled: false

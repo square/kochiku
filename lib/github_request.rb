@@ -2,7 +2,7 @@ require 'uri'
 require 'net/http'
 
 class GithubRequest
-  class ResponseError < Exception
+  class ResponseError < RuntimeError
     attr_accessor :response
   end
 

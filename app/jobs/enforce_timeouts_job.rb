@@ -20,7 +20,7 @@ class EnforceTimeoutsJob
 
         BuildArtifact.create(:build_attempt_id => attempt.id, :log_file => message)
         attempt.update!(state: :errored, finished_at: Time.current)
-        Rails.logger.error "Errored BuildAttempt:#{ attempt.id } due to timeout"
+        Rails.logger.error "Errored BuildAttempt:#{attempt.id} due to timeout"
 
         # Enqueue another BuildAttempt if this is the most recent attempt for the BuildPart
         part = attempt.build_part

@@ -1,15 +1,32 @@
 inherit_from: .rubocop_todo.yml
 AllCops:
   TargetRubyVersion: 2.3
+  TargetRailsVersion: 4.2
+  DisplayCopNames: true
   Include:
+    - 'Capfile'
+    - 'Gemfile'
     - 'Rakefile'
     - 'config.ru'
   Exclude:
-    - 'vendor/**/*'
+    - 'config/deploy.rb'
+    - 'db/migrate/*'
     - 'db/schema.rb'
+    - 'lib/ext/activerecord/persistence.rb'
+    - 'vendor/**/*'
 
-Rails:
-  Enabled: true
+Layout/EmptyLinesAroundBlockBody:
+  Enabled: false
+
+Layout/EmptyLinesAroundClassBody:
+  Enabled: false
+
+Layout/ExtraSpacing:
+  Enabled: false
+
+Layout/MultilineBlockLayout:
+  Exclude:
+    - 'spec/lib/partitioner/maven_spec.rb'
 
 Lint/HandleExceptions:
   Exclude:
@@ -24,19 +41,17 @@ Lint/UselessAssignment:
     - 'config/compass.rb'
     - 'spec/models/build_spec.rb'
 
+Metrics/MethodLength:
+  Exclude:
+    - 'lib/partitioner/pants.rb'
+
+Rails:
+  Enabled: true
+
 Style/BlockDelimiters:
   Enabled: false
 
 Style/DoubleNegation:
-  Enabled: false
-
-Style/EmptyLinesAroundBlockBody:
-  Enabled: false
-
-Style/EmptyLinesAroundClassBody:
-  Enabled: false
-
-Style/ExtraSpacing:
   Enabled: false
 
 Style/FrozenStringLiteralComment:
@@ -53,10 +68,6 @@ Style/IfUnlessModifier:
 
 Style/MultilineBlockChain:
   Enabled: false
-
-Style/MultilineBlockLayout:
-  Exclude:
-    - 'spec/lib/partitioner/maven_spec.rb'
 
 Style/TrailingCommaInLiteral:
   Enabled: false

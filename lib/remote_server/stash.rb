@@ -249,9 +249,9 @@ module RemoteServer
         make_request(get, URI(url))
       end
 
-      def post(url, body={})
+      def post(url, body = {})
         Rails.logger.info("Stash POST: #{url}, #{body}")
-        post = Net::HTTP::Post.new(url, {'Content-Type' =>'application/json'})
+        post = Net::HTTP::Post.new(url, {'Content-Type' => 'application/json'})
         setup_auth! post
         post.body = body.to_json
         make_request(post, URI(url))
@@ -259,7 +259,7 @@ module RemoteServer
 
       def delete(url, body)
         Rails.logger.info("Stash DELETE: #{url}, #{body}")
-        delete_request = Net::HTTP::Delete.new(url, {'Content-Type' =>'application/json'})
+        delete_request = Net::HTTP::Delete.new(url, {'Content-Type' => 'application/json'})
         setup_auth! delete_request
         body ||= {}
         delete_request.body = body.to_json

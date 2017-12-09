@@ -82,7 +82,11 @@ class BuildAttemptsController < ApplicationController
     http = Net::HTTP.new(builder, port)
     http.read_timeout = 5
 
-    response = http.get("/build_attempts/#{@build_attempt.id}/log/stdout.log?start=#{start}&maxBytes=#{max_bytes}") rescue false
+    response = begin
+                 http.get("/build_attempts/#{@build_attempt.id}/log/stdout.log?start=#{start}&maxBytes=#{max_bytes}")
+               rescue
+                 false
+               end
 
     if !response || response.code !~ /^2/
       render json: {"error" => "unable to reach log streamer"}, status: 500
@@ -93,5 +97,4 @@ class BuildAttemptsController < ApplicationController
     output_json['state'] = @build_attempt.state
     render json: output_json
   end
-
 end

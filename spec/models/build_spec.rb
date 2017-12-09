@@ -73,7 +73,7 @@ describe Build do
 
     it "should create build attempts for each build part" do
       build.partition(parts)
-      build.build_parts.all? {|bp| expect(bp.build_attempts).to have(1).item }
+      build.build_parts.all? { |bp| expect(bp.build_attempts).to have(1).item }
     end
 
     it "should enqueue build part jobs if repository is enabled" do
@@ -261,7 +261,7 @@ describe Build do
   describe '#to_png' do
     let(:build)     { FactoryGirl.create(:build, :state => state) }
     let(:png)       { build.to_png }
-    let(:png_color) { png.get_pixel(png.width/2, png.height/2) }
+    let(:png_color) { png.get_pixel(png.width / 2, png.height / 2) }
 
     let(:red)   { 4151209727 }
     let(:green) { 3019337471 }

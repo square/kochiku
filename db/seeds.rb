@@ -1,5 +1,5 @@
 # Eagerly load all of the models to avoid errors related to multiple threads
-Dir[Rails.root.join("app/models/*.rb")].each {|f| require f}
+Dir[Rails.root.join("app/models/*.rb")].each { |f| require f }
 
 repo_infos = [
   {

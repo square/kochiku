@@ -47,7 +47,7 @@ RSpec.describe ServerSettings do
 
     describe "stash password file" do
       before do
-        File.open(File.join(RSpec.configuration.fixture_path, "stash-pass.txt"), 'w') {|f| f.write("fake-stash-password") }
+        File.open(File.join(RSpec.configuration.fixture_path, "stash-pass.txt"), 'w') { |f| f.write("fake-stash-password") }
       end
       after do
         File.unlink(File.join(RSpec.configuration.fixture_path, "stash-pass.txt"))

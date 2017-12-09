@@ -17,7 +17,7 @@ class BuildPartitioningJob < JobBase
   def perform
     if @build.test_command.blank?
       error_message = "No test_command specified in kochiku.yml."
-      @build.update!(:error_details => { :message => error_message, :backtrace =>nil }, :state => :errored)
+      @build.update!(:error_details => { :message => error_message, :backtrace => nil }, :state => :errored)
       @build.update_commit_status!
       return
     end

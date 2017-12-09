@@ -27,7 +27,7 @@ shared_examples_for 'a remote server' do
       end
 
       it "raises RepositoryDoesNotExist" do
-        expect{subject}.to raise_error(RemoteServer::RefDoesNotExist)
+        expect{ subject }.to raise_error(RemoteServer::RefDoesNotExist)
       end
     end
 
@@ -42,7 +42,7 @@ shared_examples_for 'a remote server' do
       end
 
       it "raises BranchDoesNotExist" do
-        expect{subject}.to raise_error(RemoteServer::RefDoesNotExist)
+        expect{ subject }.to raise_error(RemoteServer::RefDoesNotExist)
       end
     end
   end

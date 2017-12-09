@@ -383,7 +383,7 @@ describe BuildsController do
   describe "#build_ref_redirect" do
     it "should redirect to the build show url that matches the ref given" do
       build = FactoryGirl.create(:build)
-      get :build_ref_redirect, ref: build.ref[0,8]
+      get :build_ref_redirect, ref: build.ref[0, 8]
       expect(response).to redirect_to(repository_build_path(build.repository, build))
     end
   end
