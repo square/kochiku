@@ -2,9 +2,8 @@ sudo: false
 cache: bundler
 language: ruby
 rvm:
-  - 2.1
-  - 2.3.4
-  - 2.4.1
+  - 2.3.5
+  - 2.4.2
 script:
   - RAILS_ENV=test bundle exec rake --trace db:create db:migrate
   - bundle exec rspec
