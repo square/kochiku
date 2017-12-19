@@ -88,5 +88,30 @@ describe BranchDecorator do
 
       it { should == {} }
     end
+
+    context 'when the some build types are missing from builds' do
+      let(:branch) do
+        proj = instance_double("Branch")
+        allow(proj).to receive(:timing_data_for_recent_builds) {
+          [
+            @pants1 = ["pants", "fb25a", 55, 43, 0, 72550, "succeeded", "2014-03-01 22:45:39 UTC"],
+            @findbugs1 = ["findbugs",  "fb25a",  2,  0, 0, 72550, "succeeded", "2014-03-01 22:45:39 UTC"],
+            @pants2 = ["pants",  "f4235",  3,  0, 0, 72560, "succeeded", "2014-03-02 00:37:55 UTC"],
+            @findbugs2 = ["findbugs", "f4235", 55, 44, 0, 72560, "succeeded", "2014-03-02 00:37:55 UTC"],
+            @errorprone2 = ["errorprone",  "f4235",  2,  0, 0, 72560, "succeeded", "2014-03-02 00:37:55 UTC"],
+            @pants3 = ["pants",  "ef570",  3,  0, 0, 72568, "succeeded", "2014-03-02 01:23:50 UTC"],
+          ]
+        }
+        proj
+      end
+
+      it 'should sort the builds and add empty values for missing build parts' do
+        should == {
+          'pants' => [@pants1, @pants2, @pants3],
+          'findbugs' => [@findbugs1, @findbugs2, []],
+          'errorprone' => [[], @errorprone2, []],
+        }
+      end
+    end
   end
 end
