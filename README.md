@@ -13,7 +13,7 @@ Use Kochiku to distribute large test suites quickly and easily. It's language ag
 
 ### Git integration
 
-Kochiku currently integrates with git repositories stored in Github (including Github Enterprise) or Atlassian Stash. This lets Kochiku automatically run test suites for pull requests and commits to the master branch. Kochiku can also build any git revision on request.
+Kochiku currently integrates with git repositories stored in Github (including Github Enterprise) or Atlassian Bitbucket (formerly known as Stash). This lets Kochiku automatically run test suites for pull requests and commits to the master branch. Kochiku can also build any git revision on request.
 
 Support for headless git servers is coming soon.
 
