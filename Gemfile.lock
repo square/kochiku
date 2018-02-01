@@ -168,7 +168,7 @@ GEM
     minitest (5.10.3)
     mono_logger (1.1.0)
     multi_json (1.12.1)
-    mysql2 (0.4.4)
+    mysql2 (0.4.10)
     net-scp (1.2.1)
       net-ssh (>= 2.6.5)
     net-ssh (2.9.2)
@@ -385,7 +385,7 @@ DEPENDENCIES
   rails-observers
   readthis
   redis
-  resque (~> 1.25)
+  resque (~> 1.27.4)
   resque-retry
   resque-scheduler
   rspec-collection_matchers
@@ -399,4 +399,4 @@ DEPENDENCIES
   webmock
 
 BUNDLED WITH
-   1.16.0
+   1.16.1

@@ -25,7 +25,7 @@ gem 'hiredis' # better Redis performance for usage as cache
 gem 'readthis'
 gem 'redis', require: ["redis", "redis/connection/hiredis"]
 
-gem 'resque', '~> 1.25'
+gem 'resque', '~> 1.27.4'
 gem 'resque-retry'
 gem 'resque-scheduler', require: false
 
