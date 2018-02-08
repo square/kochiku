@@ -45,6 +45,9 @@ Metrics/MethodLength:
   Exclude:
     - 'lib/partitioner/pants.rb'
 
+Metrics/ClassLength:
+  Enabled: false
+
 Rails:
   Enabled: true
 
