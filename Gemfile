@@ -34,7 +34,7 @@ gem 'json' # used by resque
 gem 'awesome_print', require: false
 gem 'chunky_png'
 gem 'cocaine'
-gem 'nokogiri', '~> 1.7'
+gem 'nokogiri', '~> 1.8', '>= 1.8.2' # 1.8.1 and below have known vulnerabilities
 gem 'posix-spawn'  # used by cocaine
 
 gem 'pry-byebug'
