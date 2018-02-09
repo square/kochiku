@@ -19,12 +19,13 @@ describe BranchesController do
 
   describe "#show" do
     let(:branch) { FactoryGirl.create(:branch) }
-    let!(:build1) { FactoryGirl.create(:build, :branch_record => branch, :state => :succeeded) }
-    let!(:build2) { FactoryGirl.create(:build, :branch_record => branch, :state => :errored) }
+    let!(:build1) { FactoryGirl.create(:build, :branch_record => branch, :state => :succeeded, :test_command => "script/ci") }
+    let!(:build2) { FactoryGirl.create(:build, :branch_record => branch, :state => :errored, :test_command => "script/ci") }
 
     it "should return an rss feed of builds" do
       get :show, repository_path: branch.repository, id: branch, format: :rss
       doc = REXML::Document.new(response.body)
+
       items = doc.elements.to_a("//channel/item")
       expect(items.length).to eq(Build.count)
       expect(items.first.elements.to_a("title").first.text).to eq("Build Number #{build2.id} failed")

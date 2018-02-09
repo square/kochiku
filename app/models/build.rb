@@ -66,7 +66,12 @@ class Build < ActiveRecord::Base
   scope :completed, -> { where(state: TERMINAL_STATES) }
 
   def test_command
-    (kochiku_yml && kochiku_yml.key?('test_command')) ? kochiku_yml['test_command'] : repository.test_command
+    tc = self[:test_command]
+    if tc.nil?
+      tc = (kochiku_yml && kochiku_yml.key?('test_command')) ? kochiku_yml['test_command'] : repository.test_command
+      self.update_attributes(test_command: tc)
+    end
+    tc
   end
 
   def on_success_script

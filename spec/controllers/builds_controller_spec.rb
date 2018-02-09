@@ -126,7 +126,7 @@ describe BuildsController do
   describe "#show" do
     it "should return a valid JSON" do
       branch = FactoryGirl.create(:branch, name: 'gummy-bears')
-      build = FactoryGirl.create(:build, branch_record: branch)
+      build = FactoryGirl.create(:build, branch_record: branch, :test_command => "script/ci")
       build_part = FactoryGirl.create(:build_part, build_instance: build)
       FactoryGirl.create(:build_attempt, :build_part => build_part, :state => :passed)
       get :show, repository_path: branch.repository, id: build.id, format: :json
