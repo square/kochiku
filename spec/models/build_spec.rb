@@ -582,6 +582,12 @@ describe Build do
       expect(hash['build']['elapsed_time']).to eq(build.elapsed_time)
     end
 
+    it 'returns a hash with out test_command' do
+      build.partition(parts)
+      hash = build.as_json
+      expect(hash['build'].key?('test_command')).to eq(false)
+    end
+
     it 'returns elapsed_time even when other options are used' do
       build.partition(parts)
       hash = build.as_json(include: :build_parts)

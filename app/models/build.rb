@@ -291,6 +291,8 @@ class Build < ActiveRecord::Base
   end
 
   def as_json(options = {})
+    # exclude test_command by default
+    options[:except] ||= [:test_command]
     super(options.reverse_merge(methods: :elapsed_time))
   end
 
