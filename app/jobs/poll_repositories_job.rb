@@ -1,12 +1,17 @@
 class PollRepositoriesJob
   def self.perform
-    Branch.where(convergence: true).includes(:repository).find_each do |branch|
+    Branch.joins(:repository)
+          .where(convergence: true, 'repositories.enabled': true)
+          .includes(:repository)
+          .find_each(batch_size: 20) do |branch|
+
       repo = branch.repository
 
       begin
         head = repo.sha_for_branch(branch.name)
       rescue RemoteServer::AccessDenied, RemoteServer::RefDoesNotExist, Zlib::BufError => e
-        Rails.logger.error("[PollRepositoriesJob] Exception #{e} occurred for repo #{repo.id}:#{repo.name}")
+        Rails.logger.error("[PollRepositoriesJob] Exception #{e} occurred for repo #{repo.id}:#{repo.name_with_namespace}. Automatically setting the repository to disabled.")
+        repo.update!(enabled: false)
         next
       end
 
@@ -14,6 +19,8 @@ class PollRepositoriesJob
         branch.builds.create!(ref: head, state: :partitioning)
         Rails.logger.info "Build created for #{repo.namespace}/#{repo.name}:#{branch.name} at #{head}"
       end
+
+      sleep 0.5 # take a breath
     end
   end
 end
