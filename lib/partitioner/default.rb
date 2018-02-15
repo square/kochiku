@@ -99,7 +99,7 @@ module Partitioner
     def time_greedy_partitions_for(file_to_times_hash, all_files, workers)
       # exclude tests that are not present
       file_to_times_hash.slice!(*all_files)
-      min_test_time = file_to_times_hash.values.flatten.min
+      min_test_time = file_to_times_hash.values.flatten.min || 1
       setup_time = min_test_time / 2
       # Any new tests get added in here.
       all_files.each  { |file| file_to_times_hash[file] ||= [min_test_time] }
