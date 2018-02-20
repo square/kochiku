@@ -111,7 +111,8 @@ class RepositoriesController < ApplicationController
           .permit(:enabled, :url, :timeout, :build_pull_requests,
                   :run_ci, :on_green_update, :send_build_success_email,
                   :send_build_failure_email, :allows_kochiku_merges,
-                  :email_on_first_failure, :send_merge_successful_email)
+                  :email_on_first_failure, :send_merge_successful_email,
+                  :assume_lost_after)
   end
 
   # update_convergence_branches is called by both create and update. This
