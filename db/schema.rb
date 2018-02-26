@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180208202524) do
+ActiveRecord::Schema.define(version: 20180220185338) do
 
   create_table "branches", force: :cascade do |t|
     t.integer  "repository_id", limit: 4,                   null: false
@@ -112,6 +112,7 @@ ActiveRecord::Schema.define(version: 20180208202524) do
     t.boolean  "email_on_first_failure",                  default: false, null: false
     t.boolean  "send_merge_successful_email",             default: true,  null: false
     t.boolean  "enabled",                                 default: true,  null: false
+    t.integer  "assume_lost_after",           limit: 4
   end
 
   add_index "repositories", ["host", "namespace", "name"], name: "index_repositories_on_host_and_namespace_and_name", unique: true, using: :btree

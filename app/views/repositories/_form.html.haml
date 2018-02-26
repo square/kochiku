@@ -15,6 +15,10 @@
     = f.text_field :timeout, :id => "timeout", :class => "short"
     minutes
   %div
+    %label{:for => "assume_lost_after"} Assume that a build has been lost if its still running after:
+    = f.text_field :assume_lost_after, :id => "assume_lost_after", :class => "short"
+    minutes
+  %div
     %label{:for => "run_ci"} Trigger build on push to master:
     = f.check_box :run_ci, :id => "run_ci"
   %div
