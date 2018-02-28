@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180220185338) do
+ActiveRecord::Schema.define(version: 20180227222254) do
 
   create_table "branches", force: :cascade do |t|
     t.integer  "repository_id", limit: 4,                   null: false
@@ -75,6 +75,7 @@ ActiveRecord::Schema.define(version: 20180220185338) do
     t.boolean  "build_success_email_sent",                 default: false, null: false
     t.integer  "branch_id",                  limit: 4
     t.string   "test_command",               limit: 255
+    t.string   "initiated_by",               limit: 255
   end
 
   add_index "builds", ["branch_id"], name: "index_builds_on_branch_id", using: :btree
