@@ -31,7 +31,7 @@ module ProjectStatsHelper
   end
 
   def pass_rate_text(number)
-    format("%1.0f%", 100 * number)
+    format("%1.0f%%", 100 * number)
   end
 
   # Calculates the average number of rebuilds required before builds succeed.
