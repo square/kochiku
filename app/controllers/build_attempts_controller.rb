@@ -11,6 +11,7 @@ class BuildAttemptsController < ApplicationController
         format.json { render :json => @build_attempt }
       elsif @build_attempt.start!(params[:builder])
         @build_attempt.log_streamer_port = params[:logstreamer_port]
+        @build_attempt.instance_type = params[:instance_type] if params[:instance_type].present?
         @build_attempt.save
         format.json { render :json => @build_attempt }
       else

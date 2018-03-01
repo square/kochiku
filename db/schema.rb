@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180227222254) do
+ActiveRecord::Schema.define(version: 20180301221320) do
 
   create_table "branches", force: :cascade do |t|
     t.integer  "repository_id", limit: 4,                   null: false
@@ -42,6 +42,7 @@ ActiveRecord::Schema.define(version: 20180227222254) do
     t.datetime "created_at",                    null: false
     t.datetime "updated_at",                    null: false
     t.integer  "log_streamer_port", limit: 4
+    t.string   "instance_type",     limit: 255
   end
 
   add_index "build_attempts", ["build_part_id"], name: "index_build_attempts_on_build_part_id", using: :btree
