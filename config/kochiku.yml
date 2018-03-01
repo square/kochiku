@@ -1,7 +1,7 @@
 test_command: 'script/ci'
 
 ruby:
- - 2.4.2
+ - 2.4.3
 
 targets:
   - type: spec
