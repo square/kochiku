@@ -24,6 +24,7 @@ Kochiku::Application.routes.draw do
   match '/worker_health', to: "dashboards#build_history_by_worker", via: :get, as: :build_history_by_worker
 
   match 'builds/:id' => "builds#build_redirect", :via => :get, :as => :build_redirect, :id => /\d+/
+  match 'builds/:id/status' => "builds#build_status", :via => :get, :as => :build_status, :id => /\d+/, :defaults => { :format => 'json' }
   match 'builds/:ref' => "builds#build_ref_redirect", :via => :get, :as => :build_ref_redirect
   match '/build_attempts/:build_attempt_id/build_artifacts' => "build_artifacts#create", :via => :post
   match '/build_attempts/:id/start' => "build_attempts#start", :via => :post
