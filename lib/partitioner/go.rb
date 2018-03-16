@@ -51,7 +51,7 @@ module Partitioner
         m.split("/")[n]
       end
 
-      module_group_map.map {|k, ms| ['./' + k, filter_test_packages(ms)] }
+      module_group_map.map { |k, ms| ['./' + k, filter_test_packages(ms)] }
     end
 
     def filter_test_packages(modules)
@@ -68,11 +68,11 @@ module Partitioner
       end
 
       # Convert a set to a list..
-      msList = []
+      ms_list = []
       ms.each do |m|
-        msList << m
+        ms_list << m
       end
-      msList
+      ms_list
     end
 
     def module_dependency_map
@@ -123,19 +123,15 @@ module Partitioner
         tmp_depends_on_map[import_path].add(import_path)
 
         deps = package_info["Deps"]
-        unless deps.nil?
-          deps.each do |dep|
-            tmp_depends_on_map[dep] ||= Set.new
-            tmp_depends_on_map[dep].add(import_path)
-          end
+        deps&.each do |dep|
+          tmp_depends_on_map[dep] ||= Set.new
+          tmp_depends_on_map[dep].add(import_path)
         end
 
         test_imports = package_info["TestImports"]
-        unless test_imports.nil?
-          test_imports.each do |import|
-            test_dep_map[import] ||= Set.new
-            test_dep_map[import].add(import_path)
-          end
+        test_imports&.each do |import|
+          test_dep_map[import] ||= Set.new
+          test_dep_map[import].add(import_path)
         end
 
         xtest_imports = package_info["XTestImports"]

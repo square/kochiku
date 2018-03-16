@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 require 'set'
 require 'partitioner/base'
 require 'partitioner/topological_sorter'
@@ -41,13 +42,9 @@ module Partitioner
             modules_to_build.merge(depends_on_map[module_affected_by_file] || Set.new)
           end
         end
-
         if @build.branch_record.convergence? && @build.previous_build
           modules_to_build.merge(@build.previous_build.build_parts.select(&:unsuccessful?).map(&:paths).flatten.uniq)
         end
-
-        @build.update_attributes!(:deployable_map => deployable_modules_map)
-
         add_options(group_modules(sort_modules(modules_to_build)))
       end
     ensure

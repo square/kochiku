@@ -59,7 +59,7 @@ describe Partitioner::Maven do
           allow(File).to receive(:exist?).with("module-one/pom.xml").and_return(true)
           allow(File).to receive(:exist?).with("module-two/pom.xml").and_return(true)
 
-          allow(subject).to receive(:maven_modules).and_return(["module-one", "module-two", "module-two/integration", "module-three", "module-four"])
+          allow(subject).to receive(:all_modules).and_return(["module-one", "module-two", "module-two/integration", "module-three", "module-four"])
           allow(subject).to receive(:depends_on_map).and_return(
             {
               "module-one" => ["module-one", "module-three", "module-four"].to_set,

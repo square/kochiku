@@ -125,19 +125,5 @@ module Partitioner
       end
       nil
     end
-
-    def deployable_modules_map
-      deployable_modules_map = {}
-
-      all_modules.each do |mvn_module|
-        module_pom = pom_for(mvn_module)
-        deployable_branch = module_pom.css('project>properties>deployableBranch').first
-        if deployable_branch
-          deployable_modules_map[mvn_module] = deployable_branch.text
-        end
-      end
-
-      deployable_modules_map
-    end
   end
 end

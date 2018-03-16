@@ -16,77 +16,77 @@ describe Partitioner::Go do
   context "with actual files" do
 
     let(:go_list_output) {
-      <<-OUTPUT
-{
-	"ImportPath": "liba",
-	"Deps": [
-		"runtime",
-		"runtime/internal/atomic",
-		"runtime/internal/sys",
-		"unsafe"
-	]
-}
-{
-	"ImportPath": "libb",
-	"Deps": [
-		"runtime",
-		"runtime/internal/atomic",
-		"runtime/internal/sys",
-		"unsafe"
-	]
-}
-{
-	"ImportPath": "libc",
-	"Imports": [
-		"liba"
-	],
-	"Deps": [
-		"liba",
-		"runtime",
-		"runtime/internal/atomic",
-		"runtime/internal/sys",
-		"unsafe"
-	],
-	"TestImports": [
-		"libb",
-		"testing"
-	]
-}
-{
-	"ImportPath": "libd",
-	"Imports": [
-		"libc"
-	],
-	"Deps": [
-		"liba",
-		"libc",
-		"runtime",
-		"runtime/internal/atomic",
-		"runtime/internal/sys",
-		"unsafe"
-	],
-	"TestImports": [
-		"libc",
-		"testing"
-	]
-}
-{
-	"ImportPath": "libe",
-	"Imports": [
-		"libb"
-	],
-	"Deps": [
-		"libb",
-		"runtime",
-		"runtime/internal/atomic",
-		"runtime/internal/sys",
-		"unsafe"
-	],
-	"XTestImports": [
-		"liba",
-		"testing"
-	]
-}
+      <<~OUTPUT
+        {
+          "ImportPath": "liba",
+          "Deps": [
+            "runtime",
+            "runtime/internal/atomic",
+            "runtime/internal/sys",
+            "unsafe"
+          ]
+        }
+        {
+          "ImportPath": "libb",
+          "Deps": [
+            "runtime",
+            "runtime/internal/atomic",
+            "runtime/internal/sys",
+            "unsafe"
+          ]
+        }
+        {
+          "ImportPath": "libc",
+          "Imports": [
+            "liba"
+          ],
+          "Deps": [
+            "liba",
+            "runtime",
+            "runtime/internal/atomic",
+            "runtime/internal/sys",
+            "unsafe"
+          ],
+          "TestImports": [
+            "libb",
+            "testing"
+          ]
+        }
+        {
+          "ImportPath": "libd",
+          "Imports": [
+            "libc"
+          ],
+          "Deps": [
+            "liba",
+            "libc",
+            "runtime",
+            "runtime/internal/atomic",
+            "runtime/internal/sys",
+            "unsafe"
+          ],
+          "TestImports": [
+            "libc",
+            "testing"
+          ]
+        }
+        {
+          "ImportPath": "libe",
+          "Imports": [
+            "libb"
+          ],
+          "Deps": [
+            "libb",
+            "runtime",
+            "runtime/internal/atomic",
+            "runtime/internal/sys",
+            "unsafe"
+          ],
+          "XTestImports": [
+            "liba",
+            "testing"
+          ]
+        }
     OUTPUT
     }
 
@@ -110,8 +110,8 @@ describe Partitioner::Go do
       it "it should get the dependencies" do
         dep_map = subject.module_dependency_map
 
-        expect(dep_map["liba"]).to eq(%w(liba libc libe_test).to_set)
-        expect(dep_map["libb"]).to eq(%w(libb libc libe).to_set)
+        expect(dep_map["liba"]).to eq(%w[liba libc libe_test].to_set)
+        expect(dep_map["libb"]).to eq(%w[libb libc libe].to_set)
         expect(dep_map["libc"]).to eq(["libc", "libd"].to_set)
         expect(dep_map["libd"]).to eq(["libd"].to_set)
         expect(dep_map["libe"]).to eq(["libe"].to_set)
@@ -122,8 +122,8 @@ describe Partitioner::Go do
       it "it should get the dependencies" do
         dep_map = subject.depends_on_map
 
-        expect(dep_map["liba"]).to eq(%w(liba libc libd libe_test).to_set)
-        expect(dep_map["libb"]).to eq(%w(libb libc libe).to_set)
+        expect(dep_map["liba"]).to eq(%w[liba libc libd libe_test].to_set)
+        expect(dep_map["libb"]).to eq(%w[libb libc libe].to_set)
         expect(dep_map["libc"]).to eq(["libc", "libd"].to_set)
         expect(dep_map["libd"]).to eq(["libd"].to_set)
         expect(dep_map["libe"]).to eq(["libe"].to_set)
