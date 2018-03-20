@@ -18,13 +18,14 @@
         %span.label Median time:
         %span.number #{seconds_to_minutes(median_seconds_to_success)} minutes
 
-    %div{title: "Average number of build parts reattempted to get to a successful build", class: rebuild_count_css_class(avg_rebuilds)}
-      %span.number= format("%0.1f", avg_rebuilds)
-      %span.label rebuilds required on average
+    - unless @builds.empty?
+      %div{title: "Average number of build parts reattempted to get to a successful build", class: rebuild_count_css_class(avg_rebuilds)}
+        %span.number= format("%0.1f", avg_rebuilds)
+        %span.label rebuilds required on average
 
-    %div{title: "Percentage of builds with all parts succeeding on the first try", class: pass_rate_css_class(rate)}
-      %span.number= rate
-      %span.label pass rate on first try
+      %div{title: "Percentage of builds with all parts succeeding on the first try", class: pass_rate_css_class(rate)}
+        %span.number= rate
+        %span.label pass rate on first try
 
   .stats
     %h2.subheader Build statistics
