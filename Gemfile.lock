@@ -155,7 +155,7 @@ GEM
       thor (>= 0.14, < 2.0)
     json (2.1.0)
     libv8 (3.16.14.19)
-    loofah (2.1.1)
+    loofah (2.2.1)
       crass (~> 1.0.2)
       nokogiri (>= 1.5.9)
     mail (2.6.6)
