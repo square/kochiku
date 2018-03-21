@@ -27,13 +27,14 @@
       %div{title: "Median elapsed time for successful builds on #{@branch.name}"}
         %span.label Never built
 
-    %div{title: "Average number of build parts reattempted to get to a successful build", class: rebuild_count_css_class(avg_rebuilds)}
-      %span.number= format('%0.1f', avg_rebuilds)
-      %span.label rebuilds required on average
+    - unless @builds.empty?
+      %div{title: "Average number of build parts reattempted to get to a successful build", class: rebuild_count_css_class(avg_rebuilds)}
+        %span.number= format('%0.1f', avg_rebuilds)
+        %span.label rebuilds required on average
 
-    %div{title: "Percentage of builds with all parts succeeding on the first try", class: pass_rate_css_class(rate)}
-      %span.number= rate
-      %span.label completion rate on first try
+      %div{title: "Percentage of builds with all parts succeeding on the first try", class: pass_rate_css_class(rate)}
+        %span.number= rate
+        %span.label completion rate on first try
 
 %h2.subheader
   = @repository.namespace + '/' + @repository.name
