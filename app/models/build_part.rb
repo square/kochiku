@@ -2,7 +2,6 @@ class BuildPart < ActiveRecord::Base
   # using 'build_instance' instead of 'build' because AR defines `build` for associations, and it wins
   belongs_to :build_instance, :class_name => "Build", :foreign_key => "build_id", :inverse_of => :build_parts
   has_many :build_attempts, :dependent => :destroy, :inverse_of => :build_part
-  symbolize :queue
   validates :kind, :paths, :queue, presence: true
 
   serialize :paths, Array
@@ -13,7 +12,7 @@ class BuildPart < ActiveRecord::Base
   end
 
   def create_and_enqueue_new_build_attempt!
-    build_attempt = build_attempts.create!(:state => :runnable)
+    build_attempt = build_attempts.create!(:state => 'runnable')
     BuildAttemptJob.enqueue_on(queue.to_s, job_args(build_attempt))
     build_instance.touch # invalidate the cache of builds#show
     build_attempt
@@ -45,9 +44,9 @@ class BuildPart < ActiveRecord::Base
 
   def status
     if successful?
-      :passed
+      'passed'
     else
-      last_attempt.try(:state) || :unknown
+      last_attempt.try(:state) || 'unknown'
     end
   end
 
@@ -69,9 +68,9 @@ class BuildPart < ActiveRecord::Base
 
   def to_color
     case status
-    when :passed
+    when 'passed'
       :green
-    when :failed, :errored, :aborted
+    when 'failed', 'errored', 'aborted'
       :red
     else
       :blue

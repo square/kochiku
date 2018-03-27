@@ -241,10 +241,10 @@ describe RepositoriesController do
       let(:branch) { FactoryGirl.create(:convergence_branch, repository: repository) }
 
       it "should not abort previous in-progress builds" do
-        earlier_build = FactoryGirl.create(:build, state: :runnable, branch_record: branch)
+        earlier_build = FactoryGirl.create(:build, state: 'runnable', branch_record: branch)
 
         post :build_ref, id: repository.id, ref: branch.name, sha: fake_sha
-        expect(earlier_build.reload.state).to eq(:runnable)
+        expect(earlier_build.reload.state).to eq('runnable')
       end
     end
 
@@ -252,10 +252,10 @@ describe RepositoriesController do
       let(:branch) { FactoryGirl.create(:branch, repository: repository) }
 
       it "should abort all previous in-progress builds" do
-        earlier_build = FactoryGirl.create(:build, state: :runnable, branch_record: branch)
+        earlier_build = FactoryGirl.create(:build, state: 'runnable', branch_record: branch)
 
         post :build_ref, id: repository.id, ref: branch.name, sha: fake_sha
-        expect(earlier_build.reload.state).to eq(:aborted)
+        expect(earlier_build.reload.state).to eq('aborted')
       end
     end
   end

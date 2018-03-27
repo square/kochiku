@@ -6,20 +6,20 @@ repo_infos = [
     :name => 'kandan',
     :enabled => true,
     :location => "git@github.com:kandanapp/kandan.git",
-    :build_attempt_state => :passed,
+    :build_attempt_state => 'passed',
     :types => [:spec, :cucumber, :rubocop, :lint, :unit]
   },
   {
     :name => 'copycopter-server',
     :enabled => true,
-    :build_attempt_state => :passed,
+    :build_attempt_state => 'passed',
     :location => "git@github.com:copycopter/copycopter-server.git",
     :types => [:spec]
   },
   {
     :name => 'lobsters',
     :enabled => false,
-    :build_attempt_state => :errored,
+    :build_attempt_state => 'errored',
     :location => "git@github.com:jcs/lobsters.git",
     :types => [:junit]
   }
@@ -58,7 +58,7 @@ def create_build_part(build, kind, paths, build_attempt_state)
                          :kind => kind,
                          :paths => paths,
                          :queue => 'ci')
-  build_attempt_state ||= (BuildAttempt::STATES + [:passed] * 5).sample
+  build_attempt_state ||= (BuildAttempt::STATES + ['passed'] * 5).sample
   finished = if BuildAttempt::IN_PROGRESS_BUILD_STATES.include?(build_attempt_state)
                nil
              else
@@ -75,10 +75,11 @@ def create_build_part(build, kind, paths, build_attempt_state)
   bp
 end
 
-def create_build(branch, test_types, build_attempt_state: :passed)
+def create_build(branch, test_types, build_attempt_state: 'passed')
   build = Build.create!(:branch_record => branch,
                         :ref => SecureRandom.hex(20),
-                        :state => :runnable)
+                        :initiated_by => 'test@email.com',
+                        :state => 'runnable')
 
   Array(test_types).each do |kind|
     paths = %w(
@@ -126,4 +127,4 @@ end
 
 # create an extra running build for copycopter-server to show something that is in progress
 copycopter_branch = Branch.where(repository: repos['copycopter-server'], name: 'master').first
-create_build(copycopter_branch, %w(spec), build_attempt_state: :running)
+create_build(copycopter_branch, %w(spec), build_attempt_state: 'running')

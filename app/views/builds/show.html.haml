@@ -77,7 +77,7 @@
         %td
           %span.part-status{:class => part.status}
             - text = part.status.to_s.capitalize
-            - if part.status == :running && part.last_attempt.log_streamer_port.present?
+            - if part.status == 'running' && part.last_attempt.log_streamer_port.present?
               = link_to(text, stream_logs_path(part.last_attempt.id))
             - elsif (artifact = part.most_recent_stdout_artifact)
               = link_to(text, artifact, :title => 'Last completed stdout.log')

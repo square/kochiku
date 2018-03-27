@@ -4,7 +4,7 @@ class BranchDecorator < Draper::Decorator
   delegate_all
 
   def most_recent_build_state
-    object.most_recent_build.try(:state) || :unknown
+    object.most_recent_build.try(:state) || 'unknown'
   end
 
   def last_build_duration

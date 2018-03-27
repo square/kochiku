@@ -6,10 +6,10 @@ feature "viewing an in process build" do
   let(:branch) { FactoryGirl.create(:master_branch, repository: repository) }
   let(:build) { FactoryGirl.create(:build, branch_record: branch) }
   let(:build_part) { FactoryGirl.create(:build_part, :build_instance => build, :queue => 'ci') }
-  let!(:build_attempt) { FactoryGirl.create(:build_attempt, :build_part => build_part, :state => :runnable) }
+  let!(:build_attempt) { FactoryGirl.create(:build_attempt, :build_part => build_part, :state => 'runnable') }
 
   it "view the current status of the build attempts" do
-    build.update_attribute(:state, :runnable)
+    build.update_attribute(:state, 'runnable')
 
     visit('/')
 
@@ -45,7 +45,7 @@ end
 
 feature "a failed build" do
   before :each do
-    @build_attempt = FactoryGirl.create(:build_attempt, :state => :failed)
+    @build_attempt = FactoryGirl.create(:build_attempt, :state => 'failed')
     @build_part = @build_attempt.build_part
     allow(GitRepo).to receive(:load_kochiku_yml).and_return(nil)
   end

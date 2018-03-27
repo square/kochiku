@@ -6,7 +6,7 @@ class BuildsController < ApplicationController
     @build = Build.includes(build_parts: :build_attempts)
                   .joins(:branch_record).where('branches.repository_id' => @repository.id)
                   .find(params[:id])
-    calculate_build_attempts_position(@build.build_attempts.where(state: :runnable))
+    calculate_build_attempts_position(@build.build_attempts.where(state: 'runnable'))
     format_build_parts_position
   end
 
@@ -64,7 +64,7 @@ class BuildsController < ApplicationController
                      repository.sha_for_branch(branch.name)
                    end
 
-    build = branch.builds.build(ref: ref_to_build, state: :partitioning, merge_on_success: merge_on_success)
+    build = branch.builds.build(ref: ref_to_build, state: 'partitioning', merge_on_success: merge_on_success)
 
     if build.save
       head :ok, :location => repository_build_url(repository, build)
@@ -78,7 +78,7 @@ class BuildsController < ApplicationController
 
     # This means there was an error with the partitioning job; redo it
     if @build.build_parts.empty?
-      @build.update_attributes! :state => :partitioning, :error_details => nil
+      @build.update_attributes! :state => 'partitioning', :error_details => nil
       @build.enqueue_partitioning_job
     end
 
@@ -94,7 +94,7 @@ class BuildsController < ApplicationController
       # passed but the latest attempt failed. We do not want to rebuild those parts.
       part.rebuild! if part.unsuccessful?
     end
-    @build.update_attributes! state: :running
+    @build.update_attributes! state: 'running'
 
     redirect_to [@repository, @build]
   end

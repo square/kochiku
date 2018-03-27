@@ -128,7 +128,7 @@ describe BuildsController do
       branch = FactoryGirl.create(:branch, name: 'gummy-bears')
       build = FactoryGirl.create(:build, branch_record: branch, :test_command => "script/ci")
       build_part = FactoryGirl.create(:build_part, build_instance: build)
-      FactoryGirl.create(:build_attempt, :build_part => build_part, :state => :passed)
+      FactoryGirl.create(:build_attempt, :build_part => build_part, :state => 'passed')
       get :show, repository_path: branch.repository, id: build.id, format: :json
       ret = JSON.parse(response.body)
       expect(ret['build']['build_parts'].length).to eq(1)
@@ -139,12 +139,12 @@ describe BuildsController do
     context "when the repository is disabled" do
       render_views
       let(:build) {
-        FactoryGirl.create(:build_on_disabled_repo, state: :failed)
+        FactoryGirl.create(:build_on_disabled_repo, state: 'failed')
       }
 
       it "should not show 'Rebuild failed parts' button or rebuild action in #build-summary table" do
         build_part = FactoryGirl.create(:build_part, build_instance: build)
-        FactoryGirl.create(:completed_build_attempt, build_part: build_part, state: :failed)
+        FactoryGirl.create(:completed_build_attempt, build_part: build_part, state: 'failed')
         get :show, repository_path: build.repository, id: build.id
         expect(response.body).to_not match(/<input.*value="Rebuild failed parts"/)
         expect(response.body).to_not match(%r{<a.*>Rebuild<\/a>$})
@@ -160,12 +160,12 @@ describe BuildsController do
     context "when the repository is enabled" do
       render_views
       let(:build) {
-        FactoryGirl.create(:build, state: :failed)
+        FactoryGirl.create(:build, state: 'failed')
       }
 
       it "should show 'Rebuild failed parts' button or rebuild action in #build-summary table" do
         build_part = FactoryGirl.create(:build_part, build_instance: build)
-        FactoryGirl.create(:completed_build_attempt, build_part: build_part, state: :failed)
+        FactoryGirl.create(:completed_build_attempt, build_part: build_part, state: 'failed')
         get :show, repository_path: build.repository, id: build.id
         expect(response.body).to match(/<input.*value="Rebuild failed parts"/)
         expect(response.body).to match(%r{<a.*>Rebuild<\/a>$})
@@ -191,13 +191,13 @@ describe BuildsController do
 
     # spot-check that it does some abort action
     it "sets the build's state to aborted" do
-      expect(@build.reload.state).to eq(:aborted)
+      expect(@build.reload.state).to eq('aborted')
     end
   end
 
   describe "#on_success_log_file link" do
     render_views
-    let(:build) { FactoryGirl.create(:build, state: :succeeded) }
+    let(:build) { FactoryGirl.create(:build, state: 'succeeded') }
     before do
       @action = :show
       @params = {:id => build.id, :repository_path => build.repository}
@@ -302,11 +302,11 @@ describe BuildsController do
 
     context "happy path" do
       before do
-        @attempt_1 = FactoryGirl.create(:build_attempt, :build_part => parts[0], :state => :failed)
-        @attempt_2 = FactoryGirl.create(:build_attempt, :build_part => parts[1], :state => :failed)
-        @attempt_3 = FactoryGirl.create(:build_attempt, :build_part => parts[1], :state => :errored)
-        @attempt_4 = FactoryGirl.create(:build_attempt, :build_part => parts[2], :state => :passed)
-        @attempt_5 = FactoryGirl.create(:build_attempt, :build_part => parts[3], :state => :aborted)
+        @attempt_1 = FactoryGirl.create(:build_attempt, :build_part => parts[0], :state => 'failed')
+        @attempt_2 = FactoryGirl.create(:build_attempt, :build_part => parts[1], :state => 'failed')
+        @attempt_3 = FactoryGirl.create(:build_attempt, :build_part => parts[1], :state => 'errored')
+        @attempt_4 = FactoryGirl.create(:build_attempt, :build_part => parts[2], :state => 'passed')
+        @attempt_5 = FactoryGirl.create(:build_attempt, :build_part => parts[3], :state => 'aborted')
       end
 
       it "rebuilds all failed attempts" do
@@ -331,8 +331,8 @@ describe BuildsController do
 
     context "an successful prior build attempt should not be rebuilt" do
       it "does something" do
-        FactoryGirl.create(:build_attempt, :build_part => parts[1], :state => :passed) # attempt 1
-        FactoryGirl.create(:build_attempt, :build_part => parts[1], :state => :failed) # attempt 2
+        FactoryGirl.create(:build_attempt, :build_part => parts[1], :state => 'passed') # attempt 1
+        FactoryGirl.create(:build_attempt, :build_part => parts[1], :state => 'failed') # attempt 2
 
         expect { subject }.to_not change(BuildAttempt, :count)
       end

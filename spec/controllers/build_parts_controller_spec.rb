@@ -5,7 +5,7 @@ describe BuildPartsController do
 
   let(:build) { FactoryGirl.create(:build) }
   let(:repository) { build.repository }
-  let(:build_part) { build.build_parts.create!(:paths => ["a"], :kind => "test", :queue => :ci) }
+  let(:build_part) { build.build_parts.create!(:paths => ["a"], :kind => "test", :queue => 'ci') }
 
   describe "#show" do
     it "renders the show template successfully even if elapsed time is nil" do

@@ -5,7 +5,7 @@ describe BuildPartitioningJob do
   describe "#perform" do
     subject { BuildPartitioningJob.perform(id) }
     let(:id) { build.id }
-    let(:build) { FactoryGirl.create(:build, :state => :runnable) }
+    let(:build) { FactoryGirl.create(:build, :state => 'runnable') }
     before do
       allow(GitRepo).to receive(:load_kochiku_yml).and_return(nil)
     end
@@ -70,7 +70,7 @@ describe BuildPartitioningJob do
                )
         expect { subject }.to raise_error(NameError)
         build.reload
-        expect(build.state).to eq(:errored)
+        expect(build.state).to eq('errored')
         expect(build.error_details[:message]).to eq(error_message)
         expect(build.error_details[:backtrace]).not_to be_blank
       end
@@ -81,7 +81,7 @@ describe BuildPartitioningJob do
 
       it "should re-raise the error and set the build state to waiting for sync" do
         expect { subject }.to raise_error(GitRepo::RefNotFoundError)
-        expect(build.reload.state).to eq(:waiting_for_sync)
+        expect(build.reload.state).to eq('waiting_for_sync')
       end
     end
 

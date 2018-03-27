@@ -88,7 +88,7 @@ class Repository < ActiveRecord::Base
   def ensure_build_exists(sha, branch)
     build = build_for_commit(sha)
     unless build.present?
-      build = branch.builds.create!(ref: sha, state: :partitioning)
+      build = branch.builds.create!(ref: sha, state: 'partitioning')
     end
     build
   end

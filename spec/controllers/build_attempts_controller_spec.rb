@@ -4,7 +4,7 @@ describe BuildAttemptsController do
   describe "#start" do
     it "should set the start time and state of the build attempt" do
       build_attempt = FactoryGirl.create(:build_attempt)
-      expect(build_attempt.state).to eq(:runnable)
+      expect(build_attempt.state).to eq('runnable')
       expect(build_attempt.started_at).to be_nil
       expect(build_attempt.builder).to be_nil
 
@@ -12,7 +12,7 @@ describe BuildAttemptsController do
       expect(response).to be_success
 
       build_attempt.reload
-      expect(build_attempt.state).to eq(:running)
+      expect(build_attempt.state).to eq('running')
       expect(build_attempt.started_at).not_to be_nil
       expect(build_attempt.builder).to eq("build01")
       expect(build_attempt.log_streamer_port).to be_nil
@@ -20,7 +20,7 @@ describe BuildAttemptsController do
 
     it "should set log streamer port if provided" do
       build_attempt = FactoryGirl.create(:build_attempt)
-      expect(build_attempt.state).to eq(:runnable)
+      expect(build_attempt.state).to eq('runnable')
       expect(build_attempt.started_at).to be_nil
       expect(build_attempt.builder).to be_nil
       expect(build_attempt.log_streamer_port).to be_nil
@@ -29,34 +29,34 @@ describe BuildAttemptsController do
       expect(response).to be_success
 
       build_attempt.reload
-      expect(build_attempt.state).to eq(:running)
+      expect(build_attempt.state).to eq('running')
       expect(build_attempt.started_at).not_to be_nil
       expect(build_attempt.builder).to eq("build01")
       expect(build_attempt.log_streamer_port).to eq(10000)
     end
 
     it "should return aborted if the build_attempt is aborted" do
-      build_attempt = FactoryGirl.create(:build_attempt, :state => :aborted)
+      build_attempt = FactoryGirl.create(:build_attempt, :state => 'aborted')
 
       post :start, :id => build_attempt.to_param, :builder => "build01", :format => :json
       expect(response).to be_success
 
       expect(JSON.parse(response.body)["build_attempt"]["state"]).to eq("aborted")
-      expect(build_attempt.reload.state).to eq(:aborted)
+      expect(build_attempt.reload.state).to eq('aborted')
     end
   end
 
   describe "#finish" do
     it "should set the finish time and state of the build attempt" do
       build_attempt = FactoryGirl.create(:build_attempt)
-      expect(build_attempt.state).to eq(:runnable)
+      expect(build_attempt.state).to eq('runnable')
       expect(build_attempt.finished_at).to be_nil
 
       post :finish, :id => build_attempt.to_param, :state => "passed", :format => :json
       expect(response).to be_success
 
       build_attempt.reload
-      expect(build_attempt.state).to eq(:passed)
+      expect(build_attempt.state).to eq('passed')
       expect(build_attempt.finished_at).not_to be_nil
     end
 
@@ -76,7 +76,7 @@ describe BuildAttemptsController do
 
       expect(response.code).to eq("302")
       build_attempt.reload
-      expect(build_attempt.state).to eq(:aborted)
+      expect(build_attempt.state).to eq('aborted')
     end
   end
 
@@ -126,7 +126,7 @@ describe BuildAttemptsController do
         stub_request(:get, "http://worker.example.com:10000/build_attempts/100/log/stdout.log?maxBytes=250000&start=0").to_return(:status => 200, :body => logstreamer_body, :headers => {})
       end
       it "should proxy request from logstreamer and add build attempt state" do
-        build_attempt = FactoryGirl.create(:build_attempt, :log_streamer_port => 10000, :builder => 'worker.example.com', :id => 100, state: :running)
+        build_attempt = FactoryGirl.create(:build_attempt, :log_streamer_port => 10000, :builder => 'worker.example.com', :id => 100, state: 'running')
 
         get :stream_logs_chunk, :id => build_attempt.to_param, :format => :json
         expect(response.code).to eq("200")

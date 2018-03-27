@@ -318,10 +318,6 @@ GEM
       colorize (>= 0.7.0)
       net-scp (>= 1.1.2)
       net-ssh (>= 2.8.0)
-    symbolize (4.5.2)
-      activemodel (>= 3.2, < 5)
-      activesupport (>= 3.2, < 5)
-      i18n
     sysexits (1.2.0)
     therubyracer (0.12.3)
       libv8 (~> 3.16.14.15)
@@ -392,7 +388,6 @@ DEPENDENCIES
   rspec-rails (~> 3.0)
   rubocop
   sass-rails
-  symbolize
   therubyracer
   thin
   uglifier

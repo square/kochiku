@@ -9,7 +9,6 @@ gem 'rails-observers'
 gem 'carrierwave'
 gem 'draper', '~> 2.1'
 gem 'mysql2', '>= 0.4.4'
-gem 'symbolize'
 
 gem 'compass-rails'
 gem 'haml-rails'

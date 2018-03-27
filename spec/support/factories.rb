@@ -19,7 +19,7 @@ FactoryGirl.define do
   end
 
   factory :build do
-    state :partitioning
+    state 'partitioning'
     ref { SecureRandom.hex(20) } # 20 is the length in bytes, resulting string is twice n
     association :branch_record, factory: :branch
 
@@ -28,7 +28,7 @@ FactoryGirl.define do
     end
 
     factory :completed_build do
-      state [:failed, :succeeded].sample
+      state ['failed', 'succeeded'].sample
 
       # specify num_build_parts on the factory to create a build with more than 1 build_part
       transient do
@@ -46,10 +46,10 @@ FactoryGirl.define do
   end
 
   factory :build_part do
-    association :build_instance, :factory => :build, :state => :runnable
+    association :build_instance, :factory => :build, :state => 'runnable'
     kind :test
     paths ["/foo/1.test", "foo/baz/a.test", "foo/baz/b.test"]
-    queue :ci
+    queue 'ci'
 
     factory :build_part_with_build_attempt do
       after(:create) do |build_part, evaluator|
@@ -60,16 +60,16 @@ FactoryGirl.define do
 
   factory :build_attempt do
     build_part
-    state :runnable
+    state 'runnable'
 
     factory :completed_build_attempt do
-      state { build_part.build_instance.state == :succeeded ? :passed : :failed }
+      state { build_part.build_instance.state == 'succeeded' ? 'passed' : 'failed' }
       finished_at { Time.current }
     end
   end
 
   factory :build_artifact do
-    association :build_attempt, :state => :failed
+    association :build_attempt, :state => 'failed'
     log_file File.open(FIXTURE_PATH + "build_artifact.log")
 
     factory :stdout_build_artifact do

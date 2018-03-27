@@ -51,7 +51,7 @@ class BranchesController < ApplicationController
       flash[:warn] = "Did not find a new commit on the #{@branch.name} branch to build"
       redirect_to repository_branch_path(@repository, @branch)
     else
-      build = @branch.builds.build(ref: ref, state: :partitioning)
+      build = @branch.builds.build(ref: ref, state: 'partitioning')
 
       if build.save
         flash[:message] = "New build started for #{build.ref} on #{@branch.name}"

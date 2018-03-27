@@ -46,10 +46,10 @@ describe PullRequestsController do
         end
 
         it "does not build if there is already a ci build in progress" do
-          master_branch.builds.create!(:ref => to_40('w'), :state => :succeeded)
+          master_branch.builds.create!(:ref => to_40('w'), :state => 'succeeded')
           frozen_time = 3.seconds.from_now
           allow(Time).to receive(:now).and_return(frozen_time)
-          master_branch.builds.create!(:ref => to_40('y'), :state => :partitioning)
+          master_branch.builds.create!(:ref => to_40('y'), :state => 'partitioning')
           expect {
             post :build, push_payload
             expect(response).to be_success
@@ -64,7 +64,7 @@ describe PullRequestsController do
         end
 
         it "builds if there is completed ci build" do
-          master_branch.builds.create!(:ref => to_40('w'), :state => :succeeded)
+          master_branch.builds.create!(:ref => to_40('w'), :state => 'succeeded')
           expect {
             post :build, push_payload
             expect(response).to be_success
@@ -72,10 +72,10 @@ describe PullRequestsController do
         end
 
         it "builds if there is a completed ci build after a build that is still building" do
-          master_branch.builds.create!(:ref => to_40('w'), :state => :partitioning)
+          master_branch.builds.create!(:ref => to_40('w'), :state => 'partitioning')
           frozen_time = 3.seconds.from_now
           allow(Time).to receive(:now).and_return(frozen_time)
-          master_branch.builds.create!(:ref => to_40('y'), :state => :succeeded)
+          master_branch.builds.create!(:ref => to_40('y'), :state => 'succeeded')
           expect {
             post :build, push_payload
             expect(response).to be_success

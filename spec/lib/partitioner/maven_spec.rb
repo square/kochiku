@@ -176,7 +176,7 @@ describe Partitioner::Maven do
 
         it "should not add all successful parts from the previous build" do
           build_part = FactoryGirl.create(:build_part, :build_instance => build, :paths => ["module-one"])
-          FactoryGirl.create(:build_attempt, :build_part => build_part, :state => :passed)
+          FactoryGirl.create(:build_attempt, :build_part => build_part, :state => 'passed')
           expect(build.build_parts.first).to be_successful
 
           partitions = subject.partitions
@@ -305,7 +305,7 @@ describe Partitioner::Maven do
     context "with a module that failed to build" do
       before do
         build_part = FactoryGirl.create(:build_part, :paths => ["failed-module"], :build_instance => build)
-        FactoryGirl.create(:build_attempt, :state => :failed, :build_part => build_part)
+        FactoryGirl.create(:build_attempt, :state => 'failed', :build_part => build_part)
         expect(build.build_parts.failed_or_errored).to eq([build_part])
 
         allow(GitRepo).to receive(:inside_copy).and_yield

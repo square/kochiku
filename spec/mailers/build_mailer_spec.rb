@@ -10,7 +10,7 @@ describe BuildMailer do
     end
 
     it "sends the email" do
-      build_attempt = FactoryGirl.build(:build_attempt, :state => :errored, :builder => "test-builder")
+      build_attempt = FactoryGirl.build(:build_attempt, :state => 'errored', :builder => "test-builder")
 
       email = BuildMailer.error_email(build_attempt, "error text")
 
@@ -37,8 +37,8 @@ describe BuildMailer do
       allow(partitioner).to receive(:emails_for_commits_causing_failures).and_return({})
       allow(Partitioner).to receive(:for_build).and_return(partitioner)
 
-      build_part = build.build_parts.create!(:paths => ["a", "b"], :kind => "cucumber", :queue => :ci)
-      @build_attempt = build_part.build_attempts.create!(:state => :failed, :builder => "test-builder")
+      build_part = build.build_parts.create!(:paths => ["a", "b"], :kind => "cucumber", :queue => 'ci')
+      @build_attempt = build_part.build_attempts.create!(:state => 'failed', :builder => "test-builder")
       FactoryGirl.create(:stdout_build_artifact, build_attempt: @build_attempt)
     end
 
@@ -108,8 +108,8 @@ describe BuildMailer do
         end
 
         it "includes link to PR" do
-          build_part = build.build_parts.create!(:paths => ["a", "b"], :kind => "cucumber", :queue => :ci)
-          build_part.build_attempts.create!(:state => :passed, :builder => "test-builder")
+          build_part = build.build_parts.create!(:paths => ["a", "b"], :kind => "cucumber", :queue => 'ci')
+          build_part.build_attempts.create!(:state => 'passed', :builder => "test-builder")
 
           email = BuildMailer.build_break_email(build)
           expect(email.html_part.body).to include("pull-requests/3/overview")
@@ -148,8 +148,8 @@ describe BuildMailer do
       allow(GitBlame).to receive(:changes_in_branch).and_return([{hash: "sha", author: "Joe", date: "some day", message: "always be shipping it"}])
       allow(GitBlame).to receive(:last_email_in_branch).and_return(["foo@example.com"])
 
-      build_part = build.build_parts.create!(paths: ["a", "b"], kind: "cucumber", queue: :ci)
-      build_part.build_attempts.create!(state: :passed, builder: "test-builder")
+      build_part = build.build_parts.create!(paths: ["a", "b"], kind: "cucumber", queue: 'ci')
+      build_part.build_attempts.create!(state: 'passed', builder: "test-builder")
     end
 
     it "sends an email" do

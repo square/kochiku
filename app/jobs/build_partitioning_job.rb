@@ -17,7 +17,7 @@ class BuildPartitioningJob < JobBase
   def perform
     if @build.test_command.blank?
       error_message = "No test_command specified in kochiku.yml."
-      @build.update!(:error_details => { :message => error_message, :backtrace => nil }, :state => :errored)
+      @build.update!(:error_details => { :message => error_message, :backtrace => nil }, :state => 'errored')
       @build.update_commit_status!
       return
     end
@@ -30,7 +30,7 @@ class BuildPartitioningJob < JobBase
       @build.update_attributes!(:state => :waiting_for_sync)
     else
       @build.update_attributes!(
-        :state => :errored,
+        :state => 'errored',
         :error_details => { :message => e.to_s, :backtrace => e.backtrace.join("\n") }
       )
       @build.update_commit_status!

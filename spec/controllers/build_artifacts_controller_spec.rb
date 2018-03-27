@@ -3,8 +3,8 @@ require 'spec_helper'
 describe BuildArtifactsController do
   describe "#create" do
     let(:build) { FactoryGirl.create(:build) }
-    let(:build_part) { build.build_parts.create!(:paths => ["a"], :kind => "test", :queue => :ci) }
-    let(:build_attempt) { build_part.build_attempts.create!(:state => :failed) }
+    let(:build_part) { build.build_parts.create!(:paths => ["a"], :kind => "test", :queue => 'ci') }
+    let(:build_attempt) { build_part.build_attempts.create!(:state => 'failed') }
     let(:log_file) { fixture_file_upload("/build_artifact.log", 'text/xml') }
 
     it "should create a build artifact for the build attempt" do

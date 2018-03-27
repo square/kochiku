@@ -24,23 +24,23 @@ describe ApplicationHelper do
 
   describe "#build_success_in_words" do
 
-    it "should return success when state = :succeeded" do
-      @build.state = :succeeded
+    it "should return success when state = 'succeeded'" do
+      @build.state = 'succeeded'
       expect(build_success_in_words(@build)).to eq('success')
     end
 
-    it "should return failed when state = :errored" do
-      @build.state = :errored
+    it "should return failed when state = 'errored'" do
+      @build.state = 'errored'
       expect(build_success_in_words(@build)).to eq('failed')
     end
 
-    it "should return failed when state = :doomed" do
-      @build.state = :doomed
+    it "should return failed when state = 'doomed'" do
+      @build.state = 'doomed'
       expect(build_success_in_words(@build)).to eq('failed')
     end
 
     it "should return state otherwise" do
-      @build.state = :partitioning
+      @build.state = 'partitioning'
       expect(build_success_in_words(@build)).to eq('partitioning')
     end
   end

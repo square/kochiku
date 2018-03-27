@@ -234,7 +234,7 @@ describe Repository do
 
       expect(build1.branch_record).to eq(branch)
       expect(build1.ref).to eq(sha)
-      expect(build1.state).to eq(:partitioning)
+      expect(build1.state).to eq('partitioning')
     end
   end
 end
