@@ -112,7 +112,8 @@ class BuildsController < ApplicationController
   end
 
   def build_status
-    @build = Build.joins(:branch_record).where('branches.repository_id' => @repository.id).find(params[:id])
+    @build = @repository ? @repository.builds.find(params[:id]) : Build.find(params[:id])
+
     respond_to do |format|
       format.json do
         render :json => @build
@@ -144,8 +145,10 @@ class BuildsController < ApplicationController
   private
 
   def load_repository
-    r_namespace, r_name = params[:repository_path].split('/')
-    @repository = Repository.where(namespace: r_namespace, name: r_name).first!
+    if params[:repository_path]
+      r_namespace, r_name = params[:repository_path].split('/')
+      @repository = Repository.where(namespace: r_namespace, name: r_name).first!
+    end
   end
 
   def format_build_parts_position
