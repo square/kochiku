@@ -13,7 +13,7 @@ class Branch < ActiveRecord::Base
     if last_build && !last_build.completed?
       last_build
     else
-      builds.create_with(state: :partitioning).find_or_create_by!(ref: ref)
+      builds.create_with(state: 'partitioning').find_or_create_by!(ref: ref)
     end
   end
 

@@ -18,17 +18,17 @@ describe Repository do
 
   describe '.lookup_by_url' do
     it 'should return the Repository (straightforward)' do
-      repo = FactoryGirl.create(:repository)
+      repo = FactoryBot.create(:repository)
       expect(Repository.lookup_by_url(repo.url)).to eq(repo)
     end
 
     it 'should return the Repository when a host alias is used during creation' do
-      repo = FactoryGirl.create(:repository, url: "git@git-alias.example.com:square/some-repo.git")
+      repo = FactoryBot.create(:repository, url: "git@git-alias.example.com:square/some-repo.git")
       expect(Repository.lookup_by_url("git@git.example.com:square/some-repo.git")).to eq(repo)
     end
 
     it 'should return the Repository when a host alias is used during lookup' do
-      repo = FactoryGirl.create(:repository, url: "git@git.example.com:square/some-repo.git")
+      repo = FactoryBot.create(:repository, url: "git@git.example.com:square/some-repo.git")
       expect(Repository.lookup_by_url("git@git-alias.example.com:square/some-repo.git")).to eq(repo)
     end
 
@@ -95,7 +95,7 @@ describe Repository do
 
     context "name" do
       before do
-        @repo1 = FactoryGirl.create(:repository, url: "git@git.example.com:kansas/kansas-city.git")
+        @repo1 = FactoryBot.create(:repository, url: "git@git.example.com:kansas/kansas-city.git")
       end
 
       it "should allow two repositories with the same name from different namespaces" do
@@ -168,7 +168,7 @@ describe Repository do
 
   context "#run_ci=" do
     it "converts the checkbox to bool" do
-      repository = FactoryGirl.create(:repository)
+      repository = FactoryBot.create(:repository)
       repository.run_ci = "1"
       repository.save
       repository.reload
@@ -182,7 +182,7 @@ describe Repository do
 
   context "#build_pull_requests=" do
     it "converts the checkbox to bool" do
-      repository = FactoryGirl.create(:repository)
+      repository = FactoryBot.create(:repository)
       repository.build_pull_requests = "1"
       repository.save
       repository.reload
@@ -195,7 +195,7 @@ describe Repository do
   end
 
   it "saves build tags" do
-    repository = FactoryGirl.create(:repository)
+    repository = FactoryBot.create(:repository)
     repository.on_green_update = "1,2,3"
     repository.save
     repository.reload
@@ -203,26 +203,26 @@ describe Repository do
   end
 
   describe '#build_for_commit' do
-    let!(:repositoryA) { FactoryGirl.create(:repository) }
-    let!(:repositoryB) { FactoryGirl.create(:repository) }
-    let!(:branchA1) { FactoryGirl.create(:branch, repository: repositoryA) }
-    let!(:branchB1) { FactoryGirl.create(:branch, repository: repositoryB) }
+    let!(:repositoryA) { FactoryBot.create(:repository) }
+    let!(:repositoryB) { FactoryBot.create(:repository) }
+    let!(:branchA1) { FactoryBot.create(:branch, repository: repositoryA) }
+    let!(:branchB1) { FactoryBot.create(:branch, repository: repositoryB) }
     let(:sha) { to_40('a') }
 
     it "should return the build associated with the repository" do
-      buildA1 = FactoryGirl.create(:build, branch_record: branchA1, ref: sha)
+      buildA1 = FactoryBot.create(:build, branch_record: branchA1, ref: sha)
       expect(repositoryA.build_for_commit(sha)).to eq(buildA1)
       expect(repositoryB.build_for_commit(sha)).to be_nil
 
-      buildB1 = FactoryGirl.create(:build, branch_record: branchB1, ref: sha)
+      buildB1 = FactoryBot.create(:build, branch_record: branchB1, ref: sha)
       expect(repositoryA.build_for_commit(sha)).to eq(buildA1)
       expect(repositoryB.build_for_commit(sha)).to eq(buildB1)
     end
   end
 
   describe '#ensure_build_exists' do
-    let(:repository) { FactoryGirl.create(:repository) }
-    let(:branch) { FactoryGirl.create(:branch, repository: repository) }
+    let(:repository) { FactoryBot.create(:repository) }
+    let(:branch) { FactoryBot.create(:branch, repository: repository) }
 
     it 'creates a new build only if one does not exist' do
       sha = to_40('abcdef')
@@ -234,7 +234,7 @@ describe Repository do
 
       expect(build1.branch_record).to eq(branch)
       expect(build1.ref).to eq(sha)
-      expect(build1.state).to eq(:partitioning)
+      expect(build1.state).to eq('partitioning')
     end
   end
 end

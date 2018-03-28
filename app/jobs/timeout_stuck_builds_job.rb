@@ -17,15 +17,15 @@ class TimeoutStuckBuildsJob < JobBase
                   missing += attempts.reject { |attempt| current_queue.match(/build_attempt_id\\*\"\:#{attempt.id}[^0-9]/) }
                 end
 
-    missing.select! { |build_attempt_partial| BuildAttempt.find(build_attempt_partial.id).state == :runnable }
-    missing.each { |build_attempt_partial| BuildAttempt.find(build_attempt_partial.id).finish!(:errored) }
+    missing.select! { |build_attempt_partial| BuildAttempt.find(build_attempt_partial.id).state == 'runnable' }
+    missing.each { |build_attempt_partial| BuildAttempt.find(build_attempt_partial.id).finish!('errored') }
   end
 
   def self.clean_lost_builds
     # check for builds that have hit their assume_lost_after
     Repository.where("assume_lost_after IS NOT NULL").find_each do |repo|
       repo.build_attempts.where("build_attempts.state = 'running' AND build_attempts.started_at < ?", repo.assume_lost_after.minutes.ago).each do |build_attempt|
-        build_attempt.finish!(:errored)
+        build_attempt.finish!('errored')
       end
     end
   end

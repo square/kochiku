@@ -1,15 +1,15 @@
 require 'spec_helper'
 
 describe BuildStateUpdateJob do
-  let(:repository) { FactoryGirl.create(:repository, url: 'git@github.com:square/test-repo.git') }
-  let(:branch) { FactoryGirl.create(:branch, :repository => repository) }
-  let(:build) { FactoryGirl.create(:build, :state => :runnable, :branch_record => branch) }
+  let(:repository) { FactoryBot.create(:repository, url: 'git@github.com:square/test-repo.git') }
+  let(:branch) { FactoryBot.create(:branch, :repository => repository) }
+  let(:build) { FactoryBot.create(:build, :state => 'runnable', :branch_record => branch) }
   let(:name) { repository.name + "_pull_requests" }
   let(:current_repo_master) { build.ref }
 
   before do
-    build.build_parts.create!(:kind => :spec, :paths => ["foo", "bar"], :queue => :ci)
-    build.build_parts.create!(:kind => :cucumber, :paths => ["baz"], :queue => :ci)
+    build.build_parts.create!(:kind => :spec, :paths => ["foo", "bar"], :queue => 'ci')
+    build.build_parts.create!(:kind => :cucumber, :paths => ["baz"], :queue => 'ci')
     # TODO: This is terrible, need to fold this feedback back into the design.
     # We are stubbing methods that are not called from the class under test.
     allow(GitRepo).to receive(:load_kochiku_yml).and_return(nil)
@@ -42,8 +42,8 @@ describe BuildStateUpdateJob do
       BuildStateUpdateJob.perform(build.id)
 
       build.build_parts.each do |part|
-        build_attempt = part.build_attempts.create!(:state => :running)
-        build_attempt.finish!(:passed)
+        build_attempt = part.build_attempts.create!(:state => 'running')
+        build_attempt.finish!('passed')
       end
 
       expect(GithubRequest).to receive(:post)
@@ -58,9 +58,9 @@ describe BuildStateUpdateJob do
     context "when a build part is still in progress" do
       it "does not kick off a new build unless finished" do
         (build.build_parts - [build.build_parts.last]).each do |part|
-          part.build_attempts.create!(state: :passed)
+          part.build_attempts.create!(state: 'passed')
         end
-        build.build_parts.last.build_attempts.create!(state: :running)
+        build.build_parts.last.build_attempts.create!(state: 'running')
         build.update_state_from_parts!
 
         expect {
@@ -72,7 +72,7 @@ describe BuildStateUpdateJob do
     context "when all parts have passed" do
       before do
         build.build_parts.each do |part|
-          part.build_attempts.create!(state: :passed)
+          part.build_attempts.create!(state: 'passed')
         end
         build.update_state_from_parts!
       end
@@ -86,7 +86,7 @@ describe BuildStateUpdateJob do
         end
 
         context "with a build on a convergence branch" do
-          let(:branch) { FactoryGirl.create(:convergence_branch, repository: repository) }
+          let(:branch) { FactoryBot.create(:convergence_branch, repository: repository) }
 
           it "should promote the build" do
             expect(BuildStrategy).to receive(:promote_build).with(build)
@@ -111,14 +111,14 @@ describe BuildStateUpdateJob do
             end
 
             it "does not kick off a new build if one is already running" do
-              branch.builds.create!(ref: 'some-other-sha-1111111111111111111111111', state: :partitioning)
+              branch.builds.create!(ref: 'some-other-sha-1111111111111111111111111', state: 'partitioning')
               expect { subject }.to_not change(branch.builds, :count)
             end
 
             it "does not roll back a build's state" do
-              new_build = branch.builds.create!(ref: current_repo_master, state: :failed)
+              new_build = branch.builds.create!(ref: current_repo_master, state: 'failed')
               expect { subject }.to_not change(branch.builds, :count)
-              expect(new_build.reload.state).to eq(:failed)
+              expect(new_build.reload.state).to eq('failed')
             end
           end
 
@@ -138,7 +138,7 @@ describe BuildStateUpdateJob do
     end
 
     context "when there is a success script" do
-      let(:build) { FactoryGirl.create(:build, state: :succeeded, branch_record: branch) }
+      let(:build) { FactoryBot.create(:build, state: 'succeeded', branch_record: branch) }
 
       before do
         kochiku_yaml_config = { 'on_success_script' => 'echo hip hip hooray' }
@@ -164,7 +164,7 @@ describe BuildStateUpdateJob do
     end
 
     context "where this is no success script" do
-      let(:build) { FactoryGirl.create(:build, state: :succeeded, branch_record: branch) }
+      let(:build) { FactoryBot.create(:build, state: 'succeeded', branch_record: branch) }
 
       before do
         kochiku_yaml_config = { }
@@ -179,7 +179,7 @@ describe BuildStateUpdateJob do
 
     context "when a part has failed but some are still running" do
       before do
-        build.build_parts.first.build_attempts.create!(:state => :failed)
+        build.build_parts.first.build_attempts.create!(:state => 'failed')
         build.update_state_from_parts!
       end
 
@@ -189,12 +189,12 @@ describe BuildStateUpdateJob do
     context "when all parts have run and some have failed" do
       before do
         (build.build_parts - [build.build_parts.first]).each do |part|
-          ba = part.build_attempts.create!(:state => :passed)
-          FactoryGirl.create(:stdout_build_artifact, build_attempt: ba)
+          ba = part.build_attempts.create!(:state => 'passed')
+          FactoryBot.create(:stdout_build_artifact, build_attempt: ba)
         end
 
-        failed_build_attempt = build.build_parts.first.build_attempts.create!(:state => :failed)
-        FactoryGirl.create(:stdout_build_artifact, build_attempt: failed_build_attempt)
+        failed_build_attempt = build.build_parts.first.build_attempts.create!(:state => 'failed')
+        FactoryBot.create(:stdout_build_artifact, build_attempt: failed_build_attempt)
 
         build.update_state_from_parts!
       end

@@ -5,7 +5,7 @@ require 'rspec/rails'
 require 'rspec/collection_matchers'
 require 'webmock/rspec'
 require 'nokogiri'
-require 'factory_girl'
+require 'factory_bot'
 require 'capybara/rspec'
 require 'git_blame'
 
@@ -58,6 +58,7 @@ RSpec.configure do |config|
   config.before :each do
     WebMock.disable_net_connect!
     allow(JobBase).to receive(:enqueue_in)
+    allow_any_instance_of(Build).to receive(:ensure_initiated_by).and_return(nil)
 
     allow(GitBlame).to receive(:git_names_and_emails_since_last_green).and_return("")
     allow(GitBlame).to receive(:git_names_and_emails_in_branch).and_return("")

@@ -3,7 +3,7 @@ require 'spec_helper'
 describe GithubCommitStatus do
   subject { GithubCommitStatus.new(build, oauth_token) }
   let(:oauth_token) { "my_test_token" }
-  let(:build) { FactoryGirl.create(:build) }
+  let(:build) { FactoryBot.create(:build) }
 
   before do
     settings = SettingsAccessor.new(<<-YAML)
@@ -17,7 +17,7 @@ describe GithubCommitStatus do
   end
 
   it "marks a build as pending" do
-    build.update_attributes!(:state => :running)
+    build.update_attributes!(:state => 'running')
     expect(GithubRequest).to receive(:post)
       .with(%r|/statuses/#{build.ref}|,
             hash_including(:state => 'pending'),
@@ -27,7 +27,7 @@ describe GithubCommitStatus do
   end
 
   it "marks a build as success" do
-    build.update_attributes!(:state => :succeeded)
+    build.update_attributes!(:state => 'succeeded')
     expect(GithubRequest).to receive(:post)
       .with(%r|/statuses/#{build.ref}|,
             hash_including(:state => 'success'),
@@ -37,7 +37,7 @@ describe GithubCommitStatus do
   end
 
   it "marks a build as failure" do
-    build.update_attributes!(:state => :failed)
+    build.update_attributes!(:state => 'failed')
     expect(GithubRequest).to receive(:post)
       .with(%r|/statuses/#{build.ref}|,
             hash_including(:state => 'failure'),
@@ -47,8 +47,9 @@ describe GithubCommitStatus do
   end
 
   it "uses a repos github url" do
-    build.branch_record.update_attributes!(:repository => FactoryGirl.create(:repository, :url => "git@github.com:square/kochiku-worker.git"))
-    build.update_attributes!(:state => :failed)
+    build.branch_record.update_attributes!(:repository => FactoryBot.create(:repository, :url => "git@github.com:square/kochiku-worker.git"))
+    build.update_attributes!(:state => 'failed')
+    build.reload
     expect(GithubRequest).to receive(:post)
       .with("https://api.github.com/repos/square/kochiku-worker/statuses/#{build.ref}",
             anything, anything).and_return(commit_status_response)

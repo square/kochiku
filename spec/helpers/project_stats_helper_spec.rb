@@ -7,7 +7,7 @@ describe ProjectStatsHelper do
 
   def create_some_builds_with_build_attempts(count)
     count.times do
-      ba = FactoryGirl.create(:build_attempt, :state => :passed)
+      ba = FactoryBot.create(:build_attempt, :state => 'passed')
       ba.build_instance.update_state_from_parts!
       @builds << ba.build_instance
     end
@@ -25,7 +25,7 @@ describe ProjectStatsHelper do
     context "when some parts failed before passing" do
       before do
         create_some_builds_with_build_attempts(3)
-        FactoryGirl.create(:build_attempt, :state => :failed, :build_part => @builds.first.build_parts.first)
+        FactoryBot.create(:build_attempt, :state => 'failed', :build_part => @builds.first.build_parts.first)
       end
       it { should == '67%' }
     end
@@ -33,7 +33,7 @@ describe ProjectStatsHelper do
     context "when not all parts ever passed" do
       before do
         create_some_builds_with_build_attempts(2)
-        @builds.first.update_attributes! :state => :failed
+        @builds.first.update_attributes! :state => 'failed'
       end
       it { should == '50%' }
     end
@@ -41,7 +41,7 @@ describe ProjectStatsHelper do
     context "when the latest build part is running" do
       before do
         create_some_builds_with_build_attempts(3)
-        @builds.last.update_attribute(:state, :running)
+        @builds.last.update_attribute(:state, 'running')
       end
 
       it "should not count running build" do
@@ -63,8 +63,8 @@ describe ProjectStatsHelper do
       before do
         create_some_builds_with_build_attempts(1)
 
-        failed_first = FactoryGirl.create(:build_attempt, :state => :failed)
-        FactoryGirl.create(:build_attempt, :state => :passed, :build_part => failed_first.build_part)
+        failed_first = FactoryBot.create(:build_attempt, :state => 'failed')
+        FactoryBot.create(:build_attempt, :state => 'passed', :build_part => failed_first.build_part)
         failed_first.build_instance.update_state_from_parts!
         @builds << failed_first.build_instance
       end
@@ -73,8 +73,8 @@ describe ProjectStatsHelper do
 
     context "when not all parts ever passed" do
       before do
-        never_passed = FactoryGirl.create(:build_attempt, :state => :failed)
-        FactoryGirl.create(:build_attempt, :state => :failed, :build_part => never_passed.build_part)
+        never_passed = FactoryBot.create(:build_attempt, :state => 'failed')
+        FactoryBot.create(:build_attempt, :state => 'failed', :build_part => never_passed.build_part)
         never_passed.build_instance.update_state_from_parts!
         @builds << never_passed.build_instance
 
@@ -108,14 +108,14 @@ describe ProjectStatsHelper do
 
     before do
       # setup test with successful two builds containing varying build attempts
-      ba = FactoryGirl.create(:build_attempt, :state => :errored)
-      FactoryGirl.create(:build_attempt, :state => :failed, :build_part => ba.build_part)
-      FactoryGirl.create(:build_attempt, :state => :passed, :build_part => ba.build_part)
+      ba = FactoryBot.create(:build_attempt, :state => 'errored')
+      FactoryBot.create(:build_attempt, :state => 'failed', :build_part => ba.build_part)
+      FactoryBot.create(:build_attempt, :state => 'passed', :build_part => ba.build_part)
       ba.build_instance.update_state_from_parts!
       @builds << ba.build_instance
 
-      ba = FactoryGirl.create(:build_attempt, :state => :failed)
-      FactoryGirl.create(:build_attempt, :state => :passed, :build_part => ba.build_part)
+      ba = FactoryBot.create(:build_attempt, :state => 'failed')
+      FactoryBot.create(:build_attempt, :state => 'passed', :build_part => ba.build_part)
       ba.build_instance.update_state_from_parts!
       @builds << ba.build_instance
     end
@@ -124,7 +124,7 @@ describe ProjectStatsHelper do
 
     context 'when there is an unsuccessful build' do
       before do
-        ba = FactoryGirl.create(:build_attempt, :state => :errored)
+        ba = FactoryBot.create(:build_attempt, :state => 'errored')
         ba.build_instance.update_state_from_parts!
         @builds << ba.build_instance
       end
@@ -140,9 +140,9 @@ describe ProjectStatsHelper do
 
     before do
       5.times do |i|
-        @builds << build = FactoryGirl.create(:build, :state => :succeeded, :created_at => (10 + 5 * i).minutes.ago)
-        build_part = FactoryGirl.create(:build_part, :build_instance => build)
-        FactoryGirl.create(:build_attempt, :build_part => build_part, :finished_at => build.created_at + (3 * i).minutes)
+        @builds << build = FactoryBot.create(:build, :state => 'succeeded', :created_at => (10 + 5 * i).minutes.ago)
+        build_part = FactoryBot.create(:build_part, :build_instance => build)
+        FactoryBot.create(:build_attempt, :build_part => build_part, :finished_at => build.created_at + (3 * i).minutes)
       end
     end
 
@@ -150,7 +150,7 @@ describe ProjectStatsHelper do
 
     context 'when there is an unsuccessful build' do
       before do
-        ba = FactoryGirl.create(:build_attempt, :state => :errored)
+        ba = FactoryBot.create(:build_attempt, :state => 'errored')
         ba.build_instance.update_state_from_parts!
         @builds << ba.build_instance
       end
@@ -162,9 +162,9 @@ describe ProjectStatsHelper do
 
     context 'when there is an even number of builds' do
       before do
-        @builds << build = FactoryGirl.create(:build, :state => :succeeded, :created_at => 45.minutes.ago)
-        build_part = FactoryGirl.create(:build_part, :build_instance => build)
-        FactoryGirl.create(:build_attempt, :build_part => build_part, :finished_at => build.created_at + 17.minutes)
+        @builds << build = FactoryBot.create(:build, :state => 'succeeded', :created_at => 45.minutes.ago)
+        build_part = FactoryBot.create(:build_part, :build_instance => build)
+        FactoryBot.create(:build_attempt, :build_part => build_part, :finished_at => build.created_at + 17.minutes)
       end
 
       it 'should average the middle two' do

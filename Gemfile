@@ -1,15 +1,18 @@
 source 'https://rubygems.org'
 
-gem 'actionpack-action_caching'
+gem 'actionpack-action_caching', '> 1.1.1'
+
+gem 'activemodel-serializers-xml' # required for xml serialization
+gem 'rails-controller-testing' # Included to provide 'assigns' method
+
 gem 'dynamic_form'
 gem 'passenger', '~> 4.0.41', group: :production
-gem 'rails', '~> 4.2.7'
+gem 'rails', '= 5.0.6'
 gem 'rails-observers'
 
 gem 'carrierwave'
-gem 'draper', '~> 2.1'
+gem 'draper', '~> 3.0.1'
 gem 'mysql2', '>= 0.4.4'
-gem 'symbolize'
 
 gem 'compass-rails'
 gem 'haml-rails'
@@ -41,7 +44,7 @@ gem 'pry-byebug'
 gem 'pry-rails'
 
 group :test, :development do
-  gem 'factory_girl_rails'
+  gem 'factory_bot_rails'
   gem 'haml_lint', require: false
   gem 'rspec-collection_matchers'
   gem 'rspec-rails', '~> 3.0'
@@ -54,7 +57,6 @@ group :development do
   gem 'capistrano-bundler', '~> 1.1', require: false
   gem 'capistrano-rails', '~> 1.1', require: false
   gem 'capistrano-rvm', '~> 0.1', require: false
-  gem 'quiet_assets'
   gem 'rails-erd'
   gem 'thin'
 end

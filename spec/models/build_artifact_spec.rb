@@ -10,8 +10,8 @@ describe BuildArtifact do
   end
 
   describe "stdout_log scope" do
-    let!(:artifact) { FactoryGirl.create :build_artifact }
-    let!(:stdout_artifact) { FactoryGirl.create :build_artifact, :log_file => File.open(FIXTURE_PATH + 'stdout.log.gz') }
+    let!(:artifact) { FactoryBot.create :build_artifact }
+    let!(:stdout_artifact) { FactoryBot.create :build_artifact, :log_file => File.open(FIXTURE_PATH + 'stdout.log.gz') }
 
     subject { BuildArtifact.stdout_log }
 

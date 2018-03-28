@@ -11,9 +11,9 @@ module ApplicationHelper
 
   def build_success_in_words(build)
     case build.state
-    when :succeeded
+    when 'succeeded'
       'success'
-    when :errored, :doomed
+    when 'errored', 'doomed'
       'failed'
     else
       build.state.to_s
@@ -24,9 +24,9 @@ module ApplicationHelper
     return "Unknown" unless build.is_a?(Build)
 
     case build.state
-    when :partitioning, :runnable, :running
+    when 'partitioning', 'runnable', 'running'
       "Building"
-    when :doomed, :failed, :succeeded, :errored
+    when 'doomed', 'failed', 'succeeded', 'errored'
       "CheckingModifications"
     end
   end

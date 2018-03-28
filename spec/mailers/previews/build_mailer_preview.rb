@@ -70,10 +70,10 @@ end
 
 class BuildMailerPreview < ActionMailer::Preview
   def build_break_email
-    BuildMailer.build_break_email(Build.where(:state => :errored).first)
+    BuildMailer.build_break_email(Build.where(:state => 'errored').first)
   end
 
   def build_success_email
-    BuildMailer.build_success_email(Build.where(:state => :succeeded).first)
+    BuildMailer.build_success_email(Build.where(:state => 'succeeded').first)
   end
 end

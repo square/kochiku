@@ -46,6 +46,9 @@ Kochiku::Application.configure do
   # number of complex assets.
   config.assets.debug = true
 
+  # suppress output of asset requests. Formerly handled by quiet_assets gem
+  config.assets.quiet = true
+
   # Generate digests for assets URLs
   # config.assets.digest = false
 

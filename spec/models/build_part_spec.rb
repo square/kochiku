@@ -1,10 +1,10 @@
 require 'spec_helper'
 
 describe BuildPart do
-  let(:repository) { FactoryGirl.create(:repository) }
-  let(:branch) { FactoryGirl.create(:branch, :repository => repository) }
-  let(:build) { FactoryGirl.create(:build, branch_record: branch, state: :runnable, created_at: 5.minutes.ago, updated_at: 5.minutes.ago) }
-  let(:build_part) { FactoryGirl.create(:build_part, :paths => ["a", "b"], :kind => "spec", :build_instance => build, :queue => 'ci') }
+  let(:repository) { FactoryBot.create(:repository) }
+  let(:branch) { FactoryBot.create(:branch, :repository => repository) }
+  let(:build) { FactoryBot.create(:build, branch_record: branch, state: 'runnable', created_at: 5.minutes.ago, updated_at: 5.minutes.ago) }
+  let(:build_part) { FactoryBot.create(:build_part, :paths => ["a", "b"], :kind => "spec", :build_instance => build, :queue => 'ci') }
 
   before do
     allow(GitRepo).to receive(:load_kochiku_yml).and_return(nil)
@@ -51,7 +51,7 @@ describe BuildPart do
   end
 
   describe "#job_args" do
-    let(:repository) { FactoryGirl.create(:repository, :url => "git@github.com:org/test-repo.git") }
+    let(:repository) { FactoryBot.create(:repository, :url => "git@github.com:org/test-repo.git") }
 
     context "with a git mirror specified" do
       before do
@@ -65,7 +65,7 @@ describe BuildPart do
       end
 
       it "should substitute the mirror" do
-        build_attempt = build_part.build_attempts.create!(:state => :runnable)
+        build_attempt = build_part.build_attempts.create!(:state => 'runnable')
         args = build_part.job_args(build_attempt)
         expect(args["repo_url"]).to eq("git://git-mirror.example.com/org/test-repo.git")
       end
@@ -82,7 +82,7 @@ describe BuildPart do
       end
 
       it "should return the original git url" do
-        build_attempt = build_part.build_attempts.create!(:state => :runnable)
+        build_attempt = build_part.build_attempts.create!(:state => 'runnable')
         args = build_part.job_args(build_attempt)
         expect(args["repo_url"]).to eq(repository.url)
       end
@@ -94,7 +94,7 @@ describe BuildPart do
 
     context "with all successful attempts" do
       before do
-        2.times { FactoryGirl.create(:build_attempt, :build_part => build_part, :state => :passed) }
+        2.times { FactoryBot.create(:build_attempt, :build_part => build_part, :state => 'passed') }
       end
 
       it { should be false }
@@ -102,8 +102,8 @@ describe BuildPart do
 
     context "with one successful attempt" do
       before {
-        2.times { FactoryGirl.create(:build_attempt, :build_part => build_part, :state => :failed) }
-        FactoryGirl.create(:build_attempt, :build_part => build_part, :state => :passed)
+        2.times { FactoryBot.create(:build_attempt, :build_part => build_part, :state => 'failed') }
+        FactoryBot.create(:build_attempt, :build_part => build_part, :state => 'passed')
       }
 
       it { should be false }
@@ -111,7 +111,7 @@ describe BuildPart do
 
     context "with all unsuccessful attempts" do
       before do
-        2.times { FactoryGirl.create(:build_attempt, :build_part => build_part, :state => :failed) }
+        2.times { FactoryBot.create(:build_attempt, :build_part => build_part, :state => 'failed') }
       end
 
       it { should be true }
@@ -123,29 +123,29 @@ describe BuildPart do
 
     context "with all successful attempts" do
       before do
-        2.times { FactoryGirl.create(:build_attempt, :build_part => build_part, :state => :passed) }
+        2.times { FactoryBot.create(:build_attempt, :build_part => build_part, :state => 'passed') }
       end
 
-      it { should == :passed }
+      it { should == 'passed' }
     end
 
     context "with one successful attempt" do
       before do
-        FactoryGirl.create(:build_attempt, :build_part => build_part, :state => :failed)
-        FactoryGirl.create(:build_attempt, :build_part => build_part, :state => :passed)
-        FactoryGirl.create(:build_attempt, :build_part => build_part, :state => :failed)
+        FactoryBot.create(:build_attempt, :build_part => build_part, :state => 'failed')
+        FactoryBot.create(:build_attempt, :build_part => build_part, :state => 'passed')
+        FactoryBot.create(:build_attempt, :build_part => build_part, :state => 'failed')
       end
 
-      it { should == :passed }
+      it { should == 'passed' }
     end
 
     context "with no successful attempts" do
       before do
-        FactoryGirl.create(:build_attempt, :build_part => build_part, :state => :failed)
-        FactoryGirl.create(:build_attempt, :build_part => build_part, :state => :running)
+        FactoryBot.create(:build_attempt, :build_part => build_part, :state => 'failed')
+        FactoryBot.create(:build_attempt, :build_part => build_part, :state => 'running')
       end
 
-      it { should == :running }
+      it { should == 'running' }
     end
   end
 
@@ -155,13 +155,13 @@ describe BuildPart do
       it { should be true }
     end
     context "when finished" do
-      before { FactoryGirl.create(:build_attempt, :build_part => build_part, :state => :passed, :finished_at => Time.current) }
+      before { FactoryBot.create(:build_attempt, :build_part => build_part, :state => 'passed', :finished_at => Time.current) }
       it { should be false }
     end
   end
 
   describe "#should_reattempt?" do
-    let(:build_part) { FactoryGirl.create(:build_part, retry_count: 1, build_instance: build) }
+    let(:build_part) { FactoryBot.create(:build_part, retry_count: 1, build_instance: build) }
 
     it "should reattempt" do
       expect(build_part.should_reattempt?).to be true
@@ -169,8 +169,8 @@ describe BuildPart do
 
     context "when we have already hit the retry count" do
       before do
-        FactoryGirl.create(:build_attempt, build_part: build_part, state: :failed)
-        FactoryGirl.create(:build_attempt, build_part: build_part, state: :failed)
+        FactoryBot.create(:build_attempt, build_part: build_part, state: 'failed')
+        FactoryBot.create(:build_attempt, build_part: build_part, state: 'failed')
       end
 
       it "will not reattempt" do
@@ -180,7 +180,7 @@ describe BuildPart do
 
     context "when we are just one away from the retry count" do
       before do
-        FactoryGirl.create(:build_attempt, build_part: build_part, state: :failed)
+        FactoryBot.create(:build_attempt, build_part: build_part, state: 'failed')
       end
 
       it "will reattempt" do
@@ -189,10 +189,10 @@ describe BuildPart do
     end
 
     context "when it fails very fast" do
-      let(:build_part) { FactoryGirl.create(:build_part, retry_count: 0, build_instance: build) }
+      let(:build_part) { FactoryBot.create(:build_part, retry_count: 0, build_instance: build) }
 
       before do
-        FactoryGirl.create(:build_attempt, build_part: build_part, state: :errored, started_at: 10.seconds.ago, finished_at: Time.current)
+        FactoryBot.create(:build_attempt, build_part: build_part, state: 'errored', started_at: 10.seconds.ago, finished_at: Time.current)
       end
 
       it "will reattempt" do
@@ -201,11 +201,11 @@ describe BuildPart do
     end
 
     context "after 5 failures" do
-      let(:build_part) { FactoryGirl.create(:build_part, retry_count: 0, build_instance: build) }
+      let(:build_part) { FactoryBot.create(:build_part, retry_count: 0, build_instance: build) }
 
       before do
         5.times do
-          FactoryGirl.create(:build_attempt, build_part: build_part, state: :errored, started_at: 10.seconds.ago, finished_at: Time.current)
+          FactoryBot.create(:build_attempt, build_part: build_part, state: 'errored', started_at: 10.seconds.ago, finished_at: Time.current)
         end
       end
 
@@ -215,10 +215,10 @@ describe BuildPart do
     end
 
     context "when it fails after a longer time" do
-      let(:build_part) { FactoryGirl.create(:build_part, retry_count: 0, build_instance: build) }
+      let(:build_part) { FactoryBot.create(:build_part, retry_count: 0, build_instance: build) }
 
       before do
-        FactoryGirl.create(:build_attempt, build_part: build_part, state: :errored, started_at: 70.seconds.ago, finished_at: Time.current)
+        FactoryBot.create(:build_attempt, build_part: build_part, state: 'errored', started_at: 70.seconds.ago, finished_at: Time.current)
       end
 
       it "shouldn't reattempt" do
@@ -228,8 +228,8 @@ describe BuildPart do
 
     context "when there has already been a successful attempt" do
       before do
-        FactoryGirl.create(:build_attempt, build_part: build_part, state: :passed)
-        FactoryGirl.create(:build_attempt, build_part: build_part, state: :failed)
+        FactoryBot.create(:build_attempt, build_part: build_part, state: 'passed')
+        FactoryBot.create(:build_attempt, build_part: build_part, state: 'failed')
       end
 
       it "will not reattempt" do
@@ -242,11 +242,11 @@ describe BuildPart do
     subject(:json) { build_part.as_json['build_part'].with_indifferent_access }
     context "with a build attempt" do
       before do
-        FactoryGirl.create(:build_attempt, :build_part => build_part, :state => :passed)
+        FactoryBot.create(:build_attempt, :build_part => build_part, :state => 'passed')
       end
 
       it "includes synthetic attributes like status" do
-        expect(json[:status]).to eq(:passed)
+        expect(json[:status]).to eq('passed')
       end
     end
   end

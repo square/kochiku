@@ -2,7 +2,7 @@ require 'spec_helper'
 
 describe RepositoryObserver do
   subject { RepositoryObserver.instance }
-  let(:repository) { FactoryGirl.create(:repository, :url => "git@git.example.com:square/web.git") }
+  let(:repository) { FactoryBot.create(:repository, :url => "git@git.example.com:square/web.git") }
 
   before do
     settings = SettingsAccessor.new(<<-YAML)

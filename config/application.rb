@@ -56,13 +56,5 @@ module Kochiku
     config.assets.version = '1.0'
 
     config.assets.precompile << Proc.new{ |path| !File.basename(path).starts_with?('_') }
-
-    # In Rails 4, Active Record suppresses errors raised within after_rollback
-    # or after_commit callbacks and only prints them to the logs. In Rails 5,
-    # these errors will no longer be suppressed. Instead, the errors will
-    # propagate normally just like in other Active Record callbacks.
-    #
-    # Set to true to opt into the Rails 5 behavior now
-    config.active_record.raise_in_transactional_callbacks = true
   end
 end

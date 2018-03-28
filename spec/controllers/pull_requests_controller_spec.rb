@@ -12,19 +12,19 @@ describe PullRequestsController do
       end
 
       let!(:repository) do
-        FactoryGirl.create(:repository, { url: "git@#{git_server_type}.com:square/web.git" }.merge(repository_fields))
+        FactoryBot.create(:repository, { url: "git@#{git_server_type}.com:square/web.git" }.merge(repository_fields))
       end
       let(:repository_fields) { {} }  # expected to be overwritten by a sub-context
 
       context "when push requests come" do
         let(:repository_fields) { { run_ci: true } }
-        let!(:master_branch) { FactoryGirl.create(:master_branch, repository: repository) }
-        let!(:convergence_branch) { FactoryGirl.create(:branch, repository: repository, convergence: true, name: "convergence_branch") }
+        let!(:master_branch) { FactoryBot.create(:master_branch, repository: repository) }
+        let!(:convergence_branch) { FactoryBot.create(:branch, repository: repository, convergence: true, name: "convergence_branch") }
 
         it "creates a build" do
           expect(Build.where(branch_id: master_branch.id, ref: to_40('2'))).to_not exist
           expect {
-            post :build, push_payload
+            post :build, params: push_payload
             expect(response).to be_success
           }.to change(Build, :count).by(1)
           expect(Build.where(branch_id: master_branch.id, ref: to_40('2'))).to exist
@@ -32,7 +32,7 @@ describe PullRequestsController do
 
         it "does not create a build for pushes to non-convergence branches" do
           expect {
-            post :build, push_payload("ref" => "refs/heads/some-branch")
+            post :build, params: push_payload("ref" => "refs/heads/some-branch")
             expect(response).to be_success
           }.to_not change(Build, :count)
         end
@@ -40,44 +40,44 @@ describe PullRequestsController do
         it "does not create a build if repository has ci disabled" do
           repository.update_attributes!(:run_ci => false)
           expect {
-            post :build, push_payload
+            post :build, params: push_payload
             expect(response).to be_success
           }.to_not change(Build, :count)
         end
 
         it "does not build if there is already a ci build in progress" do
-          master_branch.builds.create!(:ref => to_40('w'), :state => :succeeded)
+          master_branch.builds.create!(:ref => to_40('w'), :state => 'succeeded')
           frozen_time = 3.seconds.from_now
           allow(Time).to receive(:now).and_return(frozen_time)
-          master_branch.builds.create!(:ref => to_40('y'), :state => :partitioning)
+          master_branch.builds.create!(:ref => to_40('y'), :state => 'partitioning')
           expect {
-            post :build, push_payload
+            post :build, params: push_payload
             expect(response).to be_success
           }.to_not change(Build, :count)
         end
 
         it "builds for convergence branches" do
           expect {
-            post :build, push_payload("ref" => "refs/heads/convergence_branch")
+            post :build, params: push_payload("ref" => "refs/heads/convergence_branch")
             expect(response).to be_success
           }.to change(Build, :count).by(1)
         end
 
         it "builds if there is completed ci build" do
-          master_branch.builds.create!(:ref => to_40('w'), :state => :succeeded)
+          master_branch.builds.create!(:ref => to_40('w'), :state => 'succeeded')
           expect {
-            post :build, push_payload
+            post :build, params: push_payload
             expect(response).to be_success
           }.to change(Build, :count).by(1)
         end
 
         it "builds if there is a completed ci build after a build that is still building" do
-          master_branch.builds.create!(:ref => to_40('w'), :state => :partitioning)
+          master_branch.builds.create!(:ref => to_40('w'), :state => 'partitioning')
           frozen_time = 3.seconds.from_now
           allow(Time).to receive(:now).and_return(frozen_time)
-          master_branch.builds.create!(:ref => to_40('y'), :state => :succeeded)
+          master_branch.builds.create!(:ref => to_40('y'), :state => 'succeeded')
           expect {
-            post :build, push_payload
+            post :build, params: push_payload
             expect(response).to be_success
           }.to change(Build, :count).by(1)
         end
@@ -93,7 +93,7 @@ describe PullRequestsController do
             "full_name" => nil
           }
           expect {
-            post :build, push_payload("repository" => repository_overrides)
+            post :build, params: push_payload("repository" => repository_overrides)
             expect(response).to be_success
           }.to_not change(Build, :count)
         end
@@ -105,7 +105,7 @@ describe PullRequestsController do
         context "when there is no existing Branch record" do
           it "should create a Branch record on demand" do
             expect(Branch.where(repository: repository, name: "branch-name")).to_not exist
-            post :build, pull_request_payload
+            post :build, params: pull_request_payload
             expect(response).to be_success
             expect(Branch.where(repository: repository, name: "branch-name")).to exist
           end
@@ -119,13 +119,13 @@ describe PullRequestsController do
                 "body" => "best pull request ever",
               })
           end
-          let!(:branch) { FactoryGirl.create(:branch, repository: repository, name: "branch-name") }
+          let!(:branch) { FactoryBot.create(:branch, repository: repository, name: "branch-name") }
 
           it "has no effect" do
-            FactoryGirl.create(:build, branch_record: branch, branch_id: branch.id, ref: "de8251ff97ee194a289832576287d6f8ad74e3d0")
+            FactoryBot.create(:build, branch_record: branch, branch_id: branch.id, ref: "de8251ff97ee194a289832576287d6f8ad74e3d0")
 
             expect {
-              post :build, @github_payload
+              post :build, params: @github_payload
               expect(response).to be_success
             }.to_not change(Build, :count)
           end
@@ -134,23 +134,23 @@ describe PullRequestsController do
             common_sha = "de8251ff97ee194a289832576287d6f8ad74e3d0"
 
             # create build with the same ref on a different repository
-            repo2 = FactoryGirl.create(:repository, url: "git@git.#{git_server_type}.com:square/other-repo.git")
-            repo2_branch = FactoryGirl.create(:branch, repository: repo2)
-            FactoryGirl.create(:build, branch_record: repo2_branch, ref: common_sha)
+            repo2 = FactoryBot.create(:repository, url: "git@git.#{git_server_type}.com:square/other-repo.git")
+            repo2_branch = FactoryBot.create(:branch, repository: repo2)
+            FactoryBot.create(:build, branch_record: repo2_branch, ref: common_sha)
 
             expect(Build.where(branch_id: branch.id, ref: common_sha)).to_not exist
-            post :build, @github_payload
+            post :build, params: @github_payload
             expect(Build.where(branch_id: branch.id, ref: common_sha)).to exist
           end
         end
 
         context do
-          let(:branch) { FactoryGirl.create(:branch, repository: repository, name: "branch-name") }
+          let(:branch) { FactoryBot.create(:branch, repository: repository, name: "branch-name") }
 
           it "creates a build for a pull request" do
             expect(Build.where(branch_id: branch.id, ref: to_40('1'))).to_not exist
             expect {
-              post :build, pull_request_payload
+              post :build, params: pull_request_payload
               expect(response).to be_success
             }.to change(Build, :count).by(1)
             expect(Build.where(branch_id: branch.id, ref: to_40('1'))).to exist
@@ -159,7 +159,7 @@ describe PullRequestsController do
           it "does not create a build if build_pull_requests is disabled" do
             repository.update_attribute(:build_pull_requests, false)
             expect {
-              post :build, pull_request_payload({"pull_request" => {"body" => "don't build it"}})
+              post :build, params: pull_request_payload({"pull_request" => {"body" => "don't build it"}})
               expect(response).to be_success
             }.to_not change(branch.builds, :count)
           end
@@ -167,19 +167,19 @@ describe PullRequestsController do
           it "does not build a closed pull request" do
             closed_action = git_server_type == "github" ? {"pull_request" => {"state" => "closed"}} : {"action" => "closed"}
             expect {
-              post :build, pull_request_payload(closed_action)
+              post :build, params: pull_request_payload(closed_action)
               expect(response).to be_success
             }.to_not change(branch.builds, :count)
           end
 
           it "does not blow up if action is missing" do
-            post :build, pull_request_payload({"action" => nil})
+            post :build, params: pull_request_payload({"action" => nil})
             expect(response).to be_success
           end
 
           context "when there are other builds for the same branch" do
-            let!(:build_one) { FactoryGirl.create(:build, :branch_record => branch, :ref => to_40('w')) }
-            let!(:build_two) { FactoryGirl.create(:build, :branch_record => branch, :ref => to_40('y')) }
+            let!(:build_one) { FactoryBot.create(:build, :branch_record => branch, :ref => to_40('w')) }
+            let!(:build_two) { FactoryBot.create(:build, :branch_record => branch, :ref => to_40('y')) }
 
             it "aborts previous builds of the same branch" do
               github_payload = pull_request_payload(
@@ -189,7 +189,7 @@ describe PullRequestsController do
                 })
 
               expect {
-                post :build, github_payload
+                post :build, params: github_payload
                 expect(response).to be_success
               }.to change(Build, :count)
               expect(build_one.reload).to be_aborted
@@ -201,7 +201,7 @@ describe PullRequestsController do
 
       it "does not blow up if pull_request data is missing" do
         expect {
-          post :build, pull_request_payload({"pull_request" => nil})
+          post :build, params: pull_request_payload({"pull_request" => nil})
           expect(response).to be_success
         }.to_not change(Build, :count)
       end
@@ -209,7 +209,7 @@ describe PullRequestsController do
       it "should not error if the repository url in the request is not found" do
         expect {
           pr_payload = pull_request_payload("repository" => { "ssh_url" => "git@git.#{git_server_type}.com:doesnot/exist.git" })
-          post :build, pr_payload
+          post :build, params: pr_payload
           expect(response).to be_success
         }.to_not change(Build, :count)
       end

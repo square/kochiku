@@ -2,14 +2,14 @@
 require "spec_helper"
 
 feature "viewing an in process build" do
-  let(:repository) { FactoryGirl.create(:repository) }
-  let(:branch) { FactoryGirl.create(:master_branch, repository: repository) }
-  let(:build) { FactoryGirl.create(:build, branch_record: branch) }
-  let(:build_part) { FactoryGirl.create(:build_part, :build_instance => build, :queue => 'ci') }
-  let!(:build_attempt) { FactoryGirl.create(:build_attempt, :build_part => build_part, :state => :runnable) }
+  let(:repository) { FactoryBot.create(:repository) }
+  let(:branch) { FactoryBot.create(:master_branch, repository: repository) }
+  let(:build) { FactoryBot.create(:build, branch_record: branch) }
+  let(:build_part) { FactoryBot.create(:build_part, :build_instance => build, :queue => 'ci') }
+  let!(:build_attempt) { FactoryBot.create(:build_attempt, :build_part => build_part, :state => 'runnable') }
 
   it "view the current status of the build attempts" do
-    build.update_attribute(:state, :runnable)
+    build.update_attribute(:state, 'runnable')
 
     visit('/')
 
@@ -45,7 +45,7 @@ end
 
 feature "a failed build" do
   before :each do
-    @build_attempt = FactoryGirl.create(:build_attempt, :state => :failed)
+    @build_attempt = FactoryBot.create(:build_attempt, :state => 'failed')
     @build_part = @build_attempt.build_part
     allow(GitRepo).to receive(:load_kochiku_yml).and_return(nil)
   end
@@ -62,9 +62,9 @@ end
 
 feature "requesting a new build of a branch" do
   before :each do
-    @repository = FactoryGirl.create(:repository, url: "git@github.com:square/kochiku.git")
+    @repository = FactoryBot.create(:repository, url: "git@github.com:square/kochiku.git")
     @branch_name = "test/branch"
-    @branch = FactoryGirl.create(:branch, name: @branch_name, repository: @repository)
+    @branch = FactoryBot.create(:branch, name: @branch_name, repository: @repository)
     @branch_head_sha = "4b41fe773057b2f1e2063eb94814d32699a34541"
 
     build_ref_info = <<RESPONSE

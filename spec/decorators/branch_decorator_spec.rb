@@ -9,12 +9,12 @@ describe BranchDecorator do
     context "when at least one build is present" do
       before do
         allow(branch).to receive(:most_recent_build) {
-          instance_double("Build", state: :running)
+          instance_double("Build", state: 'running')
         }
       end
 
       it "returns the state of the most recent build" do
-        expect(decorated_branch.most_recent_build_state).to be(:running)
+        expect(decorated_branch.most_recent_build_state).to eq('running')
       end
     end
 
@@ -23,8 +23,8 @@ describe BranchDecorator do
         allow(branch).to receive(:most_recent_build).and_return(nil)
       end
 
-      it "returns :unknown" do
-        expect(decorated_branch.most_recent_build_state).to be(:unknown)
+      it "returns 'unknown'" do
+        expect(decorated_branch.most_recent_build_state).to eq('unknown')
       end
     end
   end
@@ -36,7 +36,7 @@ describe BranchDecorator do
     context "with a completed build" do
       before do
         allow(branch).to receive(:last_completed_build) {
-          instance_double("Build", state: :succeeded, elapsed_time: 60)
+          instance_double("Build", state: 'succeeded', elapsed_time: 60)
         }
       end
 

@@ -3,12 +3,12 @@ class BuildAttempt < ActiveRecord::Base
   belongs_to :build_part, :inverse_of => :build_attempts, :touch => true
   has_one :build_instance, through: :build_part
 
-  FAILED_BUILD_STATES = [:failed, :errored].freeze
-  COMPLETED_BUILD_STATES = [:passed, :aborted] + FAILED_BUILD_STATES
-  IN_PROGRESS_BUILD_STATES = [:runnable, :running].freeze
+  FAILED_BUILD_STATES = %w[failed errored].freeze
+  COMPLETED_BUILD_STATES = %w[passed aborted] + FAILED_BUILD_STATES
+  IN_PROGRESS_BUILD_STATES = %w[runnable running].freeze
   STATES = IN_PROGRESS_BUILD_STATES + COMPLETED_BUILD_STATES
 
-  symbolize :state, :in => STATES, :scopes => true
+  validates :state, inclusion: { in: STATES }
 
   scope :unsuccessful, -> { where(state: FAILED_BUILD_STATES) }
 
@@ -21,7 +21,7 @@ class BuildAttempt < ActiveRecord::Base
   end
 
   def start!(builder)
-    return false unless update_attributes(:state => :running, :started_at => Time.current, :builder => builder)
+    return false unless update_attributes(:state => 'running', :started_at => Time.current, :builder => builder)
 
     build = build_part.build_instance
     previous_state, new_state = build.update_state_from_parts!
@@ -46,7 +46,7 @@ class BuildAttempt < ActiveRecord::Base
       # Will only send email if email_on_first_failure is enabled.
       build_part.build_instance.send_build_status_email!
       build_part.rebuild!
-    elsif state == :errored
+    elsif state == 'errored'
       BuildMailer.error_email(self, error_txt).deliver_now
     end
 
@@ -72,15 +72,15 @@ class BuildAttempt < ActiveRecord::Base
   end
 
   def successful?
-    state == :passed
+    state == 'passed'
   end
 
   def aborted?
-    state == :aborted
+    state == 'aborted'
   end
 
   def running?
-    state == :running
+    state == 'running'
   end
 
   def stopped?
@@ -88,7 +88,7 @@ class BuildAttempt < ActiveRecord::Base
   end
 
   def errored?
-    state == :errored
+    state == 'errored'
   end
 
   def should_reattempt?

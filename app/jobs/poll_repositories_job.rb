@@ -16,7 +16,7 @@ class PollRepositoriesJob
       end
 
       unless repo.build_for_commit(head)
-        branch.builds.create!(ref: head, state: :partitioning)
+        branch.builds.create!(ref: head, state: 'partitioning')
         Rails.logger.info "Build created for #{repo.namespace}/#{repo.name}:#{branch.name} at #{head}"
       end
 

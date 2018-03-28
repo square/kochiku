@@ -4,8 +4,8 @@ describe ApplicationHelper do
   include ActionView::Helpers
   include Haml::Helpers
 
-  let(:repository) { FactoryGirl.create(:repository, :url => "git@git.example.com:square/web.git") }
-  let(:branch) { FactoryGirl.create(:branch, repository: repository, name: "nomnomnom") }
+  let(:repository) { FactoryBot.create(:repository, :url => "git@git.example.com:square/web.git") }
+  let(:branch) { FactoryBot.create(:branch, repository: repository, name: "nomnomnom") }
 
   before do
     settings = SettingsAccessor.new(<<-YAML)
@@ -24,23 +24,23 @@ describe ApplicationHelper do
 
   describe "#build_success_in_words" do
 
-    it "should return success when state = :succeeded" do
-      @build.state = :succeeded
+    it "should return success when state = 'succeeded'" do
+      @build.state = 'succeeded'
       expect(build_success_in_words(@build)).to eq('success')
     end
 
-    it "should return failed when state = :errored" do
-      @build.state = :errored
+    it "should return failed when state = 'errored'" do
+      @build.state = 'errored'
       expect(build_success_in_words(@build)).to eq('failed')
     end
 
-    it "should return failed when state = :doomed" do
-      @build.state = :doomed
+    it "should return failed when state = 'doomed'" do
+      @build.state = 'doomed'
       expect(build_success_in_words(@build)).to eq('failed')
     end
 
     it "should return state otherwise" do
-      @build.state = :partitioning
+      @build.state = 'partitioning'
       expect(build_success_in_words(@build)).to eq('partitioning')
     end
   end
@@ -58,17 +58,17 @@ describe ApplicationHelper do
   end
 
   describe "#show_link_to_compare" do
-    let(:branch_stash) { FactoryGirl.create(:branch, repository: repository_stash, name: "okay") }
-    let(:branch_stash_no_greenupdate) { FactoryGirl.create(:branch, repository: repository_stash_no_greenupdate, name: "okay") }
+    let(:branch_stash) { FactoryBot.create(:branch, repository: repository_stash, name: "okay") }
+    let(:branch_stash_no_greenupdate) { FactoryBot.create(:branch, repository: repository_stash_no_greenupdate, name: "okay") }
     let(:repository_stash) {
-      FactoryGirl.create(:stash_repository, url: "https://stash.example.com/scm/square/web2.git",
-                                            host: "stash.example.com", namespace: "square",
-                                            on_green_update: "green,red")
+      FactoryBot.create(:stash_repository, url: "https://stash.example.com/scm/square/web2.git",
+                                           host: "stash.example.com", namespace: "square",
+                                           on_green_update: "green,red")
     }
     let(:repository_stash_no_greenupdate) {
-      FactoryGirl.create(:stash_repository, url: "https://stash.example.com/scm/square/web3.git",
-                                            host: "stash.example.com",
-                                            namespace: "square", on_green_update: "")
+      FactoryBot.create(:stash_repository, url: "https://stash.example.com/scm/square/web3.git",
+                                           host: "stash.example.com",
+                                           namespace: "square", on_green_update: "")
     }
 
     it "creates a url to github showing the diff between 2 SHAs" do

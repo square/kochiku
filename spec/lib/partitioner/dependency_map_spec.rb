@@ -4,7 +4,7 @@ describe Partitioner::DependencyMap do
   include_examples "Partitioner::Default behavior", Partitioner::DependencyMap
 
   describe '#partitions' do
-    let(:build) { FactoryGirl.create(:build) }
+    let(:build) { FactoryBot.create(:build) }
     let(:partitioner) { Partitioner::DependencyMap.new(build, build.kochiku_yml) }
 
     before do
@@ -78,7 +78,7 @@ describe Partitioner::DependencyMap do
       end
 
       context 'on a branch where all tests should be run' do
-        let(:build) { FactoryGirl.create(:build, :branch_record => FactoryGirl.create(:master_branch)) }
+        let(:build) { FactoryBot.create(:build, :branch_record => FactoryBot.create(:master_branch)) }
 
         context 'when one of the source_globs matches changed files' do
           let(:changed_files) { %w(source_glob/1/foo.rb) }

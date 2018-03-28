@@ -13,7 +13,7 @@
                 %span.attempt-status{:class => :passed}
                 // ugly hack because in this table, partitioning means "in progress", whereas in
                 // the following build attempts table, it means not started yet
-              - elsif partition_job.state == :partitioning
+              - elsif partition_job.state == 'partitioning'
                 %span.attempt-status{:class => :running}
               - else
                 %span.attempt-status{:class => partition_job.state}

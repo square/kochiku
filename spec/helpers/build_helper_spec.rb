@@ -3,12 +3,12 @@ require 'spec_helper'
 describe BuildHelper do
   include ActionView::Helpers
   include Haml::Helpers
-  let(:build) { FactoryGirl.create(:build) }
+  let(:build) { FactoryBot.create(:build) }
 
   describe "#multiple_ruby_versions?" do
     context "with a ruby build with multiple ruby versions" do
-      let!(:build_part) { FactoryGirl.create(:build_part, :build_instance => build, :options => options) }
-      let!(:build_part2) { FactoryGirl.create(:build_part, :build_instance => build, :options => options2) }
+      let!(:build_part) { FactoryBot.create(:build_part, :build_instance => build, :options => options) }
+      let!(:build_part2) { FactoryBot.create(:build_part, :build_instance => build, :options => options2) }
       let(:options) { {"ruby" => "1.9.3-p194"} }
       let(:options2) { {"ruby" => "2.0"} }
 
@@ -18,7 +18,7 @@ describe BuildHelper do
     end
 
     context "with a ruby build with only one ruby version" do
-      let!(:build_part) { FactoryGirl.create(:build_part, :build_instance => build, :options => options) }
+      let!(:build_part) { FactoryBot.create(:build_part, :build_instance => build, :options => options) }
       let(:options) { {"ruby" => "1.9.3-p194"} }
 
       it "returns false" do
@@ -27,7 +27,7 @@ describe BuildHelper do
     end
 
     context "with a non-ruby build" do
-      let!(:build_part) { FactoryGirl.create(:build_part, :build_instance => build, :options => options) }
+      let!(:build_part) { FactoryBot.create(:build_part, :build_instance => build, :options => options) }
       let(:options) { {} }
 
       it "returns false" do
@@ -37,8 +37,8 @@ describe BuildHelper do
   end
 
   context "with a ruby build with multiple ruby versions" do
-    let!(:build_part) { FactoryGirl.create(:build_part, :build_instance => build, :options => options) }
-    let!(:build_part2) { FactoryGirl.create(:build_part, :build_instance => build, :options => options2) }
+    let!(:build_part) { FactoryBot.create(:build_part, :build_instance => build, :options => options) }
+    let!(:build_part2) { FactoryBot.create(:build_part, :build_instance => build, :options => options2) }
     let(:options) { {"ruby" => "1.9.3-p194"} }
     let(:options2) { {"ruby" => "2.0"} }
 
@@ -49,7 +49,7 @@ describe BuildHelper do
   end
 
   context "with a build only having one target" do
-    let!(:build_part) { FactoryGirl.create(:build_part, :build_instance => build, :paths => ['a']) }
+    let!(:build_part) { FactoryBot.create(:build_part, :build_instance => build, :paths => ['a']) }
     it "returns the info" do
       expect(build_metadata_headers(build, false)).to eq(["Target"])
       expect(build_metadata_values(build, build_part, false)).to include("a")
@@ -57,7 +57,7 @@ describe BuildHelper do
   end
 
   context "with a build with paths" do
-    let!(:build_part) { FactoryGirl.create(:build_part, :build_instance => build, :paths => ['a', 'b']) }
+    let!(:build_part) { FactoryBot.create(:build_part, :build_instance => build, :paths => ['a', 'b']) }
     it "returns the info" do
       expect(build_metadata_headers(build, false)).to include("Paths")
       metadata_values = build_metadata_values(build, build_part, false).first
@@ -73,8 +73,8 @@ describe BuildHelper do
 
   context "with a build with multiple chunks" do
     let!(:build_part) {
-      FactoryGirl.create(:build_part, :build_instance => build, :paths => ['a', 'b'],
-                                      :options => {'total_workers' => 5, 'worker_chunk' => 3})
+      FactoryBot.create(:build_part, :build_instance => build, :paths => ['a', 'b'],
+                                     :options => {'total_workers' => 5, 'worker_chunk' => 3})
     }
 
     it "displays worker chunk in paths" do
@@ -83,7 +83,7 @@ describe BuildHelper do
   end
 
   context "a build part with no paths (/dev/null)" do
-    let!(:build_part) { FactoryGirl.create(:build_part, build_instance: build, paths: ['/dev/null'], kind: 'lint-check') }
+    let!(:build_part) { FactoryBot.create(:build_part, build_instance: build, paths: ['/dev/null'], kind: 'lint-check') }
 
     it "displays the BuildPart kind instead of /dev/null" do
       expect(format_paths(build_part)).to eq("lint-check")

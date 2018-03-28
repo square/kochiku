@@ -59,7 +59,7 @@
               %br
         %td.wrap
           - unless attempt.stopped?
-            = link_to("Abandon", finish_build_attempt_path(attempt, :state => :aborted), :method => :post)
+            = link_to("Abandon", finish_build_attempt_path(attempt, :state => 'aborted'), :method => :post)
 
 %ol#build-paths
   - if @build_part.options['total_workers'] && @build_part.options['worker_chunk']

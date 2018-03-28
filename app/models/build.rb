@@ -21,37 +21,37 @@ class Build < ActiveRecord::Base
     end
 
     def passed
-      joins(:build_attempts).where("build_attempts.state" => :passed).group("build_parts.id")
+      joins(:build_attempts).where("build_attempts.state" => 'passed').group("build_parts.id")
     end
 
     def failed
-      not_passed_and_last_attempt_in_state(:failed)
+      not_passed_and_last_attempt_in_state('failed')
     end
 
     def failed_or_errored
-      not_passed_and_last_attempt_in_state(:failed, :errored)
+      not_passed_and_last_attempt_in_state('failed', 'errored')
     end
 
     def failed_errored_or_aborted
-      not_passed_and_last_attempt_in_state(:failed, :errored, :aborted)
+      not_passed_and_last_attempt_in_state('failed', 'errored', 'aborted')
     end
 
     def errored
-      not_passed_and_last_attempt_in_state(:errored)
+      not_passed_and_last_attempt_in_state('errored')
     end
 
     def all_passed_on_first_try?
-      successful_build_attempts = joins(:build_attempts).where("build_attempts.state" => :passed).count
-      unsuccessful_build_attempts = joins(:build_attempts).where("build_attempts.state != ?", :passed).count
+      successful_build_attempts = joins(:build_attempts).where("build_attempts.state" => 'passed').count
+      unsuccessful_build_attempts = joins(:build_attempts).where("build_attempts.state != ?", 'passed').count
       successful_build_attempts > 0 && unsuccessful_build_attempts == 0
     end
   end
   has_many :build_attempts, :through => :build_parts
-  TERMINAL_STATES = [:failed, :succeeded, :errored, :aborted].freeze
-  FAILED_STATES = [:failed, :errored, :doomed].freeze
-  IN_PROGRESS_STATES = [:waiting_for_sync, :partitioning, :runnable, :running, :doomed].freeze
+  TERMINAL_STATES = %w[failed succeeded errored aborted].freeze
+  FAILED_STATES = %w[failed errored doomed].freeze
+  IN_PROGRESS_STATES = %w[waiting_for_sync partitioning runnable running doomed].freeze
   STATES = IN_PROGRESS_STATES + TERMINAL_STATES
-  symbolize :state, :in => STATES
+  validates :state, inclusion: { in: STATES }
   serialize :error_details, Hash
 
   validates :branch_id, presence: true
@@ -84,7 +84,7 @@ class Build < ActiveRecord::Base
   end
 
   def previous_successful_build
-    Build.where(branch_id: self.branch_id, state: :succeeded).where("id < ?", self.id).order("id DESC").first
+    Build.where(branch_id: self.branch_id, state: 'succeeded').where("id < ?", self.id).order("id DESC").first
   end
 
   def enqueue_partitioning_job
@@ -102,7 +102,7 @@ class Build < ActiveRecord::Base
   def partition(parts)
     return unless repository.enabled?
     transaction do
-      update_attributes!(:state => :runnable)
+      update_attributes!(:state => 'runnable')
       parts.each do |part|
         build_parts.create!(:kind => part['type'],
                             :paths => part['files'],
@@ -123,15 +123,15 @@ class Build < ActiveRecord::Base
     failed = build_parts.failed
     next_state = case
                  when (build_parts - passed).empty?
-                   :succeeded
-                 when self.state == :aborted
-                   :aborted
+                   'succeeded'
+                 when self.state == 'aborted'
+                   'aborted'
                  when errored.any?
-                   :errored
+                   'errored'
                  when (passed | failed).count == build_parts.count
-                   :failed
+                   'failed'
                  else
-                   failed.empty? ? :running : :doomed
+                   failed.empty? ? 'running' : 'doomed'
                  end
 
     previous_state = self.state
@@ -183,7 +183,7 @@ class Build < ActiveRecord::Base
   end
 
   def succeeded?
-    state == :succeeded
+    state == 'succeeded'
   end
 
   def failed?
@@ -192,11 +192,11 @@ class Build < ActiveRecord::Base
 
   # has a build part with failed attempts but no successful ones yet
   def already_failed?
-    build_parts.any? { |part| part.build_attempts.unsuccessful.exists? && !part.build_attempts.where(state: :passed).exists? }
+    build_parts.any? { |part| part.build_attempts.unsuccessful.exists? && !part.build_attempts.where(state: 'passed').exists? }
   end
 
   def aborted?
-    state == :aborted
+    state == 'aborted'
   end
 
   def promotable?
@@ -235,19 +235,19 @@ class Build < ActiveRecord::Base
   # protect against accidental merges. Updates the state of all of the build's
   # 'runnable' build_parts to be 'aborted'.
   def abort!
-    update!(state: :aborted, merge_on_success: false)
+    update!(state: 'aborted', merge_on_success: false)
 
     BuildAttempt
       .joins(:build_part)
-      .where(:state => :runnable, 'build_parts.build_id' => self.id)
-      .update_all(state: :aborted, updated_at: Time.current)
+      .where(:state => 'runnable', 'build_parts.build_id' => self.id)
+      .update_all(state: 'aborted', updated_at: Time.current)
   end
 
   def to_color
     case state
-    when :succeeded
+    when 'succeeded'
       :green
-    when :failed, :errored, :aborted, :doomed
+    when 'failed', 'errored', 'aborted', 'doomed'
       :red
     else
       :blue
