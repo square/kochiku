@@ -340,7 +340,7 @@ describe BuildsController do
   end
 
   describe "#retry_partitioning" do
-    let(:build) { FactoryGirl.create(:build) }
+    let!(:build) { FactoryGirl.create(:build) }
     before do
       allow(GitRepo).to receive(:load_kochiku_yml).and_return(nil)
     end

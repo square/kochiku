@@ -49,6 +49,7 @@ describe GithubCommitStatus do
   it "uses a repos github url" do
     build.branch_record.update_attributes!(:repository => FactoryGirl.create(:repository, :url => "git@github.com:square/kochiku-worker.git"))
     build.update_attributes!(:state => 'failed')
+    build.reload
     expect(GithubRequest).to receive(:post)
       .with("https://api.github.com/repos/square/kochiku-worker/statuses/#{build.ref}",
             anything, anything).and_return(commit_status_response)
