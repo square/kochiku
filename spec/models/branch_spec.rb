@@ -3,15 +3,15 @@ require 'spec_helper'
 RSpec.describe Branch, type: :model do
 
   it 'should fail on nil name' do
-    expect(FactoryGirl.build(:branch, name: nil).valid?).to be false
+    expect(FactoryBot.build(:branch, name: nil).valid?).to be false
   end
 
   it 'should fail on empty name' do
-    expect(FactoryGirl.build(:branch, name: "").valid?).to be false
+    expect(FactoryBot.build(:branch, name: "").valid?).to be false
   end
 
   describe '#abort_in_progress_builds_behind_build' do
-    let(:branch) { FactoryGirl.create(:branch) }
+    let(:branch) { FactoryBot.create(:branch) }
 
     it 'aborts non-finished builds for a branch' do
       build1 = branch.builds.create(state: 'succeeded', ref: to_40('1'))
@@ -31,14 +31,14 @@ RSpec.describe Branch, type: :model do
   end
 
   describe "#last_completed_build" do
-    let(:branch) { FactoryGirl.create(:branch) }
+    let(:branch) { FactoryBot.create(:branch) }
     subject { branch.last_completed_build }
 
     it "should return the most recent build in a completed state" do
-      FactoryGirl.create(:build, :branch_record => branch, :state => 'running')
-      FactoryGirl.create(:build, :branch_record => branch, :state => 'succeeded')
-      expected = FactoryGirl.create(:build, :branch_record => branch, :state => 'errored')
-      FactoryGirl.create(:build, :branch_record => branch, :state => 'partitioning')
+      FactoryBot.create(:build, :branch_record => branch, :state => 'running')
+      FactoryBot.create(:build, :branch_record => branch, :state => 'succeeded')
+      expected = FactoryBot.create(:build, :branch_record => branch, :state => 'errored')
+      FactoryBot.create(:build, :branch_record => branch, :state => 'partitioning')
 
       should == expected
     end
@@ -47,18 +47,18 @@ RSpec.describe Branch, type: :model do
   describe '#timing_data_for_recent_builds' do
     subject { branch.timing_data_for_recent_builds.to_a }
 
-    let(:branch) { FactoryGirl.create(:branch) }
+    let(:branch) { FactoryBot.create(:branch) }
 
     context 'when the branch has never been built' do
       it { should == [] }
     end
 
     context 'when the branch has one build' do
-      let!(:build) { FactoryGirl.create(:build, :branch_record => branch, :state => 'succeeded') }
+      let!(:build) { FactoryBot.create(:build, :branch_record => branch, :state => 'succeeded') }
 
       context 'when the build has one part' do
         let!(:build_part) {
-          FactoryGirl.create(:build_part, :build_instance => build, :kind => 'spec')
+          FactoryBot.create(:build_part, :build_instance => build, :kind => 'spec')
         }
 
         context 'when the part has zero attempts' do
@@ -76,7 +76,7 @@ RSpec.describe Branch, type: :model do
 
         context 'when the part has an unstarted attempt' do
           let!(:build_attempt) do
-            FactoryGirl.create(
+            FactoryBot.create(
               :build_attempt,
               :build_part => build_part,
               :state => 'runnable'
@@ -98,7 +98,7 @@ RSpec.describe Branch, type: :model do
 
         context 'when the part has one attempt' do
           let!(:build_attempt) do
-            FactoryGirl.create(
+            FactoryBot.create(
               :build_attempt,
               :build_part => build_part,
               :started_at => 12.minutes.ago,

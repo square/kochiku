@@ -5,7 +5,7 @@ describe BuildPartitioningJob do
   describe "#perform" do
     subject { BuildPartitioningJob.perform(id) }
     let(:id) { build.id }
-    let(:build) { FactoryGirl.create(:build, :state => 'runnable') }
+    let(:build) { FactoryBot.create(:build, :state => 'runnable') }
     before do
       allow(GitRepo).to receive(:load_kochiku_yml).and_return(nil)
     end

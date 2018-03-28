@@ -5,7 +5,7 @@ describe PollRepositoriesJob do
   subject { PollRepositoriesJob.perform }
 
   let(:repo) { branch.repository }
-  let!(:branch) { FactoryGirl.create(:convergence_branch) }
+  let!(:branch) { FactoryBot.create(:convergence_branch) }
 
   before do
     allow(described_class).to receive(:sleep).and_return(nil)
@@ -20,7 +20,7 @@ describe PollRepositoriesJob do
   end
 
   it "won't build an old commit" do
-    FactoryGirl.create(:build, :branch_record => branch, :ref => to_40("test_sha"))
+    FactoryBot.create(:build, :branch_record => branch, :ref => to_40("test_sha"))
     expect { subject }.to_not change{ branch.reload.builds.count }
   end
 

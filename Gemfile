@@ -44,7 +44,7 @@ gem 'pry-byebug'
 gem 'pry-rails'
 
 group :test, :development do
-  gem 'factory_girl_rails'
+  gem 'factory_bot_rails'
   gem 'haml_lint', require: false
   gem 'rspec-collection_matchers'
   gem 'rspec-rails', '~> 3.0'

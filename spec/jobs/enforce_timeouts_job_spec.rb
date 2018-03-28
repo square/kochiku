@@ -2,10 +2,10 @@ require 'spec_helper'
 
 describe EnforceTimeoutsJob do
   let(:repo_timeout) { 10 } # minutes
-  let(:repository) { FactoryGirl.create(:repository, :url => 'git@github.com:square/test-repo.git', :timeout => repo_timeout) }
-  let(:branch) { FactoryGirl.create(:branch, :repository => repository) }
-  let(:build) { FactoryGirl.create(:build, :state => 'runnable', :branch_record => branch) }
-  let(:build_part) { FactoryGirl.create(:build_part, :build_instance => build, :kind => :cucumber, :paths => ['baz'], :queue => 'ci') }
+  let(:repository) { FactoryBot.create(:repository, :url => 'git@github.com:square/test-repo.git', :timeout => repo_timeout) }
+  let(:branch) { FactoryBot.create(:branch, :repository => repository) }
+  let(:build) { FactoryBot.create(:build, :state => 'runnable', :branch_record => branch) }
+  let(:build_part) { FactoryBot.create(:build_part, :build_instance => build, :kind => :cucumber, :paths => ['baz'], :queue => 'ci') }
 
   subject { EnforceTimeoutsJob.perform }
 

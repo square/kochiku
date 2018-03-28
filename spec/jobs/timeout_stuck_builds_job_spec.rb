@@ -1,9 +1,9 @@
 require 'spec_helper'
 
 describe TimeoutStuckBuildsJob do
-  let(:repository) { FactoryGirl.create(:repository, url: 'git@github.com:square/test-repo.git', assume_lost_after: 10) }
-  let(:branch) { FactoryGirl.create(:branch, :repository => repository) }
-  let(:build) { FactoryGirl.create(:build, :state => 'runnable', :branch_record => branch) }
+  let(:repository) { FactoryBot.create(:repository, url: 'git@github.com:square/test-repo.git', assume_lost_after: 10) }
+  let(:branch) { FactoryBot.create(:branch, :repository => repository) }
+  let(:build) { FactoryBot.create(:build, :state => 'runnable', :branch_record => branch) }
 
   subject { TimeoutStuckBuildsJob.perform }
 

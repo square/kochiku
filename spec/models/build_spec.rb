@@ -1,8 +1,8 @@
 require 'spec_helper'
 
 describe Build do
-  let(:branch) { FactoryGirl.create(:branch) }
-  let(:build) { FactoryGirl.create(:build, branch_record: branch) }
+  let(:branch) { FactoryBot.create(:branch) }
+  let(:build) { FactoryBot.create(:build, branch_record: branch) }
   let(:parts) { [{'type' => 'cucumber', 'files' => ['a', 'b'], 'queue' => 'ci'}, {'type' => 'rspec', 'files' => ['c', 'd'], 'queue' => 'ci'}] }
 
   before do
@@ -23,7 +23,7 @@ describe Build do
     end
 
     it "should force uniqueness on ref" do
-      build2 = FactoryGirl.build(:build, branch_record: branch, ref: build.ref)
+      build2 = FactoryBot.build(:build, branch_record: branch, ref: build.ref)
       expect(build2).not_to be_valid
       expect(build2).to have(1).error_on(:ref)
     end
@@ -82,10 +82,10 @@ describe Build do
     end
 
     it "should not enqueue build part jobs if repository is disabled" do
-      build2 = FactoryGirl.create(:build_on_disabled_repo)
+      build2 = FactoryBot.create(:build_on_disabled_repo)
       build2.partition(parts)
       expect(BuildAttemptJob).to receive(:enqueue_on).exactly(0).times
-      expect(build2.build_parts(true)).to be_empty
+      expect(build2.build_parts.reload).to be_empty
     end
 
     it "rolls back any changes to the database if an error occurs" do
@@ -97,7 +97,7 @@ describe Build do
 
       expect { build.partition(parts) }.to raise_error(ActiveRecord::ActiveRecordError)
 
-      expect(build.build_parts(true)).to be_empty
+      expect(build.build_parts.reload).to be_empty
       expect(build.state).to eq('runnable')
     end
   end
@@ -119,43 +119,43 @@ describe Build do
   end
 
   describe "#update_state_from_parts!" do
-    let(:build) { FactoryGirl.create(:build, branch_record: branch, :state => 'running') }
-    let!(:build_part_1) { FactoryGirl.create(:build_part, :build_instance => build) }
-    let!(:build_part_2) { FactoryGirl.create(:build_part, :build_instance => build) }
+    let(:build) { FactoryBot.create(:build, branch_record: branch, :state => 'running') }
+    let!(:build_part_1) { FactoryBot.create(:build_part, :build_instance => build) }
+    let!(:build_part_2) { FactoryBot.create(:build_part, :build_instance => build) }
 
     it "should set a build state to running if it is successful so far, but still incomplete" do
-      FactoryGirl.create(:build_attempt, build_part: build_part_1, state: 'passed')
-      FactoryGirl.create(:build_attempt, build_part: build_part_2, state: 'running')
+      FactoryBot.create(:build_attempt, build_part: build_part_1, state: 'passed')
+      FactoryBot.create(:build_attempt, build_part: build_part_2, state: 'running')
       build.update_state_from_parts!
 
       expect(build.state).to eq('running')
     end
 
     it "should set build state to errored if any of its parts errored" do
-      FactoryGirl.create(:build_attempt, build_part: build_part_1, state: 'errored')
-      FactoryGirl.create(:build_attempt, build_part: build_part_2, state: 'passed')
+      FactoryBot.create(:build_attempt, build_part: build_part_1, state: 'errored')
+      FactoryBot.create(:build_attempt, build_part: build_part_2, state: 'passed')
       build.update_state_from_parts!
 
       expect(build.state).to eq('errored')
     end
 
     it "should set build state to succeeded if all of its parts passed" do
-      FactoryGirl.create(:build_attempt, build_part: build_part_1, state: 'passed')
-      FactoryGirl.create(:build_attempt, build_part: build_part_2, state: 'passed')
+      FactoryBot.create(:build_attempt, build_part: build_part_1, state: 'passed')
+      FactoryBot.create(:build_attempt, build_part: build_part_2, state: 'passed')
       build.update_state_from_parts!
 
       expect(build.state).to eq('succeeded')
     end
 
     it "should set a build state to doomed if it has a failed part but is still has more parts to process" do
-      FactoryGirl.create(:build_attempt, build_part: build_part_1, state: 'failed')
+      FactoryBot.create(:build_attempt, build_part: build_part_1, state: 'failed')
       build.update_state_from_parts!
       expect(build.state).to eq('doomed')
     end
 
     it "should change a doomed build to failed once it is complete" do
-      ba1 = FactoryGirl.create(:build_attempt, build_part: build_part_1, state: 'failed')
-      ba2 = FactoryGirl.create(:build_attempt, build_part: build_part_2, state: 'running')
+      ba1 = FactoryBot.create(:build_attempt, build_part: build_part_1, state: 'failed')
+      ba2 = FactoryBot.create(:build_attempt, build_part: build_part_2, state: 'running')
       build.update_state_from_parts!
       expect(build.state).to eq('doomed')
 
@@ -165,56 +165,56 @@ describe Build do
     end
 
     it "should set build_state to running when a failed attempt is retried" do
-      ba1 = FactoryGirl.create(:build_attempt, build_part: build_part_1, state: 'passed')
-      ba2_1 = FactoryGirl.create(:build_attempt, build_part: build_part_2, state: 'failed')
-      ba2_2 = FactoryGirl.create(:build_attempt, build_part: build_part_2, state: 'running')
+      ba1 = FactoryBot.create(:build_attempt, build_part: build_part_1, state: 'passed')
+      ba2_1 = FactoryBot.create(:build_attempt, build_part: build_part_2, state: 'failed')
+      ba2_2 = FactoryBot.create(:build_attempt, build_part: build_part_2, state: 'running')
       build.update_state_from_parts!
 
       expect(build.state).to eq('running')
     end
 
     it "should set build_state to doomed when an attempt is retried but other attempts are failed" do
-      ba1 = FactoryGirl.create(:build_attempt, build_part: build_part_1, state: 'failed')
-      ba2_1 = FactoryGirl.create(:build_attempt, build_part: build_part_2, state: 'failed')
-      ba2_2 = FactoryGirl.create(:build_attempt, build_part: build_part_2, state: 'running')
+      ba1 = FactoryBot.create(:build_attempt, build_part: build_part_1, state: 'failed')
+      ba2_1 = FactoryBot.create(:build_attempt, build_part: build_part_2, state: 'failed')
+      ba2_2 = FactoryBot.create(:build_attempt, build_part: build_part_2, state: 'running')
       build.update_state_from_parts!
 
       expect(build.state).to eq('doomed')
     end
 
     it "should ignore the old build_attempts" do
-      ba1 = FactoryGirl.create(:build_attempt, build_part: build_part_1, state: 'passed')
-      ba2_1 = FactoryGirl.create(:build_attempt, build_part: build_part_2, state: 'errored')
-      ba2_2 = FactoryGirl.create(:build_attempt, build_part: build_part_2, state: 'passed')
+      ba1 = FactoryBot.create(:build_attempt, build_part: build_part_1, state: 'passed')
+      ba2_1 = FactoryBot.create(:build_attempt, build_part: build_part_2, state: 'errored')
+      ba2_2 = FactoryBot.create(:build_attempt, build_part: build_part_2, state: 'passed')
       build.update_state_from_parts!
 
       expect(build.state).to eq('succeeded')
     end
 
     it "should not ignore old build_attempts that passed" do
-      ba1 = FactoryGirl.create(:build_attempt, build_part: build_part_1, state: 'passed')
-      ba2_1 = FactoryGirl.create(:build_attempt, build_part: build_part_2, state: 'passed')
-      ba2_2 = FactoryGirl.create(:build_attempt, build_part: build_part_2, state: 'errored')
+      ba1 = FactoryBot.create(:build_attempt, build_part: build_part_1, state: 'passed')
+      ba2_1 = FactoryBot.create(:build_attempt, build_part: build_part_2, state: 'passed')
+      ba2_2 = FactoryBot.create(:build_attempt, build_part: build_part_2, state: 'errored')
       build.update_state_from_parts!
 
       expect(build.state).to eq('succeeded')
     end
 
     context "when the build is aborted" do
-      let(:build) { FactoryGirl.create(:build, branch_record: branch, state: 'aborted') }
+      let(:build) { FactoryBot.create(:build, branch_record: branch, state: 'aborted') }
 
       it "should set state to succeeded if a build is aborted, but all of its parts passed" do
         # scenario is applicable if a build is aborted only after its build parts are already running
-        FactoryGirl.create(:build_attempt, build_part: build_part_1, state: 'passed')
-        FactoryGirl.create(:build_attempt, build_part: build_part_2, state: 'passed')
+        FactoryBot.create(:build_attempt, build_part: build_part_1, state: 'passed')
+        FactoryBot.create(:build_attempt, build_part: build_part_2, state: 'passed')
         build.update_state_from_parts!
 
         expect(build.state).to eq('succeeded')
       end
 
       it "should remain aborted when build attempts finish as errored or failed" do
-        FactoryGirl.create(:build_attempt, build_part: build_part_1, state: 'passed')
-        ba = FactoryGirl.create(:build_attempt, build_part: build_part_1, state: 'errored')
+        FactoryBot.create(:build_attempt, build_part: build_part_1, state: 'passed')
+        ba = FactoryBot.create(:build_attempt, build_part: build_part_1, state: 'errored')
         build.update_state_from_parts!
         expect(build.state).to eq('aborted')
 
@@ -236,7 +236,7 @@ describe Build do
   end
 
   describe "#abort!" do
-    let(:build) { FactoryGirl.create(:build, :state => 'runnable', :merge_on_success => true) }
+    let(:build) { FactoryBot.create(:build, :state => 'runnable', :merge_on_success => true) }
 
     it "should mark the build as aborted" do
       expect{ build.abort! }.to change(build, :state).from('runnable').to('aborted')
@@ -247,10 +247,10 @@ describe Build do
     end
 
     it "should mark all of the build's unstarted build_attempts as aborted" do
-      build_part1 = FactoryGirl.create(:build_part, :build_instance => build)
-      build_part2 = FactoryGirl.create(:build_part, :build_instance => build)
-      build_attempt_started = FactoryGirl.create(:build_attempt, :build_part => build_part1, :state => 'running')
-      build_attempt_unstarted = FactoryGirl.create(:build_attempt, :build_part => build_part2, :state => 'runnable')
+      build_part1 = FactoryBot.create(:build_part, :build_instance => build)
+      build_part2 = FactoryBot.create(:build_part, :build_instance => build)
+      build_attempt_started = FactoryBot.create(:build_attempt, :build_part => build_part1, :state => 'running')
+      build_attempt_unstarted = FactoryBot.create(:build_attempt, :build_part => build_part2, :state => 'runnable')
       build.abort!
 
       expect(build_attempt_started.reload.state).to eq('running')
@@ -259,7 +259,7 @@ describe Build do
   end
 
   describe '#to_png' do
-    let(:build)     { FactoryGirl.create(:build, :state => state) }
+    let(:build)     { FactoryBot.create(:build, :state => state) }
     let(:png)       { build.to_png }
     let(:png_color) { png.get_pixel(png.width / 2, png.height / 2) }
 
@@ -307,7 +307,7 @@ describe Build do
 
     it "returns nil when there are no previous successful builds for the branch" do
       expect(build.succeeded?).to be false
-      build2 = FactoryGirl.create(:build, branch_record: branch)
+      build2 = FactoryBot.create(:build, branch_record: branch)
 
       expect(build.previous_successful_build).to be_nil
       expect(build2.previous_successful_build).to be_nil
@@ -316,13 +316,13 @@ describe Build do
     it "returns the most recent build in state == 'succeeded' prior to this build" do
       stub_request(:post, /https:\/\/git\.squareup\.com\/api\/v3\/repos\/square\/kochiku\/statuses\//)
       expect(successful_build.succeeded?).to be true
-      build2 = FactoryGirl.create(:build, branch_record: branch)
+      build2 = FactoryBot.create(:build, branch_record: branch)
       expect(build2.previous_successful_build).to eq(successful_build)
     end
   end
 
   describe "#mergable_by_kochiku??" do
-    let(:build) { FactoryGirl.create(:build, branch_record: branch) }
+    let(:build) { FactoryBot.create(:build, branch_record: branch) }
 
     before do
       expect(build.branch_record).to_not be_convergence
@@ -372,8 +372,8 @@ describe Build do
 
     context 'there is a newer build for the same branch' do
       let(:build) {
-        FactoryGirl.create(:build, branch_record: branch,
-                                   state: 'succeeded', merge_on_success: true)
+        FactoryBot.create(:build, branch_record: branch,
+                                  state: 'succeeded', merge_on_success: true)
       }
 
       before do
@@ -399,7 +399,7 @@ describe Build do
     end
 
     context "for a build on a convergence branch" do
-      let(:build) { FactoryGirl.create(:convergence_branch_build) }
+      let(:build) { FactoryBot.create(:convergence_branch_build) }
 
       it "should be false" do
         build.merge_on_success = true
@@ -410,8 +410,8 @@ describe Build do
 
   describe "#newer_branch_build_exists?" do
     before do
-      @build1 = FactoryGirl.create(:build, branch_record: branch)
-      @build2 = FactoryGirl.create(:build, branch_record: branch)
+      @build1 = FactoryBot.create(:build, branch_record: branch)
+      @build2 = FactoryBot.create(:build, branch_record: branch)
     end
 
     it "should be true for the earlier build" do
@@ -424,24 +424,24 @@ describe Build do
   end
 
   describe "#already_failed?" do
-    let!(:build_part_1) { FactoryGirl.create(:build_part, :build_instance => build, :retry_count => 3) }
+    let!(:build_part_1) { FactoryBot.create(:build_part, :build_instance => build, :retry_count => 3) }
     it "returns false when there exists successful build attempt" do
-      ba1 = FactoryGirl.create(:build_attempt, build_part: build_part_1, state: 'failed')
-      ba2_1 = FactoryGirl.create(:build_attempt, build_part: build_part_1, state: 'passed')
+      ba1 = FactoryBot.create(:build_attempt, build_part: build_part_1, state: 'failed')
+      ba2_1 = FactoryBot.create(:build_attempt, build_part: build_part_1, state: 'passed')
       expect(build.already_failed?).to eq(false)
     end
 
     it "returns true when there exists no successful build attempt" do
-      ba1 = FactoryGirl.create(:build_attempt, build_part: build_part_1, state: 'failed')
-      ba2_1 = FactoryGirl.create(:build_attempt, build_part: build_part_1, state: 'running')
+      ba1 = FactoryBot.create(:build_attempt, build_part: build_part_1, state: 'failed')
+      ba2_1 = FactoryBot.create(:build_attempt, build_part: build_part_1, state: 'running')
       expect(build.already_failed?).to eq(true)
     end
   end
 
   describe "#send_build_status_email!" do
-    let(:repository) { FactoryGirl.create(:repository) }
-    let(:branch) { FactoryGirl.create(:branch, repository: repository) }
-    let(:build) { FactoryGirl.create(:build, state: 'runnable', branch_record: branch) }
+    let(:repository) { FactoryBot.create(:repository) }
+    let(:branch) { FactoryBot.create(:branch, repository: repository) }
+    let(:build) { FactoryBot.create(:build, state: 'runnable', branch_record: branch) }
     let(:build_attempt) { build.build_parts.first.build_attempts.create!(state: 'failed') }
 
     it "should not send a failure email if the branch has never had a successful build" do
@@ -451,8 +451,8 @@ describe Build do
 
     context "for a branch that has had a successful build" do
       let(:build) {
-        FactoryGirl.create(:build, state: 'succeeded', branch_record: branch)
-        FactoryGirl.create(:build, state: 'runnable', branch_record: branch)
+        FactoryBot.create(:build, state: 'succeeded', branch_record: branch)
+        FactoryBot.create(:build, state: 'runnable', branch_record: branch)
       }
 
       it "should not send the email if the build is not completed" do
@@ -499,12 +499,12 @@ describe Build do
         end
 
         context "retries enabled" do
-          let!(:build_part_1) { FactoryGirl.create(:build_part, :build_instance => build, :retry_count => 3) }
-          let!(:build_part_2) { FactoryGirl.create(:build_part, :build_instance => build, :retry_count => 3) }
+          let!(:build_part_1) { FactoryBot.create(:build_part, :build_instance => build, :retry_count => 3) }
+          let!(:build_part_2) { FactoryBot.create(:build_part, :build_instance => build, :retry_count => 3) }
 
           it "should not send email before retry" do
-            ba1 = FactoryGirl.create(:build_attempt, build_part: build_part_1, state: 'running')
-            ba2_1 = FactoryGirl.create(:build_attempt, build_part: build_part_2, state: 'running')
+            ba1 = FactoryBot.create(:build_attempt, build_part: build_part_1, state: 'running')
+            ba2_1 = FactoryBot.create(:build_attempt, build_part: build_part_2, state: 'running')
 
             expect(BuildMailer).to_not receive(:build_break_email)
 
@@ -519,13 +519,13 @@ describe Build do
         end
 
         context "on a convergence branch build" do
-          let(:branch) { FactoryGirl.create(:convergence_branch, repository: repository) }
-          let!(:build_part_1) { FactoryGirl.create(:build_part, :build_instance => build, :retry_count => 3) }
-          let!(:build_part_2) { FactoryGirl.create(:build_part, :build_instance => build, :retry_count => 3) }
+          let(:branch) { FactoryBot.create(:convergence_branch, repository: repository) }
+          let!(:build_part_1) { FactoryBot.create(:build_part, :build_instance => build, :retry_count => 3) }
+          let!(:build_part_2) { FactoryBot.create(:build_part, :build_instance => build, :retry_count => 3) }
 
           it "should not send email prior to retry" do
-            ba1 = FactoryGirl.create(:build_attempt, build_part: build_part_1, state: 'passed')
-            ba2_1 = FactoryGirl.create(:build_attempt, build_part: build_part_2, state: 'running')
+            ba1 = FactoryBot.create(:build_attempt, build_part: build_part_1, state: 'passed')
+            ba2_1 = FactoryBot.create(:build_attempt, build_part: build_part_2, state: 'running')
 
             expect(BuildMailer).to_not receive(:build_break_email)
 
@@ -534,14 +534,14 @@ describe Build do
         end
 
         context "branch build" do
-          let(:branch) { FactoryGirl.create(:branch, repository: repository) }
-          let(:branch_build) { FactoryGirl.create(:build, :state => 'runnable', :branch_record => branch) }
-          let!(:build_part_1) { FactoryGirl.create(:build_part, :build_instance => branch_build, :retry_count => 3) }
-          let!(:build_part_2) { FactoryGirl.create(:build_part, :build_instance => branch_build, :retry_count => 3) }
+          let(:branch) { FactoryBot.create(:branch, repository: repository) }
+          let(:branch_build) { FactoryBot.create(:build, :state => 'runnable', :branch_record => branch) }
+          let!(:build_part_1) { FactoryBot.create(:build_part, :build_instance => branch_build, :retry_count => 3) }
+          let!(:build_part_2) { FactoryBot.create(:build_part, :build_instance => branch_build, :retry_count => 3) }
 
           it "should send email prior to retry" do
-            ba1 = FactoryGirl.create(:build_attempt, build_part: build_part_1, state: 'passed')
-            ba2_1 = FactoryGirl.create(:build_attempt, build_part: build_part_2, state: 'running')
+            ba1 = FactoryBot.create(:build_attempt, build_part: build_part_1, state: 'passed')
+            ba2_1 = FactoryBot.create(:build_attempt, build_part: build_part_2, state: 'running')
 
             expect(BuildMailer).to receive(:build_break_email).once.and_return(OpenStruct.new(:deliver => nil))
 

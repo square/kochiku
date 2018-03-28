@@ -2,7 +2,7 @@ require 'spec_helper'
 require 'partitioner'
 
 RSpec.shared_examples "Partitioner::Default behavior" do |partitioner_class|
-  let(:build) { FactoryGirl.create(:build) }
+  let(:build) { FactoryBot.create(:build) }
   let(:partitioner) { partitioner_class.new(build, build.kochiku_yml) }
 
   before do
@@ -101,7 +101,7 @@ RSpec.shared_examples "Partitioner::Default behavior" do |partitioner_class|
       end
 
       context "with a master build" do
-        let(:build) { FactoryGirl.create(:convergence_branch_build) }
+        let(:build) { FactoryBot.create(:convergence_branch_build) }
 
         it "should use the ci queue" do
           expect(build.branch_record).to be_convergence

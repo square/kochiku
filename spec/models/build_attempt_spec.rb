@@ -10,9 +10,9 @@ describe BuildAttempt do
   end
 
   describe "finish!" do
-    let(:build) { FactoryGirl.create(:build, :state => 'runnable', :merge_on_success => true) }
-    let(:build_part) { FactoryGirl.create(:build_part, :build_instance => build, retry_count: 2) }
-    let!(:build_attempt) { FactoryGirl.create(:build_attempt, :state => 'running', :build_part => build_part) }
+    let(:build) { FactoryBot.create(:build, :state => 'runnable', :merge_on_success => true) }
+    let(:build_part) { FactoryBot.create(:build_part, :build_instance => build, retry_count: 2) }
+    let!(:build_attempt) { FactoryBot.create(:build_attempt, :state => 'running', :build_part => build_part) }
 
     context "build auto-retries" do
       it "requests a rebuild if should_reattempt? is true" do

@@ -10,7 +10,7 @@ describe BuildMailer do
     end
 
     it "sends the email" do
-      build_attempt = FactoryGirl.build(:build_attempt, :state => 'errored', :builder => "test-builder")
+      build_attempt = FactoryBot.build(:build_attempt, :state => 'errored', :builder => "test-builder")
 
       email = BuildMailer.error_email(build_attempt, "error text")
 
@@ -28,9 +28,9 @@ describe BuildMailer do
   end
 
   describe "#build_break_email" do
-    let(:repository) { FactoryGirl.create(:repository) }
-    let(:branch) { FactoryGirl.create(:branch, repository: repository, name: 'funyuns') }
-    let(:build) { FactoryGirl.create(:build, branch_record: branch) }
+    let(:repository) { FactoryBot.create(:repository) }
+    let(:branch) { FactoryBot.create(:branch, repository: repository, name: 'funyuns') }
+    let(:build) { FactoryBot.create(:build, branch_record: branch) }
 
     before do
       partitioner = instance_double('Partitioner::Base')
@@ -39,7 +39,7 @@ describe BuildMailer do
 
       build_part = build.build_parts.create!(:paths => ["a", "b"], :kind => "cucumber", :queue => 'ci')
       @build_attempt = build_part.build_attempts.create!(:state => 'failed', :builder => "test-builder")
-      FactoryGirl.create(:stdout_build_artifact, build_attempt: @build_attempt)
+      FactoryBot.create(:stdout_build_artifact, build_attempt: @build_attempt)
     end
 
     context "on a convergence branch" do
@@ -140,9 +140,9 @@ describe BuildMailer do
   end
 
   describe '#build_success_email' do
-    let(:repository) { FactoryGirl.create(:repository) }
-    let(:branch) { FactoryGirl.create(:branch, repository: repository, name: 'funyuns') }
-    let(:build) { FactoryGirl.create(:build, branch_record: branch) }
+    let(:repository) { FactoryBot.create(:repository) }
+    let(:branch) { FactoryBot.create(:branch, repository: repository, name: 'funyuns') }
+    let(:build) { FactoryBot.create(:build, branch_record: branch) }
 
     before do
       allow(GitBlame).to receive(:changes_in_branch).and_return([{hash: "sha", author: "Joe", date: "some day", message: "always be shipping it"}])
@@ -164,9 +164,9 @@ describe BuildMailer do
     end
 
     context "stash repository" do
-      let(:repository) { FactoryGirl.create(:stash_repository) }
-      let(:branch) { FactoryGirl.create(:branch, repository: repository, name: 'funyuns') }
-      let(:build) { FactoryGirl.create(:build, branch_record: branch) }
+      let(:repository) { FactoryBot.create(:stash_repository) }
+      let(:branch) { FactoryBot.create(:branch, repository: repository, name: 'funyuns') }
+      let(:build) { FactoryBot.create(:build, branch_record: branch) }
 
       context "build has an open pull request" do
         before do

@@ -3,7 +3,7 @@ require 'github_post_receive_hook'
 
 describe GithubPostReceiveHook do
   subject { GithubPostReceiveHook.new(repository, 'github_oauth_token_test') }
-  let(:repository) { FactoryGirl.create(:repository, :url => "git@git.example.com:square/web.git") }
+  let(:repository) { FactoryBot.create(:repository, :url => "git@git.example.com:square/web.git") }
 
   before do
     settings = SettingsAccessor.new(<<-YAML)

@@ -2,7 +2,7 @@ require 'spec_helper'
 require 'partitioner'
 
 describe Partitioner do
-  let(:build) { FactoryGirl.create(:build, ref: to_40('1')) }
+  let(:build) { FactoryBot.create(:build, ref: to_40('1')) }
 
   before do
     allow(GitRepo).to receive(:load_kochiku_yml).and_return(kochiku_yml)

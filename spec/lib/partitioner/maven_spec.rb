@@ -2,9 +2,9 @@ require 'spec_helper'
 require 'partitioner/maven'
 
 describe Partitioner::Maven do
-  let(:repository) { FactoryGirl.create(:repository) }
-  let(:branch) { FactoryGirl.create(:master_branch, repository: repository, name: "master") }
-  let(:build) { FactoryGirl.create(:build, branch_record: branch) }
+  let(:repository) { FactoryBot.create(:repository) }
+  let(:branch) { FactoryBot.create(:master_branch, repository: repository, name: "master") }
+  let(:build) { FactoryBot.create(:build, branch_record: branch) }
   let(:kochiku_yml) { nil }
 
   subject { Partitioner::Maven.new(build, kochiku_yml) }
@@ -160,11 +160,11 @@ describe Partitioner::Maven do
       end
 
       context "with a previous build on the same branch" do
-        let(:build2) { FactoryGirl.create(:build, branch_record: branch) }
+        let(:build2) { FactoryBot.create(:build, branch_record: branch) }
         subject { Partitioner::Maven.new(build2, kochiku_yml) }
 
         it "should add all the non-successful parts from the previous build" do
-          build_part = FactoryGirl.create(:build_part, :build_instance => build, :paths => ["module-one"])
+          build_part = FactoryBot.create(:build_part, :build_instance => build, :paths => ["module-one"])
           expect(build.build_parts.first).to be_unsuccessful
 
           partitions = subject.partitions
@@ -175,8 +175,8 @@ describe Partitioner::Maven do
         end
 
         it "should not add all successful parts from the previous build" do
-          build_part = FactoryGirl.create(:build_part, :build_instance => build, :paths => ["module-one"])
-          FactoryGirl.create(:build_attempt, :build_part => build_part, :state => 'passed')
+          build_part = FactoryBot.create(:build_part, :build_instance => build, :paths => ["module-one"])
+          FactoryBot.create(:build_attempt, :build_part => build_part, :state => 'passed')
           expect(build.build_parts.first).to be_successful
 
           partitions = subject.partitions
@@ -271,19 +271,19 @@ describe Partitioner::Maven do
     end
 
     context "on a non-convergence branch" do
-      let(:branch) { FactoryGirl.create(:branch, convergence: false) }
-      # let(:build) { FactoryGirl.create(:build, :branch => "branch-of-master") }
+      let(:branch) { FactoryBot.create(:branch, convergence: false) }
+      # let(:build) { FactoryBot.create(:build, :branch => "branch-of-master") }
 
       before do
         expect(build.branch_record).to_not be_convergence
       end
 
       context "with a previous build" do
-        let(:build2) { FactoryGirl.create(:build, branch_record: FactoryGirl.create(:master_branch)) }
+        let(:build2) { FactoryBot.create(:build, branch_record: FactoryBot.create(:master_branch)) }
         subject { Partitioner::Maven.new(build2, kochiku_yml) }
 
         it "should NOT add all the non-successful parts from the previous build" do
-          FactoryGirl.create(:build_part, :build_instance => build, :paths => ["module-one"])
+          FactoryBot.create(:build_part, :build_instance => build, :paths => ["module-one"])
 
           expect(build.build_parts.first).to be_unsuccessful
           allow(subject).to receive(:sort_modules) { |mvn_modules| mvn_modules }
@@ -304,8 +304,8 @@ describe Partitioner::Maven do
 
     context "with a module that failed to build" do
       before do
-        build_part = FactoryGirl.create(:build_part, :paths => ["failed-module"], :build_instance => build)
-        FactoryGirl.create(:build_attempt, :state => 'failed', :build_part => build_part)
+        build_part = FactoryBot.create(:build_part, :paths => ["failed-module"], :build_instance => build)
+        FactoryBot.create(:build_attempt, :state => 'failed', :build_part => build_part)
         expect(build.build_parts.failed_or_errored).to eq([build_part])
 
         allow(GitRepo).to receive(:inside_copy).and_yield

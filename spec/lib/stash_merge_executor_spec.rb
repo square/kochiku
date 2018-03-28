@@ -13,9 +13,9 @@ describe StashMergeExecutor do
     stub_const "Settings", settings
   end
 
-  let(:repository) { FactoryGirl.create(:stash_repository) }
-  let(:branch) { FactoryGirl.create(:branch, repository: repository, name: 'funyuns') }
-  let(:stash_build) { FactoryGirl.create(:build, branch_record: branch) }
+  let(:repository) { FactoryBot.create(:stash_repository) }
+  let(:branch) { FactoryBot.create(:branch, repository: repository, name: 'funyuns') }
+  let(:stash_build) { FactoryBot.create(:build, branch_record: branch) }
   let(:stash_merger) { described_class.new(stash_build) }
 
   context "Using stash repository" do
@@ -40,7 +40,7 @@ describe StashMergeExecutor do
     end
 
     context "for a build on a convergence branch" do
-      let(:branch) { FactoryGirl.create(:convergence_branch, repository: repository) }
+      let(:branch) { FactoryBot.create(:convergence_branch, repository: repository) }
 
       it "should raise an exception" do
         expect { subject }.to raise_error(/ineligible for merge/)

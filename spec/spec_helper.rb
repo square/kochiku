@@ -5,7 +5,7 @@ require 'rspec/rails'
 require 'rspec/collection_matchers'
 require 'webmock/rspec'
 require 'nokogiri'
-require 'factory_girl'
+require 'factory_bot'
 require 'capybara/rspec'
 require 'git_blame'
 

@@ -3,8 +3,8 @@ require 'spec_helper'
 describe BuildsController do
   describe "#create" do
     let(:action) { :create }
-    let(:repo) { FactoryGirl.create(:repository) }
-    let!(:branch) { FactoryGirl.create(:branch, repository: repo, name: 'gummy-bears') }
+    let(:repo) { FactoryBot.create(:repository) }
+    let!(:branch) { FactoryBot.create(:branch, repository: repo, name: 'gummy-bears') }
     let(:git_sha) { '30b111147d9a245468c6650f54de5c16584bc154' }
     let(:params) {
       {
@@ -16,7 +16,7 @@ describe BuildsController do
 
     it "should return a 404 if the repo does not exist" do
       repo.destroy
-      post action, params
+      post action, params: params
       expect(response.code).to eq("404")
     end
 
@@ -24,31 +24,31 @@ describe BuildsController do
       branch_name = branch.name
       branch.destroy
       expect {
-        post action, params
+        post action, params: params
       }.to change { Branch.exists?(name: branch_name) }.from(false).to(true)
     end
 
     it "should create a new build" do
       expect {
-        post action, params
+        post action, params: params
       }.to change { Build.exists?(ref: git_sha) }.from(false).to(true)
     end
 
     it "sets merge_on_success when param given" do
-      post action, params.merge(merge_on_success: "1")
+      post action, params: params.merge(merge_on_success: "1")
       new_build = Build.where(ref: git_sha).first
       expect(new_build.merge_on_success).to be(true)
     end
 
     it "defaults merge_on_success to false when param not given" do
       expect(params.key?(:merge_on_success)).to be(false)
-      post action, params
+      post action, params: params
       new_build = Build.where(ref: git_sha).first
       expect(new_build.merge_on_success).to be(false)
     end
 
     it "should return the build info page in the location header" do
-      post action, params
+      post action, params: params
 
       new_build = Build.where(ref: git_sha).first
       expect(new_build).to be_present
@@ -72,17 +72,17 @@ describe BuildsController do
 
       it "should create a build for the HEAD commit on the given branch" do
         expect {
-          post action, params
+          post action, params: params
         }.to change { Build.exists?(ref: to_40("2"), branch_record: branch) }.from(false).to(true)
       end
     end
 
     context "when the pushed sha has already been built" do
       it "has no effect" do
-        branch = FactoryGirl.create(:branch, repository: repo, name: 'other-branch')
-        build = FactoryGirl.create(:build, branch_record: branch, ref: git_sha)
+        branch = FactoryBot.create(:branch, repository: repo, name: 'other-branch')
+        build = FactoryBot.create(:build, branch_record: branch, ref: git_sha)
         expect {
-          post action, params
+          post action, params: params
           expect(response).to be_success
         }.to_not change(Build, :count)
         expect(response.headers["Location"]).to eq(repository_build_url(repo, build))
@@ -91,11 +91,11 @@ describe BuildsController do
 
     context "when the sha is already associated with another branch under this repo" do
       it "should return a URL to the existing build" do
-        other_branch = FactoryGirl.create(:branch, repository: repo)
-        other_build = FactoryGirl.create(:build, branch_record: other_branch, ref: git_sha)
+        other_branch = FactoryBot.create(:branch, repository: repo)
+        other_build = FactoryBot.create(:build, branch_record: other_branch, ref: git_sha)
         branch  # ensure the 'let' gets invoked
 
-        post action, params
+        post action, params: params
         expect(response).to be_success
         expect(response.headers["Location"]).to eq(repository_build_url(repo, other_build))
       end
@@ -103,12 +103,12 @@ describe BuildsController do
 
     context "when the sha is already used by a different repo" do
       it "should create a new build" do
-        other_repo = FactoryGirl.create(:repository)
-        other_branch = FactoryGirl.create(:branch, repository: other_repo)
-        other_build = FactoryGirl.create(:build, branch_record: other_branch, ref: git_sha)
+        other_repo = FactoryBot.create(:repository)
+        other_branch = FactoryBot.create(:branch, repository: other_repo)
+        other_build = FactoryBot.create(:build, branch_record: other_branch, ref: git_sha)
 
         expect {
-          post action, params
+          post action, params: params
           expect(response).to be_success
         }.to change(Build, :count).by(1)
         expect(response.headers["Location"]).to_not eq(repository_build_url(other_repo, other_build))
@@ -118,18 +118,18 @@ describe BuildsController do
     it "should allow the repository url to be in an alternate format" do
       expect(repo).to_not be_new_record
 
-      post action, params.merge(repo_url: "https://github.com/#{repo.namespace}/#{repo.name}.git")
+      post action, params: params.merge(repo_url: "https://github.com/#{repo.namespace}/#{repo.name}.git")
       expect(response).to be_success
     end
   end
 
   describe "#show" do
     it "should return a valid JSON" do
-      branch = FactoryGirl.create(:branch, name: 'gummy-bears')
-      build = FactoryGirl.create(:build, branch_record: branch, :test_command => "script/ci")
-      build_part = FactoryGirl.create(:build_part, build_instance: build)
-      FactoryGirl.create(:build_attempt, :build_part => build_part, :state => 'passed')
-      get :show, repository_path: branch.repository, id: build.id, format: :json
+      branch = FactoryBot.create(:branch, name: 'gummy-bears')
+      build = FactoryBot.create(:build, branch_record: branch, :test_command => "script/ci")
+      build_part = FactoryBot.create(:build_part, build_instance: build)
+      FactoryBot.create(:build_attempt, :build_part => build_part, :state => 'passed')
+      get :show, params: { repository_path: branch.repository, id: build.id, format: :json }
       ret = JSON.parse(response.body)
       expect(ret['build']['build_parts'].length).to eq(1)
       expect(ret['build']['build_parts'][0]['build_id']).to eq(build.id)
@@ -139,20 +139,20 @@ describe BuildsController do
     context "when the repository is disabled" do
       render_views
       let(:build) {
-        FactoryGirl.create(:build_on_disabled_repo, state: 'failed')
+        FactoryBot.create(:build_on_disabled_repo, state: 'failed')
       }
 
       it "should not show 'Rebuild failed parts' button or rebuild action in #build-summary table" do
-        build_part = FactoryGirl.create(:build_part, build_instance: build)
-        FactoryGirl.create(:completed_build_attempt, build_part: build_part, state: 'failed')
-        get :show, repository_path: build.repository, id: build.id
+        build_part = FactoryBot.create(:build_part, build_instance: build)
+        FactoryBot.create(:completed_build_attempt, build_part: build_part, state: 'failed')
+        get :show, params: { repository_path: build.repository, id: build.id }
         expect(response.body).to_not match(/<input.*value="Rebuild failed parts"/)
         expect(response.body).to_not match(%r{<a.*>Rebuild<\/a>$})
       end
 
       it "should not show 'Retry Partitioning' button" do
         build.build_parts.delete_all
-        get :show, repository_path: build.repository, id: build.id
+        get :show, params: { repository_path: build.repository, id: build.id }
         expect(response.body).to_not match(/<input.*value="Retry Partitioning"/)
       end
     end
@@ -160,20 +160,20 @@ describe BuildsController do
     context "when the repository is enabled" do
       render_views
       let(:build) {
-        FactoryGirl.create(:build, state: 'failed')
+        FactoryBot.create(:build, state: 'failed')
       }
 
       it "should show 'Rebuild failed parts' button or rebuild action in #build-summary table" do
-        build_part = FactoryGirl.create(:build_part, build_instance: build)
-        FactoryGirl.create(:completed_build_attempt, build_part: build_part, state: 'failed')
-        get :show, repository_path: build.repository, id: build.id
+        build_part = FactoryBot.create(:build_part, build_instance: build)
+        FactoryBot.create(:completed_build_attempt, build_part: build_part, state: 'failed')
+        get :show, params: { repository_path: build.repository, id: build.id }
         expect(response.body).to match(/<input.*value="Rebuild failed parts"/)
         expect(response.body).to match(%r{<a.*>Rebuild<\/a>$})
       end
 
       it "should show 'Retry Partitioning' button" do
         build.build_parts.delete_all
-        get :show, repository_path: build.repository.to_param, id: build.id
+        get :show, params: { repository_path: build.repository.to_param, id: build.id }
         expect(response.body).to match(/<input.*value="Retry Partitioning"/)
       end
     end
@@ -181,8 +181,8 @@ describe BuildsController do
 
   describe "#abort" do
     before do
-      @build = FactoryGirl.create(:build)
-      put :abort, repository_path: @build.repository.to_param, id: @build.to_param
+      @build = FactoryBot.create(:build)
+      put :abort, params: { repository_path: @build.repository.to_param, id: @build.to_param }
     end
 
     it "redirects back to the build page" do
@@ -197,7 +197,7 @@ describe BuildsController do
 
   describe "#on_success_log_file link" do
     render_views
-    let(:build) { FactoryGirl.create(:build, state: 'succeeded') }
+    let(:build) { FactoryBot.create(:build, state: 'succeeded') }
     before do
       @action = :show
       @params = {:id => build.id, :repository_path => build.repository}
@@ -213,7 +213,7 @@ describe BuildsController do
       end
 
       it "displays link to on_success_log_file" do
-        get @action, @params
+        get @action, params: @params
         doc = Nokogiri::HTML(response.body)
         elements = doc.search("[text()*='on_success_script.log']")
         expect(elements.size).to eq(1)
@@ -222,7 +222,7 @@ describe BuildsController do
 
     context "does not have on_success_log_file" do
       it "does not display link to on_success_log_file" do
-        get @action, @params
+        get @action, params: @params
         doc = Nokogiri::HTML(response.body)
         elements = doc.search("[text()*='on_success_script.log']")
         expect(elements.size).to eq(0)
@@ -232,18 +232,18 @@ describe BuildsController do
 
   describe "#toggle_merge_on_success" do
     before do
-      @build = FactoryGirl.create(:build, :merge_on_success => true)
+      @build = FactoryBot.create(:build, :merge_on_success => true)
     end
 
     it "aborts merge_on_success" do
-      post :toggle_merge_on_success, id: @build.to_param, repository_path: @build.repository.to_param, merge_on_success: false
+      post :toggle_merge_on_success, params: { id: @build.to_param, repository_path: @build.repository.to_param, merge_on_success: false }
       expect(response).to redirect_to(repository_build_path(@build.repository, @build))
       expect(@build.reload.merge_on_success).to be false
     end
 
     it "enables merge_on_success" do
       @build.update_attributes(:merge_on_success => false)
-      post :toggle_merge_on_success, id: @build.to_param, repository_path: @build.repository.to_param, merge_on_success: true
+      post :toggle_merge_on_success, params: { id: @build.to_param, repository_path: @build.repository.to_param, merge_on_success: true }
       expect(response).to redirect_to(repository_build_path(@build.repository, @build))
       expect(@build.reload.merge_on_success).to be true
     end
@@ -251,7 +251,7 @@ describe BuildsController do
 
   describe "merge_on_success checkbox" do
     render_views
-    let(:build) { FactoryGirl.create(:build) }
+    let(:build) { FactoryBot.create(:build) }
 
     before do
       @action = :show
@@ -259,7 +259,7 @@ describe BuildsController do
     end
 
     it "renders the merge_on_success checkbox" do
-      get @action, @params
+      get @action, params: @params
       doc = Nokogiri::HTML(response.body)
       elements = doc.css("input[name=merge_on_success]")
       expect(elements.size).to eq(1)
@@ -267,9 +267,9 @@ describe BuildsController do
     end
 
     context "for builds with merge_on_success enabled" do
-      let(:build) { FactoryGirl.create(:build, merge_on_success: true) }
+      let(:build) { FactoryBot.create(:build, merge_on_success: true) }
       it "renders the merge_on_success checkbox" do
-        get @action, @params
+        get @action, params: @params
         doc = Nokogiri::HTML(response.body)
         elements = doc.css("input[name=merge_on_success]")
         expect(elements.size).to eq(1)
@@ -278,10 +278,10 @@ describe BuildsController do
     end
 
     context "for builds on a convergence branch" do
-      let(:build) { FactoryGirl.create(:convergence_branch_build) }
+      let(:build) { FactoryBot.create(:convergence_branch_build) }
 
       it "renders the merge_on_success checkbox disabled" do
-        get @action, @params
+        get @action, params: @params
         doc = Nokogiri::HTML(response.body)
         elements = doc.css("input[name=merge_on_success]")
         expect(elements.size).to eq(1)
@@ -291,22 +291,22 @@ describe BuildsController do
   end
 
   describe "#rebuild_failed_parts" do
-    let(:build) { FactoryGirl.create(:build) }
-    let(:parts) { (1..4).map { FactoryGirl.create(:build_part, :build_instance => build) } }
+    let(:build) { FactoryBot.create(:build) }
+    let(:parts) { (1..4).map { FactoryBot.create(:build_part, :build_instance => build) } }
 
     before do
       allow(GitRepo).to receive(:load_kochiku_yml).and_return(nil)
     end
 
-    subject { post :rebuild_failed_parts, repository_path: build.repository.to_param, id: build.id }
+    subject { post :rebuild_failed_parts, params: { repository_path: build.repository.to_param, id: build.id } }
 
     context "happy path" do
       before do
-        @attempt_1 = FactoryGirl.create(:build_attempt, :build_part => parts[0], :state => 'failed')
-        @attempt_2 = FactoryGirl.create(:build_attempt, :build_part => parts[1], :state => 'failed')
-        @attempt_3 = FactoryGirl.create(:build_attempt, :build_part => parts[1], :state => 'errored')
-        @attempt_4 = FactoryGirl.create(:build_attempt, :build_part => parts[2], :state => 'passed')
-        @attempt_5 = FactoryGirl.create(:build_attempt, :build_part => parts[3], :state => 'aborted')
+        @attempt_1 = FactoryBot.create(:build_attempt, :build_part => parts[0], :state => 'failed')
+        @attempt_2 = FactoryBot.create(:build_attempt, :build_part => parts[1], :state => 'failed')
+        @attempt_3 = FactoryBot.create(:build_attempt, :build_part => parts[1], :state => 'errored')
+        @attempt_4 = FactoryBot.create(:build_attempt, :build_part => parts[2], :state => 'passed')
+        @attempt_5 = FactoryBot.create(:build_attempt, :build_part => parts[3], :state => 'aborted')
       end
 
       it "rebuilds all failed attempts" do
@@ -324,15 +324,15 @@ describe BuildsController do
 
         expect {
           # repost to test idempotency
-          post :rebuild_failed_parts, repository_path: build.repository.to_param, id: build.id
+          post :rebuild_failed_parts, params: { repository_path: build.repository.to_param, id: build.id }
         }.to_not change(BuildAttempt, :count)
       end
     end
 
     context "an successful prior build attempt should not be rebuilt" do
       it "does something" do
-        FactoryGirl.create(:build_attempt, :build_part => parts[1], :state => 'passed') # attempt 1
-        FactoryGirl.create(:build_attempt, :build_part => parts[1], :state => 'failed') # attempt 2
+        FactoryBot.create(:build_attempt, :build_part => parts[1], :state => 'passed') # attempt 1
+        FactoryBot.create(:build_attempt, :build_part => parts[1], :state => 'failed') # attempt 2
 
         expect { subject }.to_not change(BuildAttempt, :count)
       end
@@ -340,7 +340,7 @@ describe BuildsController do
   end
 
   describe "#retry_partitioning" do
-    let!(:build) { FactoryGirl.create(:build) }
+    let!(:build) { FactoryBot.create(:build) }
     before do
       allow(GitRepo).to receive(:load_kochiku_yml).and_return(nil)
     end
@@ -348,7 +348,7 @@ describe BuildsController do
     context "when there are no build parts" do
       it "enques a partitioning job" do
         expect(Resque).to receive(:enqueue)
-        post :retry_partitioning, repository_path: build.repository.to_param, id: build.id
+        post :retry_partitioning, params: { repository_path: build.repository.to_param, id: build.id }
         expect(response).to redirect_to(repository_build_path(build.repository, build))
       end
     end
@@ -356,17 +356,17 @@ describe BuildsController do
     context "when there are already build parts" do
       it "does nothing" do
         expect(Resque).to_not receive(:enqueue)
-        FactoryGirl.create(:build_part, build_instance: build)
-        post :retry_partitioning, repository_path: build.repository.to_param, id: build.id
+        FactoryBot.create(:build_part, build_instance: build)
+        post :retry_partitioning, params: { repository_path: build.repository.to_param, id: build.id }
         expect(response).to redirect_to(repository_build_path(build.repository, build))
       end
     end
 
     context "when the build's repository is disabled" do
       it "should not partition build" do
-        build2 = FactoryGirl.create(:build_on_disabled_repo)
+        build2 = FactoryBot.create(:build_on_disabled_repo)
         expect(Resque).to_not receive(:enqueue)
-        post :retry_partitioning, repository_path: build2.repository.to_param, id: build2.id
+        post :retry_partitioning, params: { repository_path: build2.repository.to_param, id: build2.id }
         expect(response).to redirect_to(repository_build_path(build2.repository, build2))
       end
     end
@@ -374,16 +374,16 @@ describe BuildsController do
 
   describe "#build_redirect" do
     it "should redirect to the full build show url" do
-      build = FactoryGirl.create(:build)
-      get :build_redirect, id: build.id
+      build = FactoryBot.create(:build)
+      get :build_redirect, params: { id: build.id }
       expect(response).to redirect_to(repository_build_path(build.repository, build))
     end
   end
 
   describe "#build_ref_redirect" do
     it "should redirect to the build show url that matches the ref given" do
-      build = FactoryGirl.create(:build)
-      get :build_ref_redirect, ref: build.ref[0, 8]
+      build = FactoryBot.create(:build)
+      get :build_ref_redirect, params: { ref: build.ref[0, 8] }
       expect(response).to redirect_to(repository_build_path(build.repository, build))
     end
   end

@@ -3,8 +3,8 @@ require "spec_helper"
 require "#{Rails.root}/lib/build_strategies/production_build_strategy.rb"
 
 describe BuildStrategy do
-  let(:branch) { FactoryGirl.create(:branch, name: 'funyuns') }
-  let(:build) { FactoryGirl.create(:build, branch_record: branch) }
+  let(:branch) { FactoryBot.create(:branch, name: 'funyuns') }
+  let(:build) { FactoryBot.create(:build, branch_record: branch) }
 
   before(:each) do
     CommandStubber.new # ensure Open3 is stubbed
@@ -44,8 +44,8 @@ describe BuildStrategy do
     end
 
     context "Using a stash build" do
-      let(:stash_branch) { FactoryGirl.create(:branch, repository: FactoryGirl.create(:stash_repository)) }
-      let(:stash_build) { FactoryGirl.create(:build, branch_record: stash_branch) }
+      let(:stash_branch) { FactoryBot.create(:branch, repository: FactoryBot.create(:stash_repository)) }
+      let(:stash_build) { FactoryBot.create(:build, branch_record: stash_branch) }
 
       before do
         settings = SettingsAccessor.new(<<-YAML)

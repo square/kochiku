@@ -1,9 +1,9 @@
 require 'spec_helper'
 
 describe BuildStateUpdateJob do
-  let(:repository) { FactoryGirl.create(:repository, url: 'git@github.com:square/test-repo.git') }
-  let(:branch) { FactoryGirl.create(:branch, :repository => repository) }
-  let(:build) { FactoryGirl.create(:build, :state => 'runnable', :branch_record => branch) }
+  let(:repository) { FactoryBot.create(:repository, url: 'git@github.com:square/test-repo.git') }
+  let(:branch) { FactoryBot.create(:branch, :repository => repository) }
+  let(:build) { FactoryBot.create(:build, :state => 'runnable', :branch_record => branch) }
   let(:name) { repository.name + "_pull_requests" }
   let(:current_repo_master) { build.ref }
 
@@ -86,7 +86,7 @@ describe BuildStateUpdateJob do
         end
 
         context "with a build on a convergence branch" do
-          let(:branch) { FactoryGirl.create(:convergence_branch, repository: repository) }
+          let(:branch) { FactoryBot.create(:convergence_branch, repository: repository) }
 
           it "should promote the build" do
             expect(BuildStrategy).to receive(:promote_build).with(build)
@@ -138,7 +138,7 @@ describe BuildStateUpdateJob do
     end
 
     context "when there is a success script" do
-      let(:build) { FactoryGirl.create(:build, state: 'succeeded', branch_record: branch) }
+      let(:build) { FactoryBot.create(:build, state: 'succeeded', branch_record: branch) }
 
       before do
         kochiku_yaml_config = { 'on_success_script' => 'echo hip hip hooray' }
@@ -164,7 +164,7 @@ describe BuildStateUpdateJob do
     end
 
     context "where this is no success script" do
-      let(:build) { FactoryGirl.create(:build, state: 'succeeded', branch_record: branch) }
+      let(:build) { FactoryBot.create(:build, state: 'succeeded', branch_record: branch) }
 
       before do
         kochiku_yaml_config = { }
@@ -190,11 +190,11 @@ describe BuildStateUpdateJob do
       before do
         (build.build_parts - [build.build_parts.first]).each do |part|
           ba = part.build_attempts.create!(:state => 'passed')
-          FactoryGirl.create(:stdout_build_artifact, build_attempt: ba)
+          FactoryBot.create(:stdout_build_artifact, build_attempt: ba)
         end
 
         failed_build_attempt = build.build_parts.first.build_attempts.create!(:state => 'failed')
-        FactoryGirl.create(:stdout_build_artifact, build_attempt: failed_build_attempt)
+        FactoryBot.create(:stdout_build_artifact, build_attempt: failed_build_attempt)
 
         build.update_state_from_parts!
       end

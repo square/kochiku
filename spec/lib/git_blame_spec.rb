@@ -1,7 +1,7 @@
 require 'spec_helper'
 
 describe GitBlame do
-  let(:build) { FactoryGirl.create(:build) }
+  let(:build) { FactoryBot.create(:build) }
 
   describe "#emails_since_last_green" do
     subject { GitBlame.emails_since_last_green(build) }

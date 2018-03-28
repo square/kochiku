@@ -2,14 +2,14 @@ require 'spec_helper'
 
 describe BuildPartDecorator do
   describe "#most_recent_stdout_artifact" do
-    let(:artifact) { FactoryGirl.create(:build_artifact, :log_file => File.open(FIXTURE_PATH + file)) }
+    let(:artifact) { FactoryBot.create(:build_artifact, :log_file => File.open(FIXTURE_PATH + file)) }
     let(:build_attempt) { artifact.build_attempt }
     let(:build_part) { BuildPartDecorator.new(build_attempt.build_part) }
 
     subject { build_part.most_recent_stdout_artifact }
 
     before do
-      FactoryGirl.create(:build_artifact)
+      FactoryBot.create(:build_artifact)
     end
 
     context "stdout.log" do

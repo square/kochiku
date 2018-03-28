@@ -11,7 +11,7 @@ describe RepositoriesController do
     end
     it "should perform a basic create" do
       expect{
-        post :create, @params
+        post :create, params: @params
         expect(response).to be_redirect
       }.to change(Repository, :count).by(1)
       repository = Repository.where(url: "git@git.example.com:square/kochiku.git").first
@@ -20,7 +20,7 @@ describe RepositoriesController do
     end
 
     it "sets host, namespace, and name based on the repo url" do
-      post :create, @params
+      post :create, params: @params
       repository = Repository.where(url: "git@git.example.com:square/kochiku.git").first
       expect(repository.host).to eq('git.example.com')
       expect(repository.namespace).to eq('square')
@@ -28,7 +28,7 @@ describe RepositoriesController do
     end
 
     it "creates a branch_record for the convergence branches" do
-      post :create, @params.merge(convergence_branches: "master, release-1-x")
+      post :create, params: @params.merge(convergence_branches: "master, release-1-x")
       expect(response).to be_redirect
       expect(Branch.exists?(name: 'master', convergence: true)).to be(true)
       expect(Branch.exists?(name: 'release-1-x', convergence: true)).to be(true)
@@ -39,7 +39,7 @@ describe RepositoriesController do
         # timeout outside of the allowable range
         @params[:repository][:timeout] = '1000000'
 
-        post :create, @params
+        post :create, params: @params
         expect(response).to be_success
         expect(assigns[:repository].errors.full_messages.join(','))
           .to include("The maximum timeout allowed is 1440 minutes")
@@ -49,11 +49,11 @@ describe RepositoriesController do
   end
 
   describe "update" do
-    let!(:repository) { FactoryGirl.create(:repository, :url => "git@git.example.com:square/kochiku.git") }
+    let!(:repository) { FactoryBot.create(:repository, :url => "git@git.example.com:square/kochiku.git") }
 
     it "updates existing repository" do
       expect{
-        patch :update, :id => repository.id, :repository => {:url => "git@git.example.com:square/kochiku-worker.git"}
+        patch :update, params: { :id => repository.id, :repository => {:url => "git@git.example.com:square/kochiku-worker.git"} }
         expect(response).to be_redirect
       }.to_not change(Repository, :count)
       repository.reload
@@ -65,7 +65,7 @@ describe RepositoriesController do
       let(:params) { { timeout: 'abc' } }
 
       it "re-renders the edit page" do
-        patch :update, id: repository.id, repository: params
+        patch :update, params: { id: repository.id, repository: params }
         expect(response).to be_success
         expect(response).to render_template('edit')
       end
@@ -84,7 +84,7 @@ describe RepositoriesController do
       it "should successfully update the #{attribute} attribute" do
         start_value = repository.send(attribute)
         inverse_value_as_str = start_value ? "0" : "1"
-        patch :update, id: repository.id, repository: { attribute => inverse_value_as_str }
+        patch :update, params: { id: repository.id, repository: { attribute => inverse_value_as_str } }
         repository.reload
         expect(repository.send(attribute)).to eq(!start_value)
       end
@@ -94,7 +94,7 @@ describe RepositoriesController do
     [:timeout].each do |attribute|
       it "should successfully update the #{attribute} attribute" do
         new_value = rand(1440) # max imposed by repository validation
-        patch :update, id: repository.id, repository: { attribute => new_value }
+        patch :update, params: { id: repository.id, repository: { attribute => new_value } }
         repository.reload
         expect(repository.send(attribute)).to eq(new_value)
       end
@@ -106,7 +106,7 @@ describe RepositoriesController do
     ].each do |attribute|
       it "should successfully update the #{attribute} attribute" do
         new_value = "Keytar Intelligentsia artisan typewriter 3 wolf moon"
-        patch :update, id: repository.id, repository: { attribute => new_value }
+        patch :update, params: { id: repository.id, repository: { attribute => new_value } }
         repository.reload
         expect(repository.send(attribute)).to eq(new_value)
       end
@@ -115,14 +115,14 @@ describe RepositoriesController do
     describe "of convergence branches" do
       it "should set convergence on new branches in the list" do
         # branchA already has convergence
-        branchA = FactoryGirl.create(:branch, repository: repository, name: 'branchA', convergence: true)
+        branchA = FactoryBot.create(:branch, repository: repository, name: 'branchA', convergence: true)
         # branchB does not have convergence
-        branchB = FactoryGirl.create(:branch, repository: repository, name: 'branchB', convergence: false)
+        branchB = FactoryBot.create(:branch, repository: repository, name: 'branchB', convergence: false)
         # branchC does not have convergence
-        branchC = FactoryGirl.create(:branch, repository: repository, name: 'branchC', convergence: false)
+        branchC = FactoryBot.create(:branch, repository: repository, name: 'branchC', convergence: false)
         # branchD does not yet exist
 
-        patch :update, id: repository.id, repository: {timeout: 10}, convergence_branches: "branchA,branchB,branchD"
+        patch :update, params: { id: repository.id, repository: {timeout: 10}, convergence_branches: "branchA,branchB,branchD" }
         expect(branchA.reload).to be_convergence
         expect(branchB.reload).to be_convergence
         expect(branchC.reload).to_not be_convergence
@@ -132,13 +132,13 @@ describe RepositoriesController do
 
       it "should remove convergence from branches no longer in the list" do
         # branchA has convergence
-        branchA = FactoryGirl.create(:branch, repository: repository, name: 'branchA', convergence: true)
+        branchA = FactoryBot.create(:branch, repository: repository, name: 'branchA', convergence: true)
         # branchB has convergence
-        branchB = FactoryGirl.create(:branch, repository: repository, name: 'branchB', convergence: true)
+        branchB = FactoryBot.create(:branch, repository: repository, name: 'branchB', convergence: true)
         # branchC does not have convergence
-        branchC = FactoryGirl.create(:branch, repository: repository, name: 'branchC', convergence: false)
+        branchC = FactoryBot.create(:branch, repository: repository, name: 'branchC', convergence: false)
 
-        patch :update, id: repository.id, repository: {timeout: 10}, convergence_branches: "branchA"
+        patch :update, params: { id: repository.id, repository: {timeout: 10}, convergence_branches: "branchA" }
         expect(branchA.reload).to be_convergence
         expect(branchB.reload).to_not be_convergence
         expect(branchC.reload).to_not be_convergence
@@ -147,10 +147,10 @@ describe RepositoriesController do
   end
 
   describe "delete /repositories/:id" do
-    let!(:repository) { FactoryGirl.create(:repository, :url => "git@git.example.com:square/kochiku.git", :test_command => "script/something") }
+    let!(:repository) { FactoryBot.create(:repository, :url => "git@git.example.com:square/kochiku.git", :test_command => "script/something") }
     it "responds with success" do
       expect {
-        get :destroy, :id => repository.id
+        get :destroy, params: { :id => repository.id }
         expect(response).to be_redirect
       }.to change(Repository, :count).by(-1)
     end
@@ -165,7 +165,7 @@ describe RepositoriesController do
 
   describe "get /:namespace/:name/edit" do
     it "responds with success" do
-      get :edit, repository_path: FactoryGirl.create(:repository).to_param
+      get :edit, params: { repository_path: FactoryBot.create(:repository).to_param }
       expect(response).to be_success
     end
   end
@@ -178,9 +178,9 @@ describe RepositoriesController do
   end
 
   describe "get /dashboard" do
-    let(:repository) { FactoryGirl.create(:repository) }
-    let!(:master_branch) { FactoryGirl.create(:master_branch, repository: repository) }
-    let!(:non_master_branch) { FactoryGirl.create(:branch, :name => 'feature-branch', repository: repository) }
+    let(:repository) { FactoryBot.create(:repository) }
+    let!(:master_branch) { FactoryBot.create(:master_branch, repository: repository) }
+    let!(:non_master_branch) { FactoryBot.create(:branch, :name => 'feature-branch', repository: repository) }
 
     it "displays the build status of only the master branches" do
       get :dashboard
@@ -192,35 +192,35 @@ describe RepositoriesController do
   end
 
   describe 'post /build-ref' do
-    let(:repository) { FactoryGirl.create(:repository) }
+    let(:repository) { FactoryBot.create(:repository) }
     let(:fake_sha) { to_40('1') }
 
     it "creates a master build with query string parameters" do
-      post :build_ref, id: repository.id, ref: 'master', sha: fake_sha
+      post :build_ref, params: { id: repository.id, ref: 'master', sha: fake_sha }
 
       verify_response_creates_build response, 'master', fake_sha
     end
 
     it "creates a master build with payload" do
-      post :build_ref, id: repository.id, refChanges: [{refId: 'refs/heads/master', toHash: fake_sha}]
+      post :build_ref, params: { id: repository.id, refChanges: [{refId: 'refs/heads/master', toHash: fake_sha}] }
 
       verify_response_creates_build response, 'master', fake_sha
     end
 
     it "creates a branch build with query string parameters" do
-      post :build_ref, id: repository.id, ref: 'blah', sha: fake_sha
+      post :build_ref, params: { id: repository.id, ref: 'blah', sha: fake_sha }
 
       verify_response_creates_build response, 'blah', fake_sha
     end
 
     it "creates a branch build with payload" do
-      post :build_ref, id: repository.id, refChanges: [{refId: 'refs/heads/blah', toHash: fake_sha}]
+      post :build_ref, params: { id: repository.id, refChanges: [{refId: 'refs/heads/blah', toHash: fake_sha}] }
 
       verify_response_creates_build response, 'blah', fake_sha
     end
 
     it "creates a branch build for a branch name with slashes" do
-      post :build_ref, id: repository.id, refChanges: [{refId: 'refs/heads/blah/with/a/slash', toHash: fake_sha}]
+      post :build_ref, params: { id: repository.id, refChanges: [{refId: 'refs/heads/blah/with/a/slash', toHash: fake_sha}] }
 
       verify_response_creates_build response, 'blah/with/a/slash', fake_sha
     end
@@ -238,23 +238,23 @@ describe RepositoriesController do
     end
 
     context "a convergence branch" do
-      let(:branch) { FactoryGirl.create(:convergence_branch, repository: repository) }
+      let(:branch) { FactoryBot.create(:convergence_branch, repository: repository) }
 
       it "should not abort previous in-progress builds" do
-        earlier_build = FactoryGirl.create(:build, state: 'runnable', branch_record: branch)
+        earlier_build = FactoryBot.create(:build, state: 'runnable', branch_record: branch)
 
-        post :build_ref, id: repository.id, ref: branch.name, sha: fake_sha
+        post :build_ref, params: { id: repository.id, ref: branch.name, sha: fake_sha }
         expect(earlier_build.reload.state).to eq('runnable')
       end
     end
 
     context "not a convergence branch" do
-      let(:branch) { FactoryGirl.create(:branch, repository: repository) }
+      let(:branch) { FactoryBot.create(:branch, repository: repository) }
 
       it "should abort all previous in-progress builds" do
-        earlier_build = FactoryGirl.create(:build, state: 'runnable', branch_record: branch)
+        earlier_build = FactoryBot.create(:build, state: 'runnable', branch_record: branch)
 
-        post :build_ref, id: repository.id, ref: branch.name, sha: fake_sha
+        post :build_ref, params: { id: repository.id, ref: branch.name, sha: fake_sha }
         expect(earlier_build.reload.state).to eq('aborted')
       end
     end

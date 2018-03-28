@@ -5,25 +5,25 @@ describe BranchesController do
   render_views
 
   describe "#index" do
-    let(:repo) { FactoryGirl.create(:repository) }
-    let!(:a) { FactoryGirl.create(:branch, name: 'aster', repository: repo, convergence: true) }
-    let!(:b) { FactoryGirl.create(:branch, name: 'buckeye', repository: repo, updated_at: 30.minutes.ago) }
-    let!(:c) { FactoryGirl.create(:branch, name: 'creosote', repository: repo, updated_at: 15.minutes.ago) }
+    let(:repo) { FactoryBot.create(:repository) }
+    let!(:a) { FactoryBot.create(:branch, name: 'aster', repository: repo, convergence: true) }
+    let!(:b) { FactoryBot.create(:branch, name: 'buckeye', repository: repo, updated_at: 30.minutes.ago) }
+    let!(:c) { FactoryBot.create(:branch, name: 'creosote', repository: repo, updated_at: 15.minutes.ago) }
 
     it "shows branches in order" do
-      get :index, repository_path: repo
+      get :index, params: { repository_path: repo }
       expect(assigns(:convergence_branches).map(&:name)).to eq(%w{aster})
       expect(assigns(:recently_active_branches).map(&:name)).to eq(%w{creosote buckeye})
     end
   end
 
   describe "#show" do
-    let(:branch) { FactoryGirl.create(:branch) }
-    let!(:build1) { FactoryGirl.create(:build, :branch_record => branch, :state => 'succeeded', :test_command => "script/ci") }
-    let!(:build2) { FactoryGirl.create(:build, :branch_record => branch, :state => 'errored', :test_command => "script/ci") }
+    let(:branch) { FactoryBot.create(:branch) }
+    let!(:build1) { FactoryBot.create(:build, :branch_record => branch, :state => 'succeeded', :test_command => "script/ci") }
+    let!(:build2) { FactoryBot.create(:build, :branch_record => branch, :state => 'errored', :test_command => "script/ci") }
 
     it "should return an rss feed of builds" do
-      get :show, repository_path: branch.repository, id: branch, format: :rss
+      get :show, params: { repository_path: branch.repository, id: branch, format: :rss }
       doc = REXML::Document.new(response.body)
 
       items = doc.elements.to_a("//channel/item")
@@ -33,7 +33,7 @@ describe BranchesController do
     end
 
     it "should return a JSON if requested" do
-      get :show, repository_path: branch.repository, id: branch, format: :json
+      get :show, params: { repository_path: branch.repository, id: branch, format: :json }
       results = JSON.parse(response.body)
       expect(results['id']).to eq(branch.id)
       expect(results['recent_builds'].length).to eq(Build.count)
@@ -42,40 +42,40 @@ describe BranchesController do
     end
 
     context "when the repository is disabled" do
-      let(:branch2) { FactoryGirl.create(:branch_on_disabled_repo) }
+      let(:branch2) { FactoryBot.create(:branch_on_disabled_repo) }
 
       before do
-        build3 = FactoryGirl.create(:build, branch_record: branch2, state: 'failed')
-        build_part = FactoryGirl.create(:build_part, build_instance: build3)
-        FactoryGirl.create(:completed_build_attempt, build_part: build_part, state: 'failed')
+        build3 = FactoryBot.create(:build, branch_record: branch2, state: 'failed')
+        build_part = FactoryBot.create(:build_part, build_instance: build3)
+        FactoryBot.create(:completed_build_attempt, build_part: build_part, state: 'failed')
       end
 
       it "should disable build button" do
-        get :show, repository_path: branch2.repository, id: branch2
+        get :show, params: { repository_path: branch2.repository, id: branch2 }
         expect(response.body).to match(/disabled="disabled"/)
       end
     end
 
     context "when the repository is enabled" do
-      let(:branch2) { FactoryGirl.create(:branch) }
+      let(:branch2) { FactoryBot.create(:branch) }
 
       before do
-        build3 = FactoryGirl.create(:build, branch_record: branch2, state: 'failed')
-        build_part = FactoryGirl.create(:build_part, build_instance: build3)
-        FactoryGirl.create(:completed_build_attempt, build_part: build_part, state: 'failed')
+        build3 = FactoryBot.create(:build, branch_record: branch2, state: 'failed')
+        build_part = FactoryBot.create(:build_part, build_instance: build3)
+        FactoryBot.create(:completed_build_attempt, build_part: build_part, state: 'failed')
       end
 
       it "shouldn't disable build button" do
-        get :show, repository_path: branch2.repository, id: branch2
+        get :show, params: { repository_path: branch2.repository, id: branch2 }
         expect(response.body).to_not match(/disabled="disabled"/)
       end
     end
   end
 
   describe "#request_new_build" do
-    let(:branch) { FactoryGirl.create(:branch) }
+    let(:branch) { FactoryBot.create(:branch) }
     subject {
-      post :request_new_build, repository_path: branch.repository.to_param, id: branch.to_param
+      post :request_new_build, params: { repository_path: branch.repository.to_param, id: branch.to_param }
     }
 
     context "when there is a new commit on the branch that hasn't been built" do
@@ -100,7 +100,7 @@ describe BranchesController do
       let(:branch_head_sha) { "4b41fe773057b2f1e2063eb94814d32699a34541" }
 
       before do
-        FactoryGirl.create(:build, state: 'errored', branch_record: branch, ref: branch_head_sha)
+        FactoryBot.create(:build, state: 'errored', branch_record: branch, ref: branch_head_sha)
 
         fake_remote_server = double(:sha_for_branch => branch_head_sha)
         allow(RemoteServer).to receive(:for_url).with(branch.repository.url).and_return(fake_remote_server)
@@ -121,25 +121,25 @@ describe BranchesController do
   end
 
   describe "#health" do
-    let(:branch) { FactoryGirl.create(:branch) }
+    let(:branch) { FactoryBot.create(:branch) }
 
     context "normal circumstances" do
       before do
-        build = FactoryGirl.create(:build, branch_record: branch, state: 'succeeded')
-        build_part = FactoryGirl.create(:build_part, build_instance: build)
-        FactoryGirl.create(:completed_build_attempt, build_part: build_part, state: 'failed')
-        FactoryGirl.create(:completed_build_attempt, build_part: build_part, state: 'passed')
+        build = FactoryBot.create(:build, branch_record: branch, state: 'succeeded')
+        build_part = FactoryBot.create(:build_part, build_instance: build)
+        FactoryBot.create(:completed_build_attempt, build_part: build_part, state: 'failed')
+        FactoryBot.create(:completed_build_attempt, build_part: build_part, state: 'passed')
       end
 
       it "should render" do
-        get :health, repository_path: branch.repository, id: branch
+        get :health, params: { repository_path: branch.repository, id: branch }
         expect(response).to be_success
       end
     end
 
     context "no builds are present" do
       it "should not error" do
-        get :health, repository_path: branch.repository, id: branch
+        get :health, params: { repository_path: branch.repository, id: branch }
         expect(response).to be_success
       end
     end
@@ -147,14 +147,14 @@ describe BranchesController do
     context "only older builds are present" do
       before do
         # a build from 1 year ago
-        build = FactoryGirl.create(:build, branch_record: branch, state: 'failed', created_at: 1.year.ago)
-        build_part = FactoryGirl.create(:build_part, build_instance: build, created_at: 1.year.ago)
-        FactoryGirl.create(:completed_build_attempt, build_part: build_part, state: 'failed', created_at: 1.year.ago)
+        build = FactoryBot.create(:build, branch_record: branch, state: 'failed', created_at: 1.year.ago)
+        build_part = FactoryBot.create(:build_part, build_instance: build, created_at: 1.year.ago)
+        FactoryBot.create(:completed_build_attempt, build_part: build_part, state: 'failed', created_at: 1.year.ago)
       end
 
       context "no builds from the last 30 days" do
         it "should not error" do
-          get :health, repository_path: branch.repository, id: branch
+          get :health, params: { repository_path: branch.repository, id: branch }
           expect(response).to be_success
         end
       end
@@ -162,13 +162,13 @@ describe BranchesController do
       context "no builds from the last 7 days" do
         before do
           # a build from 10 days ago
-          build = FactoryGirl.create(:build, branch_record: branch, state: 'failed', created_at: 10.days.ago)
-          build_part = FactoryGirl.create(:build_part, build_instance: build, created_at: 10.days.ago)
-          FactoryGirl.create(:completed_build_attempt, build_part: build_part, state: 'failed', created_at: 10.days.ago)
+          build = FactoryBot.create(:build, branch_record: branch, state: 'failed', created_at: 10.days.ago)
+          build_part = FactoryBot.create(:build_part, build_instance: build, created_at: 10.days.ago)
+          FactoryBot.create(:completed_build_attempt, build_part: build_part, state: 'failed', created_at: 10.days.ago)
         end
 
         it "should not error" do
-          get :health, repository_path: branch.repository, id: branch
+          get :health, params: { repository_path: branch.repository, id: branch }
           expect(response).to be_success
         end
       end
@@ -180,27 +180,27 @@ describe BranchesController do
     # the logic here is tested inside branch_spec and branch_decorator_spec. Just
     # verify that the endpoint responds ok
 
-    let(:branch) { FactoryGirl.create(:branch) }
+    let(:branch) { FactoryBot.create(:branch) }
 
     before do
-      FactoryGirl.create(:completed_build, branch_record: branch)
+      FactoryBot.create(:completed_build, branch_record: branch)
     end
 
     it "should render" do
-      get :build_time_history, repository_path: branch.repository, id: branch, format: :json
+      get :build_time_history, params: { repository_path: branch.repository, id: branch, format: :json }
       expect(response).to be_success
     end
   end
 
   describe "#status_report" do
-    let(:repository) { FactoryGirl.create(:repository) }
-    let(:branch) { FactoryGirl.create(:master_branch, repository: repository) }
+    let(:repository) { FactoryBot.create(:repository) }
+    let(:branch) { FactoryBot.create(:master_branch, repository: repository) }
 
     context "when a branch has no builds" do
       before { expect(branch.builds).to be_empty }
 
       it "should return 'Unknown' for activity" do
-        get :status_report, format: :xml
+        get :status_report, params: { format: :xml }
         expect(response).to be_success
 
         doc = Nokogiri::XML(response.body)
@@ -211,10 +211,10 @@ describe BranchesController do
     end
 
     context "with a in-progress build" do
-      let!(:build) { FactoryGirl.create(:build, state: 'running', branch_record: branch) }
+      let!(:build) { FactoryBot.create(:build, state: 'running', branch_record: branch) }
 
       it "should return 'Building' for activity" do
-        get :status_report, format: :xml
+        get :status_report, params: { format: :xml }
         expect(response).to be_success
 
         doc = Nokogiri::XML(response.body)
@@ -225,10 +225,10 @@ describe BranchesController do
     end
 
     context "with a completed build" do
-      let!(:build) { FactoryGirl.create(:build, state: 'failed', branch_record: branch) }
+      let!(:build) { FactoryBot.create(:build, state: 'failed', branch_record: branch) }
 
       it "should return 'CheckingModifications' for activity" do
-        get :status_report, format: :xml
+        get :status_report, params: { format: :xml }
         expect(response).to be_success
 
         doc = Nokogiri::XML(response.body)
@@ -240,14 +240,14 @@ describe BranchesController do
 
     context "with extra convergence branch and one non-convergence" do
       before do
-        FactoryGirl.create(:branch, :name => 'feature-branch', convergence: false, repository: repository)
-        FactoryGirl.create(:branch, :name => 'convergence', convergence: true, repository: repository)
+        FactoryBot.create(:branch, :name => 'feature-branch', convergence: false, repository: repository)
+        FactoryBot.create(:branch, :name => 'convergence', convergence: true, repository: repository)
       end
 
       it "should include all of the convergence branches" do
         branch ## Explicitly reference the branch to cause it to load
 
-        get :status_report, format: :xml
+        get :status_report, params: { format: :xml }
 
         expect(response).to be_success
 

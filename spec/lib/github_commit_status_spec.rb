@@ -3,7 +3,7 @@ require 'spec_helper'
 describe GithubCommitStatus do
   subject { GithubCommitStatus.new(build, oauth_token) }
   let(:oauth_token) { "my_test_token" }
-  let(:build) { FactoryGirl.create(:build) }
+  let(:build) { FactoryBot.create(:build) }
 
   before do
     settings = SettingsAccessor.new(<<-YAML)
@@ -47,7 +47,7 @@ describe GithubCommitStatus do
   end
 
   it "uses a repos github url" do
-    build.branch_record.update_attributes!(:repository => FactoryGirl.create(:repository, :url => "git@github.com:square/kochiku-worker.git"))
+    build.branch_record.update_attributes!(:repository => FactoryBot.create(:repository, :url => "git@github.com:square/kochiku-worker.git"))
     build.update_attributes!(:state => 'failed')
     build.reload
     expect(GithubRequest).to receive(:post)
