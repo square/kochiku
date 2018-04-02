@@ -10,6 +10,7 @@ describe BuildArtifactsController do
     it "should create a build artifact for the build attempt" do
       log_contents = log_file.read
       expect(log_contents).not_to be_empty
+      log_file.rewind
 
       expect {
         post :create, params: { :build_attempt_id => build_attempt.to_param, :build_artifact => {:log_file => log_file}, :format => :xml }
