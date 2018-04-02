@@ -13,6 +13,8 @@ module Partitioner
               Partitioner::Maven.new(build, kochiku_yml)
             when 'dependency_map'
               Partitioner::DependencyMap.new(build, kochiku_yml)
+            when 'go'
+              Partitioner::Go.new(build, kochiku_yml)
             else
               # Default behavior
               Partitioner::Default.new(build, kochiku_yml)
