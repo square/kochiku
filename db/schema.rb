@@ -12,8 +12,8 @@
 
 ActiveRecord::Schema.define(version: 20180301221320) do
 
-  create_table "branches", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
-    t.bigint "repository_id", null: false
+  create_table "branches", id: :integer, force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
+    t.integer "repository_id", null: false
     t.string "name", null: false
     t.boolean "convergence", default: false, null: false
     t.datetime "created_at", null: false
@@ -23,7 +23,7 @@ ActiveRecord::Schema.define(version: 20180301221320) do
     t.index ["repository_id"], name: "index_branches_on_repository_id"
   end
 
-  create_table "build_artifacts", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
+  create_table "build_artifacts", id: :integer, force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
     t.integer "build_attempt_id"
     t.string "log_file"
     t.datetime "created_at", null: false
@@ -31,7 +31,7 @@ ActiveRecord::Schema.define(version: 20180301221320) do
     t.index ["build_attempt_id"], name: "index_build_artifacts_on_build_attempt_id"
   end
 
-  create_table "build_attempts", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
+  create_table "build_attempts", id: :integer, force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
     t.integer "build_part_id"
     t.datetime "started_at"
     t.datetime "finished_at"
@@ -45,7 +45,7 @@ ActiveRecord::Schema.define(version: 20180301221320) do
     t.index ["created_at"], name: "index_build_attempts_on_created_at"
   end
 
-  create_table "build_parts", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
+  create_table "build_parts", id: :integer, force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
     t.integer "build_id"
     t.string "kind"
     t.text "paths"
@@ -58,7 +58,7 @@ ActiveRecord::Schema.define(version: 20180301221320) do
     t.index ["paths"], name: "index_build_parts_on_paths", length: { paths: 255 }
   end
 
-  create_table "builds", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
+  create_table "builds", id: :integer, force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
     t.string "ref", limit: 40, null: false
     t.string "state"
     t.datetime "created_at", null: false
@@ -70,7 +70,7 @@ ActiveRecord::Schema.define(version: 20180301221320) do
     t.string "on_success_script_log_file"
     t.text "error_details"
     t.boolean "build_success_email_sent", default: false, null: false
-    t.bigint "branch_id"
+    t.integer "branch_id"
     t.string "test_command"
     t.string "initiated_by"
     t.index ["branch_id"], name: "index_builds_on_branch_id"
@@ -79,7 +79,7 @@ ActiveRecord::Schema.define(version: 20180301221320) do
     t.index ["ref", "project_id"], name: "index_builds_on_ref_and_project_id", unique: true
   end
 
-  create_table "projects", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
+  create_table "projects", id: :integer, force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
     t.string "name"
     t.string "branch"
     t.datetime "created_at", null: false
@@ -89,7 +89,7 @@ ActiveRecord::Schema.define(version: 20180301221320) do
     t.index ["repository_id"], name: "index_projects_on_repository_id"
   end
 
-  create_table "repositories", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
+  create_table "repositories", id: :integer, force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
     t.string "url"
     t.string "test_command"
     t.datetime "created_at", null: false

@@ -1,4 +1,4 @@
-class RemoveOnSuccessScriptFromRepositories < ActiveRecord::Migration[5.1]
+class RemoveOnSuccessScriptFromRepositories < ActiveRecord::Migration[5.0]
   def up
     # Guard against deleting any data
     rows_with_old_data = select_value("select count(*) from repositories where on_success_script IS NOT NULL AND on_success_script != ''")

@@ -1,4 +1,4 @@
-class ChangeArtifactTypeToName < ActiveRecord::Migration[5.1]
+class ChangeArtifactTypeToName < ActiveRecord::Migration[5.0]
   def self.up
     rename_column :build_artifacts, :type, :name
   end

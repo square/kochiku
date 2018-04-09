@@ -1,4 +1,4 @@
-class RenameBuildPartResultResultToState < ActiveRecord::Migration[5.1]
+class RenameBuildPartResultResultToState < ActiveRecord::Migration[5.0]
   def self.up
     rename_column :build_part_results, :result, :state
   end

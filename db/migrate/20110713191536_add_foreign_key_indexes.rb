@@ -1,4 +1,4 @@
-class AddForeignKeyIndexes < ActiveRecord::Migration[5.1]
+class AddForeignKeyIndexes < ActiveRecord::Migration[5.0]
   def self.up
     add_index :build_parts, :build_id
     add_index :build_attempts, :build_part_id

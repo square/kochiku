@@ -1,4 +1,4 @@
-class RemoveQueueOverrideFromRepositories < ActiveRecord::Migration[5.1]
+class RemoveQueueOverrideFromRepositories < ActiveRecord::Migration[5.0]
   def up
     remove_column :repositories, :queue_override
   end
