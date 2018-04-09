@@ -1,4 +1,4 @@
-class AddSuccessEmail < ActiveRecord::Migration
+class AddSuccessEmail < ActiveRecord::Migration[5.1]
   def change
     add_column :builds, :build_success_email_sent, :boolean, :default => false, :null => false
     add_column :repositories, :send_build_success_email, :boolean, :default => true, :null => false

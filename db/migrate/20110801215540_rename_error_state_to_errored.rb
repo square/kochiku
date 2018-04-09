@@ -1,4 +1,4 @@
-class RenameErrorStateToErrored < ActiveRecord::Migration
+class RenameErrorStateToErrored < ActiveRecord::Migration[5.1]
   def self.up
     execute("UPDATE build_attempts SET state='errored' WHERE state='error'")
     execute("UPDATE builds SET state='errored' WHERE state='error'")

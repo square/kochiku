@@ -1,4 +1,4 @@
-class AddRepositoryNameAsColumn < ActiveRecord::Migration
+class AddRepositoryNameAsColumn < ActiveRecord::Migration[5.1]
   Rails.logger = Logger.new(STDOUT)
 
   URL_PARSERS = {

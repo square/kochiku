@@ -1,4 +1,4 @@
-class UniqueIndexOnBuildsRef < ActiveRecord::Migration
+class UniqueIndexOnBuildsRef < ActiveRecord::Migration[5.1]
   def up
     remove_index :builds, column: :ref
 

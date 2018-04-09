@@ -1,4 +1,4 @@
-class CreateSchema < ActiveRecord::Migration
+class CreateSchema < ActiveRecord::Migration[5.1]
   def self.up
     create_table :builds do |t|
       t.string :sha

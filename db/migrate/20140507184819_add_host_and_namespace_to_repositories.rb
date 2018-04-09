@@ -1,4 +1,4 @@
-class AddHostAndNamespaceToRepositories < ActiveRecord::Migration
+class AddHostAndNamespaceToRepositories < ActiveRecord::Migration[5.1]
   def up
     rename_column :repositories, :repository_name, :name
     change_column :repositories, :name, :string, null: false  # add not null constraint
