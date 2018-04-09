@@ -1,4 +1,4 @@
-class RemoveBranchStringFromBuilds < ActiveRecord::Migration
+class RemoveBranchStringFromBuilds < ActiveRecord::Migration[5.1]
   def change
     # The previous migration (AssignBuildsToBranches) mapped branch_id on
     # builds to the newly introduced Branch records. With that complete it is

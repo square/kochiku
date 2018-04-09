@@ -1,4 +1,4 @@
-class RemoveUploadArtifactsFromBuildParts < ActiveRecord::Migration
+class RemoveUploadArtifactsFromBuildParts < ActiveRecord::Migration[5.1]
   def up
     remove_column :build_parts, :upload_artifacts
   end

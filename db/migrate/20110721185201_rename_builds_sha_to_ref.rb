@@ -1,4 +1,4 @@
-class RenameBuildsShaToRef < ActiveRecord::Migration
+class RenameBuildsShaToRef < ActiveRecord::Migration[5.1]
   def self.up
     rename_column :builds, :sha, :ref
   end

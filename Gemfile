@@ -7,7 +7,7 @@ gem 'rails-controller-testing' # Included to provide 'assigns' method
 
 gem 'dynamic_form'
 gem 'passenger', '~> 4.0.41', group: :production
-gem 'rails', '= 5.0.6'
+gem 'rails', '~> 5.1.0'
 gem 'rails-observers'
 
 gem 'carrierwave'

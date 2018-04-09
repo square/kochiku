@@ -1,4 +1,4 @@
-class AddAssumeLostAfterToRepository < ActiveRecord::Migration
+class AddAssumeLostAfterToRepository < ActiveRecord::Migration[5.1]
   def change
     add_column :repositories, :assume_lost_after, :integer
   end

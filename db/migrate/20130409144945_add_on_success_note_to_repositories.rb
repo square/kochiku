@@ -1,4 +1,4 @@
-class AddOnSuccessNoteToRepositories < ActiveRecord::Migration
+class AddOnSuccessNoteToRepositories < ActiveRecord::Migration[5.1]
   def change
     add_column :repositories, :on_success_note, :string
   end

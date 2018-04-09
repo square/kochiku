@@ -1,4 +1,4 @@
-class RemoveJavaSpecificStuff < ActiveRecord::Migration
+class RemoveJavaSpecificStuff < ActiveRecord::Migration[5.1]
   def up
     remove_column :builds, :deployable_map
     remove_column :builds, :maven_modules

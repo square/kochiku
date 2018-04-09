@@ -1,4 +1,4 @@
-class AddQueueToBuildPart < ActiveRecord::Migration
+class AddQueueToBuildPart < ActiveRecord::Migration[5.1]
   def up
     add_column :build_parts, :queue, :string
 
