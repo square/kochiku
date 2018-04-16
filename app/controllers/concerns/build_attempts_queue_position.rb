@@ -13,6 +13,7 @@ module BuildAttemptsQueuePosition
   end
 
   def calculate_build_parts_position(build)
+    @build_attempts_rank = {}
     parts_by_queue = Hash.new([])
     build_attempts = build.build_attempts.includes(:build_part).where(state: 'running')
     build_attempts.each do |attempt|
