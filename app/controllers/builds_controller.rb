@@ -6,7 +6,7 @@ class BuildsController < ApplicationController
     @build = Build.includes(build_parts: :build_attempts)
                   .joins(:branch_record).where('branches.repository_id' => @repository.id)
                   .find(params[:id])
-    calculate_build_attempts_position(@build.build_attempts.where(state: 'runnable'))
+    calculate_build_parts_position(@build)
     format_build_parts_position
   end
 
@@ -153,7 +153,7 @@ class BuildsController < ApplicationController
 
   def format_build_parts_position
     @build_parts_position = {}
-    @build_attempts_rank.each do |build_attempt_id, position|
+    @build_attempts_rank&.each do |build_attempt_id, position|
       next if position.nil?
       build_part_id = BuildAttempt.find(build_attempt_id).build_part.id
       if @build_parts_position[build_part_id].nil?
