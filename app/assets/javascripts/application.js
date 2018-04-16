@@ -33,12 +33,14 @@ Kochiku.delayedRefresh = function(updateInfo) {
   setTimeout(function() {
     if($('input#refresh').is(':checked')) {
       $.getJSON(document.URL + '/modified_time', function( data ) {
-        var buildTime = new Date(Date.parse(data));
-        if(buildTime > updateInfo.renderTime) {
-          window.location.reload();
+        var buildTime = Date.parse(data);
+        var renderTime = updateInfo.renderTime
+        if(buildTime > renderTime) {
+          Kochiku.buildInfo.renderTime = buildTime
+          Kochiku.updateBuildParts(renderTime)
         }
       });
-      Kochiku.delayedRefresh(updateInfo);
+      Kochiku.delayedRefresh(Kochiku.buildInfo);
     }
   }, 5000);
 };
@@ -46,6 +48,18 @@ Kochiku.delayedRefresh = function(updateInfo) {
 jQuery(document).ready(function() {
   jQuery("abbr.timeago").timeago();
 });
+
+Kochiku.updateBuildParts = function(renderTime) {
+  $.getJSON(document.URL + '/refresh_build_part_info', { modified_time: renderTime }, function( data ) {
+    $.each(data,function(index, el) {
+      var row;
+      row = $(".build-summary [data-id='" + el.id + "']");
+      if (row) {
+        row.replaceWith(el.content);
+      }
+    });
+  });
+}
 
 Kochiku.graphBuildTimes = function(repositoryPath, branchName) {
   var url = '/' + repositoryPath + '/' + branchName + '/build-time-history',

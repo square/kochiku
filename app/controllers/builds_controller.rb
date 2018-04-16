@@ -1,8 +1,8 @@
 require 'git_repo'
 
 class BuildsController < ApplicationController
-  before_action :load_repository, :only => [:show, :retry_partitioning, :rebuild_failed_parts, :request_build, :abort, :toggle_merge_on_success, :build_status, :modified_time]
-  before_action only: [:show] do
+  before_action :load_repository, :only => [:show, :retry_partitioning, :rebuild_failed_parts, :request_build, :abort, :toggle_merge_on_success, :build_status, :modified_time, :refresh_build_part_info]
+  before_action only: [:show, :refresh_build_part_info] do
     @build = Build.includes(build_parts: :build_attempts)
                   .joins(:branch_record).where('branches.repository_id' => @repository.id)
                   .find(params[:id])
@@ -127,6 +127,27 @@ class BuildsController < ApplicationController
     respond_to do |format|
       format.json do
         render :json => updated_at
+      end
+    end
+  end
+
+  def refresh_build_part_info
+    updated_at = @build.updated_at
+    updates = []
+    last_modified = Time.zone.at(params[:modified_time].to_i / 1000.0)
+    if updated_at > last_modified
+      updatd_parts = @build.build_parts.where("updated_at > ? OR id in (?)", last_modified, @build_parts_position.keys)
+      updatd_parts.each do |part|
+        html = ApplicationController.render(partial: 'builds/build_parts', locals: { part: part.decorate,
+                                                                                     build: @build,
+                                                                                     build_parts_position: @build_parts_position,
+                                                                                     repository: @repository })
+        updates << {id: part.id, content: html}
+      end
+    end
+    respond_to do |format|
+      format.json do
+        render :json => updates
       end
     end
   end
