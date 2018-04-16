@@ -1,7 +1,7 @@
 class BuildPartsController < ApplicationController
   before_action :load_repository_build_and_part, only: [:rebuild, :show, :modified_time]
   before_action only: [:show] do
-    calculate_build_attempts_position(@build_part.build_attempts)
+    calculate_build_attempts_position(@build_part.build_attempts, @build_part.queue)
   end
 
   include BuildAttemptsQueuePosition

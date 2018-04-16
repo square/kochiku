@@ -1,16 +1,26 @@
 module BuildAttemptsQueuePosition
   extend ActiveSupport::Concern
 
-  def calculate_build_attempts_position(build_attempts)
+  def calculate_build_attempts_position(build_attempts, queue)
     @build_attempts_rank = {}
-    build_attempts.includes(:build_part).each do |build_attempt|
-      queue = build_attempt.build_part.queue
-      cur_queue_size = Resque.size(queue)
+    jobs = Resque.redis.lrange("queue:#{queue}", 0, -1)
+    return if jobs.blank?
+    build_attempts&.each do |build_attempt|
+      next unless build_attempt.state == 'runnable'
       id = build_attempt.id.to_s
-      jobs = Resque.peek(queue, 0, cur_queue_size + 1)
-      if jobs.present? && build_attempt.state == 'runnable'
-        @build_attempts_rank[id] = jobs.index { |job| job['args'].first['build_attempt_id'] == build_attempt.id }
-      end
+      @build_attempts_rank[id] = jobs.index { |job| /"build_attempt_id\":#{id}/.match(job) }
+    end
+  end
+
+  def calculate_build_parts_position(build)
+    parts_by_queue = Hash.new([])
+    build_attempts = build.build_attempts.includes(:build_part).where(state: 'running')
+    build_attempts.each do |attempt|
+      parts_by_queue[attempt.build_part.queue] += [attempt]
+    end
+
+    parts_by_queue.each do |queue, attempts|
+      calculate_build_attempts_position(attempts, queue)
     end
   end
 end
