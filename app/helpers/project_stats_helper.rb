@@ -51,7 +51,7 @@ module ProjectStatsHelper
 
   def median_elapsed_time(builds)
     successful_builds = builds.select(&:succeeded?)
-    elapsed_times = successful_builds.map { |build| build.elapsed_time }
+    elapsed_times = successful_builds.map { |build| build.elapsed_time || 0 }
     times = elapsed_times.length
     if times.zero?
       nil

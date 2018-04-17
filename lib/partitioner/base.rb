@@ -19,5 +19,9 @@ module Partitioner
     def emails_for_commits_causing_failures
       {}
     end
+
+    def partitioner_type
+      self.class.name.gsub(/^Partitioner::/, '')
+    end
   end
 end
