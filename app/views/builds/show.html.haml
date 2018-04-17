@@ -42,6 +42,9 @@
   - if @build.completed?
     %span.info
       Built in #{duration_strftime(@build.elapsed_time, "%Hh %Mm %Ss")}
+  - if @build.completed? && @build.failed? && @build.build_parts.present?
+    %span.info
+      #{@build.build_parts.failed.count} out of #{@build.build_parts.count} build parts failed
   - if @build.is_running?
     %span.info
       = button_to "Abort Build", abort_repository_build_path(@build.repository, @build), method: :patch, class: "abort-build"
