@@ -56,6 +56,11 @@
   .build-error
     %h2 Build error
     %pre= [@build.error_details[:message], @build.error_details[:backtrace]].join("\n")
+- if @build.succeeded? && @build.build_parts.count == 0
+  .build-empty
+    %h2 Build Empty
+    %span.info
+      Partitioner did not return any work for this build.
 %table.build-summary#build-summary
   %thead
     %tr
