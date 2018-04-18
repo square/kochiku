@@ -78,4 +78,5 @@
         start_times.to_json
       };
     }
-    Kochiku.delayedRefresh({table: '.build-part-info tbody', renderTime: Date.parse("#{@build_part.updated_at}")});
+    Kochiku.buildInfo = {table: '.build-part-info tbody', renderTime: Date.parse("#{raw @build_part.updated_at}")};
+    Kochiku.delayedRefresh(Kochiku.buildInfo);

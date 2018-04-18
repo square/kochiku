@@ -4,6 +4,7 @@
   = @build.repository.name
 = content_for :favicon do
   = favicon_link_tag image_path("#{@build.to_color}.png"), :type => 'image/png'
+= hidden_field_tag 'build_id', @build.id
 
 %h2.subheader
   = @build.repository.name
@@ -80,33 +81,10 @@
       %th.right.actions Actions
   %tbody
     - @build.build_parts.decorate.each do |part|
-      %tr{:"data-id" => part.id}
-        %td.right= link_to(part.id, repository_build_part_path(@build.repository, @build, part))
-        %td
-          %span.part-status{:class => part.status}
-            - text = part.status.to_s.capitalize
-            - if part.status == 'running' && part.last_attempt.log_streamer_port.present?
-              = link_to(text, stream_logs_path(part.last_attempt.id))
-            - elsif (artifact = part.most_recent_stdout_artifact)
-              = link_to(text, artifact, :title => 'Last completed stdout.log')
-            - else
-              = text
-        %td= @build_parts_position[part.id]
-        - build_metadata_values(@build, part, display_ruby_version).each do |value|
-          %td= value
-        %td= part.kind.to_s
-        %td.right
-          - builder = part.last_attempt.try(:builder)
-          = builder ? builder.sub(".#{Settings.domain_name}", '') : "pending"
-        %td.right.elapsed= part.elapsed_time ? duration_strftime(part.elapsed_time) : "pending"
-        %td.right= part.build_attempts.size
-        %td.right
-          - if part.unsuccessful? && @repository.enabled?
-            = link_to("Rebuild", rebuild_repository_build_part_path(@build.repository, @build, part), :method => :post)
+      = render partial: 'builds/build_parts', locals: {part: part, build: @build, build_parts_position: @build_parts_position, repository: @repository}
 
 - if @build.on_success_script_log_file.url
   = link_to(File.basename(@build.on_success_script_log_file.path), @build.on_success_script_log_file.url)
-
 = content_for :javascript do
   :javascript
     if ($('#build-summary tbody tr').length > 0) {
@@ -118,7 +96,9 @@
         start_times.to_json
       };
     }
-    Kochiku.delayedRefresh({table: '.build-summary tbody', renderTime: Date.parse(#{@build.updated_at.to_json})});
+
+    Kochiku.buildInfo = {table: '.build-summary tbody', renderTime: Date.parse(#{raw @build.updated_at.to_json})};
+    Kochiku.delayedRefresh(Kochiku.buildInfo);
 
     $('abbr.timeago').click(function() {
       // swap the relative time with the absolute time
