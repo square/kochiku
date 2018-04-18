@@ -1,4 +1,4 @@
-class RenameBuildPartResultToBuildPartRun < ActiveRecord::Migration[5.1]
+class RenameBuildPartResultToBuildPartRun < ActiveRecord::Migration[5.0]
   def self.up
     rename_table :build_part_results, :build_attempts
     rename_column :build_artifacts, :build_part_result_id, :build_attempt_id

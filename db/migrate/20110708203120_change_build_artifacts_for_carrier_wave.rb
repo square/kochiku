@@ -1,4 +1,4 @@
-class ChangeBuildArtifactsForCarrierWave < ActiveRecord::Migration[5.1]
+class ChangeBuildArtifactsForCarrierWave < ActiveRecord::Migration[5.0]
   def self.up
     rename_column :build_artifacts, :name, :log_file
     remove_column :build_artifacts, :content

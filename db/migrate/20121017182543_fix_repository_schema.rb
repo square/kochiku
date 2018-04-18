@@ -1,4 +1,4 @@
-class FixRepositorySchema < ActiveRecord::Migration[5.1]
+class FixRepositorySchema < ActiveRecord::Migration[5.0]
   def change
     add_column :repositories, :run_ci, :boolean
     add_column :repositories, :use_branches_on_green, :boolean

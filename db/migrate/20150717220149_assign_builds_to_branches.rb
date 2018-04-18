@@ -1,6 +1,6 @@
 # In this migration intentionally go out of our way to not use the Project
 # model so that it can be removed from the codebase.
-class AssignBuildsToBranches < ActiveRecord::Migration[5.1]
+class AssignBuildsToBranches < ActiveRecord::Migration[5.0]
   def up
     # Be mindful of build.branch versus build#branch_id
     # `build.branch` is a reference to the name of the branch as a string

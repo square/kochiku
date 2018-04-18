@@ -1,4 +1,4 @@
-class AddProjectIdToBuilds < ActiveRecord::Migration[5.1]
+class AddProjectIdToBuilds < ActiveRecord::Migration[5.0]
   def self.up
     add_column :builds, :project_id, :integer
     add_index  :builds, :project_id
