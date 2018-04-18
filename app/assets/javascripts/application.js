@@ -34,10 +34,10 @@ Kochiku.delayedRefresh = function(updateInfo) {
     if($('input#refresh').is(':checked')) {
       $.getJSON(document.URL + '/modified_time', function( data ) {
         var buildTime = Date.parse(data);
-        var renderTime = updateInfo.renderTime
+        var renderTime = updateInfo.renderTime;
         if(buildTime > renderTime) {
-          Kochiku.buildInfo.renderTime = buildTime
-          Kochiku.updateBuildParts(renderTime)
+          Kochiku.buildInfo.renderTime = buildTime;
+          Kochiku.updateBuildParts(renderTime);
         }
       });
       Kochiku.delayedRefresh(Kochiku.buildInfo);
@@ -52,6 +52,10 @@ jQuery(document).ready(function() {
 Kochiku.updateBuildParts = function(renderTime) {
   $.getJSON(document.URL + '/refresh_build_part_info', { modified_time: renderTime }, function( data ) {
     $.each(data,function(index, el) {
+      if (el.build_complete) {
+        window.location.reload();
+
+      }
       var row;
       row = $(".build-summary [data-id='" + el.id + "']");
       if (row) {
