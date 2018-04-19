@@ -62,6 +62,7 @@ Kochiku.updateBuildParts = function(renderTime) {
         row.replaceWith(el.content);
       }
     });
+    $("table.tablesorter").trigger("update", [true]);
   });
 }
 
