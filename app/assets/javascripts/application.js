@@ -37,6 +37,12 @@ Kochiku.delayedRefresh = function(updateInfo) {
         var renderTime = updateInfo.renderTime;
         if(buildTime > renderTime) {
           Kochiku.buildInfo.renderTime = buildTime;
+          //keep the updated at display up to date
+          var timeAgo = new Date(renderTime).toISOString();
+          var updateDisplay = $("#time-since-update");
+          updateDisplay.timeago("update", timeAgo);
+          updateDisplay.prop("title", timeAgo);
+          //ajax in changed parts
           Kochiku.updateBuildParts(renderTime);
         }
       });
@@ -52,9 +58,8 @@ jQuery(document).ready(function() {
 Kochiku.updateBuildParts = function(renderTime) {
   $.getJSON(document.URL + '/refresh_build_part_info', { modified_time: renderTime }, function( data ) {
     $.each(data,function(index, el) {
-      if (el.build_complete) {
+      if (el.state != Kochiku.buildInfo.state) {
         window.location.reload();
-
       }
       var row;
       row = $(".build-summary [data-id='" + el.id + "']");
@@ -62,6 +67,7 @@ Kochiku.updateBuildParts = function(renderTime) {
         row.replaceWith(el.content);
       }
     });
+    //reload the table after its updated
     $("table.tablesorter").trigger("update", [true]);
   });
 }

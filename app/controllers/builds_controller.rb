@@ -136,7 +136,7 @@ class BuildsController < ApplicationController
     updates = []
     last_modified = Time.zone.at(params[:modified_time].to_i / 1000.0)
     if @build.completed?
-      updates << { build_complete: true }
+      updates << { state: @build.state }
     elsif updated_at > last_modified
       updatd_parts = @build.build_parts.where("updated_at > ? OR id in (?)", last_modified, @build_parts_position.keys)
       updatd_parts.each do |part|
@@ -144,7 +144,7 @@ class BuildsController < ApplicationController
                                                                                      build: @build,
                                                                                      build_parts_position: @build_parts_position,
                                                                                      repository: @repository })
-        updates << {id: part.id, content: html, build_complete: @build.completed?}
+        updates << {id: part.id, content: html, state: @build.state}
       end
     end
     respond_to do |format|
