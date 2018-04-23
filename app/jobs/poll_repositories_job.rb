@@ -1,11 +1,11 @@
 class PollRepositoriesJob
   def self.perform
-    Branch.joins(:repository)
-          .where(convergence: true, 'repositories.enabled': true)
-          .includes(:repository)
-          .find_each(batch_size: 20) do |branch|
+    Repository.where(enabled: true).find_each(batch_size: 10) do |repo|
+      branch = repo.convergence_branches.first || repo.branches.where(name: 'master').first
 
-      repo = branch.repository
+      if branch.nil?
+        Rails.logger.warn("[PollRepositoriesJob] Could not find a branch to check for repo #{repo.name_with_namespace}")
+      end
 
       begin
         head = repo.sha_for_branch(branch.name)
