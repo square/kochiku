@@ -60,12 +60,12 @@ Kochiku.updateBuildParts = function(renderTime) {
     $.each(data,function(index, el) {
       if (el.state != Kochiku.buildInfo.state) {
         if ( $.inArray(el.state, Kochiku.terminalStates) != -1) {
-        Kochiku.notify("Build on " + Kochiku.buildInfo.repo + "/" + Kochiku.buildInfo.branch + " " + el.state);
+        Kochiku.notify(Kochiku.doneMessage + Kochiku.buildInfo.repo + "/" + Kochiku.buildInfo.branch + " " + el.state);
         }
         window.location.reload();
       }
       var row;
-      row = $(".build-summary [data-id='" + el.id + "']");
+      row = $(Kochiku.buildInfo.table).find("[data-id='" + el.id + "']");
       if (row) {
         row.replaceWith(el.content);
       }

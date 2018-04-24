@@ -1,6 +1,6 @@
 class BuildPartsController < ApplicationController
-  before_action :load_repository_build_and_part, only: [:rebuild, :show, :modified_time]
-  before_action only: [:show] do
+  before_action :load_repository_build_and_part, only: [:rebuild, :show, :modified_time, :refresh_build_part_info]
+  before_action only: [:show, :refresh_build_part_info] do
     calculate_build_attempts_position(@build_part.build_attempts, @build_part.queue)
   end
 
@@ -36,6 +36,25 @@ class BuildPartsController < ApplicationController
     respond_to do |format|
       format.json do
         render :json => @build_part.updated_at
+      end
+    end
+  end
+
+  def refresh_build_part_info
+    updates = []
+    if @build_part.finished_at
+      updates << { state: @build_part.status }
+    else
+      @build_part.build_attempts.each_with_index do |attempt, index|
+        html = ApplicationController.render(partial: 'build_parts/build_attempts', locals: {  index: index,
+                                                                                              attempt: attempt,
+                                                                                              build_attempts_rank: @build_attempts_rank})
+        updates << {id: index, content: html, state: @build_part.status}
+      end
+    end
+    respond_to do |format|
+      format.json do
+        render :json => updates
       end
     end
   end

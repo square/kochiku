@@ -42,24 +42,7 @@
       %th.right.actions Actions
   %tbody
     - @build_part.build_attempts.each_with_index do |attempt, index|
-      %tr{:"data-id" => index + 1}
-        %td.right= index + 1
-        %td
-          %span.attempt-status{:class => attempt.state}= attempt.state.to_s.capitalize
-        %td.rank= @build_attempts_rank[attempt.id.to_s]
-        %td= attempt.started_at
-        %td.right.elapsed= duration_strftime(attempt.elapsed_time)
-        %td.right= attempt.builder ? attempt.builder.sub(".#{Settings.domain_name}", '') : "pending"
-        %td
-          - if attempt.running? && attempt.log_streamer_port.present?
-            = link_to("stdout.log (in progress)", stream_logs_path(attempt.id))
-          - else
-            - attempt.build_artifacts.sort_by { |artifact| artifact.log_file.path }.each do |artifact|
-              = link_to File.basename(artifact.log_file.path), artifact
-              %br
-        %td.wrap
-          - unless attempt.stopped?
-            = link_to("Abandon", finish_build_attempt_path(attempt, :state => 'aborted'), :method => :post)
+      = render partial: 'build_parts/build_attempts', locals: {attempt: attempt, index: index, build_attempts_rank: @build_attempts_rank}
 
 %ol#build-paths
   - if @build_part.options['total_workers'] && @build_part.options['worker_chunk']
@@ -79,4 +62,12 @@
       };
     }
     Kochiku.buildInfo = {table: '.build-part-info tbody', renderTime: Date.parse("#{raw @build_part.updated_at}"), state: "#{@build.state}"};
+
+    Kochiku.buildInfo.id = #{@build.id};
+    Kochiku.buildInfo.branch = "#{@build.branch_record.name}";
+    Kochiku.buildInfo.repo = "#{@build.repository.name}";
+
+    Kochiku.terminalStates = #{raw BuildAttempt::COMPLETED_BUILD_STATES};
+    Kochiku.doneMessage = "BuildPart on "
+
     Kochiku.delayedRefresh(Kochiku.buildInfo);
