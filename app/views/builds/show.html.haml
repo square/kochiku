@@ -4,7 +4,6 @@
   = @build.repository.name
 = content_for :favicon do
   = favicon_link_tag image_path("#{@build.to_color}.png"), :type => 'image/png'
-= hidden_field_tag 'build_id', @build.id
 
 %h2.subheader
   = @build.repository.name
@@ -39,7 +38,7 @@
     = timeago(@build.created_at)
   %span.info
     Updated
-    = timeago(@build.updated_at)
+    = timeago(@build.updated_at, :id => "time-since-update")
   - if @build.completed?
     %span.info
       Built in #{duration_strftime(@build.elapsed_time, "%Hh %Mm %Ss")}
@@ -97,7 +96,12 @@
       };
     }
 
-    Kochiku.buildInfo = {table: '.build-summary tbody', renderTime: Date.parse(#{raw @build.updated_at.to_json})};
+    Kochiku.buildInfo = {table: '.build-summary tbody', renderTime: Date.parse(#{raw @build.updated_at.to_json}), state: "#{@build.state}"};
+    Kochiku.buildInfo.id = #{@build.id};
+    Kochiku.buildInfo.branch = "#{@build.branch_record.name}";
+    Kochiku.buildInfo.repo = "#{@build.repository.name}";
+
+    Kochiku.terminalStates = #{raw Build::TERMINAL_STATES};
     Kochiku.delayedRefresh(Kochiku.buildInfo);
 
     $('abbr.timeago').click(function() {
