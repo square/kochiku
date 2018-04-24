@@ -59,7 +59,7 @@ Kochiku.updateBuildParts = function(renderTime) {
   $.getJSON(document.URL + '/refresh_build_part_info', { modified_time: renderTime }, function( data ) {
     $.each(data,function(index, el) {
       if (el.state != Kochiku.buildInfo.state) {
-        if ( $.inArray(el.state, Kochiku.buildInfo.terminalStates) != -1) {
+        if ( $.inArray(el.state, Kochiku.terminalStates) != -1) {
         Kochiku.notify("Build on " + Kochiku.buildInfo.repo + "/" + Kochiku.buildInfo.branch + " " + el.state);
         }
         window.location.reload();
