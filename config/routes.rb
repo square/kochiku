@@ -56,6 +56,7 @@ Kochiku::Application.routes.draw do
       resources :build_parts, as: 'parts', path: 'parts', only: [:show] do
         post 'rebuild', on: :member
         get 'modified_time', action: "modified_time", on: :member, defaults: { format: 'json' }
+        get 'refresh_build_part_info', :action => "refresh_build_part_info", :on => :member, :defaults => { :format => 'json' }
       end
     end
 

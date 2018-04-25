@@ -77,4 +77,15 @@ describe BuildPartsController do
       end
     end
   end
+
+  describe '#refresh_build_part_info' do
+    it "returns partials for build_attempts" do
+      build_attempt = FactoryBot.create(:build_attempt, build_part: build_part)
+      FactoryBot.create(:build_artifact, build_attempt: build_attempt)
+      get :refresh_build_part_info, params: { repository_path: repository, build_id: build, id: build_part, format: :json }
+      res = JSON.parse(response.body)
+      expect(res.first['state']).to eq(build_attempt.state)
+      expect(res.first['content']).to include("/build_attempts/#{build_attempt.id}/")
+    end
+  end
 end
