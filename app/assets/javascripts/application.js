@@ -76,10 +76,11 @@ Kochiku.updateBuildParts = function(renderTime) {
 }
 
 Kochiku.notify = function(message) {
+  options = {body: message}
   if ( "Notification" in window && Notification.permission !== "denied") {
     Notification.requestPermission(function (permission) {
       if (permission === "granted") {
-        var notification = new Notification(message);
+        var notification = new Notification("Kochiku Build Status", options);
       }
     });
   }
