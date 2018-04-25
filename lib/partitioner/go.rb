@@ -27,7 +27,7 @@ module Partitioner
   ################################
 
   class Go < Base
-
+    class DependencyError < StandardError; end
     def initialize(build, kochiku_yml)
       @build = build
       @options = {}
@@ -226,7 +226,11 @@ module Partitioner
 
         # Run "go list". Note that the output is NOT a valid single
         # JSON value, but multiple JSON values. See https://github.com/golang/go/issues/12643.
-        outputs = Cocaine::CommandLine.new("GOPATH=#{dir} go list -json ./...").run
+        begin
+          outputs = Cocaine::CommandLine.new("GOPATH=#{dir} go list -json ./...").run
+        rescue Cocaine::ExitStatusError => e
+          raise DependencyError, "error running 'go list -json ./...' \n\n #{e.message}"
+        end
         l = outputs[1..-3].split("}\n{")
         l.each do |blob|
           package_info = JSON.parse("{" + blob + "}")
