@@ -8,4 +8,11 @@ class BuildArtifact < ActiveRecord::Base
 
   scope :stdout_log, -> { where(:log_file => ['stdout.log.gz', 'stdout.log']) }
   scope :error_txt, -> { where(:log_file => 'error.txt') }
+
+  def as_json
+    super(except: "log_file").tap do |hash|
+      log_file = {"url" => Rails.application.routes.url_helpers.build_artifact_path(self), "name" => self.log_file.path}
+      hash["build_artifact"]["log_file"] = log_file
+    end
+  end
 end
