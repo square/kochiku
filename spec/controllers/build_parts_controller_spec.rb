@@ -21,8 +21,8 @@ describe BuildPartsController do
       get :show, params: { repository_path: repository, build_id: build, id: build_part, format: :json }
       ret = JSON.parse(response.body)
       expect(ret['build_part']['build_attempts'].length).to eq(1)
-      expect(ret['build_part']['build_attempts'][0]['build_artifacts'].length).to eq(1)
-      expect(ret['build_part']['build_attempts'][0]['build_artifacts'][0]['build_attempt_id']).to eq(build_attempt.id)
+      expect(ret['build_part']['build_attempts'][0]['files'].length).to eq(1)
+      expect(ret['build_part']['build_attempts'][0]['files'][0]['build_artifact']['build_attempt_id']).to eq(build_attempt.id)
     end
 
     context "when the repository is disabled" do

@@ -17,7 +17,7 @@ class BuildPartsController < ApplicationController
     respond_to do |format|
       format.html
       format.json do
-        render :json => @build_part, include: { build_attempts: { include: :build_artifacts } }
+        render :json => @build_part, include: { build_attempts: { methods: :files } }
       end
     end
   end
