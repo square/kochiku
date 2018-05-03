@@ -99,4 +99,8 @@ class BuildAttempt < ActiveRecord::Base
     error_artifact = build_artifacts.error_txt.first
     error_artifact.log_file.read if error_artifact
   end
+
+  def files
+    build_artifacts.as_json
+  end
 end
