@@ -96,6 +96,10 @@
       };
     }
 
+    if ( "Notification" in window && Notification.permission == "default") {
+      Notification.requestPermission();
+    }
+
     Kochiku.buildInfo = {table: '.build-summary tbody', renderTime: Date.parse(#{raw @build.updated_at.to_json}), state: "#{@build.state}"};
     Kochiku.buildInfo.id = #{@build.id};
     Kochiku.buildInfo.branch = "#{@build.branch_record.name}";

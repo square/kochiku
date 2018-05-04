@@ -61,6 +61,11 @@
         start_times.to_json
       };
     }
+
+    if ( "Notification" in window && Notification.permission == "default") {
+      Notification.requestPermission();
+    }
+
     Kochiku.buildInfo = {table: '.build-part-info tbody', renderTime: Date.parse("#{raw @build_part.updated_at}"), state: "#{@build.state}"};
 
     Kochiku.buildInfo.id = #{@build.id};
