@@ -44,7 +44,7 @@ Kochiku.delayedRefresh = function(updateInfo) {
           updateDisplay.prop("title", timeAgo);
           //ajax in changed parts
           Kochiku.updateBuildParts(renderTime);
-        } else if ($(".queue-position").length > 0) {
+        } else if ($(".queue-position-value").length > 0) {
           // if there are displayed queue positions refresh
           Kochiku.updateBuildParts(renderTime);
         }
