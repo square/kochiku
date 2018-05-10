@@ -132,12 +132,11 @@ class BuildsController < ApplicationController
   end
 
   def refresh_build_part_info
-    updated_at = @build.updated_at
     updates = []
     last_modified = Time.zone.at(params[:modified_time].to_i / 1000.0)
     if @build.completed?
       updates << { state: @build.state }
-    elsif updated_at > last_modified
+    else
       updatd_parts = @build.build_parts.where("updated_at > ? OR id in (?)", last_modified, @build_parts_position.keys)
       updatd_parts.each do |part|
         html = ApplicationController.render(partial: 'builds/build_parts', locals: { part: part.decorate,
