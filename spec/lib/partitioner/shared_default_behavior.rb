@@ -276,9 +276,9 @@ RSpec.shared_examples "Partitioner::Default behavior" do |partitioner_class|
 
             it 'should greedily partition files in the time_manifest, and round robin the remaining files' do
               partitions = subject
-              expect(partitions).to include(a_hash_including({ 'type' => 'rspec', 'files' => ['c.spec'] }))
-              expect(partitions).to include(a_hash_including({ 'type' => 'rspec', 'files' => ['d.spec', 'e.spec'] }))
-              expect(partitions).to include(a_hash_including({ 'type' => 'rspec', 'files' => ['b.spec', 'a.spec'] }))
+              expect(partitions).to include(a_hash_including({ 'type' => 'rspec', 'files' => ['c.spec', 'e.spec'] }))
+              expect(partitions).to include(a_hash_including({ 'type' => 'rspec', 'files' => ['d.spec', 'a.spec'] }))
+              expect(partitions).to include(a_hash_including({ 'type' => 'rspec', 'files' => ['b.spec'] }))
               expect(partitions).to include(a_hash_including({ 'type' => 'cuke', 'files' => ['i.feature'] }))
               expect(partitions).to include(a_hash_including({ 'type' => 'cuke', 'files' => ['h.feature'] }))
               expect(partitions).to include(a_hash_including({ 'type' => 'cuke', 'files' => ['g.feature', 'f.feature']}))

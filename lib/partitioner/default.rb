@@ -101,8 +101,6 @@ module Partitioner
       file_to_times_hash.slice!(*all_files)
       min_test_time = file_to_times_hash.values.flatten.min || 1
       setup_time = min_test_time / 2
-      # Any new tests get added in here.
-      all_files.each  { |file| file_to_times_hash[file] ||= [min_test_time] }
 
       files_by_worker = []
       runtimes_by_worker = []
@@ -118,6 +116,11 @@ module Partitioner
           runtimes_by_worker[fastest_worker_index] += file_runtime - setup_time
         end
       end
+
+      # Add any missing files
+      missing_files = all_files - file_to_times_hash.keys
+      files_by_worker = files_by_worker.zip(missing_files.in_groups(workers)).map(&:flatten).map(&:compact)
+
       files_by_worker
     end
 
