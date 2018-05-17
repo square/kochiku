@@ -2,8 +2,13 @@ sudo: false
 cache: bundler
 language: ruby
 rvm:
-  - 2.4.3
-  - 2.5.0
+  - 2.4.4
+  - 2.5.1
+before_install:
+  # some ruby versions come with a broken version of rubygems, update to
+  # consistent version
+  - gem update --system 2.7.6
+  - gem install bundler -v '>= 1.16.1'
 script:
   - RAILS_ENV=test bundle exec rake --trace db:create db:migrate
   - bundle exec rspec
