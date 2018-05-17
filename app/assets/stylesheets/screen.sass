@@ -546,9 +546,11 @@ table
 
   td
     padding: 5px
-    overflow: hidden
-    text-overflow: ellipsis
+    overflow-x: scroll
     white-space: nowrap
+
+    &::-webkit-scrollbar
+      display: none
 
     &.whisker
       padding-right: 2px
