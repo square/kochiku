@@ -29,7 +29,8 @@ Kochiku::Application.routes.draw do
   match '/build_attempts/:build_attempt_id/build_artifacts' => "build_artifacts#create", :via => :post
   match '/build_attempts/:id/start' => "build_attempts#start", :via => :post
   match '/build_attempts/:id/finish' => "build_attempts#finish", :via => :post, :as => :finish_build_attempt
-  match '/build_attempts/:id/build_part' => "build_attempts#build_part", :via => :get, :as => :build_part_redirect
+  # left here for backward compatibility in case if anyone uses it. /build_attempts/:id should be used instead.
+  match '/build_attempts/:id/build_part' => "build_attempts#show", :via => :get, :as => :build_part_redirect
   match '/build_attempts/:id/stream_logs' => "build_attempts#stream_logs", :via => :get, :as => :stream_logs
   match '/build_attempts/:id/stream_logs_chunk' => "build_attempts#stream_logs_chunk", :via => :get, :as => :stream_logs_chunk
   match '/pull-request-builder' => "pull_requests#build", :via => :post, :as => :pull_request_build
@@ -40,6 +41,7 @@ Kochiku::Application.routes.draw do
 
   resources :build_artifacts, :only => [:show]
   resources :builds, only: [:create]
+  resources :build_attempts, only: [:show]
 
   scope path: "*repository_path", as: 'repository', constraints: { repository_path: /[^\/]+\/[^\/]+/ }, format: false do
     get 'edit', to: 'repositories#edit'

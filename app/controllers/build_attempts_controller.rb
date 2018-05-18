@@ -37,15 +37,16 @@ class BuildAttemptsController < ApplicationController
     end
   end
 
-  # Redirects to the show page for the build_attempt's build_part. Added as a
-  # shortcut method to use when the IDs of the relation chain is not handy.
-  def build_part
+  # Redirects to the build_part page since we don't have a page for a single build attempt.
+  # Added as a shortcut method to use when the IDs of the relation chain is not handy.
+  def show
     @build_attempt = BuildAttempt.find(params[:id])
 
-    redirect_to repository_build_part_path(
+    redirect_to repository_build_part_url(
       @build_attempt.build_part.build_instance.repository,
       @build_attempt.build_part.build_instance,
-      @build_attempt.build_part)
+      @build_attempt.build_part,
+      anchor: helpers.dom_id(@build_attempt))
   end
 
   def stream_logs
