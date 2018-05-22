@@ -63,7 +63,18 @@ Kochiku.updateBuildParts = function(renderTime) {
     $.each(data,function(index, el) {
       if (el.state != Kochiku.buildInfo.state) {
         if ( $.inArray(el.state, Kochiku.terminalStates) != -1) {
-        Kochiku.notify(Kochiku.doneMessage + Kochiku.buildInfo.repo + "/" + Kochiku.buildInfo.branch + " " + el.state);
+        switch(el.state) {
+          case "succeeded":
+          case "passed":
+            status = "✅ " + el.state;
+            break;
+          case "failed":
+            status = "🚫 " + el.state;
+            break;
+          default:
+            status = el.state;
+        }
+        Kochiku.notify(status + " " + Kochiku.doneMessage + Kochiku.buildInfo.repo + "/" + Kochiku.buildInfo.branch);
         }
         window.location.reload();
       }
