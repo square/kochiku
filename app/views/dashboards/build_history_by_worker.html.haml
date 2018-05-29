@@ -28,5 +28,5 @@
           %td.right= worker_name
           %td
             - build_attempts.each do |build_attempt|
-              = link_to build_part_redirect_path(build_attempt) do
+              = link_to build_attempt do
                 %span.attempt-status{:class => build_attempt.state}

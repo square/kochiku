@@ -1,5 +1,5 @@
-%tr{:"data-id" => index + 1}
-  %td.right= index + 1
+%tr{id: dom_id(attempt), :"data-id" => index + 1}
+  %td.right= link_to(index + 1, attempt)
   %td
     %span.attempt-status{:class => attempt.state}= attempt.state.to_s.capitalize
   %td.rank= build_attempts_rank[attempt.id.to_s]
