@@ -1,6 +1,7 @@
 require 'on_success_uploader'
 require 'fileless_io'
 require 'build_partitioning_job'
+require 'build_initiated_by_job'
 
 class Build < ActiveRecord::Base
   # using 'branch_record' instead of 'branch' because Build has a legacy 'branch' string type column. The legacy column will be removed soon.
@@ -62,7 +63,7 @@ class Build < ActiveRecord::Base
   mount_uploader :on_success_script_log_file, OnSuccessUploader
 
   after_commit :enqueue_partitioning_job, :on => :create
-  after_commit :ensure_initiated_by, on: :create
+  after_commit :enqueue_initiated_by, on: :create
 
   scope :completed, -> { where(state: TERMINAL_STATES) }
 
@@ -299,10 +300,8 @@ class Build < ActiveRecord::Base
 
   private
 
-  def ensure_initiated_by
-    return if self.initiated_by
-    email = GitBlame.last_email_in_branch(self).first
-    self.update_attributes(initiated_by: email) if email.present?
+  def enqueue_initiated_by
+    Resque.enqueue(BuildInitiatedByJob, self.id)
   end
 
   def status_png(r, g, b)
