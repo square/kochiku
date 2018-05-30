@@ -28,6 +28,7 @@ class BuildPartitioningJob < JobBase
       end
     end
     @build.update_commit_status!
+    @build.set_initiated_by
   end
 
   def on_exception(e)

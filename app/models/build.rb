@@ -62,7 +62,6 @@ class Build < ActiveRecord::Base
   mount_uploader :on_success_script_log_file, OnSuccessUploader
 
   after_commit :enqueue_partitioning_job, :on => :create
-  after_commit :ensure_initiated_by, on: :create
 
   scope :completed, -> { where(state: TERMINAL_STATES) }
 
@@ -297,13 +296,13 @@ class Build < ActiveRecord::Base
     super(options.reverse_merge(methods: :elapsed_time))
   end
 
-  private
-
-  def ensure_initiated_by
+  def set_initiated_by
     return if self.initiated_by
     email = GitBlame.last_email_in_branch(self).first
     self.update_attributes(initiated_by: email) if email.present?
   end
+
+  private
 
   def status_png(r, g, b)
     ChunkyPNG::Canvas.new(13, 13, ChunkyPNG::Color::TRANSPARENT)
