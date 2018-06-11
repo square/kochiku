@@ -69,6 +69,10 @@ class Repository < ActiveRecord::Base
     event_types
   end
 
+  def scm_type
+    Settings.git_server(self.url).type
+  end
+
   # Public: attempts to lookup a build for the commit under any of the
   # repository's branches. This is done as an optimization since the contents
   # of the commit are guaranteed to not have changed.

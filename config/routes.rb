@@ -54,6 +54,7 @@ Kochiku::Application.routes.draw do
       post 'retry-partitioning', :action => "retry_partitioning", :on => :member, :as => :retry_partitioning
       get 'modified_time', :action => "modified_time", :on => :member, :defaults => { :format => 'json' }
       get 'refresh_build_part_info', :action => "refresh_build_part_info", :on => :member, :defaults => { :format => 'json' }
+      post 'resend-status', :action => "resend_status",  :on => :member, :defaults => { :format => 'json' }
 
       resources :build_parts, as: 'parts', path: 'parts', only: [:show] do
         post 'rebuild', on: :member
