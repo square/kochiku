@@ -11,7 +11,11 @@ class BuildArtifact < ActiveRecord::Base
 
   def as_json
     super(except: "log_file").tap do |hash|
-      log_file = {"url" => Rails.application.routes.url_helpers.build_artifact_path(self), "name" => self.log_file.path}
+      log_file = {
+        "url" => Rails.application.routes.url_helpers.build_artifact_path(self),
+        "aws_url" => self.log_file.url,
+        "name" => self.log_file.path
+      }
       hash["build_artifact"]["log_file"] = log_file
     end
   end
