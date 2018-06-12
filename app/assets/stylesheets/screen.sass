@@ -546,9 +546,9 @@ table
 
   td
     padding: 5px
-    overflow-x: scroll
     white-space: nowrap
-    /* Fix chrome 67 formating issue
+    overflow-x: scroll
+    /* Fix chrome 67 formating issue */
     position: relative
 
     &::-webkit-scrollbar
@@ -766,3 +766,12 @@ p
 
 .worker-health
   table-layout: auto
+
+// Firefox doesn't support a fixed table with
+// a scroll overflow, so just hide the overflow on Firefox.
+// It also doesn't react to just overflow-x, we need to hide
+// overflow in both axes
+@-moz-document url-prefix()
+  table
+    td
+      overflow: hidden
