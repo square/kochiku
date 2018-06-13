@@ -19,6 +19,8 @@
       Compare to last green build
 
   .actions
+    - if @build.succeeded?
+      = button_to "Sync status to #{@build.repository.scm_type}", resend_status_repository_build_path(@build.repository, @build), :method => :post
     - if @build.repository.allows_kochiku_merges?
       %form{action: toggle_merge_on_success_repository_build_path(@build.repository, @build), method: :post}
         %label

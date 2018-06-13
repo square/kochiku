@@ -131,6 +131,12 @@ class BuildsController < ApplicationController
     end
   end
 
+  def resend_status
+    @build = Build.joins(:branch_record).where('branches.repository_id' => @repository.id).find(params[:id])
+    BuildStateUpdateJob.enqueue(@build.id)
+    redirect_to repository_build_path(@repository, @build)
+  end
+
   def refresh_build_part_info
     updates = []
     last_modified = Time.zone.at(params[:modified_time].to_i / 1000.0)
