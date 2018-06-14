@@ -1,7 +1,7 @@
 require 'git_repo'
 
 class BuildsController < ApplicationController
-  before_action :load_repository, :only => [:show, :retry_partitioning, :rebuild_failed_parts, :request_build, :abort, :toggle_merge_on_success, :build_status, :modified_time, :refresh_build_part_info]
+  before_action :load_repository, :only => [:show, :retry_partitioning, :rebuild_failed_parts, :request_build, :abort, :toggle_merge_on_success, :build_status, :modified_time, :refresh_build_part_info, :resend_status]
   before_action only: [:show, :refresh_build_part_info] do
     @build = Build.includes(build_parts: :build_attempts)
                   .joins(:branch_record).where('branches.repository_id' => @repository.id)
