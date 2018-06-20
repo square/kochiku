@@ -54,6 +54,7 @@ class Build < ActiveRecord::Base
   STATES = IN_PROGRESS_STATES + TERMINAL_STATES
   validates :state, inclusion: { in: STATES }
   serialize :error_details, Hash
+  serialize :kochiku_yml_config, Hash
 
   validates :branch_id, presence: true
   validates :ref, presence: true,
@@ -94,7 +95,12 @@ class Build < ActiveRecord::Base
 
   def kochiku_yml
     if @kochiku_yml.nil?
-      @kochiku_yml = GitRepo.load_kochiku_yml(repository, ref) || false
+      # try to load the kochiku.yml info from the build's repo, if it is not in the DB already
+      update_attributes!(kochiku_yml_config: GitRepo.load_kochiku_yml(repository, ref)) if kochiku_yml_config.empty?
+
+      # if there's actually no kochiku.yml file for the build, the kochiku_yml_config
+      # attribute would still be empty, even after the above update.
+      @kochiku_yml = kochiku_yml_config.empty? ? false : kochiku_yml_config
     else
       @kochiku_yml
     end

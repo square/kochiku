@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180301221320) do
+ActiveRecord::Schema.define(version: 20180619210823) do
 
   create_table "branches", id: :integer, force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
     t.integer "repository_id", null: false
@@ -73,6 +73,7 @@ ActiveRecord::Schema.define(version: 20180301221320) do
     t.integer "branch_id"
     t.string "test_command"
     t.string "initiated_by"
+    t.text "kochiku_yml_config"
     t.index ["branch_id"], name: "index_builds_on_branch_id"
     t.index ["project_id"], name: "index_builds_on_project_id"
     t.index ["ref", "branch_id"], name: "index_builds_on_ref_and_branch_id", unique: true

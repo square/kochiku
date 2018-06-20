@@ -10,26 +10,28 @@ RSpec.shared_examples "Partitioner::Default behavior" do |partitioner_class|
     allow(GitRepo).to receive(:inside_copy).and_yield
   end
 
-  let(:kochiku_yml) {
-    [
-      {
-        'type' => 'rspec',
-        'glob' => 'spec/**/*_spec.rb',
-        'workers' => 3,
-        'balance' => rspec_balance,
-        'manifest' => rspec_manifest,
-        'time_manifest' => rspec_time_manifest,
-      },
-      {
-        'type' => 'cuke',
-        'glob' => 'features/**/*.feature',
-        'workers' => 3,
-        'balance' => cuke_balance,
-        'manifest' => cuke_manifest,
-        'time_manifest' => cuke_time_manifest,
-      }
-    ]
-  }
+  let(:kochiku_yml) do
+    {
+      "targets" => [
+        {
+          'type' => 'rspec',
+          'glob' => 'spec/**/*_spec.rb',
+          'workers' => 3,
+          'balance' => rspec_balance,
+          'manifest' => rspec_manifest,
+          'time_manifest' => rspec_time_manifest,
+        },
+        {
+          'type' => 'cuke',
+          'glob' => 'features/**/*.feature',
+          'workers' => 3,
+          'balance' => cuke_balance,
+          'manifest' => cuke_manifest,
+          'time_manifest' => cuke_time_manifest,
+        }
+      ]
+    }
+  end
 
   let(:rspec_balance) { 'alphabetically' }
   let(:rspec_manifest) { nil }
