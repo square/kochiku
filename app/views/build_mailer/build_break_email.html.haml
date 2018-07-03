@@ -20,7 +20,7 @@
     %ul
       - @failed_build_parts.each do |failed_build_part|
         %li
-          = link_to("Part number #{failed_build_part.id}", repository_build_part_url(@build.repository, @build, failed_build_part))
+          = link_to("Part: #{failed_build_part.kind}, number #{failed_build_part.id}", repository_build_part_url(@build.repository, @build, failed_build_part))
           = failed_build_part_sentence(failed_build_part)
         %span.broken-path{style: "font-size: smaller; color: gray;"} - #{failed_build_paths(failed_build_part)}
     %br
