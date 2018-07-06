@@ -183,7 +183,7 @@ GEM
       net-ssh (>= 2.6.5)
     net-ssh (2.9.2)
     nio4r (2.3.0)
-    nokogiri (1.8.2)
+    nokogiri (1.8.4)
       mini_portile2 (~> 2.3.0)
     parallel (1.12.0)
     parser (2.4.0.2)
@@ -386,7 +386,7 @@ DEPENDENCIES
   jquery-rails
   json
   mysql2 (>= 0.4.4)
-  nokogiri (~> 1.8, >= 1.8.2)
+  nokogiri (~> 1.8, >= 1.8.4)
   passenger (~> 4.0.41)
   posix-spawn
   pry-byebug
